@@ -19,6 +19,7 @@ def main() -> int:
     args = parser.parse_args()
     client = BinanceArchiveClient(args.raw_root, timeout=90, max_retries=3)
     requests: list[ArchiveRequest] = []
+    object_metadata: dict[tuple[str, str, str], dict[str, object]] = {}
     anchors = {"BTCUSDT", "ETHUSDT"}
     for market in ("spot", "um"):
         census = pd.read_csv(args.census_dir / f"{market}_archive_object_census.csv")
@@ -28,6 +29,7 @@ def main() -> int:
             if str(row.archive_month) == "nan":
                 continue
             year, month = (int(part) for part in str(row.archive_month).split("-"))
+            object_metadata[(market, str(row.symbol), str(row.archive_month))] = row.to_dict()
             requests.append(ArchiveRequest(market, "klines", str(row.symbol), year, month, interval="15m"))
     requests = sorted({request for request in requests}, key=lambda request: (request.market, request.symbol, request.year, request.month))
 
@@ -35,6 +37,7 @@ def main() -> int:
         path, manifest = client.download(request)
         frame = load_kline_archive(path)
         issues = validate_klines(frame, "15m")
+        listed = object_metadata[(request.market, request.symbol, f"{request.year:04d}-{request.month:02d}")]
         return {
             "market": request.market,
             "symbol": request.symbol,
@@ -45,6 +48,9 @@ def main() -> int:
             "last_timestamp": frame.open_time.max().isoformat() if len(frame) else None,
             "published_sha256": manifest.published_sha256,
             "computed_sha256": sha256_bytes(path.read_bytes()),
+            "object_size": listed.get("size"),
+            "object_last_modified": listed.get("last_modified"),
+            "object_etag": listed.get("etag"),
             "downloaded_at": manifest.downloaded_at,
             "integrity_status": "PASS" if not issues else "ISSUES",
             "issue_codes": ";".join(issue.code for issue in issues),

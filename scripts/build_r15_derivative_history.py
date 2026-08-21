@@ -14,6 +14,7 @@ def main() -> int:
     census_dir = Path("data/census/r1_full_history_v1")
     client = BinanceArchiveClient(Path("data/raw"), timeout=90, max_retries=3)
     requests: list[ArchiveRequest] = []
+    object_metadata: dict[tuple[str, str, str, str], dict[str, object]] = {}
     for dataset, interval in (("fundingRate", None), ("premiumIndexKlines", "15m")):
         for symbol in ("BTCUSDT", "ETHUSDT"):
             # The derivative archive index is probed directly because these
@@ -26,6 +27,7 @@ def main() -> int:
                     continue
                 stem = Path(obj.key).stem
                 year, month = stem[-7:].split("-")
+                object_metadata[(dataset, symbol, interval or "event", f"{year}-{month}")] = {"size": obj.size, "last_modified": obj.last_modified, "etag": obj.etag}
                 requests.append(ArchiveRequest("um", dataset, symbol, int(year), int(month), interval=interval))
     requests = sorted(set(requests), key=lambda r: (r.dataset, r.symbol, r.year, r.month))
 
@@ -43,6 +45,7 @@ def main() -> int:
             issues = validate_klines(normalized, "15m", allow_negative=True)
             issue_codes = ";".join(issue.code for issue in issues)
             valid = not any(issue.severity == "ERROR" for issue in issues)
+        listed = object_metadata[(request.dataset, request.symbol, request.interval or "event", f"{request.year:04d}-{request.month:02d}")]
         return {
             "dataset": request.dataset,
             "market": request.market,
@@ -55,6 +58,9 @@ def main() -> int:
             "last_timestamp": normalized.timestamp.max().isoformat() if len(normalized) and "timestamp" in normalized else normalized.open_time.max().isoformat(),
             "published_sha256": manifest.published_sha256,
             "computed_sha256": manifest.computed_sha256,
+            "object_size": listed.get("size"),
+            "object_last_modified": listed.get("last_modified"),
+            "object_etag": listed.get("etag"),
             "downloaded_at": manifest.downloaded_at,
             "integrity_status": "PASS" if valid and manifest.published_sha256 == manifest.computed_sha256 else "ISSUES",
             "issue_codes": issue_codes,
