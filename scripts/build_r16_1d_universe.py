@@ -10,6 +10,7 @@ import argparse
 import json
 import re
 import shutil
+import hashlib
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -100,10 +101,20 @@ def acquire_1d(manifest: pd.DataFrame, *, workers: int = 2) -> pd.DataFrame:
     requests = sorted(set(requests), key=lambda request: (request.market, request.symbol, request.year, request.month))
 
     def acquire(request: ArchiveRequest) -> dict[str, object]:
-        path, meta = client.download(request)
+        relative = Path(request.market) / request.dataset / request.symbol / (request.interval or "")
+        path = client.raw_root / relative / f"{request.symbol}-{request.interval}-{request.year:04d}-{request.month:02d}.zip"
+        sidecar = path.with_suffix(path.suffix + ".manifest.json")
+        if path.exists() and sidecar.exists():
+            meta = json.loads(sidecar.read_text(encoding="utf-8"))
+            computed = hashlib.sha256(path.read_bytes()).hexdigest()
+            if computed != str(meta.get("computed_sha256", "")):
+                raise RuntimeError(f"immutable cached archive checksum changed: {path}")
+        else:
+            path, manifest = client.download(request)
+            meta = manifest.to_dict()
         frame = load_kline_archive(path)
         issues = validate_klines(frame, "1d")
-        return {"market": request.market, "symbol": request.symbol, "archive_month": f"{request.year:04d}-{request.month:02d}", "raw_path": str(path), "row_count": len(frame), "first_timestamp": frame.open_time.min().isoformat() if len(frame) else None, "last_timestamp": frame.open_time.max().isoformat() if len(frame) else None, "published_sha256": meta.published_sha256, "computed_sha256": meta.computed_sha256, "integrity_status": "PASS" if not issues else "ISSUES", "issue_codes": ";".join(issue.code for issue in issues)}
+        return {"market": request.market, "symbol": request.symbol, "archive_month": f"{request.year:04d}-{request.month:02d}", "raw_path": str(path), "row_count": len(frame), "first_timestamp": frame.open_time.min().isoformat() if len(frame) else None, "last_timestamp": frame.open_time.max().isoformat() if len(frame) else None, "published_sha256": meta.get("published_sha256"), "computed_sha256": meta.get("computed_sha256"), "integrity_status": "PASS" if not issues else "ISSUES", "issue_codes": ";".join(issue.code for issue in issues)}
 
     records: list[dict[str, object]] = []
     with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
