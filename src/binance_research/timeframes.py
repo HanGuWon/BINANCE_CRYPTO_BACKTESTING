@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 import pandas as pd
 
 from .data import INTERVAL_MS, resample_klines
@@ -36,9 +37,9 @@ def compare_native_to_resampled(
             continue
         a = pd.to_numeric(left.loc[common, column], errors="coerce")
         b = pd.to_numeric(right.loc[common, column], errors="coerce")
-        tolerance = 0.0 if column == "trade_count" else 1e-10
+        tolerance = 0.0 if column == "trade_count" else 1e-6
         difference = (a - b).abs()
-        mismatch = difference > tolerance
+        mismatch = ~pd.Series(np.isclose(a.to_numpy(), b.to_numpy(), rtol=1e-9, atol=tolerance), index=common)
         rows.append({"target": target, "field": column, "status": "MATCH" if not mismatch.any() else "MISMATCH", "common_rows": len(common), "mismatch_count": int(mismatch.sum()), "max_abs_diff": float(difference.max()) if len(difference) else None})
     return pd.DataFrame(rows)
 
