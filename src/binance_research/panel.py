@@ -12,7 +12,7 @@ from typing import Iterable, Mapping
 
 import pandas as pd
 
-from .data import INTERVAL_MS, resample_klines
+from .data import DataIntegrityError, INTERVAL_MS, resample_klines
 from .features import CORE_FEATURE_SPECS
 
 PANEL_COVERAGE_STATUSES = (
@@ -22,6 +22,75 @@ PANEL_COVERAGE_STATUSES = (
     "NO_PRIOR_OBSERVATION",
     "HISTORICAL_UNAVAILABLE",
 )
+
+
+def select_verified_causal_liquidity_universe(
+    monthly_volume: pd.DataFrame,
+    *,
+    top_n: int = 50,
+    minimum_coverage_ratio: float = 1.0,
+) -> pd.DataFrame:
+    """Validate prior-month provenance and rank independently by market.
+
+    R1.6+ cohort construction should use this wrapper rather than relying on a
+    column merely named ``prior_month_quote_volume``. ``volume_month`` must be
+    exactly one calendar month before ``universe_month`` for every row.
+    """
+    required = {"market", "universe_month", "volume_month", "symbol", "prior_month_quote_volume", "first_observed"}
+    missing = required - set(monthly_volume.columns)
+    if missing:
+        raise ValueError(f"missing verified-universe columns: {', '.join(sorted(missing))}")
+    if not 0 < minimum_coverage_ratio <= 1:
+        raise ValueError("minimum_coverage_ratio must be in (0, 1]")
+    frame = monthly_volume.copy()
+    if frame["market"].isna().any() or frame["market"].astype(str).str.len().eq(0).any():
+        raise ValueError("market must be explicit for every liquidity-universe row")
+    universe_period = pd.to_datetime(frame["universe_month"], utc=True).dt.tz_convert(None).dt.to_period("M")
+    volume_period = pd.to_datetime(frame["volume_month"], utc=True).dt.tz_convert(None).dt.to_period("M")
+    if not volume_period.eq(universe_period - 1).all():
+        raise ValueError("volume_month must be the immediately preceding calendar month")
+    frame["universe_month"] = universe_period.astype(str)
+    frame["volume_month"] = volume_period.astype(str)
+    volume_start = pd.to_datetime(frame["volume_month"] + "-01", utc=True)
+    first_observed = pd.to_datetime(frame["first_observed"], utc=True, errors="coerce")
+    if first_observed.isna().any():
+        raise ValueError("first_observed must be a valid UTC timestamp")
+    frame["first_observed"] = first_observed
+    if "coverage_ratio" in frame.columns:
+        coverage = pd.to_numeric(frame["coverage_ratio"], errors="coerce")
+        if coverage.isna().any() or ((coverage < 0) | (coverage > 1)).any():
+            raise ValueError("coverage_ratio must be finite and between zero and one")
+        frame["coverage_ratio"] = coverage
+    else:
+        if {"prior_month_observed_days", "prior_month_expected_days"}.issubset(frame.columns):
+            observed = pd.to_numeric(frame["prior_month_observed_days"], errors="coerce")
+            expected = pd.to_numeric(frame["prior_month_expected_days"], errors="coerce")
+            frame["coverage_ratio"] = observed.div(expected.replace(0, pd.NA))
+        else:
+            frame["coverage_ratio"] = 1.0
+    frame["eligible_before_volume_month"] = frame["first_observed"] < volume_start
+    frame["eligibility_reason"] = "ELIGIBLE_COMPLETE_PRIOR_MONTH"
+    frame.loc[~frame["eligible_before_volume_month"], "eligibility_reason"] = "NOT_OBSERVED_BEFORE_VOLUME_MONTH"
+    frame.loc[frame["coverage_ratio"] < minimum_coverage_ratio, "eligibility_reason"] = "PARTIAL_PRIOR_MONTH_EXCLUDED"
+    frame.loc[frame["prior_month_quote_volume"].isna(), "eligibility_reason"] = "NO_PRIOR_COMPLETED_MONTH_VOLUME"
+    frame.loc[pd.to_numeric(frame["prior_month_quote_volume"], errors="coerce") < 0, "eligibility_reason"] = "INVALID_NEGATIVE_VOLUME"
+    eligible = (
+        frame["eligible_before_volume_month"]
+        & frame["coverage_ratio"].ge(minimum_coverage_ratio)
+        & pd.to_numeric(frame["prior_month_quote_volume"], errors="coerce").ge(0)
+        & pd.to_numeric(frame["prior_month_quote_volume"], errors="coerce").notna()
+    )
+    frame["prior_month_quote_volume"] = pd.to_numeric(frame["prior_month_quote_volume"], errors="coerce")
+    frame["rank"] = pd.NA
+    for (_, month), index in frame.loc[eligible].groupby(["market", "universe_month"], sort=True).groups.items():
+        ordered = frame.loc[index].sort_values(["prior_month_quote_volume", "symbol"], ascending=[False, True])
+        frame.loc[ordered.index, "rank"] = range(1, len(ordered) + 1)
+    frame["rank"] = frame["rank"].astype("Int64")
+    frame["selected_top20"] = eligible & frame["rank"].le(20)
+    frame["selected_top50"] = eligible & frame["rank"].le(50)
+    frame["selected_top100"] = eligible & frame["rank"].le(100)
+    frame["selected_top_n"] = eligible & frame["rank"].le(top_n)
+    return frame.sort_values(["market", "universe_month", "rank", "symbol"], na_position="last").reset_index(drop=True)
 
 
 def completed_cutoff_utc(now: pd.Timestamp | None = None, interval: str = "15m") -> pd.Timestamp:
@@ -37,6 +106,28 @@ def completed_cutoff_utc(now: pd.Timestamp | None = None, interval: str = "15m")
 def causal_resample(frame: pd.DataFrame, target: str) -> pd.DataFrame:
     """Strictly resample a complete source grid, dropping partial buckets."""
     return resample_klines(frame, target)
+
+
+def resample_contiguous_source(frame: pd.DataFrame, target: str, *, source_interval: str = "15m") -> pd.DataFrame:
+    """Split only on aligned gaps, then resample every segment fail-closed."""
+    if source_interval not in INTERVAL_MS:
+        raise ValueError(f"unsupported source interval: {source_interval}")
+    ordered = frame.sort_values("open_time", kind="stable").copy()
+    if ordered.empty:
+        return ordered
+    timestamps = pd.to_datetime(ordered["open_time"], utc=True)
+    if timestamps.duplicated().any() or not timestamps.is_monotonic_increasing:
+        raise DataIntegrityError("source timestamps must be unique and increasing")
+    source_step = pd.Timedelta(milliseconds=INTERVAL_MS[source_interval])
+    deltas = timestamps.diff().dropna()
+    invalid = deltas.lt(source_step) | deltas.mod(source_step).ne(pd.Timedelta(0))
+    if invalid.any():
+        raise DataIntegrityError("source timestamps are off the declared 15m grid")
+    segment_id = timestamps.diff().fillna(source_step).ne(source_step).cumsum()
+    parts = []
+    for _, segment in ordered.groupby(segment_id, sort=False):
+        parts.append(resample_klines(segment, target))
+    return pd.concat(parts, ignore_index=True) if parts else ordered.iloc[0:0].copy()
 
 
 def lifecycle_records(

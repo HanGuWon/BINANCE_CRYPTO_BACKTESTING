@@ -15,6 +15,17 @@ MONTH_RE = re.compile(r"-(?P<year>\d{4})-(?P<month>\d{2})\.zip$")
 DELIVERY_RE = re.compile(r"_[0-9]{6}$")
 LEVERAGED_RE = re.compile(r"(?:UP|DOWN|BULL|BEAR)USDT$")
 
+# These sets are intentionally conservative.  A symbol not present in the
+# frozen lists remains UNKNOWN rather than being promoted by its spelling.
+STABLECOIN_BASES = {
+    "USDT", "USDC", "BUSD", "FDUSD", "TUSD", "DAI", "USDP", "USDE",
+    "USDD", "UST", "FRAX", "LUSD", "PYUSD", "EURC", "EURS", "GUSD",
+}
+FIAT_OR_TOKENIZED_FIAT_BASES = {
+    "EUR", "AEUR", "GBP", "TRY", "BRL", "RUB", "AUD", "PLN", "NGN",
+    "ZAR", "JPY", "ARS", "BIDR", "UAH", "RON", "MXN", "COP", "CZK",
+}
+
 
 @dataclass(frozen=True)
 class EligibilityRecord:
@@ -24,6 +35,19 @@ class EligibilityRecord:
     instrument_class: str
     exclusion_reason: str
     evidence: str
+
+
+@dataclass(frozen=True)
+class AssetTaxonomyRecord:
+    market: str
+    symbol: str
+    asset_base: str
+    classification: str
+    evidence: str
+    evidence_source: str
+    classification_version: str = "r1.6-taxonomy-v1"
+    primary_crypto_eligible: bool = False
+    all_tradable_usdt_diagnostic: bool = False
 
 
 def _month_from_key(key: str) -> str | None:
@@ -107,3 +131,63 @@ def classify_instrument(market: str, symbol: str) -> EligibilityRecord:
 
 def eligibility_table(symbols: Iterable[tuple[str, str]]) -> pd.DataFrame:
     return pd.DataFrame([record.__dict__ for record in (classify_instrument(market, symbol) for market, symbol in symbols)])
+
+
+def _usdt_base(symbol: str) -> str:
+    value = symbol.upper()
+    if value.endswith("USDT"):
+        value = value[:-4]
+    # Binance quantity multipliers do not change the underlying asset class.
+    return re.sub(r"^\d{3,7}", "", value)
+
+
+def classify_asset(
+    market: str,
+    symbol: str,
+    *,
+    funding_verified_symbols: set[str] | None = None,
+) -> AssetTaxonomyRecord:
+    """Classify a USDT instrument without using returns or current survivorship.
+
+    UM perpetual verification is evidence-based: a funding archive observation
+    upgrades a suffix-free symbol to ``PERPETUAL_VERIFIED``; spelling alone is
+    retained as ``PERPETUAL_STYLE_UNVERIFIED``.
+    """
+    symbol = symbol.upper()
+    funding_verified_symbols = {item.upper() for item in (funding_verified_symbols or set())}
+    base = _usdt_base(symbol)
+    diagnostic = symbol.endswith("USDT") or bool(market == "um" and DELIVERY_RE.search(symbol))
+    if market not in {"spot", "um"}:
+        return AssetTaxonomyRecord(market, symbol, base, "UNKNOWN", "market outside frozen scope", "scope policy", primary_crypto_eligible=False, all_tradable_usdt_diagnostic=False)
+    if market == "um" and DELIVERY_RE.search(symbol):
+        return AssetTaxonomyRecord(market, symbol, base, "DATED_DELIVERY", "dated delivery suffix", "archive symbol policy", primary_crypto_eligible=False, all_tradable_usdt_diagnostic=True)
+    if not diagnostic:
+        return AssetTaxonomyRecord(market, symbol, base, "UNKNOWN", "non-USDT quote", "archive symbol spelling", primary_crypto_eligible=False, all_tradable_usdt_diagnostic=False)
+    if DELIVERY_RE.search(symbol):
+        return AssetTaxonomyRecord(market, symbol, base, "DATED_DELIVERY", "dated delivery suffix", "archive symbol policy", primary_crypto_eligible=False, all_tradable_usdt_diagnostic=True)
+    if LEVERAGED_RE.search(symbol):
+        return AssetTaxonomyRecord(market, symbol, base, "LEVERAGED_OR_SYNTHETIC", "leveraged-token suffix", "archive symbol policy", primary_crypto_eligible=False, all_tradable_usdt_diagnostic=True)
+    if base in STABLECOIN_BASES:
+        return AssetTaxonomyRecord(market, symbol, base, "STABLECOIN", "base asset in frozen stablecoin list", "r1.6 taxonomy v1", primary_crypto_eligible=False, all_tradable_usdt_diagnostic=True)
+    if base in FIAT_OR_TOKENIZED_FIAT_BASES:
+        return AssetTaxonomyRecord(market, symbol, base, "FIAT_OR_TOKENIZED_FIAT", "base asset in frozen fiat/tokenized-fiat list", "r1.6 taxonomy v1", primary_crypto_eligible=False, all_tradable_usdt_diagnostic=True)
+    if market == "spot":
+        return AssetTaxonomyRecord(market, symbol, base, "CRYPTO", "USDT quote and base not in excluded taxonomy", "r1.6 taxonomy v1", primary_crypto_eligible=True, all_tradable_usdt_diagnostic=True)
+    if symbol in funding_verified_symbols:
+        return AssetTaxonomyRecord(market, symbol, base, "PERPETUAL_VERIFIED", "historical fundingRate archive presence", "Binance Vision fundingRate census", primary_crypto_eligible=True, all_tradable_usdt_diagnostic=True)
+    return AssetTaxonomyRecord(market, symbol, base, "PERPETUAL_STYLE_UNVERIFIED", "suffix-free USDT contract without verified funding evidence", "symbol spelling only", primary_crypto_eligible=False, all_tradable_usdt_diagnostic=True)
+
+
+def asset_taxonomy_table(
+    symbols: Iterable[tuple[str, str]],
+    *,
+    funding_verified_symbols: set[str] | None = None,
+) -> pd.DataFrame:
+    """Return frozen taxonomy rows for primary and diagnostic cohorts."""
+    return pd.DataFrame([
+        record.__dict__
+        for record in (
+            classify_asset(market, symbol, funding_verified_symbols=funding_verified_symbols)
+            for market, symbol in symbols
+        )
+    ])

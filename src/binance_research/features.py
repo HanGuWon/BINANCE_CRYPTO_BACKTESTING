@@ -3,7 +3,56 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from .data import INTERVAL_MS
 from .models import FeatureSpec
+
+
+def _gap_segments(bars: pd.DataFrame, expected_interval: str) -> tuple[str, pd.Series, pd.Series]:
+    """Validate a declared grid and return timestamp column, segment ids, and timestamps."""
+    if expected_interval not in INTERVAL_MS:
+        raise ValueError(f"unsupported expected interval: {expected_interval}")
+    timestamp_column = next((name for name in ("timestamp", "open_time", "close_time") if name in bars), None)
+    if timestamp_column is None:
+        raise ValueError("gap-safe feature computation requires timestamp/open_time/close_time")
+    timestamps = pd.to_datetime(bars[timestamp_column], utc=True)
+    if not timestamps.is_monotonic_increasing or timestamps.duplicated().any():
+        raise ValueError("gap-safe feature computation requires strictly increasing unique timestamps")
+    expected = pd.Timedelta(milliseconds=INTERVAL_MS[expected_interval])
+    deltas = timestamps.diff()
+    finite = deltas.dropna()
+    invalid = finite.lt(expected) | finite.mod(expected).ne(pd.Timedelta(0))
+    if invalid.any():
+        raise ValueError("timestamps are off the declared feature grid")
+    return timestamp_column, deltas.fillna(expected).ne(expected).cumsum(), timestamps
+
+
+def compute_gap_safe_features(engine, bars: pd.DataFrame, expected_interval: str) -> pd.DataFrame:
+    """Compute features on contiguous time-grid segments only.
+
+    Every missing-data gap starts a fresh feature segment, so rolling, EWM,
+    momentum and cumulative transforms must earn their warm-up again. This is
+    the required entry point for historical panels that may contain gaps.
+    """
+    timestamp_column, segment_id, timestamps = _gap_segments(bars, expected_interval)
+    pieces = []
+    for _, positions in bars.groupby(segment_id.to_numpy(), sort=False).groups.items():
+        # Use positional selection: callers may legitimately provide a repeated
+        # DataFrame index while timestamps themselves remain unique.
+        piece = engine.compute(bars.iloc[list(positions)])
+        pieces.append(piece)
+    if not pieces:
+        return pd.DataFrame(index=bars.index)
+    output = pd.concat(pieces)
+    output.index = bars.index
+    output["segment_id"] = segment_id.to_numpy(dtype="int64")
+    segment_values = segment_id.to_numpy(dtype="int64")
+    output["segment_start"] = timestamps.groupby(segment_values, sort=False).transform("min").to_numpy()
+    output["segment_end"] = timestamps.groupby(segment_values, sort=False).transform("max").to_numpy()
+    gap_before = timestamps.diff().gt(pd.Timedelta(milliseconds=INTERVAL_MS[expected_interval]))
+    output["gap_before"] = gap_before.to_numpy()
+    output["gap_size_bars"] = timestamps.diff().div(pd.Timedelta(milliseconds=INTERVAL_MS[expected_interval])).sub(1).clip(lower=0).fillna(0).astype("int64").to_numpy()
+    output["source_coverage_status"] = np.where(gap_before, "GAP_AFTER_PREVIOUS", "COMPLETE_CONTIGUOUS")
+    return output
 
 
 def _spec(
@@ -246,6 +295,65 @@ def build_market_breadth(
     ordered.loc[ema.isna(), "above_ema"] = np.nan
     breadth = ordered.groupby(timestamp_column, sort=True)["above_ema"].mean().rename("breadth_pct_above_ema")
     return ordered.merge(breadth, left_on=timestamp_column, right_index=True, how="left")
+
+
+def build_cohort_aware_breadth(
+    panel: pd.DataFrame,
+    cohorts: pd.DataFrame,
+    *,
+    timeframe: str,
+    timestamp_column: str = "timestamp",
+    market_column: str = "market",
+    symbol_column: str = "symbol",
+    selected_column: str = "selected_top50",
+    minimum_valid_fraction: float = 0.8,
+    ema_period: int = 50,
+) -> pd.DataFrame:
+    """Compute breadth against only the frozen selected cohort denominator."""
+    if timeframe not in INTERVAL_MS:
+        raise ValueError(f"unsupported timeframe: {timeframe}")
+    if not 0 < minimum_valid_fraction <= 1:
+        raise ValueError("minimum_valid_fraction must be in (0, 1]")
+    required_panel = {timestamp_column, market_column, symbol_column, "close"}
+    required_cohort = {market_column, "universe_month", symbol_column, selected_column}
+    if missing := required_panel - set(panel.columns):
+        raise ValueError(f"missing breadth panel columns: {', '.join(sorted(missing))}")
+    if missing := required_cohort - set(cohorts.columns):
+        raise ValueError(f"missing breadth cohort columns: {', '.join(sorted(missing))}")
+    frame = panel.copy()
+    frame[timestamp_column] = pd.to_datetime(frame[timestamp_column], utc=True)
+    frame["universe_month"] = frame[timestamp_column].dt.to_period("M").astype(str)
+    frame["_close"] = pd.to_numeric(frame["close"], errors="coerce")
+    expected = pd.Timedelta(milliseconds=INTERVAL_MS[timeframe])
+    frame["_ema"] = np.nan
+    for (market, symbol), indexes in frame.groupby([market_column, symbol_column], sort=False).groups.items():
+        group = frame.loc[indexes].sort_values(timestamp_column)
+        ts = group[timestamp_column]
+        segments = ts.diff().fillna(expected).ne(expected).cumsum()
+        for _, segment_indexes in group.groupby(segments, sort=False).groups.items():
+            values = frame.loc[segment_indexes, "_close"]
+            frame.loc[segment_indexes, "_ema"] = values.ewm(span=ema_period, adjust=False, min_periods=ema_period).mean().to_numpy()
+    selected = cohorts[cohorts[selected_column].astype(bool)][[market_column, "universe_month", symbol_column]].drop_duplicates()
+    frame = frame.merge(selected.assign(_selected=True), on=[market_column, "universe_month", symbol_column], how="left")
+    frame["_selected"] = frame["_selected"].fillna(False)
+    frame["_valid"] = frame["_selected"] & frame["_ema"].notna() & frame["_close"].notna()
+    frame["_above"] = np.where(frame["_valid"], frame["_close"] > frame["_ema"], np.nan)
+    group_keys = [market_column, timestamp_column]
+    diagnostics = frame.groupby(group_keys, sort=True).agg(
+        valid_count=("_valid", "sum"),
+        selected_count=("_selected", "sum"),
+        above_count=("_above", "sum"),
+    ).reset_index()
+    diagnostics["valid_fraction"] = diagnostics["valid_count"].div(diagnostics["selected_count"].replace(0, np.nan))
+    diagnostics["breadth_pct_above_ema50"] = diagnostics["above_count"].div(diagnostics["valid_count"].replace(0, np.nan))
+    diagnostics["coverage_status"] = np.where(
+        diagnostics["valid_fraction"] >= minimum_valid_fraction,
+        "AVAILABLE",
+        "INSUFFICIENT_CROSS_SECTION",
+    )
+    diagnostics.loc[diagnostics["coverage_status"] != "AVAILABLE", "breadth_pct_above_ema50"] = np.nan
+    diagnostics = diagnostics.drop(columns=["above_count"])
+    return diagnostics
 
 
 def classify_aggtrade_side(is_buyer_maker: pd.Series) -> pd.Series:
