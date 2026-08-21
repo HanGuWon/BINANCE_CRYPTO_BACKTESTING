@@ -1,0 +1,42 @@
+{
+  "objects": 11714,
+  "rows_15m": 32025056,
+  "rows_1h": 8005673,
+  "rows_4h": 2000099,
+  "segments": 8249,
+  "gaps": 5834,
+  "research_eligible_rows": 29628553,
+  "warmup_context_rows": 12402275,
+  "failed_groups": [
+    {
+      "market": "spot",
+      "symbol": "BCCUSDT",
+      "reason": "source timestamps are off the declared 15m grid"
+    },
+    {
+      "market": "spot",
+      "symbol": "BNBUSDT",
+      "reason": "source timestamps are off the declared 15m grid"
+    },
+    {
+      "market": "spot",
+      "symbol": "BTCUSDT",
+      "reason": "source timestamps are off the declared 15m grid"
+    },
+    {
+      "market": "spot",
+      "symbol": "ETHUSDT",
+      "reason": "source timestamps are off the declared 15m grid"
+    },
+    {
+      "market": "spot",
+      "symbol": "LTCUSDT",
+      "reason": "source timestamps are off the declared 15m grid"
+    },
+    {
+      "market": "spot",
+      "symbol": "NEOUSDT",
+      "reason": "source timestamps are off the declared 15m grid"
+    }
+  ]
+}

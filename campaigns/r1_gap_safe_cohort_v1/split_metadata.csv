@@ -1,0 +1,4 @@
+timeframe,train_end_utc,validation_end_utc,target_horizon,purge_bars,operational_embargo_bars,final_holdout_status
+15m,2023-01-01T00:00:00Z,2024-11-01T00:00:00Z,24h,96,1,UNTOUCHED
+1h,2023-01-01T00:00:00Z,2024-11-01T00:00:00Z,24h,24,1,UNTOUCHED
+4h,2023-01-01T00:00:00Z,2024-11-01T00:00:00Z,24h,6,1,UNTOUCHED
