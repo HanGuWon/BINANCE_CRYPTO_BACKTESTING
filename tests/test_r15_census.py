@@ -3,10 +3,11 @@ from __future__ import annotations
 import urllib.parse
 
 import pytest
+import pandas as pd
 
 from binance_research.census import classify_instrument, object_census_rows, symbol_census
-from binance_research.data import ArchiveObject, BinanceArchiveClient, DataIntegrityError
-from binance_research.panel import feature_availability_matrix
+from binance_research.data import ArchiveObject, BinanceArchiveClient, DataIntegrityError, deduplicate_klines, normalize_klines, validate_klines
+from binance_research.panel import completed_cutoff_utc, feature_availability_matrix, lifecycle_records
 
 
 def _page(prefixes: list[str], objects: list[tuple[str, int]], *, truncated: bool, token: str | None = None) -> bytes:
@@ -78,3 +79,34 @@ def test_feature_availability_is_market_specific_and_fail_closed() -> None:
     assert premium.market_support == "um"
     assert "spot=NOT_APPLICABLE" in premium.market_coverage
     assert bool(funding.historical_campaign_eligible) is False
+
+
+def test_bounded_archive_window_does_not_infer_listing_or_delisting() -> None:
+    frame = pd.DataFrame({
+        "symbol": ["OLDUSDT", "OLDUSDT"],
+        "open_time": pd.to_datetime(["2024-01-01T00:00Z", "2024-01-01T00:15Z"]),
+    })
+    record = lifecycle_records([frame], market="spot", interval="15m").iloc[0]
+    assert record.listing_effective_start == "UNKNOWN"
+    assert record.delisting_effective_end == "UNKNOWN"
+    assert "bounded" in record.delisting_evidence
+
+
+def test_signed_premium_validation_and_monthly_daily_overlap_policy() -> None:
+    row = [1704067200000, -1.0, -0.5, -2.0, -1.5, 1.0, 1704068099999, 0.0, 1, 0.5, 0.0, 0]
+    frame = normalize_klines([row])
+    assert any(issue.code == "IMPOSSIBLE_OHLC" for issue in validate_klines(frame, "15m"))
+    assert not any(issue.code == "IMPOSSIBLE_OHLC" for issue in validate_klines(frame, "15m", allow_negative=True))
+    assert len(deduplicate_klines(normalize_klines([row, row]))) == 1
+    assert completed_cutoff_utc(pd.Timestamp("2026-08-21T05:11:00Z"), "15m") == pd.Timestamp("2026-08-21T04:45:00Z")
+
+
+def test_conflicting_archive_revision_listing_fails_closed() -> None:
+    class FakeClient(BinanceArchiveClient):
+        def _fetch(self, url: str) -> bytes:
+            if "continuation-token" in url:
+                return _page([], [("root/A/file.zip", 2)], truncated=False)
+            return _page([], [("root/A/file.zip", 1)], truncated=True, token="A")
+
+    with pytest.raises(DataIntegrityError, match="conflicting duplicate"):
+        FakeClient(".").list_objects_v2("root/")

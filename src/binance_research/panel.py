@@ -138,13 +138,14 @@ _FEATURE_SOURCE_OVERRIDES: Mapping[str, dict[str, object]] = {
 }
 
 
-def feature_availability_matrix(*, markets: tuple[str, ...] = ("spot", "um"), timeframes: tuple[str, ...] = ("15m", "1h", "4h"), coverage_overrides: Mapping[str, str] | None = None) -> pd.DataFrame:
+def feature_availability_matrix(*, markets: tuple[str, ...] = ("spot", "um"), timeframes: tuple[str, ...] = ("15m", "1h", "4h"), coverage_overrides: Mapping[str, str] | None = None, capability_overrides: Mapping[str, str] | None = None) -> pd.DataFrame:
     """Return the frozen 22-feature availability classification."""
     rows: list[dict[str, object]] = []
     coverage_overrides = coverage_overrides or {}
+    capability_overrides = capability_overrides or {}
     for spec in CORE_FEATURE_SPECS:
         override = dict(_FEATURE_SOURCE_OVERRIDES.get(spec.feature_id, {}))
-        source_capability = str(override.get("source_capability", "ARCHIVE_CAPABLE"))
+        source_capability = capability_overrides.get(spec.feature_id, str(override.get("source_capability", "ARCHIVE_CAPABLE")))
         market_support = str(override.get("market_support", ";".join(markets)))
         coverage = coverage_overrides.get(spec.feature_id, str(override.get("campaign_coverage", "PARTIAL")))
         eligible = coverage == "AVAILABLE"
