@@ -51,6 +51,15 @@ def normalize_timestamp(values: pd.Series) -> pd.Series:
 def normalize_klines(rows: Iterable[Iterable[Any]]) -> pd.DataFrame:
     frame = pd.DataFrame(list(rows), columns=KLINE_COLUMNS)
     if frame.empty: return frame.astype({"open_time": "datetime64[ns, UTC]", "close_time": "datetime64[ns, UTC]"})
+    # Monthly UM/CM archives may include a CSV header while Spot archives
+    # typically do not.  Remove that transport header before numeric parsing;
+    # any remaining malformed timestamps are still fail-closed below.
+    timestamp_numeric = pd.to_numeric(frame["open_time"], errors="coerce")
+    if timestamp_numeric.isna().any():
+        header_rows = timestamp_numeric.isna() & frame["open_time"].astype(str).eq("open_time")
+        if not header_rows.any() or int(header_rows.sum()) != 1:
+            raise DataIntegrityError("non-numeric kline timestamp outside a single archive header row")
+        frame = frame.loc[~header_rows].reset_index(drop=True)
     frame["open_time"], frame["close_time"] = normalize_timestamp(frame["open_time"]), normalize_timestamp(frame["close_time"])
     numeric = [c for c in KLINE_COLUMNS if c not in {"open_time", "close_time", "ignore"}]
     frame[numeric] = frame[numeric].apply(pd.to_numeric, errors="coerce")

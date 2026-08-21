@@ -1,0 +1,5 @@
+universe_month,market,symbol,prior_month_quote_volume,rank,selected_top20,selected_top50,selected_top100,eligibility_reason
+2024-02-01,spot,BTCUSDT,60830257410.58647,1,true,true,true,OBSERVED_BEFORE_UNIVERSE_MONTH
+2024-02-01,spot,ETHUSDT,31577150232.70652,2,true,true,true,OBSERVED_BEFORE_UNIVERSE_MONTH
+2024-02-01,um,BTCUSDT,431450209978.5226,1,true,true,true,OBSERVED_BEFORE_UNIVERSE_MONTH
+2024-02-01,um,ETHUSDT,209559031450.3296,2,true,true,true,OBSERVED_BEFORE_UNIVERSE_MONTH
