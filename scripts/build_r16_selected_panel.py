@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from binance_research.data import ArchiveRequest, BinanceArchiveClient, load_kline_archive
+from binance_research.data import ArchiveRequest, BinanceArchiveClient, DataIntegrityError, load_kline_archive
 from binance_research.features import CoreFeatureEngine, compute_gap_safe_features
 from binance_research.panel import resample_contiguous_source, write_partitioned_panel
 
@@ -66,8 +66,8 @@ def acquire_selected(manifest: pd.DataFrame, *, workers: int = 2) -> pd.DataFram
     return pd.DataFrame(rows)
 
 
-def materialize_selected(manifest: pd.DataFrame, output_root: Path) -> dict[str, int]:
-    counts = {"objects": 0, "rows_15m": 0, "rows_1h": 0, "rows_4h": 0, "segments": 0, "gaps": 0, "research_eligible_rows": 0, "warmup_context_rows": 0}
+def materialize_selected(manifest: pd.DataFrame, output_root: Path) -> dict[str, object]:
+    counts: dict[str, object] = {"objects": 0, "rows_15m": 0, "rows_1h": 0, "rows_4h": 0, "segments": 0, "gaps": 0, "research_eligible_rows": 0, "warmup_context_rows": 0, "failed_groups": []}
     for (market, symbol), group in manifest.groupby(["market", "symbol"], sort=True):
         frames = []
         for row in group.itertuples():
@@ -83,24 +83,29 @@ def materialize_selected(manifest: pd.DataFrame, output_root: Path) -> dict[str,
             continue
         source = pd.concat(frames, ignore_index=True).drop_duplicates("open_time").sort_values("open_time").reset_index(drop=True)
         counts["objects"] += len(frames)
-        for timeframe, bars in (("15m", source), ("1h", resample_contiguous_source(source.drop(columns=["market", "symbol", "membership_month", "row_class"]), "1h", source_interval="15m")), ("4h", resample_contiguous_source(source.drop(columns=["market", "symbol", "membership_month", "row_class"]), "4h", source_interval="15m"))):
-            bars = bars.rename(columns={"open_time": "timestamp"}).copy()
-            bars["market"], bars["symbol"] = market, symbol
-            bars["timeframe"] = timeframe
-            bars["universe_month"] = bars["timestamp"].dt.to_period("M").astype(str)
-            selected_months = set(group.loc[group["row_class"] == "RESEARCH_ELIGIBLE", "membership_month"].astype(str))
-            bars["row_class"] = bars["universe_month"].map(lambda month: "RESEARCH_ELIGIBLE" if month in selected_months else "WARMUP_CONTEXT_ONLY")
-            features = compute_gap_safe_features(CoreFeatureEngine(), bars.rename(columns={"timestamp": "open_time"}), timeframe)
-            features = features.drop(columns=["open_time"], errors="ignore")
-            panel = pd.concat([bars.reset_index(drop=True), features.reset_index(drop=True)], axis=1)
-            panel = panel.loc[:, ~panel.columns.duplicated()]
-            write_partitioned_panel(panel, output_root, provenance="r1.6-selected-cohort")
-            counts[f"rows_{timeframe}"] += len(panel)
-            counts["research_eligible_rows"] += int((panel.row_class == "RESEARCH_ELIGIBLE").sum())
-            counts["warmup_context_rows"] += int((panel.row_class == "WARMUP_CONTEXT_ONLY").sum())
-            if "segment_id" in panel:
-                counts["segments"] += int(panel.segment_id.nunique())
-                counts["gaps"] += int(panel.gap_before.sum())
+        try:
+            bars_by_timeframe = (("15m", source), ("1h", resample_contiguous_source(source.drop(columns=["market", "symbol", "membership_month", "row_class"]), "1h", source_interval="15m")), ("4h", resample_contiguous_source(source.drop(columns=["market", "symbol", "membership_month", "row_class"]), "4h", source_interval="15m")))
+            for timeframe, bars in bars_by_timeframe:
+                bars = bars.rename(columns={"open_time": "timestamp"}).copy()
+                bars["market"], bars["symbol"] = market, symbol
+                bars["timeframe"] = timeframe
+                bars["universe_month"] = bars["timestamp"].dt.to_period("M").astype(str)
+                selected_months = set(group.loc[group["row_class"] == "RESEARCH_ELIGIBLE", "membership_month"].astype(str))
+                bars["row_class"] = bars["universe_month"].map(lambda month: "RESEARCH_ELIGIBLE" if month in selected_months else "WARMUP_CONTEXT_ONLY")
+                features = compute_gap_safe_features(CoreFeatureEngine(), bars.rename(columns={"timestamp": "open_time"}), timeframe)
+                features = features.drop(columns=["open_time"], errors="ignore")
+                panel = pd.concat([bars.reset_index(drop=True), features.reset_index(drop=True)], axis=1)
+                panel = panel.loc[:, ~panel.columns.duplicated()]
+                write_partitioned_panel(panel, output_root, provenance="r1.6-selected-cohort")
+                counts[f"rows_{timeframe}"] += len(panel)
+                counts["research_eligible_rows"] += int((panel.row_class == "RESEARCH_ELIGIBLE").sum())
+                counts["warmup_context_rows"] += int((panel.row_class == "WARMUP_CONTEXT_ONLY").sum())
+                if "segment_id" in panel:
+                    counts["segments"] += int(panel.segment_id.nunique())
+                    counts["gaps"] += int(panel.gap_before.sum())
+        except DataIntegrityError as exc:
+            counts["failed_groups"].append({"market": market, "symbol": symbol, "reason": str(exc)})
+            continue
     return counts
 
 
@@ -113,9 +118,20 @@ def main() -> int:
     parser.add_argument("--materialize", action="store_true")
     args = parser.parse_args()
     cohorts = pd.read_csv(args.campaign_dir / "universe_monthly.csv")
-    manifest = selected_manifest(cohorts, args.census_dir)
     args.campaign_dir.mkdir(parents=True, exist_ok=True)
-    manifest.to_csv(args.campaign_dir / "selected_intraday_manifest.csv", index=False)
+    manifest_path = args.campaign_dir / "selected_intraday_manifest.csv"
+    generated_manifest = selected_manifest(cohorts, args.census_dir)
+    # Preserve an already-acquired manifest for materialization.  Rebuilding it
+    # from the census would discard raw paths and checksums before the panel is
+    # read, producing a misleading empty materialization.
+    if args.acquire or not manifest_path.exists():
+        manifest = generated_manifest
+        manifest.to_csv(manifest_path, index=False)
+    else:
+        manifest = pd.read_csv(manifest_path)
+        if len(manifest) != len(generated_manifest) or "raw_path" not in manifest.columns:
+            manifest = generated_manifest
+            manifest.to_csv(manifest_path, index=False)
     estimate = estimate_selected(manifest, args.campaign_dir)
     if args.acquire:
         acquired = acquire_selected(manifest, workers=args.workers)
