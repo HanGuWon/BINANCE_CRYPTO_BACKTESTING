@@ -148,10 +148,12 @@ def build_monthly_cohorts(manifest: pd.DataFrame, taxonomy: pd.DataFrame, output
         issues = validate_klines(frame, "1d")
         census_rows.append({"market": row.market, "symbol": row.symbol, "volume_month": str(month), "prior_month_expected_days": expected_days, "prior_month_observed_days": observed_days, "coverage_ratio": coverage, "prior_month_quote_volume": float(pd.to_numeric(frame.quote_volume, errors="coerce").sum()), "volume_integrity_status": "PASS" if not any(issue.severity == "ERROR" for issue in issues) else "ISSUES", "issue_codes": ";".join(issue.code for issue in issues)})
     volumes = pd.DataFrame(census_rows)
+    census_frames = []
     for market in ("spot", "um"):
         census = pd.read_csv(Path("data/census/r1_full_history_v1") / f"{market}_archive_symbol_census.csv")
-        census = census[["market", "symbol", "first_archive_month"]].rename(columns={"first_archive_month": "first_archive_observed"})
-        volumes = volumes.merge(census, on=["market", "symbol"], how="left")
+        census_frames.append(census[["market", "symbol", "first_archive_month"]])
+    census = pd.concat(census_frames, ignore_index=True).rename(columns={"first_archive_month": "first_archive_observed"})
+    volumes = volumes.merge(census, on=["market", "symbol"], how="left")
     volumes["universe_month"] = (pd.PeriodIndex(volumes["volume_month"], freq="M") + 1).astype(str)
     volumes["first_observed"] = pd.to_datetime(volumes["first_archive_observed"].astype(str) + "-01", utc=True, errors="coerce")
     ranked = select_verified_causal_liquidity_universe(volumes, top_n=50, minimum_coverage_ratio=1.0)
