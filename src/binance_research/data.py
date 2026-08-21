@@ -29,6 +29,16 @@ SHORT_RETENTION_DAYS = {"takerlongshortRatio": 30, "topLongShortAccountRatio": 3
 class DataIntegrityError(RuntimeError):
     pass
 
+
+@dataclass(frozen=True)
+class ArchiveObject:
+    """Metadata returned by the Binance Vision S3 listing."""
+
+    key: str
+    size: int | None = None
+    last_modified: str | None = None
+    etag: str | None = None
+
 def sha256_bytes(payload: bytes) -> str:
     return hashlib.sha256(payload).hexdigest()
 
@@ -84,7 +94,7 @@ def normalize_archive_rows(rows: pd.DataFrame, dataset: str, market: str) -> pd.
         frame = frame.sort_values("timestamp", kind="stable").reset_index(drop=True)
     return frame
 
-def validate_klines(frame: pd.DataFrame, interval: str) -> list[IntegrityIssue]:
+def validate_klines(frame: pd.DataFrame, interval: str, *, allow_negative: bool = False) -> list[IntegrityIssue]:
     missing = sorted((set(KLINE_COLUMNS) - {"ignore"}) - set(frame.columns))
     if missing: return [IntegrityIssue("MISSING_COLUMNS", "ERROR", ", ".join(missing), len(missing))]
     issues: list[IntegrityIssue] = []
@@ -93,7 +103,8 @@ def validate_klines(frame: pd.DataFrame, interval: str) -> list[IntegrityIssue]:
     numeric = frame[["open", "high", "low", "close", "volume", "quote_volume"]]
     malformed = int(numeric.isna().any(axis=1).sum())
     if malformed: issues.append(IntegrityIssue("MALFORMED_CANDLE", "ERROR", "non-numeric or missing candle fields", malformed))
-    impossible = ((frame["high"] < frame[["open", "close", "low"]].max(axis=1)) | (frame["low"] > frame[["open", "close", "high"]].min(axis=1)) | (numeric < 0).any(axis=1))
+    negative = (numeric < 0).any(axis=1) if not allow_negative else pd.Series(False, index=frame.index)
+    impossible = ((frame["high"] < frame[["open", "close", "low"]].max(axis=1)) | (frame["low"] > frame[["open", "close", "high"]].min(axis=1)) | negative)
     if int(impossible.sum()): issues.append(IntegrityIssue("IMPOSSIBLE_OHLC", "ERROR", "OHLC ordering or non-negative invariant failed", int(impossible.sum())))
     if interval in INTERVAL_MS and len(frame) > 1:
         expected = pd.Timedelta(milliseconds=INTERVAL_MS[interval]); deltas = frame["open_time"].drop_duplicates().sort_values().diff().dropna()
@@ -154,9 +165,16 @@ class ArchiveRequest:
         return f"{base}/{filename}"
 
 class BinanceArchiveClient:
-    def __init__(self, raw_root: Path, timeout: float = 60.0) -> None: self.raw_root, self.timeout = Path(raw_root), timeout
+    def __init__(self, raw_root: Path, timeout: float = 60.0, max_retries: int = 3) -> None: self.raw_root, self.timeout, self.max_retries = Path(raw_root), timeout, max_retries
     def _fetch(self, url: str) -> bytes:
-        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "binance-indicator-research/0.1"}), timeout=self.timeout) as response: return response.read()
+        for attempt in range(self.max_retries + 1):
+            try:
+                with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "binance-indicator-research/0.1"}), timeout=self.timeout) as response: return response.read()
+            except (urllib.error.URLError, TimeoutError, ConnectionResetError):
+                if attempt == self.max_retries:
+                    raise
+                time.sleep(min(2 ** attempt, 8))
+        raise AssertionError("archive fetch retry loop exhausted")
     def download(self, request: ArchiveRequest) -> tuple[Path, DatasetManifest]:
         url, payload = request.url(), self._fetch(request.url()); published = self._fetch(url + ".CHECKSUM").decode("utf-8").strip().split()[0].lower(); computed = sha256_bytes(payload)
         if published != computed: raise DataIntegrityError(f"checksum mismatch for {url}: published={published}, computed={computed}")
@@ -168,15 +186,83 @@ class BinanceArchiveClient:
             names = [name for name in archive.namelist() if not name.endswith("/")]
             if len(names) != 1: raise DataIntegrityError(f"expected one archive member, found {len(names)}")
             with archive.open(names[0]) as handle: rows = pd.read_csv(handle, header=None)
-        frame = normalize_archive_rows(rows, request.dataset, request.market); issues = validate_klines(frame, request.interval) if request.interval and "open_time" in frame else []
+        allow_negative = request.dataset.lower() in {"premiumindexklines", "premiumpriceklines"}
+        frame = normalize_archive_rows(rows, request.dataset, request.market); issues = validate_klines(frame, request.interval, allow_negative=allow_negative) if request.interval and "open_time" in frame else []
         timestamp_column = "open_time" if "open_time" in frame else "timestamp" if "timestamp" in frame else None
         manifest = DatasetManifest(schema_version=1, source="data.binance.vision", market_type=request.market, dataset=request.dataset, symbol=request.symbol, interval=request.interval, first_timestamp=(frame[timestamp_column].min().isoformat() if timestamp_column and len(frame) else None), last_timestamp=(frame[timestamp_column].max().isoformat() if timestamp_column and len(frame) else None), row_count=len(frame), downloaded_at=datetime.now(UTC).isoformat(), computed_sha256=computed, published_sha256=published, coverage_status=CoverageStatus.PARTIAL if issues else CoverageStatus.AVAILABLE, coverage_note=SHORT_RETENTION.get(request.dataset, "archive object verified"), issues=issues, archive_url=url)
         manifest_path = destination.with_suffix(destination.suffix + ".manifest.json")
         if not manifest_path.exists(): manifest_path.write_text(json.dumps(manifest.to_dict(), indent=2), encoding="utf-8")
         return destination, manifest
+    @staticmethod
+    def _local_name(tag: str) -> str:
+        return tag.rsplit("}", 1)[-1]
+
+    def _list_objects_v2_page(self, prefix: str, delimiter: str | None, continuation_token: str | None) -> tuple[list[str], list[ArchiveObject], bool, str | None]:
+        params: dict[str, str] = {"list-type": "2", "prefix": prefix}
+        if delimiter is not None:
+            params["delimiter"] = delimiter
+        if continuation_token is not None:
+            params["continuation-token"] = continuation_token
+        query = urllib.parse.urlencode(params)
+        try:
+            root = ElementTree.fromstring(self._fetch(f"https://s3-ap-northeast-1.amazonaws.com/data.binance.vision?{query}"))
+        except (ElementTree.ParseError, ValueError) as exc:
+            raise DataIntegrityError("malformed Binance Vision S3 listing XML") from exc
+        if self._local_name(root.tag) != "ListBucketResult":
+            raise DataIntegrityError("unexpected Binance Vision S3 listing root")
+        prefixes: list[str] = []
+        objects: list[ArchiveObject] = []
+        for node in root:
+            name = self._local_name(node.tag)
+            if name == "CommonPrefixes":
+                values = {self._local_name(child.tag): (child.text or "") for child in node}
+                if values.get("Prefix"):
+                    prefixes.append(values["Prefix"])
+            elif name == "Contents":
+                values = {self._local_name(child.tag): (child.text or "") for child in node}
+                size = values.get("Size")
+                try:
+                    parsed_size = int(size) if size not in {None, ""} else None
+                except ValueError as exc:
+                    raise DataIntegrityError("non-numeric object size in S3 listing") from exc
+                objects.append(ArchiveObject(values.get("Key", ""), parsed_size, values.get("LastModified"), values.get("ETag")))
+        truncated_text = next((child.text or "" for child in root if self._local_name(child.tag) == "IsTruncated"), "false").lower()
+        if truncated_text not in {"true", "false"}:
+            raise DataIntegrityError("invalid IsTruncated value in S3 listing")
+        token = next((child.text or "" for child in root if self._local_name(child.tag) == "NextContinuationToken"), None)
+        truncated = truncated_text == "true"
+        if truncated and not token:
+            raise DataIntegrityError("truncated S3 listing omitted NextContinuationToken")
+        return prefixes, objects, truncated, token
+
+    def list_objects_v2(self, prefix: str, *, delimiter: str | None = None) -> tuple[list[str], list[ArchiveObject], int]:
+        """Return all paginated prefixes/objects with deterministic de-duplication."""
+        prefixes: set[str] = set()
+        objects: dict[str, ArchiveObject] = {}
+        token: str | None = None
+        seen_tokens: set[str] = set()
+        pages = 0
+        while True:
+            page_prefixes, page_objects, truncated, next_token = self._list_objects_v2_page(prefix, delimiter, token)
+            pages += 1
+            prefixes.update(page_prefixes)
+            for obj in page_objects:
+                if obj.key:
+                    existing = objects.get(obj.key)
+                    if existing is not None and existing != obj:
+                        raise DataIntegrityError(f"conflicting duplicate S3 listing object: {obj.key}")
+                    objects[obj.key] = obj
+            if not truncated:
+                break
+            if next_token in seen_tokens:
+                raise DataIntegrityError("S3 listing continuation token repeated")
+            seen_tokens.add(next_token or "")
+            token = next_token
+        return sorted(prefixes), [objects[key] for key in sorted(objects)], pages
+
     def discover_prefixes(self, prefix: str) -> list[str]:
-        query = urllib.parse.urlencode({"delimiter": "/", "prefix": prefix}); payload = self._fetch(f"https://s3-ap-northeast-1.amazonaws.com/data.binance.vision?{query}"); root = ElementTree.fromstring(payload); namespace = {"s3": "http://s3.amazonaws.com/doc/2006-03-01/"}
-        return [node.text or "" for node in root.findall("s3:CommonPrefixes/s3:Prefix", namespace)]
+        prefixes, _, _ = self.list_objects_v2(prefix, delimiter="/")
+        return prefixes
 
 class BinanceRestClient:
     """Read-only public market-data client. No order or account methods exist."""

@@ -64,17 +64,19 @@ def lifecycle_records(
                 {
                     "market": market,
                     "symbol": str(symbol),
-                    "first_observed": ts.iloc[0].isoformat(),
-                    "last_observed": ts.iloc[-1].isoformat(),
-                    "listing_effective_start": ts.iloc[0].isoformat(),
+                    "first_archive_observed": ts.iloc[0].isoformat(),
+                    "last_archive_observed": ts.iloc[-1].isoformat(),
+                    "listing_effective_start": "UNKNOWN",
+                    "listing_evidence": "NO_INDEPENDENT_EVIDENCE; archive presence is first observation only",
                     "delisting_effective_end": "UNKNOWN",
+                    "delisting_evidence": "NO_INDEPENDENT_EVIDENCE; bounded archive end is not delisting",
                     "row_count": int(len(ts)),
                     "internal_gap_count": gaps,
-                    "coverage_state": "OBSERVED_ARCHIVE_WINDOW",
+                    "coverage_state": "OBSERVED_ARCHIVE_WINDOW_ONLY",
                     "source": source,
                 }
             )
-    return pd.DataFrame(rows).drop_duplicates(["market", "symbol", "first_observed", "last_observed"])
+    return pd.DataFrame(rows).drop_duplicates(["market", "symbol", "first_archive_observed", "last_archive_observed"])
 
 
 def select_causal_liquidity_universe(
@@ -127,12 +129,12 @@ def select_causal_liquidity_universe(
 
 _LONG_KLINE = "official klines archive; completed-bar OHLCV/taker fields"
 _FEATURE_SOURCE_OVERRIDES: Mapping[str, dict[str, object]] = {
-    "microstructure.spread": {"required_raw_sources": "historical depth/best bid-ask; forward-only collector", "historical_availability": "FORWARD_ONLY"},
-    "microstructure.top_book_imbalance": {"required_raw_sources": "historical depth/best bid-ask; forward-only collector", "historical_availability": "FORWARD_ONLY"},
-    "derivatives.oi_change": {"required_raw_sources": "Binance openInterestHist REST", "historical_availability": "SHORT_RETENTION", "max_age": "31d"},
-    "derivatives.funding_zscore": {"required_raw_sources": "Binance UM fundingRate archive/event history", "historical_availability": "ARCHIVE_CAPABLE"},
-    "derivatives.premium_zscore": {"required_raw_sources": "Binance UM premiumIndexKlines archive", "historical_availability": "ARCHIVE_CAPABLE"},
-    "context.market_breadth": {"required_raw_sources": "observed lifecycle-aware OHLCV universe", "historical_availability": "PANEL_DEPENDENT"},
+    "microstructure.spread": {"required_raw_sources": "historical depth/best bid-ask; forward-only collector", "source_capability": "FORWARD_ONLY_OR_UNVERIFIED_ARCHIVE", "market_support": "spot;um", "campaign_coverage": "HISTORICAL_UNAVAILABLE"},
+    "microstructure.top_book_imbalance": {"required_raw_sources": "historical depth/best bid-ask; forward-only collector", "source_capability": "FORWARD_ONLY_OR_UNVERIFIED_ARCHIVE", "market_support": "spot;um", "campaign_coverage": "HISTORICAL_UNAVAILABLE"},
+    "derivatives.oi_change": {"required_raw_sources": "Binance openInterestHist REST or UM Vision metrics", "source_capability": "SHORT_RETENTION_OR_UNVERIFIED_METRICS", "market_support": "um", "campaign_coverage": "HISTORICAL_UNAVAILABLE", "max_age": "31d"},
+    "derivatives.funding_zscore": {"required_raw_sources": "Binance UM fundingRate archive/event history", "source_capability": "EVENT_ARCHIVE_UNVERIFIED", "market_support": "um", "campaign_coverage": "HISTORICAL_UNAVAILABLE"},
+    "derivatives.premium_zscore": {"required_raw_sources": "Binance UM premiumIndexKlines archive", "source_capability": "ARCHIVE_PATH_UNVERIFIED", "market_support": "um", "campaign_coverage": "HISTORICAL_UNAVAILABLE"},
+    "context.market_breadth": {"required_raw_sources": "observed lifecycle-aware OHLCV universe", "source_capability": "PANEL_DEPENDENT", "market_support": "spot;um", "campaign_coverage": "PARTIAL"},
 }
 
 
@@ -141,28 +143,27 @@ def feature_availability_matrix(*, markets: tuple[str, ...] = ("spot", "um"), ti
     rows: list[dict[str, object]] = []
     for spec in CORE_FEATURE_SPECS:
         override = dict(_FEATURE_SOURCE_OVERRIDES.get(spec.feature_id, {}))
-        availability = str(override.get("historical_availability", "ARCHIVE_CAPABLE"))
-        if availability in {"FORWARD_ONLY", "SHORT_RETENTION"}:
-            coverage = "HISTORICAL_UNAVAILABLE"
-            eligible = False
-            shadow = True
-        elif availability == "PANEL_DEPENDENT":
-            coverage = "PARTIAL"
-            eligible = False
-            shadow = True
-        else:
-            coverage = "AVAILABLE"
-            eligible = True
-            shadow = False
+        source_capability = str(override.get("source_capability", "ARCHIVE_CAPABLE"))
+        market_support = str(override.get("market_support", ";".join(markets)))
+        coverage = str(override.get("campaign_coverage", "PARTIAL"))
+        eligible = coverage == "AVAILABLE"
+        shadow = not eligible
+        market_coverage = ";".join(
+            f"{market}={'NOT_APPLICABLE' if market not in market_support.split(';') else coverage}"
+            for market in markets
+        )
         rows.append(
             {
                 "feature_id": spec.feature_id,
                 "family": spec.family,
                 "required_raw_sources": override.get("required_raw_sources", _LONG_KLINE),
-                "historical_availability": availability,
+                "source_capability": source_capability,
+                "campaign_coverage": coverage,
+                "historical_availability": coverage,
                 "earliest_usable": "after declared warmup; campaign archive dependent",
                 "latest_usable": "acquisition cutoff",
-                "markets": ";".join(markets),
+                "market_support": market_support,
+                "market_coverage": market_coverage,
                 "timeframes": ";".join(timeframes),
                 "causal_method": "trailing formula on completed bars; backward as-of for external sources",
                 "max_age": override.get("max_age", "bar-close"),
