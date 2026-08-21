@@ -1,0 +1,13 @@
+market,symbol,timeframe,raw_checksum_verified,computed_rows,missing_intervals,partial_buckets,duplicate_timestamps,ohlc_invariant,immutability_check
+spot,BTCUSDT,15m,true,2976,0,0,0,PASS,PASS
+spot,ETHUSDT,15m,true,2976,0,0,0,PASS,PASS
+um,BTCUSDT,15m,true,2976,0,0,0,PASS,PASS
+um,ETHUSDT,15m,true,2976,0,0,0,PASS,PASS
+spot,BTCUSDT,1h,derived,744,0,0,0,PASS,NOT_APPLICABLE
+spot,BTCUSDT,4h,derived,186,0,0,0,PASS,NOT_APPLICABLE
+spot,ETHUSDT,1h,derived,744,0,0,0,PASS,NOT_APPLICABLE
+spot,ETHUSDT,4h,derived,186,0,0,0,PASS,NOT_APPLICABLE
+um,BTCUSDT,1h,derived,744,0,0,0,PASS,NOT_APPLICABLE
+um,BTCUSDT,4h,derived,186,0,0,0,PASS,NOT_APPLICABLE
+um,ETHUSDT,1h,derived,744,0,0,0,PASS,NOT_APPLICABLE
+um,ETHUSDT,4h,derived,186,0,0,0,PASS,NOT_APPLICABLE
