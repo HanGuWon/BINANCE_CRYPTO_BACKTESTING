@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import inspect
 
 import pandas as pd
 import pytest
@@ -46,3 +47,9 @@ def test_cli_gap_safe_path_resets_state_after_source_gap(tmp_path: Path, bars, m
     assert features.loc[250, "segment_id"] == 1
     assert pd.isna(features.loc[250, "rsi14"])
     assert features.loc[250, "cvd"] == pytest.approx(gapped.loc[250, "taker_buy_volume"] - (gapped.loc[250, "volume"] - gapped.loc[250, "taker_buy_volume"]))
+
+
+def test_cli_explicit_final_holdout_branch_is_gap_safe_without_accessing_data() -> None:
+    source = inspect.getsource(cli.run_research)
+    assert source.count("compute_gap_safe_features") >= 2
+    assert "if args.final_holdout" in source
