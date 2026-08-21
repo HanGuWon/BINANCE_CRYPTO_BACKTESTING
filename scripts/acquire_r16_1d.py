@@ -19,7 +19,8 @@ def main() -> int:
     manifest = __import__("pandas").read_csv(manifest_path)
     acquired = acquire_1d(manifest, workers=args.workers)
     acquired.to_csv(args.campaign_dir / "volume_archive_acquisition.csv", index=False)
-    merged = manifest.merge(acquired[["market", "symbol", "archive_month", "raw_path"]], on=["market", "symbol", "archive_month"], how="left")
+    acquisition_columns = [column for column in acquired.columns if column not in {"market", "symbol", "archive_month"}]
+    merged = manifest.merge(acquired[["market", "symbol", "archive_month", *acquisition_columns]], on=["market", "symbol", "archive_month"], how="left")
     merged.to_csv(manifest_path, index=False)
     estimate_path = args.campaign_dir / "volume_size_estimate.json"
     estimate = json.loads(estimate_path.read_text(encoding="utf-8"))

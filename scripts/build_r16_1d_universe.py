@@ -118,9 +118,14 @@ def acquire_1d(manifest: pd.DataFrame, *, workers: int = 2) -> pd.DataFrame:
 
     records: list[dict[str, object]] = []
     with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
-        futures = [pool.submit(acquire, request) for request in requests]
+        futures = {pool.submit(acquire, request): request for request in requests}
         for number, future in enumerate(as_completed(futures), start=1):
-            records.append(future.result())
+            request = futures[future]
+            try:
+                records.append(future.result())
+            except Exception as exc:
+                path = client.raw_root / request.market / request.dataset / request.symbol / (request.interval or "") / f"{request.symbol}-{request.interval}-{request.year:04d}-{request.month:02d}.zip"
+                records.append({"market": request.market, "symbol": request.symbol, "archive_month": f"{request.year:04d}-{request.month:02d}", "raw_path": str(path) if path.exists() else None, "integrity_status": "ERROR", "issue_codes": f"{type(exc).__name__}:{exc}"})
             if number % 100 == 0:
                 print(f"verified 1d archives {number}/{len(requests)}", flush=True)
     return pd.DataFrame(records).sort_values(["market", "symbol", "archive_month"])
@@ -130,6 +135,8 @@ def build_monthly_cohorts(manifest: pd.DataFrame, taxonomy: pd.DataFrame, output
     """Aggregate complete prior calendar months and freeze diagnostic cohorts."""
     census_rows = []
     for row in manifest.itertuples():
+        if str(getattr(row, "integrity_status", "PASS")) != "PASS":
+            continue
         raw_path = Path(getattr(row, "raw_path", ""))
         if not raw_path.exists():
             continue
