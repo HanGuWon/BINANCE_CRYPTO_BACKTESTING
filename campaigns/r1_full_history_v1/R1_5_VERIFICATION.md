@@ -38,6 +38,10 @@ Gate D passed as a metadata census, not as a downloaded candidate panel. The
 archive contains 3,682 Spot historical symbols and 986 UM symbols. The frozen
 return-independent policy leaves 670 Spot candidates and 832 UM perpetual-style
 candidates; 3,012 Spot and 154 UM exclusions are recorded with reasons.
+Broad-universe monthly Top-20/50/100 cohort counts are therefore
+`NOT_CONSTRUCTED`: no candidate membership was selected, and no monthly cohort
+file is claimed. Constructing those cohorts requires the prior-month
+quote-volume acquisition that remains blocked below.
 
 Gate E produced an actual size estimate and stopped before broad acquisition.
 Eligible candidates require 46,801 15m monthly objects and 5,273,148,503
