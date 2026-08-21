@@ -13,6 +13,7 @@ from binance_research.derivatives import (
     validate_metrics_schema,
 )
 from binance_research.features import build_cohort_aware_breadth, compute_gap_safe_features, CoreFeatureEngine
+from binance_research.panel import select_verified_causal_liquidity_universe
 from binance_research.provenance import append_archive_revision
 from binance_research.splits import global_calendar_split, horizon_purge_bars
 from binance_research.timeframes import compare_native_to_resampled
@@ -103,3 +104,25 @@ def test_native_timeframe_comparison_matches_exact_aggregation() -> None:
     native["taker_buy_quote_volume"] = 2
     result = compare_native_to_resampled(source, native, target="1h")
     assert result["status"].eq("MATCH").all()
+
+
+def test_partial_prior_month_is_excluded_and_future_month_cannot_rewrite_membership() -> None:
+    frame = pd.DataFrame(
+        {
+            "market": ["spot", "spot", "spot"],
+            "universe_month": ["2024-03-01"] * 3,
+            "volume_month": ["2024-02-01"] * 3,
+            "symbol": ["A", "B", "C"],
+            "first_observed": ["2023-01-01T00:00:00Z"] * 3,
+            "prior_month_expected_days": [29] * 3,
+            "prior_month_observed_days": [29, 28, 29],
+            "coverage_ratio": [1.0, 28 / 29, 1.0],
+            "prior_month_quote_volume": [100.0, 1000.0, 50.0],
+        }
+    )
+    result = select_verified_causal_liquidity_universe(frame, top_n=2)
+    assert set(result.loc[result.selected_top50, "symbol"]) == {"A", "C"}
+    revised = frame.copy()
+    revised.loc[0, "prior_month_quote_volume"] = 1.0
+    revised.loc[1, "prior_month_quote_volume"] = 999999.0
+    assert set(select_verified_causal_liquidity_universe(revised, top_n=2).loc[lambda x: x.selected_top50, "symbol"]) == {"A", "C"}
