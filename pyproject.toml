@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "binance-indicator-research"
+version = "0.1.0"
+description = "Causal, research-only Binance indicator and backtest harness"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+dependencies = [
+  "numpy>=2.0",
+  "pandas>=2.2",
+  "scipy>=1.13",
+  "pyarrow>=16.0",
+]
+
+[project.optional-dependencies]
+models = ["scikit-learn>=1.5"]
+streaming = ["websockets>=13.0"]
+dev = ["pytest>=8.2", "pytest-cov>=5.0"]
+
+[project.scripts]
+binance-research = "binance_research.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/binance_research"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+

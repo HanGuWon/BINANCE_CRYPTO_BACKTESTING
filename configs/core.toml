@@ -1,0 +1,23 @@
+[research]
+timeframes = ["5m", "15m", "1h", "4h"]
+horizons_minutes = [15, 60, 240, 720, 1440]
+quantiles = 5
+random_seed = 1729
+
+[split]
+train_fraction = 0.60
+validation_fraction = 0.20
+test_fraction = 0.20
+embargo_bars = 1
+
+[costs]
+maker_fee_bps = 2.0
+taker_fee_bps = 5.0
+spread_bps = 1.0
+slippage_bps = 1.0
+latency_bars = 0
+
+[rule]
+holding_bars = 4
+fee_mode = "taker"
+

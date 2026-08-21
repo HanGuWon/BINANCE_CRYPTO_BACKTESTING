@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environments
+.venv/
+venv/
+env/
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+*secret*
+*credentials*
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Raw / processed research data
+data/raw/**
+data/processed/**
+data/cache/**
+
+# Generated research outputs
+artifacts/**
+reports/generated/**
+
+# Builds
+build/
+dist/
+dist-*/
+*.egg-info/
+
+# Temporary files
+*.tmp
+*.bak
+*.log
+
+# Keep empty data/output roots visible in the repository.
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!artifacts/.gitkeep
+!reports/.gitkeep
