@@ -1,0 +1,9 @@
+{
+  "objects": 11714,
+  "compressed_bytes": 1451948765,
+  "estimated_extracted_bytes": 5807795060,
+  "estimated_parquet_bytes": 2177923147,
+  "estimated_temporary_peak_bytes": 7259743825,
+  "free_disk_before_bytes": 26590482432,
+  "status": "ESTIMATED_ONLY"
+}

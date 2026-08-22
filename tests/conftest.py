@@ -5,6 +5,12 @@ import pandas as pd
 import pytest
 
 
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+
 @pytest.fixture
 def bars() -> pd.DataFrame:
     n = 500
@@ -33,4 +39,3 @@ def bars() -> pd.DataFrame:
         "breadth_pct_above_ema": rng.uniform(0.2, 0.8, n),
         "symbol": "BTCUSDT",
     })
-

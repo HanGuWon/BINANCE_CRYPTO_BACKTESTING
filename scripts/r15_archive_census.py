@@ -23,10 +23,14 @@ DATASET_PROBES = {
     "um_mark_price_monthly": "data/futures/um/monthly/markPriceKlines/",
     "um_index_price_monthly": "data/futures/um/monthly/indexPriceKlines/",
     "um_metrics_monthly": "data/futures/um/monthly/metrics/",
+    "um_metrics_daily": "data/futures/um/daily/metrics/",
     "um_book_ticker_monthly": "data/futures/um/monthly/bookTicker/",
+    "um_book_ticker_daily": "data/futures/um/daily/bookTicker/",
     "um_book_depth_monthly": "data/futures/um/monthly/bookDepth/",
+    "um_book_depth_daily": "data/futures/um/daily/bookDepth/",
     "um_aggtrades_monthly": "data/futures/um/monthly/aggTrades/",
     "um_liquidation_snapshot_monthly": "data/futures/um/monthly/liquidationSnapshot/",
+    "um_liquidation_snapshot_daily": "data/futures/um/daily/liquidationSnapshot/",
 }
 
 
@@ -77,7 +81,7 @@ def main() -> int:
     for name, prefix in DATASET_PROBES.items():
         try:
             prefixes, objects, pages = client.list_objects_v2(prefix, delimiter="/")
-            probes.append({"dataset": name, "prefix": prefix, "status": "PRESENT" if prefixes or objects else "EMPTY_OR_UNLISTED", "pages": pages, "symbol_prefix_count": len(prefixes), "object_count": len(objects), "sample_prefix": prefixes[0] if prefixes else None, "sample_object": objects[0].key if objects else None})
+            probes.append({"dataset": name, "prefix": prefix, "status": "PRESENT" if prefixes or objects else "EMPTY_OR_UNLISTED_AT_THE_PROBED_PATH", "pages": pages, "symbol_prefix_count": len(prefixes), "object_count": len(objects), "sample_prefix": prefixes[0] if prefixes else None, "sample_object": objects[0].key if objects else None})
         except Exception as exc:
             probes.append({"dataset": name, "prefix": prefix, "status": "LISTING_ERROR", "error": f"{type(exc).__name__}: {exc}"})
 

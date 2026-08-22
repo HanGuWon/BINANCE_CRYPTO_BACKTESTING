@@ -1,0 +1,9 @@
+dataset,market,timeframe,object_count,integrity_failures,gap_count,partial_boundary_count,status
+native_1d_klines,spot,1d,25713,23,0,0,ACQUIRED_WITH_RECORDED_OBJECT_FAILURES
+native_1d_klines,um,1d,20456,22,0,0,ACQUIRED_WITH_RECORDED_OBJECT_FAILURES
+selected_context_klines,spot,15m,6322,0,0,0,ACQUIRED
+selected_context_klines,um,15m,5392,0,0,0,ACQUIRED
+selected_materialized_panel,spot+um,15m/1h/4h,11714,6,5834,0,MATERIALIZED_WITH_QUARANTINED_GROUPS
+r1_5_anchor_klines,spot,15m,216,20,0,0,INHERITED_R1_5_ISSUES_RECORDED
+r1_5_anchor_klines,um,15m,158,0,0,0,INHERITED_R1_5_VERIFIED
+r1_5_derivatives,um,event,316,0,0,0,INHERITED_R1_5_DERIVATIVE_MANIFEST

@@ -46,6 +46,7 @@ dist-*/
 *.tmp
 *.bak
 *.log
+campaigns/r1_gap_safe_cohort_v1/*.err
 
 # Keep empty data/output roots visible in the repository.
 !data/raw/.gitkeep

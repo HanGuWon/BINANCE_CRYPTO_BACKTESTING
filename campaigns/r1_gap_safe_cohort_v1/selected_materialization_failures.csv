@@ -1,0 +1,7 @@
+market,symbol,reason
+spot,BCCUSDT,source timestamps are off the declared 15m grid
+spot,BNBUSDT,source timestamps are off the declared 15m grid
+spot,BTCUSDT,source timestamps are off the declared 15m grid
+spot,ETHUSDT,source timestamps are off the declared 15m grid
+spot,LTCUSDT,source timestamps are off the declared 15m grid
+spot,NEOUSDT,source timestamps are off the declared 15m grid

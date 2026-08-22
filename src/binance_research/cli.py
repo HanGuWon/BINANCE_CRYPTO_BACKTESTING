@@ -15,7 +15,7 @@ from .backtest import CostModel, run_backtest
 from .collector import AppendOnlyEventStore, ForwardCollector
 from .data import ArchiveRequest, BinanceArchiveClient, dataset_hash, load_kline_archive, normalize_timestamp, validate_klines
 from .experiments import fit_quantile_model, predictive_study
-from .features import CORE_FEATURE_SPECS, CoreFeatureEngine, preregistered_rule_variants
+from .features import CORE_FEATURE_SPECS, CoreFeatureEngine, compute_gap_safe_features, preregistered_rule_variants
 from .registry import ExperimentRecord, ExperimentRegistry, code_hash
 from .regimes import classify_regimes, fit_regime_thresholds
 from .reporting import ArtifactWriter
@@ -111,7 +111,7 @@ def _selected_walk_forward(development: pd.DataFrame, variants: pd.DataFrame, co
 def run_research(args: argparse.Namespace) -> int:
     config = _load_config(args.config); bars = _load_bars(args.input)
     train_end, validation_start, validation_end, test_start = _outer_positions(len(bars), config)
-    pretest = bars.iloc[:validation_end].copy(); pretest = pd.concat([pretest, CoreFeatureEngine().compute(pretest)], axis=1)
+    pretest = bars.iloc[:validation_end].copy(); pretest = pd.concat([pretest, compute_gap_safe_features(CoreFeatureEngine(), pretest, args.timeframe)], axis=1)
     train, validation = pretest.iloc[:train_end].copy(), pretest.iloc[validation_start:validation_end].copy()
     development = pd.concat([train, validation], ignore_index=True)
     issues = validate_klines(pretest, args.timeframe)
@@ -145,7 +145,7 @@ def run_research(args: argparse.Namespace) -> int:
         model = CostModel(cost.maker_fee_bps, cost.taker_fee_bps, cost.fallback_spread_bps, slippage, cost.latency_bars); result = run_backtest(validation, primary, model, int(rule["holding_bars"]), str(rule["fee_mode"]), timeframe, args.market); cost_records.append({"feature_id": "sig_ema20_50", "slippage_bps": slippage, **result.summary})
     walk_forward = _selected_walk_forward(development, variants, cost, rule, timeframe, args.market, int(config["split"].get("embargo_bars", 0)))
     if args.final_holdout:
-        full = pd.concat([bars, CoreFeatureEngine().compute(bars)], axis=1); test = full.iloc[test_start:]; final_summary, _, _ = _backtest_summaries(test, test[signal_columns], cost, rule, timeframe, args.market); final_holdout = final_summary.assign(status="ACCESSED_AFTER_EXPLICIT_OPT_IN")
+        full = pd.concat([bars, compute_gap_safe_features(CoreFeatureEngine(), bars, args.timeframe)], axis=1); test = full.iloc[test_start:]; final_summary, _, _ = _backtest_summaries(test, test[signal_columns], cost, rule, timeframe, args.market); final_holdout = final_summary.assign(status="ACCESSED_AFTER_EXPLICIT_OPT_IN")
     else: final_holdout = pd.DataFrame([{ "status": "UNTOUCHED", "reason": "pass --final-holdout only after candidate freeze"}])
     feature_corr = correlation_matrix(validation[feature_columns]); clusters = hierarchical_feature_clusters(feature_corr).rename_axis("feature_id").reset_index() if len(feature_corr) > 1 else pd.DataFrame(columns=["feature_id", "cluster"]); signal_corr = correlation_matrix(validation[signal_columns]); overlap = trade_overlap_matrix(validation[signal_columns]); returns = pd.concat(return_series.values(), axis=1, sort=False) if return_series else pd.DataFrame(); return_corr = correlation_matrix(returns, method="pearson", minimum_periods=3)
     writer = ArtifactWriter(args.output); tables = {"indicator_summary.csv": summary, "indicator_by_symbol.csv": by_symbol, "indicator_by_regime.csv": by_regime, "indicator_by_year.csv": by_year, "indicator_by_month.csv": by_month, "predictive_horizons.csv": predictive, "parameter_robustness.csv": parameter_summary, "feature_correlation.csv": feature_corr, "feature_clusters.csv": clusters, "signal_correlation.csv": signal_corr, "trade_overlap.csv": overlap, "return_series_correlation.csv": return_corr, "cost_sensitivity.csv": pd.DataFrame(cost_records), "walk_forward.csv": walk_forward, "final_holdout.csv": final_holdout}; artifact_paths = writer.write_tables(tables)

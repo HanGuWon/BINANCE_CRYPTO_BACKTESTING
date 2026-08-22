@@ -6,7 +6,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from binance_research.data import DataIntegrityError, deduplicate_klines, load_kline_archive, resample_klines
+from binance_research.data import deduplicate_klines, load_kline_archive
+from binance_research.panel import resample_contiguous_source
 
 
 def _resample_contiguous(frame: pd.DataFrame, rule: str) -> pd.DataFrame:
@@ -14,17 +15,7 @@ def _resample_contiguous(frame: pd.DataFrame, rule: str) -> pd.DataFrame:
     ordered = deduplicate_klines(frame.sort_values("open_time"))
     if len(ordered) < 2:
         return ordered.iloc[0:0].copy()
-    step = ordered.open_time.diff().dropna().iloc[0]
-    breaks = ordered.open_time.diff().fillna(step).ne(step).cumsum()
-    pieces: list[pd.DataFrame] = []
-    for _, segment in ordered.groupby(breaks):
-        if len(segment) < 2:
-            continue
-        try:
-            pieces.append(resample_klines(segment, rule))
-        except DataIntegrityError:
-            continue
-    return pd.concat(pieces, ignore_index=True) if pieces else ordered.iloc[0:0].copy()
+    return resample_contiguous_source(ordered, rule, source_interval="15m")
 
 
 def main() -> int:

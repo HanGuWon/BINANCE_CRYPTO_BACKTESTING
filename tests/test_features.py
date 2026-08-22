@@ -9,6 +9,7 @@ from binance_research.features import (
     CoreFeatureEngine,
     build_market_breadth,
     classify_aggtrade_side,
+    compute_gap_safe_features,
     preregistered_rule_variants,
 )
 

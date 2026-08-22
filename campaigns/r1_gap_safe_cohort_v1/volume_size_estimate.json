@@ -1,0 +1,12 @@
+{
+  "objects": 46169,
+  "compressed_bytes": 79643414,
+  "estimated_extracted_bytes": 318573656,
+  "estimated_parquet_bytes": 119465121,
+  "estimated_temporary_peak_bytes": 398217070,
+  "free_disk_before_bytes": 30508445696,
+  "required_safety_margin_bytes": 159286828,
+  "primary_candidate_symbols": 1485,
+  "status": "ACQUIRED",
+  "free_disk_after_bytes": 30135975936
+}
