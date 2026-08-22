@@ -1,0 +1,13 @@
+feature,market,timeframe,research_eligible_rows,finite_rows,coverage_fraction,first_finite_timestamp,last_finite_timestamp,classification,reason
+timestamp,spot,15m,NA,NA,NA,NA,NA,R2A_PRIMARY,base_bar_field
+timestamp,um,15m,NA,NA,NA,NA,NA,R2A_PRIMARY,base_bar_field
+core_technical,spot,15m,NA,NA,NA,NA,NA,R2A_PRIMARY,gap_safe_engine_available
+core_technical,um,15m,NA,NA,NA,NA,NA,R2A_PRIMARY,gap_safe_engine_available
+btc_context,spot,15m,NA,NA,NA,NA,NA,R2B_RESTRICTED,native_context_join_not_rerun_in_final_campaign
+btc_context,um,15m,NA,NA,NA,NA,NA,R2B_RESTRICTED,native_context_join_not_rerun_in_final_campaign
+market_breadth,spot,15m,NA,NA,NA,NA,NA,R2B_RESTRICTED,cohort_aware_helper_tested_not_rerun_in_final_campaign
+market_breadth,um,15m,NA,NA,NA,NA,NA,R2B_RESTRICTED,cohort_aware_helper_tested_not_rerun_in_final_campaign
+funding,um,15m,NA,NA,NA,NA,NA,R2B_RESTRICTED,event_asof_helper_available_native_panel_not_rerun
+premium,um,15m,NA,NA,NA,NA,NA,R2B_RESTRICTED,gap_safe_helper_available_native_panel_not_rerun
+final_holdout,spot,15m,NA,NA,NA,NA,NA,NOT_APPLICABLE,UNTOUCHED
+final_holdout,um,15m,NA,NA,NA,NA,NA,NOT_APPLICABLE,UNTOUCHED
