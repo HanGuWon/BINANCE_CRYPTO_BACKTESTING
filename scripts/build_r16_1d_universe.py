@@ -38,37 +38,22 @@ def _free_bytes(path: Path) -> int:
 
 def _summarize_1d_archive(path: Path) -> dict[str, object]:
     """Read only the native 1d fields needed for causal ranking and QA."""
-    rows = 0
-    quote_volume = 0.0
-    timestamps: list[int] = []
     issues: list[str] = []
-    with zipfile.ZipFile(path) as archive:
-        name = next(member for member in archive.namelist() if not member.endswith("/"))
-        with archive.open(name) as handle:
-            reader = csv.reader(io.TextIOWrapper(handle, encoding="utf-8", errors="strict"))
-            for values in reader:
-                if not values or values[0] == "open_time":
-                    continue
-                try:
-                    timestamp = int(float(values[0]))
-                    quote = float(values[7])
-                    open_, high, low, close = (float(values[index]) for index in (1, 2, 3, 4))
-                except (ValueError, IndexError, UnicodeError) as exc:
-                    issues.append(type(exc).__name__)
-                    continue
-                if timestamp in timestamps:
-                    issues.append("DUPLICATE_TIMESTAMP")
-                if high < max(open_, close, low) or low > min(open_, close, high) or quote < 0:
-                    issues.append("IMPOSSIBLE_OHLC")
-                timestamps.append(timestamp)
-                quote_volume += quote
-                rows += 1
-    timestamps = sorted(timestamps)
+    frame = load_kline_archive(path)
+    stamps = pd.to_datetime(frame["open_time"], utc=True)
+    rows = int(len(frame))
+    quote_volume = float(pd.to_numeric(frame["quote_volume"], errors="coerce").fillna(0).sum())
+    timestamps = sorted(stamps.drop_duplicates())
+    if stamps.duplicated().any():
+        issues.append("DUPLICATE_TIMESTAMP")
     if len(timestamps) > 1:
-        gaps = [right - left for left, right in zip(timestamps, timestamps[1:]) if right - left > 86_400_000]
+        gaps = [right - left for left, right in zip(timestamps, timestamps[1:]) if right - left > pd.Timedelta(days=1)]
         if gaps:
             issues.append("MISSING_INTERVAL")
-    days = {timestamp // 86_400_000 for timestamp in timestamps}
+    impossible = ((frame["high"] < frame[["open", "close", "low"]].max(axis=1)) | (frame["low"] > frame[["open", "close", "high"]].min(axis=1)) | (pd.to_numeric(frame["quote_volume"], errors="coerce") < 0))
+    if impossible.any():
+        issues.append("IMPOSSIBLE_OHLC")
+    days = {timestamp.floor("D") for timestamp in timestamps}
     return {"row_count": rows, "observed_days": len(days), "quote_volume": quote_volume, "issue_codes": ";".join(sorted(set(issues))), "integrity_status": "PASS" if not issues else "ISSUES"}
 
 
@@ -174,7 +159,10 @@ def build_monthly_cohorts(manifest: pd.DataFrame, taxonomy: pd.DataFrame, output
     """Aggregate complete prior calendar months and freeze diagnostic cohorts."""
     census_rows = []
     for row in manifest.itertuples():
-        if str(getattr(row, "integrity_status", "PASS")) != "PASS":
+        integrity = getattr(row, "integrity_status", None)
+        if integrity is None or (isinstance(integrity, float) and pd.isna(integrity)):
+            raise RuntimeError("MISSING_INTEGRITY_PROVENANCE: row lacks integrity_status")
+        if str(integrity) != "PASS":
             continue
         raw_path = Path(getattr(row, "raw_path", ""))
         if not raw_path.exists():
@@ -217,7 +205,16 @@ def main() -> int:
         estimate["status"] = "ACQUIRED"
         estimate["free_disk_after_bytes"] = _free_bytes(Path.cwd())
         (args.output_dir / "volume_size_estimate.json").write_text(json.dumps(estimate, indent=2), encoding="utf-8")
-        listed = listed.merge(acquired[["market", "symbol", "archive_month", "raw_path"]], on=["market", "symbol", "archive_month"], how="left")
+        acquisition_columns = [
+            column
+            for column in acquired.columns
+            if column not in {"market", "symbol", "archive_month"}
+        ]
+        listed = listed.merge(
+            acquired[["market", "symbol", "archive_month", *acquisition_columns]],
+            on=["market", "symbol", "archive_month"],
+            how="left",
+        )
         listed.to_csv(args.output_dir / "volume_archive_manifest.csv", index=False)
     if args.cohorts:
         build_monthly_cohorts(listed, taxonomy, args.output_dir)

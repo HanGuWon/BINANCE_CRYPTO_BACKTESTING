@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 import numpy as np
 import pandas as pd
 
@@ -81,6 +83,20 @@ def test_global_calendar_split_and_24h_purge() -> None:
     assert horizon_purge_bars("15m") == 96
     assert split.purge_bars["target_horizon"] == 96
     assert split.train.timestamp.max() < pd.Timestamp("2024-01-01", tz="UTC")
+
+
+@pytest.mark.parametrize("timeframe,step", [("15m", "15min"), ("1h", "1h"), ("4h", "4h")])
+def test_split_purge_embargo_exact_boundaries(timeframe: str, step: str) -> None:
+    step_delta = pd.Timedelta(step)
+    frame = pd.DataFrame({"timestamp": pd.date_range("2024-01-01", periods=20000, freq=step, tz="UTC")})
+    purge = {"15m": 96, "1h": 24, "4h": 6}[timeframe]
+    train_end = pd.Timestamp("2024-01-20", tz="UTC")
+    validation_end = pd.Timestamp("2024-02-10", tz="UTC")
+    split = global_calendar_split(frame, train_end=train_end.isoformat(), validation_end=validation_end.isoformat(), timeframe=timeframe, operational_embargo_bars=1)
+    assert split.train["timestamp"].max() == train_end - (purge + 1) * step_delta
+    assert split.validation["timestamp"].min() == train_end + step_delta
+    assert split.validation["timestamp"].max() == validation_end - (purge + 1) * step_delta
+    assert split.test["timestamp"].min() == validation_end + step_delta
 
 
 def test_archive_revision_registry_is_append_only(tmp_path: Path) -> None:

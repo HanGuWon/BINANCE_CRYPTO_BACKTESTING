@@ -54,9 +54,12 @@ def global_calendar_split(
     step = pd.Timedelta({"15m": "15min", "1h": "1h", "4h": "4h"}[timeframe])
     train_cut = train_boundary - purge * step
     validation_cut = validation_boundary - purge * step
+    embargo_delta = operational_embargo_bars * step
+    validation_start = train_boundary + embargo_delta
+    test_start = validation_boundary + embargo_delta
     train = ordered[ordered[timestamp_column] < train_cut].copy()
-    validation = ordered[(ordered[timestamp_column] >= train_boundary) & (ordered[timestamp_column] < validation_cut)].copy()
-    test = ordered[ordered[timestamp_column] >= validation_boundary].copy()
+    validation = ordered[(ordered[timestamp_column] >= validation_start) & (ordered[timestamp_column] < validation_cut)].copy()
+    test = ordered[ordered[timestamp_column] >= test_start].copy()
     return GlobalCalendarPartitions(
         train=train,
         validation=validation,

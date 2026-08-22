@@ -46,7 +46,7 @@ def infer_timestamp_unit(values: pd.Series) -> str:
     finite = pd.to_numeric(values, errors="coerce").dropna()
     if finite.empty:
         raise DataIntegrityError("cannot infer timestamp unit from empty values")
-    magnitude = float(finite.abs().median())
+    magnitude = float(finite.abs().min())
     if magnitude >= 1e17: return "ns"
     if magnitude >= 1e14: return "us"
     if magnitude >= 1e11: return "ms"

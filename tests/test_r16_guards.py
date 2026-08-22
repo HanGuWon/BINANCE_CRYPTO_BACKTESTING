@@ -4,6 +4,9 @@ import pandas as pd
 import pytest
 
 from binance_research.data import DataIntegrityError
+from binance_research.data import infer_timestamp_unit, normalize_timestamp
+from scripts.build_r16_1d_universe import _summarize_1d_archive
+from scripts.build_r17_cohorts_strict import strict_verified_manifest
 from binance_research.features import CoreFeatureEngine, compute_gap_safe_features
 from binance_research.panel import select_verified_causal_liquidity_universe
 from scripts.materialize_r15_anchor_panel import _resample_contiguous
@@ -78,5 +81,35 @@ def test_anchor_resample_rejects_off_grid_source() -> None:
         }
     )
 
-    with pytest.raises(DataIntegrityError, match="declared 15m grid"):
+    with pytest.raises(DataIntegrityError, match="OFF_GRID_PHASE"):
         _resample_contiguous(frame, "1h")
+
+
+def test_missing_integrity_status_fails_closed() -> None:
+    frame = pd.DataFrame(
+        {
+            "market": ["spot"],
+            "symbol": ["AUSDT"],
+            "archive_month": ["2024-01"],
+            "raw_path": ["data/raw/spot/klines/AUSDT/1d/AUSDT-1d-2024-01.zip"],
+            "published_sha256": ["a" * 64],
+            "computed_sha256": ["a" * 64],
+        }
+    )
+
+    with pytest.raises(RuntimeError, match="MISSING_INTEGRITY_PROVENANCE"):
+        strict_verified_manifest(frame)
+
+
+def test_spot_post_2025_microsecond_timestamps_normalize() -> None:
+    assert infer_timestamp_unit(pd.Series([1609459200000])) == "ms"
+    assert normalize_timestamp(pd.Series([1609459200000])).iloc[0] == pd.Timestamp("2021-01-01T00:00:00Z")
+    assert infer_timestamp_unit(pd.Series([1735689600000000])) == "us"
+    assert normalize_timestamp(pd.Series([1735689600000000])).iloc[0] == pd.Timestamp("2025-01-01T00:00:00Z")
+
+
+def test_implausible_epoch_fail_closed() -> None:
+    from binance_research.data import DataIntegrityError
+    with pytest.raises(DataIntegrityError, match="implausible epoch"):
+        infer_timestamp_unit(pd.Series([12345]))
+    assert infer_timestamp_unit(pd.Series([1e19])) == "ns"

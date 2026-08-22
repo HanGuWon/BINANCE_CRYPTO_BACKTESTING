@@ -18,6 +18,9 @@ def _gap_segments(bars: pd.DataFrame, expected_interval: str) -> tuple[str, pd.S
     if not timestamps.is_monotonic_increasing or timestamps.duplicated().any():
         raise ValueError("gap-safe feature computation requires strictly increasing unique timestamps")
     expected = pd.Timedelta(milliseconds=INTERVAL_MS[expected_interval])
+    epoch_ns = timestamps.astype("datetime64[ns, UTC]").astype("int64")
+    if ((epoch_ns % expected.value) != 0).any():
+        raise ValueError("timestamps are not aligned to the canonical UTC interval boundary (OFF_GRID_PHASE)")
     deltas = timestamps.diff()
     finite = deltas.dropna()
     invalid = finite.lt(expected) | finite.mod(expected).ne(pd.Timedelta(0))
