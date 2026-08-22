@@ -128,15 +128,17 @@ def resample_klines(frame: pd.DataFrame, rule: str) -> pd.DataFrame:
     if len(frame) < 2: return frame.iloc[0:0].copy()
     ordered = frame.sort_values("open_time", kind="stable"); deltas = ordered["open_time"].diff().dropna(); source_step = deltas.iloc[0]
     if (deltas != source_step).any(): raise DataIntegrityError("source bars must have one regular interval before resampling")
-    target_step = pd.Timedelta(rule)
+    # Some pandas builds no longer accept lowercase interval aliases such as
+    # "15m"; canonical INTERVAL_MS values are unambiguous Timedeltas.
+    target_step = pd.Timedelta(milliseconds=INTERVAL_MS[rule]) if rule in INTERVAL_MS else pd.Timedelta(rule)
     if target_step < source_step or target_step <= pd.Timedelta(0): raise ValueError("target resample rule must be no shorter than source bars")
     ratio, expected_count = target_step / source_step, int(round(float(target_step / source_step)))
     if not np.isclose(float(ratio), expected_count): raise ValueError("target resample rule must be an integer multiple of source bars")
     indexed = ordered.set_index("open_time")
     aggregation = {"open": "first", "high": "max", "low": "min", "close": "last", "volume": "sum", "close_time": "last", "quote_volume": "sum", "trade_count": "sum", "taker_buy_volume": "sum", "taker_buy_quote_volume": "sum"}
     available = {key: value for key, value in aggregation.items() if key in indexed.columns}
-    result = indexed.resample(rule, label="left", closed="left").agg(available)
-    counts = indexed["close"].resample(rule, label="left", closed="left").count()
+    result = indexed.resample(target_step, label="left", closed="left").agg(available)
+    counts = indexed["close"].resample(target_step, label="left", closed="left").count()
     return result.loc[counts == expected_count].dropna(subset=["open", "close"]).reset_index()
 
 

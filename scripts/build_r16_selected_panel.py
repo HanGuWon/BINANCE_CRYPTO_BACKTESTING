@@ -43,6 +43,7 @@ def selected_manifest(cohorts: pd.DataFrame, census_dir: Path, *, top_column: st
 
 
 OFF_GRID_AUDIT_SYMBOLS = {("spot", symbol) for symbol in ("BCCUSDT", "BNBUSDT", "BTCUSDT", "ETHUSDT", "LTCUSDT", "NEOUSDT")}
+_BTC_REFERENCE_CACHE: dict[tuple[str, str], pd.DataFrame | None] = {}
 
 
 def _infer_timeframe(panel: pd.DataFrame) -> str:
@@ -247,19 +248,25 @@ def finalize_breadth(manifest: pd.DataFrame, *, timeframe: str, output_root: Pat
 
 def _load_btc_reference(market: str, timeframe: str, *, manifest: pd.DataFrame | None = None) -> pd.DataFrame | None:
     """Load BTCUSDT native bars for the same market/timeframe from raw archives."""
+    cache_key = (market, timeframe)
+    if cache_key in _BTC_REFERENCE_CACHE:
+        return _BTC_REFERENCE_CACHE[cache_key]
     if market == "spot":
         root = Path("data/raw/spot/klines/BTCUSDT") / timeframe
     else:
         root = Path("data/raw/um/klines/BTCUSDT") / timeframe
     if not root.is_dir():
+        _BTC_REFERENCE_CACHE[cache_key] = None
         return None
     frames = []
     for path in sorted(root.glob("BTCUSDT-*.zip")):
         try:
             frames.append(load_kline_archive(path))
         except Exception:
+            _BTC_REFERENCE_CACHE[cache_key] = None
             return None
     if not frames:
+        _BTC_REFERENCE_CACHE[cache_key] = None
         return None
     source = pd.concat(frames, ignore_index=True).drop_duplicates("open_time").sort_values("open_time").reset_index(drop=True)
     stamps = source["open_time"].astype("datetime64[ns, UTC]")
@@ -267,7 +274,9 @@ def _load_btc_reference(market: str, timeframe: str, *, manifest: pd.DataFrame |
     step_ms = {"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}[timeframe]
     reference["segment_id"] = (stamps.diff().fillna(pd.Timedelta(milliseconds=step_ms)) != pd.Timedelta(milliseconds=step_ms)).cumsum()
     reference["close"] = source["close"].to_numpy()
-    return build_btc_reference(reference, source_market=market)
+    result = build_btc_reference(reference, source_market=market)
+    _BTC_REFERENCE_CACHE[cache_key] = result
+    return result
 
 
 def build_btc_reference(btc_bars: pd.DataFrame, *, source_market: str) -> pd.DataFrame:
@@ -287,9 +296,9 @@ def attach_btc_context(panel: pd.DataFrame, btc_reference: pd.DataFrame, *, time
     """
     step_ms = {"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}[timeframe]
     reference = btc_reference.copy()
-    reference["btc_close_time"] = pd.to_datetime(reference["btc_open_time"], utc=True) + pd.Timedelta(milliseconds=step_ms)
+    reference["btc_close_time"] = (pd.to_datetime(reference["btc_open_time"], utc=True).astype("datetime64[ns, UTC]") + pd.Timedelta(milliseconds=step_ms)).astype("datetime64[ns, UTC]")
     frame = panel.copy()
-    frame["_decision_ts"] = pd.to_datetime(frame["timestamp"], utc=True) + pd.Timedelta(milliseconds=step_ms)
+    frame["_decision_ts"] = (pd.to_datetime(frame["timestamp"], utc=True).astype("datetime64[ns, UTC]") + pd.Timedelta(milliseconds=step_ms)).astype("datetime64[ns, UTC]")
     merged = pd.merge_asof(
         frame.sort_values("_decision_ts"),
         reference.sort_values("btc_close_time"),
@@ -319,7 +328,8 @@ def attach_um_funding(panel: pd.DataFrame, symbol: str) -> pd.DataFrame:
     scored = funding_event_zscore(events).rename(columns={"timestamp": "funding_source_timestamp", "funding_zscore": "funding_zscore90"})
     step_ms = {"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}[_infer_timeframe(panel)]
     frame = panel.copy()
-    frame["_decision_ts"] = pd.to_datetime(frame["timestamp"], utc=True) + pd.Timedelta(milliseconds=step_ms)
+    frame["_decision_ts"] = (pd.to_datetime(frame["timestamp"], utc=True).astype("datetime64[ns, UTC]") + pd.Timedelta(milliseconds=step_ms)).astype("datetime64[ns, UTC]")
+    scored["funding_source_timestamp"] = pd.to_datetime(scored["funding_source_timestamp"], utc=True).astype("datetime64[ns, UTC]")
     merged = pd.merge_asof(
         frame.sort_values("_decision_ts"),
         scored[["funding_source_timestamp", "funding_rate", "funding_zscore90"]],
@@ -406,8 +416,9 @@ def attach_um_premium(panel: pd.DataFrame, *, symbol: str, timeframe: str) -> pd
     for _, positions in raw.groupby(segment_id.to_numpy(), sort=False).groups.items():
         z.iloc[list(positions)] = _rolling_zscore(values.iloc[list(positions)], 90).to_numpy()
     raw = raw[["timestamp", "premium"]].assign(premium_zscore90=z)
+    raw["timestamp"] = pd.to_datetime(raw["timestamp"], utc=True).astype("datetime64[ns, UTC]")
     step_ms = {"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}[timeframe]
-    out["_decision_ts"] = pd.to_datetime(out["timestamp"], utc=True) + pd.Timedelta(milliseconds=step_ms)
+    out["_decision_ts"] = (pd.to_datetime(out["timestamp"], utc=True).astype("datetime64[ns, UTC]") + pd.Timedelta(milliseconds=step_ms)).astype("datetime64[ns, UTC]")
     merged = pd.merge_asof(
         out.sort_values("_decision_ts"),
         raw.rename(columns={"timestamp": "premium_source_timestamp"}),
