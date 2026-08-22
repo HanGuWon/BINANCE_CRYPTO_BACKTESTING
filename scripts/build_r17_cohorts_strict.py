@@ -63,6 +63,8 @@ def strict_verified_manifest(manifest: pd.DataFrame) -> tuple[pd.DataFrame, pd.D
                     continue
                 if str(summary["integrity_status"]) != "PASS":
                     reason = "SECOND_PASS_ISSUES:" + str(summary["issue_codes"])
+                elif int(summary["observed_days"]) != pd.Period(str(row["archive_month"]), freq="M").days_in_month:
+                    reason = "SECOND_PASS_COVERAGE_NE_1.0"
         if reason:
             exclusions.append(
                 {

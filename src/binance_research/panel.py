@@ -12,7 +12,7 @@ from typing import Iterable, Mapping
 
 import pandas as pd
 
-from .data import DataIntegrityError, INTERVAL_MS, resample_klines
+from .data import DataIntegrityError, INTERVAL_MS, resample_klines, validate_klines
 from .features import CORE_FEATURE_SPECS
 
 PANEL_COVERAGE_STATUSES = (
@@ -119,10 +119,11 @@ def resample_contiguous_source(frame: pd.DataFrame, target: str, *, source_inter
     if timestamps.duplicated().any() or not timestamps.is_monotonic_increasing:
         raise DataIntegrityError("source timestamps must be unique and increasing")
     source_step = pd.Timedelta(milliseconds=INTERVAL_MS[source_interval])
-    stamps = pd.to_datetime(ordered['open_time'], utc=True)
-    phase_ns = stamps.astype('datetime64[ns, UTC]').astype('int64') % source_step.value
+    # Absolute UTC phase mirrors the canonical validate_klines contract so the
+    # grid rule lives with the kline integrity validator.
+    phase_ns = timestamps.astype("datetime64[ns, UTC]").astype("int64") % source_step.value
     if (phase_ns != 0).any():
-        raise DataIntegrityError('source timestamps are not aligned to the canonical UTC grid (OFF_GRID_PHASE)')
+        raise DataIntegrityError("source timestamps are not aligned to the canonical UTC grid (OFF_GRID_PHASE)")
     deltas = timestamps.diff().dropna()
     invalid = deltas.lt(source_step) | deltas.mod(source_step).ne(pd.Timedelta(0))
     if invalid.any():

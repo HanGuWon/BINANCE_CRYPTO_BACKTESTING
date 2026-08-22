@@ -108,6 +108,11 @@ def validate_klines(frame: pd.DataFrame, interval: str, *, allow_negative: bool 
     if int(impossible.sum()): issues.append(IntegrityIssue("IMPOSSIBLE_OHLC", "ERROR", "OHLC ordering or non-negative invariant failed", int(impossible.sum())))
     if interval in INTERVAL_MS and len(frame) > 1:
         expected = pd.Timedelta(milliseconds=INTERVAL_MS[interval]); deltas = frame["open_time"].drop_duplicates().sort_values().diff().dropna()
+        stamps = frame["open_time"].drop_duplicates().sort_values()
+        phase_ns = stamps.astype("datetime64[ns, UTC]").astype("int64") % expected.value
+        off_grid = int((phase_ns != 0).sum())
+        if off_grid:
+            issues.append(IntegrityIssue("OFF_GRID_PHASE", "ERROR", "timestamps are not aligned to the absolute UTC interval phase", off_grid))
         gaps, irregular = deltas[deltas > expected], deltas[(deltas < expected) | ((deltas % expected) != pd.Timedelta(0))]
         if len(gaps): issues.append(IntegrityIssue("MISSING_INTERVAL", "WARN", "gaps in candle grid", int(sum(max(0, int(delta / expected) - 1) for delta in gaps))))
         if len(irregular): issues.append(IntegrityIssue("IRREGULAR_INTERVAL", "ERROR", "timestamps are off the requested grid", len(irregular)))
