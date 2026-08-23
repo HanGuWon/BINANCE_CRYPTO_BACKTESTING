@@ -42,7 +42,11 @@ def selected_manifest(cohorts: pd.DataFrame, census_dir: Path, *, top_column: st
     return result.sort_values(["market", "symbol", "archive_month"]).reset_index(drop=True)
 
 
-OFF_GRID_AUDIT_SYMBOLS = {("spot", symbol) for symbol in ("BCCUSDT", "BNBUSDT", "BTCUSDT", "ETHUSDT", "LTCUSDT", "NEOUSDT")}
+OFF_GRID_AUDIT_SYMBOLS = {
+    "15m": {("spot", symbol) for symbol in ("BCCUSDT", "BNBUSDT", "BTCUSDT", "ETHUSDT", "LTCUSDT", "NEOUSDT")},
+    "1h": set(),
+    "4h": {("spot", "ICXUSDT"), ("spot", "ONTUSDT")},
+}
 _BTC_REFERENCE_CACHE: dict[tuple[str, str], pd.DataFrame | None] = {}
 
 
@@ -54,18 +58,19 @@ def _infer_timeframe(panel: pd.DataFrame) -> str:
     raise ValueError("panel timeframe must be explicit for causal joins")
 
 
-def quarantine_local_off_grid_rows(source: pd.DataFrame, market: str, symbol: str) -> tuple[pd.DataFrame, int]:
+def quarantine_local_off_grid_rows(source: pd.DataFrame, market: str, symbol: str, *, timeframe: str = "15m") -> tuple[pd.DataFrame, int]:
     """Remove every off-grid row (absolute UTC phase check), never snap.
 
     Only the six audited February-2018 spot series may contain off-grid rows;
     any other series fails closed. The normal return-to-grid row is preserved.
     """
     stamps = pd.to_datetime(source["open_time"], utc=True)
-    step_ns = int(pd.Timedelta(minutes=15).value)
+    step_ms = {"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}[timeframe]
+    step_ns = step_ms * 1_000_000
     off_grid = (stamps.astype("datetime64[ns, UTC]").astype("int64") % step_ns) != 0
     if not off_grid.any():
         return source, 0
-    if (market, symbol) not in OFF_GRID_AUDIT_SYMBOLS:
+    if (market, symbol) not in OFF_GRID_AUDIT_SYMBOLS.get(timeframe, set()):
         raise DataIntegrityError("unexpected off-grid rows for unaudited series " + market + "/" + symbol)
     mask = off_grid.to_numpy()
     return source.loc[~mask].copy(), int(mask.sum())
@@ -171,7 +176,7 @@ def materialize_native_selected(manifest: pd.DataFrame, *, timeframe: str, outpu
         if not frames:
             continue
         source = pd.concat(frames, ignore_index=True).drop_duplicates("open_time").sort_values("open_time").reset_index(drop=True)
-        source, quarantined = quarantine_local_off_grid_rows(source, market, symbol)
+        source, quarantined = quarantine_local_off_grid_rows(source, market, symbol, timeframe=timeframe)
         counts["quarantined_off_grid_rows"] = int(counts["quarantined_off_grid_rows"]) + quarantined
         counts["objects"] += len(frames)
         try:
