@@ -214,6 +214,16 @@ def materialize_native_selected(manifest: pd.DataFrame, *, timeframe: str, outpu
         if market == "um":
             panel = attach_um_funding(panel, symbol)
             panel = attach_um_premium(panel, symbol=symbol, timeframe=timeframe)
+        # Recompute the context-derived engine outputs on the enriched frame
+        # so btc_regime/sig_btc_regime reflect real causal BTC history.
+        from binance_research.features import _optional
+        btc_close = _optional(panel, "btc_close")
+        btc_ema = btc_close.ewm(span=200, adjust=False, min_periods=200).mean()
+        btc_distance = (btc_close - btc_ema) / btc_ema.replace(0, np.nan)
+        panel["btc_regime"] = np.select([btc_distance > 0.005, btc_distance < -0.005], [1.0, -1.0], default=0.0)
+        panel.loc[btc_ema.isna(), "btc_regime"] = np.nan
+        panel.loc[panel["btc_close"].isna(), "btc_regime"] = np.nan
+        panel["sig_btc_regime"] = panel["btc_regime"]
         # Stage D ordering: CoreFeatureEngine runs on enriched sources.  The
         # per-symbol engine pass above already consumed btc/funding/premium
         # columns when present; breadth joins as a cross-sectional second pass
@@ -264,6 +274,7 @@ def finalize_breadth(manifest: pd.DataFrame, *, timeframe: str, output_root: Pat
             # The stale engine-pass breadth signal (computed before the real
             # cross-sectional breadth existed) must not shadow the joined one.
             frame = frame.drop(columns=["sig_market_breadth"], errors="ignore")
+            frame = frame.merge(window.drop_duplicates("timestamp"), on="timestamp", how="left")
             import numpy as _np
             frame["sig_market_breadth"] = _np.select(
                 [frame["market_breadth"] >= 0.6, frame["market_breadth"] <= 0.4],
@@ -271,7 +282,6 @@ def finalize_breadth(manifest: pd.DataFrame, *, timeframe: str, output_root: Pat
                 default=0.0,
             )
             frame.loc[frame["market_breadth"].isna(), "sig_market_breadth"] = _np.nan
-            frame = frame.merge(window.drop_duplicates("timestamp"), on="timestamp", how="left")
             frame.to_parquet(path, index=False)
     return {"breadth_rows": len(diagnostics)}
 
