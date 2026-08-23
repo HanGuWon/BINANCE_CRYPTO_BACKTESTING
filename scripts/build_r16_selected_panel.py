@@ -44,7 +44,9 @@ def selected_manifest(cohorts: pd.DataFrame, census_dir: Path, *, top_column: st
 
 OFF_GRID_AUDIT_SYMBOLS = {
     "15m": {("spot", symbol) for symbol in ("BCCUSDT", "BNBUSDT", "BTCUSDT", "ETHUSDT", "LTCUSDT", "NEOUSDT")},
-    "1h": set(),
+    # The same February-2018 Spot anomaly propagates to the native 1h/4h
+    # archives of these six series; quarantine stays fail-closed per grid.
+    "1h": {("spot", symbol) for symbol in ("BCCUSDT", "BNBUSDT", "BTCUSDT", "ETHUSDT", "LTCUSDT", "NEOUSDT")},
     "4h": {("spot", "ICXUSDT"), ("spot", "ONTUSDT")},
 }
 _BTC_REFERENCE_CACHE: dict[tuple[str, str], pd.DataFrame | None] = {}
