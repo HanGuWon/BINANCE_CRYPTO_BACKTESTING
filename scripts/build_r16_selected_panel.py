@@ -195,6 +195,10 @@ def materialize_native_selected(manifest: pd.DataFrame, *, timeframe: str, outpu
         bars["row_class"] = bars["universe_month"].map(lambda month: "RESEARCH_ELIGIBLE" if month in selected_months else "WARMUP_CONTEXT_ONLY")
         features = compute_gap_safe_features(CoreFeatureEngine(), bars.rename(columns={"timestamp": "open_time"}), timeframe)
         features = features.drop(columns=["open_time"], errors="ignore")
+        # Context columns are recomputed after causal joins; drop the stale
+        # engine-pass versions so the final concat keeps the real values.
+        stale_context = [column for column in ("btc_regime", "sig_btc_regime", "market_breadth", "sig_market_breadth") if column in features.columns]
+        features = features.drop(columns=stale_context)
         panel = pd.concat([bars.reset_index(drop=True), features.reset_index(drop=True)], axis=1)
         panel = panel.loc[:, ~panel.columns.duplicated()]
         # Stage B/C: build the BTC reference from a SEPARATE completed-bar
@@ -325,7 +329,17 @@ def attach_btc_context(panel: pd.DataFrame, btc_reference: pd.DataFrame, *, time
     merged["btc_source_age"] = (merged["_decision_ts"] - merged["btc_close_time"]).dt.total_seconds().div(step_ms / 1000)
     merged.loc[merged["btc_close"].isna(), "btc_source_age"] = np.nan
     merged["btc_coverage_status"] = np.where(merged["btc_close"].notna(), "AVAILABLE", "NO_PRIOR_OBSERVATION")
+    # A stale NaN btc_regime column from the pre-context engine pass must not
+    # shadow the freshly recomputed context after the causal join.
     return merged
+
+
+def drop_stale_context_columns(panel: pd.DataFrame) -> pd.DataFrame:
+    """Remove engine-pass context columns that require post-join recomputation."""
+    stale = [column for column in ("btc_regime", "sig_btc_regime") if column in panel.columns]
+    if stale:
+        panel = panel.drop(columns=stale)
+    return panel
 
 
 def attach_um_funding(panel: pd.DataFrame, symbol: str) -> pd.DataFrame:
