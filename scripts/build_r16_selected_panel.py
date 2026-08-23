@@ -197,7 +197,9 @@ def materialize_native_selected(manifest: pd.DataFrame, *, timeframe: str, outpu
         features = features.drop(columns=["open_time"], errors="ignore")
         # Context columns are recomputed after causal joins; drop the stale
         # engine-pass versions so the final concat keeps the real values.
-        stale_context = [column for column in ("btc_regime", "sig_btc_regime", "market_breadth", "sig_market_breadth") if column in features.columns]
+        # btc_regime/sig_btc_regime must survive as engine outputs computed on
+        # the enriched frame, so only the breadth pair is dropped here.
+        stale_context = [column for column in ("market_breadth", "sig_market_breadth") if column in features.columns]
         features = features.drop(columns=stale_context)
         panel = pd.concat([bars.reset_index(drop=True), features.reset_index(drop=True)], axis=1)
         panel = panel.loc[:, ~panel.columns.duplicated()]
