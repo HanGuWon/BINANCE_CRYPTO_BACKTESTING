@@ -92,10 +92,18 @@ def acquire_selected(manifest: pd.DataFrame, *, workers: int = 2, timeframe: str
     with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
         futures = [pool.submit(acquire, request) for request in requests]
         for number, future in enumerate(as_completed(futures), start=1):
-            rows.append(future.result())
+            try:
+                rows.append(future.result())
+            except Exception as exc:
+                # A missing remote archive is a real coverage gap, not an
+                # implementation error; record it and keep the run going.
+                print(f"acquire failed: {type(exc).__name__}: {exc}", flush=True)
             if number % 50 == 0:
                 print(f"acquired selected context {number}/{len(futures)}", flush=True)
-    return pd.DataFrame(rows)
+    frame = pd.DataFrame(rows)
+    if "market" not in frame.columns:
+        frame = pd.DataFrame(columns=["market", "symbol", "archive_month", "raw_path", "published_sha256", "computed_sha256", "timeframe"])
+    return frame
 
 
 def materialize_selected(manifest: pd.DataFrame, output_root: Path) -> dict[str, object]:
@@ -494,7 +502,8 @@ def main() -> int:
     estimate_path = args.campaign_dir / estimate_name
     if args.acquire:
         acquired = acquire_selected(manifest, workers=args.workers, timeframe=args.timeframe)
-        manifest = manifest.merge(acquired, on=["market", "symbol", "archive_month"], how="left")
+        if len(acquired):
+            manifest = manifest.merge(acquired, on=["market", "symbol", "archive_month"], how="left", suffixes=("", "_acquired"))
         manifest.to_csv(manifest_path, index=False)
         estimate["status"] = "ACQUIRED"
         estimate["free_disk_after_bytes"] = int(shutil.disk_usage(Path.cwd()).free)
