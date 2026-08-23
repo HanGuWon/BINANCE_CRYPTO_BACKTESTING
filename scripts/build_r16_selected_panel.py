@@ -336,7 +336,7 @@ def attach_btc_context(panel: pd.DataFrame, btc_reference: pd.DataFrame, *, time
 
 def drop_stale_context_columns(panel: pd.DataFrame) -> pd.DataFrame:
     """Remove engine-pass context columns that require post-join recomputation."""
-    stale = [column for column in ("btc_regime", "sig_btc_regime") if column in panel.columns]
+    stale = [column for column in ("btc_regime", "sig_btc_regime", "market_breadth", "sig_market_breadth") if column in panel.columns]
     if stale:
         panel = panel.drop(columns=stale)
     return panel
