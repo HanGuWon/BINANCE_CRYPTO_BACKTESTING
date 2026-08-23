@@ -196,10 +196,9 @@ def materialize_native_selected(manifest: pd.DataFrame, *, timeframe: str, outpu
         features = compute_gap_safe_features(CoreFeatureEngine(), bars.rename(columns={"timestamp": "open_time"}), timeframe)
         features = features.drop(columns=["open_time"], errors="ignore")
         # Context columns are recomputed after causal joins; drop the stale
-        # engine-pass versions so the final concat keeps the real values.
-        # btc_regime/sig_btc_regime must survive as engine outputs computed on
-        # the enriched frame, so only the breadth pair is dropped here.
-        stale_context = [column for column in ("market_breadth", "sig_market_breadth") if column in features.columns]
+        # engine-pass versions (computed before btc/funding/premium existed)
+        # so the final concat keeps the post-join values only.
+        stale_context = [column for column in ("btc_regime", "sig_btc_regime", "market_breadth", "sig_market_breadth") if column in features.columns]
         features = features.drop(columns=stale_context)
         panel = pd.concat([bars.reset_index(drop=True), features.reset_index(drop=True)], axis=1)
         panel = panel.loc[:, ~panel.columns.duplicated()]
@@ -262,6 +261,16 @@ def finalize_breadth(manifest: pd.DataFrame, *, timeframe: str, output_root: Pat
                 & (diagnostics["timestamp"].dt.year == year)
             ][["timestamp", "selected_count", "valid_count", "valid_fraction", "breadth_pct_above_ema50", "breadth_coverage_status", "market_breadth"]]
             frame = frame.drop(columns=["selected_count", "valid_count", "valid_fraction", "breadth_pct_above_ema50", "breadth_coverage_status", "market_breadth"], errors="ignore")
+            # The stale engine-pass breadth signal (computed before the real
+            # cross-sectional breadth existed) must not shadow the joined one.
+            frame = frame.drop(columns=["sig_market_breadth"], errors="ignore")
+            import numpy as _np
+            frame["sig_market_breadth"] = _np.select(
+                [frame["market_breadth"] >= 0.6, frame["market_breadth"] <= 0.4],
+                [1.0, -1.0],
+                default=0.0,
+            )
+            frame.loc[frame["market_breadth"].isna(), "sig_market_breadth"] = _np.nan
             frame = frame.merge(window.drop_duplicates("timestamp"), on="timestamp", how="left")
             frame.to_parquet(path, index=False)
     return {"breadth_rows": len(diagnostics)}
