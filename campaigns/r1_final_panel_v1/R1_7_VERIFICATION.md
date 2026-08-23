@@ -1,53 +1,111 @@
-# R1.7 Verification
+# R1.7 Verification — Final R1 Panel
 
-Verdict: **PARTIALLY VERIFIED — R1 PANEL BLOCKERS REMAIN**
+Verdict: **VERIFIED — FULL R1 PANEL READY FOR R2A**
 
 ## Provenance
 
 - Branch: `research/r1-final-panel-v1`
-- Implementation commit: `16d82eeba081465dd41df4d96fcfc6bd948b2a1e`
-- Campaign metadata commit: pending (this commit)
-- Remote branch: `origin/research/r1-final-panel-v1` (implementation pushed)
-- Python: 3.11 (uv-managed runtime)
-- Final holdout: `UNTOUCHED`
+- Implementation commit: 918e0355f7185458587a708bf44150d203abc5c7
+- Campaign metadata commit: this commit
+- Remote: origin/research/r1-final-panel-v1 (implementation pushed)
+- Python: 3.11.15
+- Final holdout: UNTOUCHED
 
 ## Verification gates
 
-- `python -m compileall -q src tests scripts`: PASS
-- `pytest --collect-only -q`: 75 tests collected
-- `pytest -q`: 75 passed, 1 warning
-- Real post-2025 Spot evidence: `BTCUSDT-1d-2025-02.zip` normalized to 28 rows / 28 observed days / `PASS`; no false `MISSING_INTERVAL`.
-- Synthetic timestamp proof: `1735689600000` and `1735689600000000` both normalize to `2025-01-01T00:00:00Z` using millisecond and microsecond inference respectively.
+- python -m compileall -q src tests scripts: PASS
+- pytest --collect-only -q: 85 tests collected
+- pytest -q: **85 passed, 1 warning**
 
-## Strict 1d verification
+## Native timeframe panels (Spot + UM)
 
-- Listed objects: 46,169
-- Verified: 46,124
-- Excluded: 45
-- Exclusions: 30 `OTHER_REAL_FAILURE` (archive acquisition errors) and 15 `PARTIAL_LISTING_MONTH`; no exclusion was caused by post-2025 Spot microsecond timestamps.
-- Canonical classified file: `volume_ranking_exclusions_final.csv`.
+All three native timeframes were acquired from official monthly archives with
+published/computed SHA-256 equality enforced per object and materialized
+fail-closed per market x symbol group.
 
-## Corrected cohorts
+| Timeframe | Objects | Rows | Research rows | Warmup rows | Segments | Gaps | Failed groups |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 15m | 11,714 | 33,426,508 | 23,946,209 | 9,480,299 | 2,915 | 2,104 | 0 |
+| 1h | 11,714 | 8,357,138 | 5,986,859 | 2,370,279 | 2,860 | 2,049 | 0 |
+| 4h | 11,714 | 2,090,190 | 1,497,298 | 592,892 | 1,730 | 919 | 0 |
 
-- Before membership hash: `2a3e1466c4f12fc30be46e84626ed3d03fd4fe107a06d5c25b6aaeea0125c4da`
-- Rebuilt membership hash: `7f650cfb0a09f32796762804dce750fdc2bb9b9f4d97a5b538b175309c7a72c9`
-- Spot: 107 selected months / 407 distinct selected symbols.
-- UM: 78 selected months / 404 distinct selected symbols.
-- Mature months with Top50 shortfall: 0. The prior five zero-count mature Spot months were invalidated and recovered after timestamp normalization.
+Manifests: selected_15m_manifest.csv, selected_1h_manifest.csv,
+selected_4h_manifest.csv. Summaries: selected_15m_summary.json,
+selected_1h_summary.json, selected_4h_summary.json.
 
 ## Off-grid quarantine
 
-Six audited Spot symbols (`BCCUSDT`, `BNBUSDT`, `BTCUSDT`, `ETHUSDT`, `LTCUSDT`, `NEOUSDT`) each have one contiguous February-2018 off-grid run of 81 rows. The canonical return-to-grid row at `2018-02-10T06:15:00Z` is preserved. Quarantine is fail-closed and never snaps timestamps. See `off_grid_anomalies.csv`.
+- 15m: 486 quarantined rows across the six audited February-2018 Spot series
+  (BCCUSDT, BNBUSDT, BTCUSDT, ETHUSDT, LTCUSDT, NEOUSDT); the canonical
+  return-to-grid row 2018-02-10T06:15:00Z is preserved.
+- 1h: 258 quarantined rows (same six audited series, propagated to the native
+  1h archives).
+- 4h: 18 quarantined rows (ICXUSDT, ONTUSDT, June-2018, 9 rows each).
+  All quarantines are fail-closed; no timestamps were snapped and no candles
+  were synthesized.
 
-## Split proof
+## Context integration (post-join recomputation)
 
-With 24-hour purge and one operational embargo bar, exact boundaries are asserted for 15m/1h/4h in tests. Example 15m proof: last train `2024-01-18T23:45Z`, first validation `2024-01-20T00:15Z`, last validation `2024-02-08T23:45Z`, first test `2024-02-10T00:15Z`. Equivalent 1h and 4h assertions are included.
+BTC regime, funding, premium, and breadth are attached BEFORE the final
+feature computation that depends on them. Stale engine-pass context columns
+are dropped before causal joins, and btc_regime/sig_btc_regime are recomputed
+on the enriched frame.
 
-## Blockers / scope
+Verified finite coverage on final partitions (ETHUSDT 2023 sample):
 
-The implementation contains native 15m/1h/4h request and materializer paths, causal BTC context, cohort-aware breadth, event-level funding, and premium helpers. The final campaign rerun did not complete all three native timeframe acquisitions and end-to-end joins after the implementation commit; therefore native panel row/segment counts and feature coverage are not promoted to `R2A_PRIMARY`. No R2A performance analysis or holdout metric was run.
+- Spot 15m: btc_regime 35,035/35,035; market_breadth 34,986/35,035.
+- UM 15m: btc_regime 35,040/35,040; funding_rate 35,040/35,040;
+  premium 35,040/35,040; market_breadth 35,040/35,040.
+- Spot 1h: btc_regime 8,759/8,759; UM 1h: 8,760/8,760 with funding/premium.
+- Spot 4h: btc_regime 2,190/2,190; UM 4h: 2,190/2,190 with funding/premium.
 
-## Free disk and Git
+## Feature availability (real counts)
 
-- Last observed free disk before cleanup: approximately 15.7 GB.
-- Implementation commit was pushed successfully to GitHub. This report and the small verification artifacts are the only additional campaign files intended for Git; raw archives, Parquet, pickle manifests, and temporary logs remain untracked/excluded.
+eature_availability_final.csv is generated from the final panel audit.
+All audited features are R2A_PRIMARY with real finite row counts:
+
+- core_technical (ema20_50_spread, rsi14): coverage 0.958-0.999.
+- btc_context (btc_regime): coverage 0.916-0.996.
+- market_breadth: coverage 0.985-0.996.
+- funding (UM only): coverage 0.995 across all timeframes.
+- premium (UM only): coverage 0.995 across all timeframes.
+- Historical exact spread/top-book/OI remain forward-shadow per source
+  capability and are NOT promoted.
+- final_holdout: NOT_APPLICABLE / UNTOUCHED.
+
+## Split / purge / embargo
+
+split_metadata_final.csv records exact UTC boundaries per timeframe with a
+24h purge (96/24/6 bars for 15m/1h/4h) and one operational embargo bar, e.g.
+15m: last train 2024-01-18T23:45Z, first validation 2024-01-20T00:15Z,
+last validation 2024-02-08T23:45Z, first holdout 2024-02-10T00:15Z.
+Boundaries are asserted in tests/test_r16_semantics.py.
+
+## Cohort
+
+- Authoritative cohort: universe_monthly.csv (single source for all
+  downstream manifests).
+- Membership hash: 7f650cfb0a09f32796762804dce750fdc2bb9b9f4d97a5b538b175309c7a72c9
+  (cohort_membership_after_fix.sha256).
+- top50_shortfalls.csv regenerated from the final cohort: 33 structural
+  shortfalls, all early-history months with genuinely fewer than 50 seasoned
+  assets (Spot through 2019-08, UM through 2020-10). No mature-month
+  actual_n=0 entries remain.
+
+## Git / disk
+
+- Implementation pushed: 65ff126..918e035 on research/r1-final-panel-v1.
+- Raw archives, Parquet partitions, pickle caches, and logs are untracked by
+  design; only reviewed text artifacts are committed.
+- Free disk after completion: ~1.6 GB (raw archive corpus retained for
+  lineage).
+
+## Final acceptance
+
+A new researcher can clone the branch, obtain the declared immutable raw
+objects via the committed manifests, and reconstruct the same cohorts, panels,
+context features, and coverage reports without hidden local state. Every
+promoted R2A_PRIMARY feature is traced to actual finite historical rows in
+feature_availability_final.csv. All current artifacts are mutually consistent
+and the final holdout remains untouched.
+
