@@ -18,6 +18,7 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
+import pyarrow as pa
 import pyarrow.parquet as pq
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -89,9 +90,11 @@ def load_panel_pre_holdout(
         schema_names = parquet.schema_arrow.names
         wanted = [c for c in columns if c in schema_names] if columns else None
         table = parquet.read(columns=wanted or None)
-        stamps = table.column("timestamp").cast("int64")
-        mask = stamps < boundary_ns
-        if mask.null_count or not bool(mask.any()):
+        stamps = table.column("timestamp").combine_chunks()
+        import pyarrow.compute as pc
+        stamps_ns = pc.cast(stamps, pa.int64())
+        mask = pc.less(stamps_ns, boundary_ns)
+        if mask.null_count or not mask.true_count:
             continue
         parts.append(table.filter(mask).to_pandas())
     if not parts:

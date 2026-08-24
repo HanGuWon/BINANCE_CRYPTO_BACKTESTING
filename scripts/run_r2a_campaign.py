@@ -22,7 +22,6 @@ sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "src"))
 
 from r2a_engine import (  # noqa: E402
-    DEFAULT_COLUMNS,
     HOLDOUT_BOUNDARY_BY_TF,
     SPLIT_FIRST_VALIDATION,
     SPLIT_LAST_TRAIN,
@@ -96,7 +95,7 @@ def main() -> int:
         key = (trial.market, trial.timeframe)
         if key not in panels:
             print(f"loading panel {key}", flush=True)
-            panel = load_panel_pre_holdout(DATA_ROOT, trial.market, trial.timeframe, columns=DEFAULT_COLUMNS + ["funding_zscore90_y", "funding_zscore90", "market_breadth"])
+            panel = load_panel_pre_holdout(DATA_ROOT, trial.market, trial.timeframe, columns=None)
             assert_no_holdout(panel, timeframe=trial.timeframe, context=f"panel {key}")
             panels[key] = panel
         panel = panels[key]
