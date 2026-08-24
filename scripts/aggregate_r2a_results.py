@@ -8,6 +8,7 @@ execution); boundaries are re-asserted here before any statistic is computed.
 from __future__ import annotations
 
 import math
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -176,10 +177,30 @@ def main() -> int:
     concentration = pd.DataFrame(concentration_rows)
 
     # Cohort diagnostics (validation, primary top50 as executed).
-    cohort_diag = validation[["trial_id"]].copy()
-    cohort_diag["cohort"] = "top50"
-    cohort_diag["trades"] = validation["executed_trades"]
-    cohort_diag["sharpe"] = validation["sharpe"]
+    universe = pd.read_csv(ROOT / "campaigns" / "r1_final_panel_v1" / "universe_monthly.csv", usecols=["market", "universe_month", "symbol", "selected_top20", "selected_top50", "selected_top100"])
+    cohort_diag_rows = []
+    for trial in registry.itertuples(index=False):
+        trades = pd.read_parquet(CHECKPOINT_ROOT / (str(trial.trial_id) + "_trades.parquet"))
+        if trades.empty:
+            for cohort in ("top20", "top50", "top100"):
+                cohort_diag_rows.append({"trial_id": trial.trial_id, "cohort": cohort, "trades": 0, "mean_net_return": np.nan, "sharpe": np.nan})
+            continue
+        stamps_t = pd.to_datetime(trades["decision_time"], utc=True)
+        valid_part_c = trades[(stamps_t >= SPLIT_FIRST_VALIDATION[trial.timeframe]) & (stamps_t <= SPLIT_LAST_VALIDATION[trial.timeframe])]
+        month_str_c = pd.to_datetime(valid_part_c["decision_time"]).dt.strftime("%Y-%m") if not valid_part_c.empty else pd.Series(dtype=str)
+        for cohort in ("top20", "top50", "top100"):
+            column = "selected_" + cohort
+            allowed = set(universe.loc[(universe.market == trial.market) & universe[column].astype(bool)].apply(lambda r: (str(r.universe_month), str(r.symbol)), axis=1))
+            if valid_part_c.empty:
+                subset = valid_part_c
+            else:
+                mask_values = [(month, str(symbol)) in allowed for month, symbol in zip(month_str_c, valid_part_c["symbol"])]
+                mask = pd.Series(mask_values, index=valid_part_c.index)
+                subset = valid_part_c[mask]
+            net = subset["net_return"].astype(float) if not subset.empty else pd.Series(dtype=float)
+            sharpe = float(np.sqrt(PPY[trial.timeframe]) * net.mean() / net.std(ddof=0)) if len(net) > 1 and net.std(ddof=0) > 0 else np.nan
+            cohort_diag_rows.append({"trial_id": trial.trial_id, "cohort": cohort, "trades": int(len(subset)), "mean_net_return": float(net.mean()) if len(net) else np.nan, "sharpe": sharpe})
+    cohort_diag = pd.DataFrame(cohort_diag_rows)
 
     # Multiple testing: BH-FDR within market x timeframe family.
     hac["family"] = hac["market"] + "|" + hac["timeframe"]
@@ -205,13 +226,27 @@ def main() -> int:
     surviving_count = int((multiple_testing["fdr_q_value"] <= FDR_ALPHA).sum())
 
     # Frozen grading on validation evidence only.
+    wf_count = wf.set_index("trial_id")["fold_count"].to_dict()
     wf_pos = wf.set_index("trial_id")["positive_fold_fraction"].to_dict()
+    robustness_notes = []
     grades = []
     for row in validation.itertuples(index=False):
         mq = multiple_testing.loc[multiple_testing.trial_id == row.trial_id, "fdr_q_value"]
         qval = float(mq.iloc[0]) if len(mq) and np.isfinite(float(mq.iloc[0])) else float("nan")
-        posfrac = wf_pos.get(row.trial_id, np.nan)
-        posfrac = float(posfrac) if posfrac is not None and np.isfinite(posfrac) else -1.0
+        folds = int(wf_count.get(row.trial_id, 0))
+        raw_pos = wf_pos.get(row.trial_id, np.nan)
+        posfrac = float(raw_pos) if raw_pos is not None and np.isfinite(raw_pos) else -1.0
+        if folds < 2:
+            # Frozen criteria cannot be evaluated from a single fold; this must
+            # never silently count as walk-forward replication PASS.
+            grade = "D"
+            mp = multiple_testing.loc[multiple_testing.trial_id == row.trial_id, "p_value_two_sided"]
+            pval = float(mp.iloc[0]) if len(mp) else np.nan
+            if np.isfinite(pval) and pval < 0.05:
+                grade = "C"
+            grades.append(grade)
+            robustness_notes.append({"trial_id": row.trial_id, "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE", "fold_count": folds})
+            continue
         grade = "D"
         if np.isfinite(qval) and np.isfinite(row.hac_t_stat) and abs(row.hac_t_stat) >= 3 and posfrac >= 0.75 and qval <= 0.05:
             grade = "A"
@@ -222,8 +257,9 @@ def main() -> int:
             pval = float(mp.iloc[0]) if len(mp) else np.nan
             if np.isfinite(pval) and pval < 0.05:
                 grade = "C"
-        grades.append(grade)
+            grades.append(grade)
     validation["grade"] = grades
+    (CAMPAIGN / 'robustness_flags.json').write_text(json.dumps(robustness_notes, indent=2))
 
     validation.to_csv(CAMPAIGN / "validation_results.csv", index=False)
     train_desc.to_csv(CAMPAIGN / "train_descriptive.csv", index=False)

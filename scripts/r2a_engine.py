@@ -78,7 +78,14 @@ def load_panel_pre_holdout(
     *,
     columns: list[str] | tuple[str, ...] | None = None,
 ) -> pd.DataFrame:
-    """Stream partitions with predicate pushdown; holdout rows never load."""
+    """Load only pre-holdout rows using per-row-group timestamp pre-scan.
+
+    Honest limitation (R2A_ERRATUM_001): row-groups entirely inside the
+    holdout are skipped via row-group statistics; straddling groups are read
+    from disk but filtered BEFORE pandas conversion. Proven: holdout rows
+    never reach pandas, signals, trades, checkpoints or aggregates.
+    Not claimed: byte-level "never read from disk" for straddling groups.
+    """
     pattern_root = Path(root) / f"market={market}"
     paths = sorted(pattern_root.glob(f"symbol=*/timeframe={timeframe}/year=*/part-000.parquet"))
     if not paths:
@@ -87,14 +94,30 @@ def load_panel_pre_holdout(
     parts: list[pd.DataFrame] = []
     for path in paths:
         parquet = pq.ParquetFile(path)
+        meta = parquet.metadata
+        keep_groups = []
+        for group_index in range(meta.num_row_groups):
+            group_meta = meta.row_group(group_index)
+            ts_column_index = next(
+                (i for i in range(group_meta.num_columns) if group_meta.column(i).path_in_schema == "timestamp"),
+                None,
+            )
+            if ts_column_index is None:
+                keep_groups.append(group_index)
+                continue
+            column_stats = group_meta.column(ts_column_index).statistics
+            group_max_ns = int(pd.Timestamp(column_stats.max).value) if column_stats and column_stats.max is not None else None
+            if group_max_ns is None or group_max_ns >= boundary_ns:
+                keep_groups.append(group_index)
+        if not keep_groups:
+            continue
         schema_names = parquet.schema_arrow.names
         wanted = [c for c in columns if c in schema_names] if columns else None
-        table = parquet.read(columns=wanted or None)
-        stamps = table.column("timestamp").combine_chunks()
         import pyarrow.compute as pc
-        stamps_ns = pc.cast(stamps, pa.int64())
+        table = parquet.read(columns=wanted or None)
+        stamps_ns = pc.cast(table.column("timestamp").combine_chunks(), pa.int64())
         mask = pc.less(stamps_ns, boundary_ns)
-        if mask.null_count or not mask.true_count:
+        if not mask.true_count:
             continue
         parts.append(table.filter(mask).to_pandas())
     if not parts:
@@ -434,7 +457,6 @@ def _execute_symbol(
     """Execute one trial on one symbol; return (trades, eligible_rows)."""
     market, timeframe, side = trial["market"], trial["timeframe"], trial["side"]
     horizon = HORIZON_BARS_24H[timeframe]
-    embargo = OPERATIONAL_EMBARGO_BARS
     fee = COSTS[market]["taker_bps"] / 10_000
     slippage_total = 2 * COSTS[market]["slippage_bps"] / 10_000
     direction_base = 1 if side == "LONG" else -1
@@ -455,9 +477,10 @@ def _execute_symbol(
         month_key = str(months[decision])
         if (market, month_key, str(symbols)) not in selected:
             continue
-        entry_index = decision + 1 + embargo
-        exit_index = entry_index + horizon - 1 + embargo
-        # Exit fill is the executable open `horizon` bars after the entry open.
+        # Canonical next-open execution (R2A_ERRATUM_001): operational
+        # embargo belongs to split boundaries only and NEVER delays an
+        # individual trade. Entry is immediately the next executable open.
+        entry_index = decision + 1
         exit_index = entry_index + horizon
         if exit_index >= n or not np.isfinite(opens[entry_index]) or opens[entry_index] <= 0:
             continue
@@ -468,8 +491,10 @@ def _execute_symbol(
         if market == "um":
             if symbols not in funding_cache:
                 funding_cache[symbols] = _funding_events(str(symbols))
-            funding_cost = _crossed_funding_cost(stamps.iloc[entry_index], stamps.iloc[exit_index], direction_base, funding_cache[symbols])
-        net = gross - fee * 2 - slippage_total - funding_cost
+            funding_cashflow = _crossed_funding_cost(stamps.iloc[entry_index], stamps.iloc[exit_index], direction_base, funding_cache[symbols])
+        else:
+            funding_cashflow = 0.0
+        net = gross - fee * 2 - slippage_total + funding_cashflow
         records.append({
             "trial_id": trial["trial_id"],
             "market": market, "timeframe": timeframe, "side": side, "symbol": str(symbols),
@@ -477,7 +502,7 @@ def _execute_symbol(
             "decision_time": stamps.iloc[decision].isoformat(),
             "entry_time": stamps.iloc[entry_index].isoformat(),
             "exit_time": stamps.iloc[exit_index].isoformat(),
-            "gross_return": gross, "net_return": net, "funding_cost": funding_cost,
+                "gross_return": gross, "net_return": net, "funding_cashflow": funding_cashflow,
         })
         next_available = exit_index
     trades = pd.DataFrame.from_records(records)

@@ -119,3 +119,77 @@ def test_evaluation_metrics_contract() -> None:
     evidence = evaluate_trial(trades, periods_per_year=365 * 24, total_eligible_rows=1000, holding_bars=24)
     for key in ("observations", "signals", "executed_trades", "signal_frequency", "exposure", "turnover", "hit_rate", "mean_net_return", "hac_t_stat"):
         assert key in evidence and np.isfinite(evidence[key]) or key == "bootstrap_ci_low"
+
+
+def test_entry_is_exactly_decision_plus_one() -> None:
+    """Exact timestamp regression: entry_index == decision_index + 1 (no embargo latency)."""
+    trial = {"trial_id": "T0001", "feature_id": "momentum.rsi", "variant": "rsi_14_30_70", "market": "spot", "timeframe": "1h", "side": "LONG"}
+    panel = _panel(market="spot")
+    universe = {("spot", month, "BTCUSDT") for month in panel.universe_month.unique()}
+    trades, _ = _execute_symbol(panel, trial, universe, {})
+    assert len(trades) > 0
+    stamps = pd.to_datetime(panel.timestamp, utc=True).reset_index(drop=True)
+    decision_times = pd.to_datetime(trades.decision_time, utc=True)
+    entry_times = pd.to_datetime(trades.entry_time, utc=True)
+    expected_entries = stamps.iloc[decision_times.map(lambda t: stamps[stamps == t].index[0]).to_numpy() + 1].to_numpy()
+    assert (entry_times.to_numpy() == expected_entries).all()
+
+
+def test_operational_embargo_never_delays_trades() -> None:
+    """The embargo is a split-boundary concept; it must not appear in trade timing."""
+    trial = {"trial_id": "T0001", "feature_id": "momentum.rsi", "variant": "rsi_14_30_70", "market": "spot", "timeframe": "1h", "side": "LONG"}
+    panel = _panel(market="spot")
+    universe = {("spot", month, "BTCUSDT") for month in panel.universe_month.unique()}
+    trades, _ = _execute_symbol(panel, trial, universe, {})
+    stamps = pd.to_datetime(panel.timestamp, utc=True).reset_index(drop=True)
+    decision_pos = pd.Index(stamps).get_indexer(pd.to_datetime(trades.decision_time, utc=True))
+    entry_pos = pd.Index(stamps).get_indexer(pd.to_datetime(trades.entry_time, utc=True))
+    assert (entry_pos - decision_pos == 1).all()
+
+
+@pytest.mark.parametrize("side,direction", [("LONG", 1), ("SHORT", -1)])
+def test_funding_sign_convention(side: str, direction: int) -> None:
+    """net = gross - fees - slippage + funding_cashflow; cashflow=-side*sum(rates)."""
+    from r2a_engine import COSTS
+    trial = {"trial_id": "T9999", "feature_id": "momentum.rsi", "variant": "rsi_14_30_70", "market": "um", "timeframe": "1h", "side": side}
+    panel = _panel(market="um").copy()
+    # Force a deterministic signal at bar 300 so exactly one trade occurs.
+    panel["rsi_force"] = 0.0
+    universe = {("um", month, "BTCUSDT") for month in panel.universe_month.unique()}
+    events = pd.DataFrame({
+        "timestamp": pd.date_range("2023-06-01", periods=400, freq="8h", tz="UTC"),
+        "funding_rate": [0.001] * 400,  # positive funding
+    })
+    funding_cache = {"BTCUSDT": events}
+    signal_override = pd.Series(0.0, index=panel.index)
+    signal_override.iloc[300] = direction
+    original_compute = __import__("r2a_engine").compute_signal
+    import r2a_engine as engine
+    engine.compute_signal = lambda frame, fid, var, mkt: signal_override.reset_index(drop=True)
+    try:
+        trades, _ = _execute_symbol(panel.reset_index(drop=True), trial, universe, funding_cache)
+    finally:
+        engine.compute_signal = original_compute
+    assert len(trades) == 1
+    fee_total = 2 * COSTS["um"]["taker_bps"] / 10_000
+    slip_total = 2 * COSTS["um"]["slippage_bps"] / 10_000
+    entry_open = float(panel.open.iloc[301])
+    exit_open = float(panel.open.iloc[325])
+    gross = direction * (exit_open / entry_open - 1)
+    crossed_count = int(trades.iloc[0]["funding_cashflow"] / (-direction * 0.001))
+    expected_net = gross - fee_total - slip_total + (-direction) * crossed_count * 0.001
+    assert trades.iloc[0]["net_return"] == pytest.approx(expected_net, rel=1e-6)
+
+
+def test_non_overlapping_positions_per_symbol_all_timeframes() -> None:
+    """A new position in a symbol cannot open before the prior one exits."""
+    for timeframe in ("15m", "1h", "4h"):
+        trial = {"trial_id": "T0001", "feature_id": "momentum.rsi", "variant": "rsi_14_30_70", "market": "um", "timeframe": timeframe, "side": "LONG"}
+        panel = _panel(n=600, market="um", timeframe=timeframe)
+        universe = {("um", month, "BTCUSDT") for month in panel.universe_month.unique()}
+        trades, _ = _execute_symbol(panel, trial, universe, {})
+        if len(trades) < 2:
+            continue
+        entries = pd.to_datetime(trades.entry_time, utc=True)
+        exits = pd.to_datetime(trades.exit_time, utc=True)
+        assert (entries.to_numpy()[1:] > exits.to_numpy()[:-1]).all()
