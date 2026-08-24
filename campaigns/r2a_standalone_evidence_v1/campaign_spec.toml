@@ -1,6 +1,7 @@
 schema_version = 1
 campaign_id = "r2a_standalone_evidence_v1"
-preregistration_commit = "THIS_COMMIT"  # replaced by CI at freeze time
+preregistration_commit = "dd4f0011519575f5474ba759d5764a7d27d5db66"  # original freeze
+amendment_001_commit = "801cde50ec661d8c65cfa9ed7af76b42aa3c48fd"
 data_root = "data/processed/r1_gap_safe_cohort"  # LOCAL STORAGE ONLY: junction to D:
 
 [universe]

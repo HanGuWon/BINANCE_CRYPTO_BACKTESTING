@@ -6,7 +6,7 @@ Verdict: **VERIFIED — FULL R1 PANEL READY FOR R2A**
 
 - Branch: `research/r1-final-panel-v1`
 - Implementation commit: 918e0355f7185458587a708bf44150d203abc5c7
-- Campaign metadata commit: this commit
+- Campaign metadata commit: c3eda47 (R1.7) / corrected in R1.7.1 as 26d475da5b3747011a7c488118920bf3fc5950e3
 - Remote: origin/research/r1-final-panel-v1 (implementation pushed)
 - Python: 3.11.15
 - Final holdout: UNTOUCHED

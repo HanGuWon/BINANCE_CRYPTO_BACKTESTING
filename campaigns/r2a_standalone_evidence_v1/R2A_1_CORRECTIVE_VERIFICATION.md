@@ -8,7 +8,7 @@ Verdict: **VERIFIED — R2A CORRECTED, PRIOR POSITIVE EVIDENCE DID NOT SURVIVE**
 - Pre-outcome amendment SHA: 801cde50ec661d8c65cfa9ed7af76b42aa3c48fd (252-trial registry frozen)
 - Erratum SHA (this correction): see R2A_ERRATUM_001.md commit below
 - Corrected implementation / corrected outcome SHA: the R2A.1 corrective commit
-  (this commit; engine fixes + rerun + re-aggregation landed together after the
+  a051eeeceae9cee34ee4a0150e94de51e6747747; engine fixes + rerun + re-aggregation landed together after the
   superseded run was archived, so no superseded outcome could inform it)
 - Superseded outcome artifacts: campaigns/r2a_standalone_evidence_v1/
   superseded_outcomes_v0/ with SHA256SUMS.txt; superseded checkpoints on D:
@@ -34,7 +34,7 @@ Verdict: **VERIFIED — R2A CORRECTED, PRIOR POSITIVE EVIDENCE DID NOT SURVIVE**
 - Grade A: 0    Grade B: 0    Grade C: 73    Grade D: 179
 - FDR survivors (q<=0.05): 67 across families, but NONE satisfy the frozen
   promotion criteria for A/B.
-- The single prior Grade B (T0130) is now Grade C/D territory: its walk-forward
+- The single prior positive (T0130, previously Grade A in the superseded run) is now Grade C/D territory: its walk-forward
   fold_count is 1, which is explicitly reported as INSUFFICIENT_ROBUSTNESS_EVIDENCE
   (robustness_flags.json lists all 252 trials as having <2 independent folds).
 - Concentration failures (top symbol >50% of net contribution): 43 trials flagged;
