@@ -5,12 +5,18 @@
 Determine which individual indicators contain reproducible pre-holdout
 predictive information and which survive causal next-open execution costs.
 
+
 ## Frozen design decisions
 
+# AMENDED PRE-OUTCOME (R2A_PROTOCOL_AMENDMENT_001.md): feature counts
+corrected to per market x timeframe eligibility; validation-only primary
+grading added. No outcome was observed before the amendment.
 - Feature universe: exact R2A_PRIMARY feature IDs from the corrected
-  feature_availability_final.csv (19 spot; 19 um including funding and
-  funding_zscore). Premium/premium_zscore are R2B_RESTRICTED and are NOT
-  part of R2A.
+  feature_availability_final.csv, with eligibility enforced per exact
+  market x timeframe cell: Spot = 17 R2A-primary IDs; UM = 19 where
+  structurally available. context.market_breadth is NOT eligible on 1h
+  (FORWARD_SHADOW there), so no 1h breadth trial exists. Premium and
+  premium_zscore are R2B_RESTRICTED and are NOT part of R2A.
 - Markets: Spot LONG-only; UM LONG and SHORT.
 - Timeframes: native 15m/1h/4h only.
 - Cohort: causal monthly Top50 primary cohort (from universe_monthly.csv);
@@ -45,7 +51,10 @@ predictive information and which survive causal next-open execution costs.
 ## Execution order
 
 1. Freeze trial registry (trial_registry.csv committed BEFORE any run).
-2. Run trials exactly once over train+validation partitions.
-3. Score with metrics_contract.md metrics; apply multiple_testing_plan.md.
-4. Emit evidence grades via promotion_policy.md.
+2. Run trials exactly once: descriptive evidence on train, PRIMARY
+   evidence on validation only (never pooled).
+3. Score with metrics_contract.md metrics; apply multiple_testing_plan.md
+   to validation-only primary statistics.
+4. Emit evidence grades via promotion_policy.md using validation evidence
+   as primary and train results as supporting context only.
 5. STOP. Holdout evaluation is a separate future campaign.
