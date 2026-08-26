@@ -80,7 +80,7 @@ def bootstrap_fold_ci(fold_means: list[float]) -> tuple[float, float]:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--root", default="D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2a2/checkpoints_v5")
+    ap.add_argument("--root", default="D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2a2/checkpoints_v9")
     args = ap.parse_args()
     root = Path(args.root)
     registry = pd.read_csv(CAMPAIGN / "trial_registry.csv")
@@ -159,7 +159,8 @@ def main() -> int:
     mfe.to_csv(out / "mfe_mae_diagnostics.csv", index=False)
     proof = {"checkpoint_root": str(root), "holdout_boundaries": {k: v.isoformat() for k, v in HOLDOUT_BOUNDARY_BY_TF.items()}, "checked_files": int(len(fold_df)), "status": "PASS", "method": "all decision_time values asserted strictly before timeframe boundary"}
     (out / "holdout_guard_proof.json").write_text(json.dumps(proof, indent=2))
-    manifest = {"checkpoint_root": str(root), "registry_sha256": sha256(CAMPAIGN / "trial_registry.csv"), "units": int(len(fold_df)), "failed_units": int(fold_df.empty), "aggregate_script": sha256(Path(__file__))}
+    expected_units = int(len(registry) * len(folds))
+    manifest = {"checkpoint_root": str(root), "registry_sha256": sha256(CAMPAIGN / "trial_registry.csv"), "units": int(len(fold_df)), "expected_units": expected_units, "failed_units": int(max(expected_units - len(fold_df), 0)), "aggregate_script": sha256(Path(__file__))}
     (out / "aggregate_manifest.json").write_text(json.dumps(manifest, indent=2))
     print(json.dumps({"units": len(fold_df), "trials": len(horizon), "fdr_survivors": int((horizon.fdr_q_value <= .05).sum()), "replications": int((horizon.temporal_replication == "TEMPORAL_REPLICATION").sum())}, indent=2))
     return 0
