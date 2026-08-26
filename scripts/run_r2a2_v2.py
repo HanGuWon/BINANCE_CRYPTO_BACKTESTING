@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import time
@@ -32,7 +33,13 @@ from r2a2_folds import fold_bounds, STEP, OPERATIONAL_EMBARGO_BARS  # noqa: E402
 
 CAMPAIGN = ROOT / "campaigns" / "r2a2_temporal_horizon_v1"
 DATA_ROOT = Path("data/processed/r1_gap_safe_cohort")
-CHECKPOINT_ROOT = Path("D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2a2/checkpoints_v4")
+SHARD_INDEX = int(os.environ.get("R2A2_SHARD_INDEX", "0"))
+SHARD_COUNT = int(os.environ.get("R2A2_SHARD_COUNT", "1"))
+if not (0 <= SHARD_INDEX < SHARD_COUNT):
+    raise ValueError("R2A2_SHARD_INDEX must be in [0, R2A2_SHARD_COUNT)")
+CHECKPOINT_ROOT = Path("D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2a2") / (
+    "checkpoints_v5" if SHARD_COUNT == 1 else f"checkpoints_v5_shard{SHARD_INDEX}"
+)
 MARKETS = ("spot", "um")
 TIMEFRAMES = ("15m", "1h", "4h")
 COSTS = {"spot": {"fee_total": 2 * 10.0 / 10_000, "slip_total": 2 * 5.0 / 10_000}, "um": {"fee_total": 2 * 5.0 / 10_000, "slip_total": 2 * 5.0 / 10_000}}
@@ -142,6 +149,9 @@ def main() -> int:
     started = time.time()
     CHECKPOINT_ROOT.mkdir(parents=True, exist_ok=True)
     registry = pd.read_csv(CAMPAIGN / "trial_registry.csv")
+    full_registry_count = len(registry)
+    if SHARD_COUNT > 1:
+        registry = registry.iloc[SHARD_INDEX::SHARD_COUNT].reset_index(drop=True)
     folds = pd.read_csv(CAMPAIGN / "fold_registry.csv")
     registry_sha = _sha256_file(CAMPAIGN / "trial_registry.csv")
     implementation_sha = _git("rev-parse", "HEAD")
@@ -153,11 +163,11 @@ def main() -> int:
             raise RuntimeError("checkpoint settings mismatch; refusing resume with changed code/registry")
         print("resuming existing v2 run", flush=True)
     else:
-        state = {"registry_sha256": registry_sha, "implementation_sha": implementation_sha, "checkpoint_root": str(CHECKPOINT_ROOT), "completed_units": [], "failed_units": []}
+        state = {"registry_sha256": registry_sha, "implementation_sha": implementation_sha, "checkpoint_root": str(CHECKPOINT_ROOT), "shard_index": SHARD_INDEX, "shard_count": SHARD_COUNT, "full_registry_count": full_registry_count, "completed_units": [], "failed_units": []}
         manifest_path.write_text(json.dumps(state, indent=2))
     completed = set(state["completed_units"])
     total_units = len(registry) * len(folds)
-    print(f"R2A.2 v2: trials={len(registry)} folds={len(folds)} units={total_units}", flush=True)
+    print(f"R2A.2 v2: shard={SHARD_INDEX}/{SHARD_COUNT} trials={len(registry)}/{full_registry_count} folds={len(folds)} units={total_units}", flush=True)
     print(f"registry sha256={registry_sha[:16]} implementation={implementation_sha[:12]}", flush=True)
     universes = {m: _load_universe_top50(m) for m in MARKETS}
     funding_cache_all: dict[str, pd.DataFrame | None] = {}
