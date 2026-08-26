@@ -32,7 +32,7 @@ from r2a2_folds import fold_bounds, STEP, OPERATIONAL_EMBARGO_BARS  # noqa: E402
 
 CAMPAIGN = ROOT / "campaigns" / "r2a2_temporal_horizon_v1"
 DATA_ROOT = Path("data/processed/r1_gap_safe_cohort")
-CHECKPOINT_ROOT = Path("D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2a2/checkpoints_v2")
+CHECKPOINT_ROOT = Path("D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2a2/checkpoints_v3")
 MARKETS = ("spot", "um")
 TIMEFRAMES = ("15m", "1h", "4h")
 COSTS = {"spot": {"fee_total": 2 * 10.0 / 10_000, "slip_total": 2 * 5.0 / 10_000}, "um": {"fee_total": 2 * 5.0 / 10_000, "slip_total": 2 * 5.0 / 10_000}}
