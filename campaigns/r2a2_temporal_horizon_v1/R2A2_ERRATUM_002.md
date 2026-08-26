@@ -62,6 +62,11 @@ identity (`b2251de...`/`de491378...`) are provenance for abandoned phases, not
 the active executable. The next clean run is pinned to a newly committed
 source identity and `checkpoints_v10`.
 
+The untracked legacy helper `scripts/run_r2a2_campaign.py` was also moved to
+`scripts/legacy_invalid/` and retained with an invalid-reason note because it
+uses the same raw-nonzero directional gate. It is not imported or executed by
+the corrected runner.
+
 ## Corrected execution
 
 - run_r2a2_v2.py now gates on exact sign match and records signal_value per
