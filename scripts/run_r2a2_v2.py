@@ -38,7 +38,7 @@ SHARD_COUNT = int(os.environ.get("R2A2_SHARD_COUNT", "1"))
 if not (0 <= SHARD_INDEX < SHARD_COUNT):
     raise ValueError("R2A2_SHARD_INDEX must be in [0, R2A2_SHARD_COUNT)")
 CHECKPOINT_ROOT = Path("D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2a2") / (
-    "checkpoints_v9" if SHARD_COUNT == 1 else f"checkpoints_v9_shard{SHARD_INDEX}"
+    "checkpoints_v10" if SHARD_COUNT == 1 else f"checkpoints_v10_shard{SHARD_INDEX}"
 )
 MARKETS = ("spot", "um")
 TIMEFRAMES = ("15m", "1h", "4h")
@@ -56,6 +56,24 @@ def _sha256_file(path: Path) -> str:
 
 def _git(*args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
+
+
+SCIENTIFIC_SOURCE_PATHS = ("scripts", "src", "tests", "configs", "campaigns/r2a2_temporal_horizon_v1")
+
+
+def _scientific_source_identity() -> tuple[str, bool, str]:
+    """Return commit, tracked/untracked scientific dirtiness, and content hash."""
+    commit = _git("rev-parse", "HEAD")
+    status = _git("status", "--porcelain=v1", "--untracked-files=all", "--", *SCIENTIFIC_SOURCE_PATHS)
+    digest = hashlib.sha256()
+    tracked = _git("ls-files", "--", *SCIENTIFIC_SOURCE_PATHS).splitlines()
+    for relative in sorted(path for path in tracked if path):
+        path = ROOT / relative
+        if path.exists() and path.is_file():
+            digest.update(relative.replace("\\", "/").encode("utf-8"))
+            digest.update(b"\0")
+            digest.update(path.read_bytes())
+    return commit, bool(status), digest.hexdigest()
 
 
 def _load_universe_top50(market: str) -> set[tuple[str, str, str]]:
@@ -210,16 +228,25 @@ def main() -> int:
         registry = registry.iloc[SHARD_INDEX::SHARD_COUNT].reset_index(drop=True)
     folds = pd.read_csv(CAMPAIGN / "fold_registry.csv")
     registry_sha = _sha256_file(CAMPAIGN / "trial_registry.csv")
-    implementation_sha = _git("rev-parse", "HEAD")
+    implementation_sha, source_dirty, source_tree_sha256 = _scientific_source_identity()
+    if source_dirty:
+        raise RuntimeError("scientific source tree is dirty; commit and qualify before outcome execution")
     manifest_path = CHECKPOINT_ROOT / "run_manifest.json"
     state: dict[str, object] = {}
     if manifest_path.exists():
         state = json.loads(manifest_path.read_text())
-        if state.get("registry_sha256") != registry_sha or state.get("implementation_sha") != implementation_sha:
+        if (state.get("registry_sha256") != registry_sha
+                or state.get("implementation_sha") != implementation_sha
+                or state.get("source_tree_sha256") != source_tree_sha256
+                or state.get("source_dirty") is not False):
             raise RuntimeError("checkpoint settings mismatch; refusing resume with changed code/registry")
         print("resuming existing v2 run", flush=True)
     else:
-        state = {"registry_sha256": registry_sha, "implementation_sha": implementation_sha, "checkpoint_root": str(CHECKPOINT_ROOT), "shard_index": SHARD_INDEX, "shard_count": SHARD_COUNT, "full_registry_count": full_registry_count, "completed_units": [], "failed_units": []}
+        state = {"registry_sha256": registry_sha, "implementation_sha": implementation_sha,
+                 "source_tree_sha256": source_tree_sha256, "source_dirty": False,
+                 "checkpoint_root": str(CHECKPOINT_ROOT), "shard_index": SHARD_INDEX,
+                 "shard_count": SHARD_COUNT, "full_registry_count": full_registry_count,
+                 "completed_units": [], "failed_units": []}
         manifest_path.write_text(json.dumps(state, indent=2))
     completed = set(state["completed_units"])
     total_units = len(registry) * len(folds)
