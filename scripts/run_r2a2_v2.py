@@ -38,7 +38,7 @@ SHARD_COUNT = int(os.environ.get("R2A2_SHARD_COUNT", "1"))
 if not (0 <= SHARD_INDEX < SHARD_COUNT):
     raise ValueError("R2A2_SHARD_INDEX must be in [0, R2A2_SHARD_COUNT)")
 CHECKPOINT_ROOT = Path("D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2a2") / (
-    "checkpoints_v5" if SHARD_COUNT == 1 else f"checkpoints_v5_shard{SHARD_INDEX}"
+    "checkpoints_v6" if SHARD_COUNT == 1 else f"checkpoints_v6_shard{SHARD_INDEX}"
 )
 MARKETS = ("spot", "um")
 TIMEFRAMES = ("15m", "1h", "4h")
@@ -99,15 +99,16 @@ def execute_segment(
     # decision index 0 eligible while preserving horizon-based non-overlap.
     next_available = -1  # per-symbol non-overlap state within this segment
     n = len(group)
-    for decision in range(n):
-        raw = float(signal.iloc[decision]) if decision < len(signal) and np.isfinite(float(signal.iloc[decision])) else 0.0
+    raw_values = signal.to_numpy(dtype=float, copy=False)
+    candidate_mask = np.isfinite(raw_values) & (raw_values == (1.0 if side == "LONG" else -1.0)) & eligible
+    candidate_mask &= (stamps >= validation_start).to_numpy() & (stamps < validation_end).to_numpy()
+    for decision in np.flatnonzero(candidate_mask):
+        raw = float(raw_values[decision])
         # Directional gate (follow-up audit P0): LONG requires signal == +1,
         # SHORT requires signal == -1. Never execute on the opposite sign.
         required_sign = 1.0 if side == "LONG" else -1.0
-        if raw != required_sign or not eligible[decision] or decision <= next_available:
+        if raw != required_sign or decision <= next_available:
             continue
-        if not (validation_start <= stamps.iloc[decision] < validation_end):
-            continue  # warmup/state-only row
         month_key = str(months[decision])
         if (market, month_key, symbol_key) not in universe_top50:
             continue
