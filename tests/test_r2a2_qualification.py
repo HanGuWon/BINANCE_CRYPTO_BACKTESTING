@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "src"))
 
 from r2a_engine import compute_signal  # noqa: E402
-from run_r2a2_v2 import execute_segment  # noqa: E402
+from run_r2a2_v2 import execute_segment, execute_segment_all_folds  # noqa: E402
 
 
 def _panel(timeframe: str = "1h", with_gap: bool = True) -> pd.DataFrame:
@@ -137,3 +137,15 @@ def test_qualification_optimized_equals_reference(timeframe: str, side: str, fea
                         assert ov == rv, f"{key} mismatch on {symbol}/{feature_id}"
                 assert o["funding_cashflow"] == pytest.approx(r["funding_cashflow"])
     assert mismatches == 0
+
+
+def test_one_pass_multi_fold_equals_independent_fold_calls() -> None:
+    panel = _panel(timeframe="1h", with_gap=True)
+    seg = panel.loc[panel.symbol == "AAAUSDT"].iloc[:150].reset_index(drop=True)
+    signal = pd.Series(np.where(np.arange(len(seg)) % 3 == 0, 1.0, 0.0))
+    universe = {("spot", m, "AAAUSDT") for m in seg.universe_month.unique()}
+    windows = [("F1", pd.Timestamp("2023-01-10", tz="UTC"), pd.Timestamp("2023-01-20", tz="UTC")), ("F2", pd.Timestamp("2023-01-20", tz="UTC"), pd.Timestamp("2023-02-01", tz="UTC"))]
+    multi = execute_segment_all_folds(seg, signal, market="spot", side="LONG", horizon_bars=4, fold_windows=windows, universe_top50=universe, funding_events=None)
+    for fold_id, start, end in windows:
+        single = execute_segment(seg, signal, market="spot", side="LONG", horizon_bars=4, validation_start=start, validation_end=end, universe_top50=universe, funding_events=None)
+        assert multi[fold_id].to_dict("records") == single.to_dict("records")
