@@ -38,7 +38,7 @@ SHARD_COUNT = int(os.environ.get("R2A2_SHARD_COUNT", "1"))
 if not (0 <= SHARD_INDEX < SHARD_COUNT):
     raise ValueError("R2A2_SHARD_INDEX must be in [0, R2A2_SHARD_COUNT)")
 CHECKPOINT_ROOT = Path("D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2a2") / (
-    "checkpoints_v7" if SHARD_COUNT == 1 else f"checkpoints_v7_shard{SHARD_INDEX}"
+    "checkpoints_v8" if SHARD_COUNT == 1 else f"checkpoints_v8_shard{SHARD_INDEX}"
 )
 MARKETS = ("spot", "um")
 TIMEFRAMES = ("15m", "1h", "4h")
@@ -138,6 +138,61 @@ def execute_segment(
     return pd.DataFrame.from_records(records)
 
 
+def execute_segment_all_folds(
+    segment: pd.DataFrame,
+    signal: pd.Series,
+    *,
+    market: str,
+    side: str,
+    horizon_bars: int,
+    fold_windows: list[tuple[str, pd.Timestamp, pd.Timestamp]],
+    universe_top50: set[tuple[str, str, str]],
+    funding_events: pd.DataFrame | None,
+) -> dict[str, pd.DataFrame]:
+    """Execute all disjoint validation folds in one candidate pass.
+
+    Each fold keeps an independent non-overlap sentinel, so this is equivalent
+    to eight calls to ``execute_segment`` while avoiding eight full scans.
+    """
+    group = segment.reset_index(drop=True)
+    stamps = pd.to_datetime(group["timestamp"], utc=True)
+    eligible = (group["row_class"] == "RESEARCH_ELIGIBLE").to_numpy() if "row_class" in group else np.ones(len(group), dtype=bool)
+    months = group["universe_month"].to_numpy() if "universe_month" in group else np.array([""] * len(group))
+    opens = group["open"].astype(float).to_numpy()
+    raw_values = signal.to_numpy(dtype=float, copy=False)
+    sign = 1.0 if side == "LONG" else -1.0
+    fold_labels = np.full(len(group), "", dtype=object)
+    for fold_id, start, end in fold_windows:
+        mask = (stamps >= start).to_numpy() & (stamps < end).to_numpy()
+        fold_labels[mask] = fold_id
+    candidate_mask = np.isfinite(raw_values) & (raw_values == sign) & eligible & (fold_labels != "")
+    state = {fold_id: -1 for fold_id, _, _ in fold_windows}
+    records = {fold_id: [] for fold_id, _, _ in fold_windows}
+    symbol_key = str(group["symbol"].iloc[0])
+    direction_base = 1 if side == "LONG" else -1
+    costs = COSTS[market]
+    for decision in np.flatnonzero(candidate_mask):
+        fold_id = str(fold_labels[decision])
+        if decision <= state[fold_id]:
+            continue
+        month_key = str(months[decision])
+        if (market, month_key, symbol_key) not in universe_top50:
+            continue
+        entry_index = decision + 1
+        exit_index = entry_index + horizon_bars
+        if exit_index >= len(group) or not np.isfinite(opens[entry_index]) or opens[entry_index] <= 0:
+            continue
+        gross = direction_base * (opens[exit_index] / opens[entry_index] - 1)
+        funding_cashflow = 0.0
+        if market == "um" and funding_events is not None and len(funding_events):
+            crossed = funding_events[(funding_events.timestamp > stamps.iloc[entry_index]) & (funding_events.timestamp <= stamps.iloc[exit_index])]
+            funding_cashflow = -direction_base * float(crossed.funding_rate.sum())
+        net = gross - costs["fee_total"] - costs["slip_total"] + funding_cashflow
+        records[fold_id].append({"market": market, "timeframe": str(group["timeframe"].iloc[0]), "side": side, "symbol": symbol_key, "universe_month": month_key, "segment_first_ts": stamps.iloc[0].isoformat(), "decision_time": stamps.iloc[decision].isoformat(), "entry_time": stamps.iloc[entry_index].isoformat(), "exit_time": stamps.iloc[exit_index].isoformat(), "gross_return": gross, "net_return": net, "funding_cashflow": funding_cashflow, "signal_value": float(raw_values[decision])})
+        state[fold_id] = exit_index
+    return {fold_id: pd.DataFrame.from_records(rows) for fold_id, rows in records.items()}
+
+
 def segment_frames(panel_symbol: pd.DataFrame, timeframe: str) -> list[tuple[int, pd.DataFrame]]:
     """Partition one symbol's history by authoritative gap machinery (segment boundaries)."""
     from binance_research.features import _gap_segments
@@ -180,50 +235,51 @@ def main() -> int:
     # Canonical signal cache: (market, tf, symbol, segment_id, feature_id, variant) -> Series
     signal_cache: dict[tuple, pd.Series] = {}
     done_count = 0
+    fold_windows = []
+    for _, fold_row in folds.iterrows():
+        start, end = fold_bounds(str(fold_row.fold_id))
+        fold_windows.append((str(fold_row.fold_id), start, end))
     for _, trial in registry.iterrows():
-        for _, fold_row in folds.iterrows():
-            unit = f"{trial.trial_id}|{fold_row.fold_id}"
-            if unit in completed:
-                done_count += 1
-                continue
-            try:
-                key = (trial.market, trial.timeframe)
-                if key not in panels:
-                    print(f"loading panel {key}", flush=True)
-                    raw_panel = load_panel_pre_holdout(DATA_ROOT, trial.market, trial.timeframe, columns=None)
-                    assert_no_holdout(raw_panel, timeframe=trial.timeframe, context=f"panel {key}")
-                    panels[key] = {sym: segment_frames(g.reset_index(drop=True), trial.timeframe) for sym, g in raw_panel.groupby("symbol", sort=True)}
-                segments_by_symbol = panels[key]
-                validation_start, validation_end = fold_bounds(str(fold_row.fold_id))
-                step = STEP[trial.timeframe]
-                validation_start_eff = validation_start + OPERATIONAL_EMBARGO_BARS * step
-                all_trades = []
-                for symbol, segments in sorted(segments_by_symbol.items()):
-                    funding_events = get_funding(str(symbol)) if trial.market == "um" else None
-                    for seg_id, segment in segments:
-                        cache_key = (trial.market, trial.timeframe, str(symbol), int(seg_id), trial.feature_id, trial.variant)
-                        if cache_key not in signal_cache:
-                            signal_cache[cache_key] = compute_segment_signal(segment, trial.feature_id, trial.variant, trial.market)
-                        signal = signal_cache[cache_key]
-                        t = execute_segment(
-                            segment, signal, market=trial.market, side=trial.side,
-                            horizon_bars=int(trial.horizon_bars),
-                            validation_start=validation_start_eff, validation_end=validation_end,
-                            universe_top50=universes[trial.market], funding_events=funding_events,
-                        )
-                        if not t.empty:
-                            all_trades.append(t)
-                combined = pd.concat(all_trades, ignore_index=True) if all_trades else pd.DataFrame()
-                out = CHECKPOINT_ROOT / f"{trial.trial_id}_{fold_row.fold_id}_trades.parquet"
-                combined.to_parquet(out, index=False)
+        pending = [f"{trial.trial_id}|{fold_id}" for fold_id, _, _ in fold_windows if f"{trial.trial_id}|{fold_id}" not in completed]
+        if not pending:
+            done_count += len(fold_windows)
+            continue
+        try:
+            key = (trial.market, trial.timeframe)
+            if key not in panels:
+                print(f"loading panel {key}", flush=True)
+                raw_panel = load_panel_pre_holdout(DATA_ROOT, trial.market, trial.timeframe, columns=None)
+                assert_no_holdout(raw_panel, timeframe=trial.timeframe, context=f"panel {key}")
+                panels[key] = {sym: segment_frames(g.reset_index(drop=True), trial.timeframe) for sym, g in raw_panel.groupby("symbol", sort=True)}
+            step = STEP[trial.timeframe]
+            effective_windows = [(fid, start + OPERATIONAL_EMBARGO_BARS * step, end) for fid, start, end in fold_windows]
+            by_fold: dict[str, list[pd.DataFrame]] = {fid: [] for fid, _, _ in effective_windows}
+            for symbol, segments in sorted(panels[key].items()):
+                funding_events = get_funding(str(symbol)) if trial.market == "um" else None
+                for seg_id, segment in segments:
+                    cache_key = (trial.market, trial.timeframe, str(symbol), int(seg_id), trial.feature_id, trial.variant)
+                    if cache_key not in signal_cache:
+                        signal_cache[cache_key] = compute_segment_signal(segment, trial.feature_id, trial.variant, trial.market)
+                    parts = execute_segment_all_folds(segment, signal_cache[cache_key], market=trial.market, side=trial.side, horizon_bars=int(trial.horizon_bars), fold_windows=effective_windows, universe_top50=universes[trial.market], funding_events=funding_events)
+                    for fold_id, frame in parts.items():
+                        if not frame.empty:
+                            by_fold[fold_id].append(frame)
+            for fold_id, _, _ in effective_windows:
+                unit = f"{trial.trial_id}|{fold_id}"
+                if unit in completed:
+                    continue
+                frames = by_fold[fold_id]
+                combined = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+                combined.to_parquet(CHECKPOINT_ROOT / f"{trial.trial_id}_{fold_id}_trades.parquet", index=False)
                 state["completed_units"].append(unit)
-            except Exception as exc:
+        except Exception as exc:
+            for unit in pending:
                 state["failed_units"].append({"unit": unit, "error": repr(exc)})
-                print(f"{unit} FAILED {exc!r}", flush=True)
-            manifest_path.write_text(json.dumps(state, indent=2))
-            done_count += 1
-            if done_count % 500 == 0:
-                print(f"progress {done_count}/{total_units} completed_units={len(state['completed_units'])} cached_signals={len(signal_cache)}", flush=True)
+            print(f"{trial.trial_id} FAILED {exc!r}", flush=True)
+        manifest_path.write_text(json.dumps(state, indent=2))
+        done_count += len(fold_windows)
+        if done_count % 500 == 0:
+            print(f"progress {done_count}/{total_units} completed_units={len(state['completed_units'])} cached_signals={len(signal_cache)}", flush=True)
     print(f"DONE elapsed={time.time()-started:.0f}s completed={len(set(state['completed_units']))}/{total_units} failed={len(state['failed_units'])}", flush=True)
     return 0
 
