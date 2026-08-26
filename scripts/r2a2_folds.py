@@ -12,14 +12,14 @@ import pandas as pd
 
 # Frozen in campaigns/r2a2_temporal_horizon_v1/campaign_spec.toml
 FOLD_BLOCKS = [
-    ("2020-H1", "2020-01-01", "2020-07-01"),
-    ("2020-H2", "2020-07-01", "2021-01-01"),
-    ("2021-H1", "2021-01-01", "2021-07-01"),
-    ("2021-H2", "2021-07-01", "2022-01-01"),
-    ("2022-H1", "2022-01-01", "2022-07-01"),
-    ("2022-H2", "2022-07-01", "2023-01-01"),
-    ("2023-H1", "2023-01-01", "2023-07-01"),
-    ("2023-H2", "2023-07-01", "2024-01-01"),
+    ("F01", "2020-H1", "2020-01-01", "2020-07-01"),
+    ("F02", "2020-H2", "2020-07-01", "2021-01-01"),
+    ("F03", "2021-H1", "2021-01-01", "2021-07-01"),
+    ("F04", "2021-H2", "2021-07-01", "2022-01-01"),
+    ("F05", "2022-H1", "2022-01-01", "2022-07-01"),
+    ("F06", "2022-H2", "2022-07-01", "2023-01-01"),
+    ("F07", "2023-H1", "2023-01-01", "2023-07-01"),
+    ("F08", "2023-H2", "2023-07-01", "2024-01-01"),
 ]
 HORIZON_BARS_24H = {"15m": 96, "1h": 24, "4h": 6}
 STEP = {"15m": pd.Timedelta("15min"), "1h": pd.Timedelta("1h"), "4h": pd.Timedelta("4h")}
@@ -27,8 +27,8 @@ OPERATIONAL_EMBARGO_BARS = 1
 
 
 def fold_bounds(fold_id: str) -> tuple[pd.Timestamp, pd.Timestamp]:
-    for name, start, end in FOLD_BLOCKS:
-        if name == fold_id:
+    for fold, block, start, end in FOLD_BLOCKS:
+        if fold == fold_id:
             return pd.Timestamp(start, tz="UTC"), pd.Timestamp(end, tz="UTC")
     raise KeyError(f"unknown fold: {fold_id}")
 

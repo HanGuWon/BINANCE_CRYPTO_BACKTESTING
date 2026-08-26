@@ -107,8 +107,9 @@ def load_panel_pre_holdout(
                 continue
             column_stats = group_meta.column(ts_column_index).statistics
             group_max_ns = int(pd.Timestamp(column_stats.max).value) if column_stats and column_stats.max is not None else None
-            if group_max_ns is None or group_max_ns >= boundary_ns:
-                keep_groups.append(group_index)
+        if group_max_ns is None or group_max_ns < boundary_ns:
+            # Keep only row-groups that contain at least one pre-holdout row.
+            keep_groups.append(group_index)
         if not keep_groups:
             continue
         schema_names = parquet.schema_arrow.names
@@ -124,7 +125,8 @@ def load_panel_pre_holdout(
         raise FileNotFoundError(f"{market}/{timeframe}: every partition lies inside the holdout")
     frame = pd.concat(parts, ignore_index=True)
     frame["timestamp"] = pd.to_datetime(frame["timestamp"], utc=True)
-    return frame.sort_values(["symbol", "timestamp"], kind="stable").reset_index(drop=True)
+    sort_keys = [key for key in ("symbol", "timestamp") if key in frame.columns]
+    return frame.sort_values(sort_keys, kind="stable").reset_index(drop=True) if sort_keys else frame
 
 
 # ---------------------------------------------------------------- signals
@@ -194,8 +196,8 @@ def compute_signal(frame: pd.DataFrame, feature_id: str, variant: str, market: s
     if feature_id == "trend.adx_dmi":
         up = high.diff()
         down = -low.diff()
-        plus_dm = pd.Series(np.where((up > down) & (up > 0), up, 0.0))
-        minus_dm = pd.Series(np.where((down > up) & (down > 0), down, 0.0))
+        plus_dm = pd.Series(np.where((up > down) & (up > 0), up, 0.0), index=base.index)
+        minus_dm = pd.Series(np.where((down > up) & (down > 0), down, 0.0), index=base.index)
         tr = pd.concat([high - low, (high - close.shift(1)).abs(), (low - close.shift(1)).abs()], axis=1).max(axis=1)
         atr = tr.ewm(alpha=1 / 14, adjust=False, min_periods=14).mean()
         plus_di = 100 * plus_dm.ewm(alpha=1 / 14, adjust=False, min_periods=14).mean().div(atr.replace(0, np.nan))
