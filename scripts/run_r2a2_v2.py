@@ -92,7 +92,10 @@ def execute_segment(
     n = len(group)
     for decision in range(n):
         raw = float(signal.iloc[decision]) if decision < len(signal) and np.isfinite(float(signal.iloc[decision])) else 0.0
-        if raw == 0.0 or not eligible[decision] or decision < next_available:
+        # Directional gate (follow-up audit P0): LONG requires signal == +1,
+        # SHORT requires signal == -1. Never execute on the opposite sign.
+        required_sign = 1.0 if side == "LONG" else -1.0
+        if raw != required_sign or not eligible[decision] or decision <= next_available:
             continue
         if not (validation_start <= stamps.iloc[decision] < validation_end):
             continue  # warmup/state-only row
@@ -119,6 +122,7 @@ def execute_segment(
             "entry_time": stamps.iloc[entry_index].isoformat(),
             "exit_time": stamps.iloc[exit_index].isoformat(),
             "gross_return": gross, "net_return": net, "funding_cashflow": funding_cashflow,
+            "signal_value": raw,
         })
         next_available = exit_index
     return pd.DataFrame.from_records(records)
