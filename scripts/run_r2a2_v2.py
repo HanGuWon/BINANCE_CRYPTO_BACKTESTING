@@ -38,7 +38,7 @@ SHARD_COUNT = int(os.environ.get("R2A2_SHARD_COUNT", "1"))
 if not (0 <= SHARD_INDEX < SHARD_COUNT):
     raise ValueError("R2A2_SHARD_INDEX must be in [0, R2A2_SHARD_COUNT)")
 CHECKPOINT_ROOT = Path("D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2a2") / (
-    "checkpoints_v6" if SHARD_COUNT == 1 else f"checkpoints_v6_shard{SHARD_INDEX}"
+    "checkpoints_v7" if SHARD_COUNT == 1 else f"checkpoints_v7_shard{SHARD_INDEX}"
 )
 MARKETS = ("spot", "um")
 TIMEFRAMES = ("15m", "1h", "4h")
