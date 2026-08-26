@@ -88,7 +88,9 @@ def execute_segment(
     opens = group["open"].astype(float).to_numpy()
     symbol_key = str(group["symbol"].iloc[0])
     records: list[dict[str, object]] = []
-    next_available = 0  # per-symbol non-overlap state within this segment
+    # No prior position exists before the first decision row.  Using -1 keeps
+    # decision index 0 eligible while preserving horizon-based non-overlap.
+    next_available = -1  # per-symbol non-overlap state within this segment
     n = len(group)
     for decision in range(n):
         raw = float(signal.iloc[decision]) if decision < len(signal) and np.isfinite(float(signal.iloc[decision])) else 0.0
@@ -164,7 +166,7 @@ def main() -> int:
             funding_cache_all[symbol] = load_funding_events(symbol)
         return funding_cache_all[symbol]
     panels: dict[tuple[str, str], dict[str, list[tuple[int, pd.DataFrame]]]] = {}
-    # Canonical signal cache: (market, tf, symbol, first_segment_ts, feature_id, variant) -> Series
+    # Canonical signal cache: (market, tf, symbol, segment_id, feature_id, variant) -> Series
     signal_cache: dict[tuple, pd.Series] = {}
     done_count = 0
     for _, trial in registry.iterrows():
@@ -188,7 +190,7 @@ def main() -> int:
                 for symbol, segments in sorted(segments_by_symbol.items()):
                     funding_events = get_funding(str(symbol)) if trial.market == "um" else None
                     for seg_id, segment in segments:
-                        cache_key = (trial.market, trial.timeframe, str(symbol), str(segment["timestamp"].iloc[0].isoformat()), trial.feature_id, trial.variant)
+                        cache_key = (trial.market, trial.timeframe, str(symbol), int(seg_id), trial.feature_id, trial.variant)
                         if cache_key not in signal_cache:
                             signal_cache[cache_key] = compute_segment_signal(segment, trial.feature_id, trial.variant, trial.market)
                         signal = signal_cache[cache_key]
