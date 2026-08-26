@@ -144,7 +144,7 @@ def test_registered_matrix_qualification() -> None:
                         actual = execute_segment(segment, signal, market=market, side=trial.side, horizon_bars=int(trial.horizon_bars), validation_start=start, validation_end=end, universe_top50=universe, funding_events=funding)
                         expected = _reference_execute(segment, signal, market=market, side=trial.side, horizon_bars=int(trial.horizon_bars), validation_start=start, validation_end=end, universe_top50=universe, funding_events=funding)
                         _assert_equal(actual, expected, f"{market}/{timeframe}/{symbol}/{segment_id}/{trial.trial_id}")
-                        if market == "um":
+                        if market == "um" and not actual.empty:
                             observed_funding_cashflows.extend(actual.funding_cashflow.astype(float).tolist())
             assert seen_gap, f"gap segment was not exercised for {market}/{timeframe}"
 
