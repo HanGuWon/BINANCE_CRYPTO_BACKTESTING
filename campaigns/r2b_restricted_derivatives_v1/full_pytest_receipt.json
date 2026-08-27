@@ -1,0 +1,10 @@
+{
+  "command": "python -m pytest -q",
+  "status": "PASS",
+  "passed": 151,
+  "failed": 0,
+  "warnings": 1,
+  "warning_summary": "UserWarning: timezone information dropped when converting a PeriodArray/Index in test_r16_semantics.py",
+  "holdout_status": "UNTOUCHED",
+  "source_commit_for_tested_scientific_files": "e04c4a6a57dab1f289daa55acd5a4af7e44398bb"
+}

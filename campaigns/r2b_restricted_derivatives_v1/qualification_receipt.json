@@ -1,0 +1,10 @@
+{
+  "status": "NOT_RUN_BLOCKED_IMPLEMENTATION",
+  "campaign_id": "r2b_restricted_derivatives_v1",
+  "reason": "No frozen directional signal semantics exist for derivatives.premium or derivatives.premium_zscore; executing a qualification would invent the scientific rule.",
+  "optimized_vs_reference": "NOT_APPLICABLE",
+  "final_holdout_status": "UNTOUCHED",
+  "outcome_run_started": false,
+  "required_fields_if_unblocked": ["decision_time", "symbol", "side", "signal_value", "entry_time", "exit_time", "gross_return", "funding_cashflow", "net_return"],
+  "matrix_required_if_unblocked": ["spot_15m_LONG", "spot_1h_LONG", "spot_4h_LONG", "um_15m_LONG_SHORT", "um_1h_LONG_SHORT", "um_4h_LONG_SHORT", "all_registered_horizons", "positive_and_negative_funding", "gap_segment"]
+}
