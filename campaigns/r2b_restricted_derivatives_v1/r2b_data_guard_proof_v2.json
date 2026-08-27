@@ -1,0 +1,14 @@
+{
+  "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\processed\\r2b_restricted_derivatives_v1_repaired_v2_causal3",
+  "partition_files": 1467,
+  "rows": 8357398,
+  "available_premium_rows": 8352862,
+  "timeframe_rows": {
+    "15m": 6367539,
+    "1h": 1591886,
+    "4h": 397973
+  },
+  "holdout_cutoff": "2024-02-10T00:00:00+00:00",
+  "tree_sha256": "6eef4e59225cb45c2833452a883249b11f03469298c1ecfb3837c5f4aaa27a7d",
+  "causal_guard": "PASS"
+}

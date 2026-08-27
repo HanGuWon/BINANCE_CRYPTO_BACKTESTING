@@ -1,0 +1,145 @@
+{
+  "panel_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\processed\\r2b_restricted_derivatives_v1_repaired_v2_causal3",
+  "partition_files_scanned": 1467,
+  "panel_rows_scanned": 8357398,
+  "panel_um_symbols": 193,
+  "premium_acquired_symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+  ],
+  "premium_acquired_symbol_count": 2,
+  "premium_manifest_rows": 158,
+  "premium_manifest_integrity_failures": 0,
+  "binance_vision_premium_symbol_prefix_count_from_census": 916,
+  "feature_availability_rows": [
+    {
+      "feature": "derivatives.premium",
+      "market": "um",
+      "timeframe": "15m",
+      "research_eligible_rows": 10698873,
+      "finite_rows": 450048,
+      "coverage_fraction": 0.042065,
+      "first_finite_timestamp": "2020-03-01T00:00:00+00:00",
+      "last_finite_timestamp": "2026-07-31T23:45:00+00:00",
+      "classification": "R2B_RESTRICTED",
+      "reason": "research_eligible_denominator_independent_audit"
+    },
+    {
+      "feature": "derivatives.premium_zscore",
+      "market": "um",
+      "timeframe": "15m",
+      "research_eligible_rows": 10698873,
+      "finite_rows": 444530,
+      "coverage_fraction": 0.041549,
+      "first_finite_timestamp": "2020-03-01T22:15:00+00:00",
+      "last_finite_timestamp": "2026-07-31T23:45:00+00:00",
+      "classification": "R2B_RESTRICTED",
+      "reason": "research_eligible_denominator_independent_audit"
+    },
+    {
+      "feature": "derivatives.premium",
+      "market": "um",
+      "timeframe": "1h",
+      "research_eligible_rows": 2674721,
+      "finite_rows": 112512,
+      "coverage_fraction": 0.042065,
+      "first_finite_timestamp": "2020-03-01T00:00:00+00:00",
+      "last_finite_timestamp": "2026-07-31T23:00:00+00:00",
+      "classification": "R2B_RESTRICTED",
+      "reason": "research_eligible_denominator_independent_audit"
+    },
+    {
+      "feature": "derivatives.premium_zscore",
+      "market": "um",
+      "timeframe": "1h",
+      "research_eligible_rows": 2674721,
+      "finite_rows": 107304,
+      "coverage_fraction": 0.040118,
+      "first_finite_timestamp": "2020-03-04T17:00:00+00:00",
+      "last_finite_timestamp": "2026-07-31T23:00:00+00:00",
+      "classification": "R2B_RESTRICTED",
+      "reason": "research_eligible_denominator_independent_audit"
+    },
+    {
+      "feature": "derivatives.premium",
+      "market": "um",
+      "timeframe": "4h",
+      "research_eligible_rows": 668683,
+      "finite_rows": 28128,
+      "coverage_fraction": 0.042065,
+      "first_finite_timestamp": "2020-03-01T00:00:00+00:00",
+      "last_finite_timestamp": "2026-07-31T20:00:00+00:00",
+      "classification": "R2B_RESTRICTED",
+      "reason": "research_eligible_denominator_independent_audit"
+    },
+    {
+      "feature": "derivatives.premium_zscore",
+      "market": "um",
+      "timeframe": "4h",
+      "research_eligible_rows": 668683,
+      "finite_rows": 23094,
+      "coverage_fraction": 0.034537,
+      "first_finite_timestamp": "2020-03-15T20:00:00+00:00",
+      "last_finite_timestamp": "2026-07-31T20:00:00+00:00",
+      "classification": "R2B_RESTRICTED",
+      "reason": "research_eligible_denominator_independent_audit"
+    }
+  ],
+  "root_cause_before_repair": "ARCHIVE_NOT_ACQUIRED for panel symbols outside BTCUSDT/ETHUSDT; the original anchor acquisition script was hard-coded to those two symbols.",
+  "classification_before_repair": "RECOVERABLY_INCOMPLETE_ACQUISITION",
+  "corrected_timeframe_coverage": [
+    {
+      "feature": "derivatives.premium",
+      "timeframe": "15m",
+      "eligible_rows": 6367539,
+      "finite_rows": 6364083,
+      "coverage_fraction": 0.9994572471405357,
+      "missingness_cause": "AVAILABLE"
+    },
+    {
+      "feature": "derivatives.premium",
+      "timeframe": "1h",
+      "eligible_rows": 1591886,
+      "finite_rows": 1591022,
+      "coverage_fraction": 0.9994572475667227,
+      "missingness_cause": "AVAILABLE"
+    },
+    {
+      "feature": "derivatives.premium",
+      "timeframe": "4h",
+      "eligible_rows": 397973,
+      "finite_rows": 397757,
+      "coverage_fraction": 0.9994572496124109,
+      "missingness_cause": "AVAILABLE"
+    },
+    {
+      "feature": "derivatives.premium_zscore",
+      "timeframe": "15m",
+      "eligible_rows": 6367539,
+      "finite_rows": 6336535,
+      "coverage_fraction": 0.9951309289193203,
+      "missingness_cause": "AVAILABLE"
+    },
+    {
+      "feature": "derivatives.premium_zscore",
+      "timeframe": "1h",
+      "eligible_rows": 1591886,
+      "finite_rows": 1564766,
+      "coverage_fraction": 0.9829636041776861,
+      "missingness_cause": "AVAILABLE"
+    },
+    {
+      "feature": "derivatives.premium_zscore",
+      "timeframe": "4h",
+      "eligible_rows": 397973,
+      "finite_rows": 372552,
+      "coverage_fraction": 0.9361238073939689,
+      "missingness_cause": "AVAILABLE"
+    }
+  ],
+  "classification_after_repair": "PREHOLDOUT_ACQUISITION_REPAIRED_AVAILABILITY_CONDITIONED",
+  "no_data_modified": true,
+  "artifact_sha256": {
+    "premium_coverage_audit.csv": "7e1f9efd33493023fffc1be0b9e79289ebe93bf7ecfad43539c634ac23f088d4"
+  }
+}
