@@ -1,5 +1,10 @@
 # R2B readiness audit
 
+> Historical snapshot retained for provenance. The `R2B_BLOCKED_SIGNAL_SEMANTICS`
+> disposition below predates amendment 002 and synthetic qualification; the
+> superseding current disposition is recorded in
+> `R2B_PREOUTCOME_FREEZE_REPORT_2026-08-28.md` and the reproducibility manifest.
+
 Audit disposition: **`R2B_BLOCKED_SIGNAL_SEMANTICS`**
 
 This is an adversarial pre-outcome audit. It does not reopen R2A.2, produce an

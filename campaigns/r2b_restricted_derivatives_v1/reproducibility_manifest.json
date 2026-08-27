@@ -1,6 +1,6 @@
 {
   "campaign_id": "r2b_restricted_derivatives_v1",
-  "status": "R2B_BLOCKED_IMPLEMENTATION",
+  "status": "R2B_READY_FOR_PREOUTCOME_FREEZE",
   "outcome_run": false,
   "final_holdout_status": "UNTOUCHED",
   "data_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/processed/r2b_restricted_derivatives_v1_repaired_v2_causal3",
@@ -9,20 +9,27 @@
   "superseded_registry_sha256": "8c302f31a54ccf783010f48a7e964c4ce6871ac8757965dde603b029f2ef0238",
   "fold_registry_sha256": "f1d6c7c4c03bbd821bf2c6bab08f6d99e43cd9542b376a863ea7ab06d08ec359",
   "premium_archive_manifest_sha256": "658247addf91573883613be97f45753359f0f255bf6a70c7ac85efeadde71662",
-  "premium_provenance_summary_sha256": "34b1b68348f34a6f837f4f5bf22adc1e6781f3966a730d700452cc280d60aa48",
+  "premium_provenance_summary_sha256": "d7bc02d21416505b34e3c1029398ae2aff3e24cc7bb96b5ff7fbaa6cb4e1702f",
   "r2b_data_guard_proof_sha256": "a3a60c5eb170b63f92cdf78b1e2a7d3537b03ad991fdc9b9127ae954953447dd",
-  "full_pytest_receipt_sha256": "626f352aa33a5ed63725e9c4119e1352aefd68c5d134ffc7f6edb7bc431f5144",
+  "full_pytest_receipt_sha256": "49a038eb4d268830b6d88c482d95fe8dfaecb9bc4c134cf9db8644fc6f3c0087",
   "source_sha256": {
     "scripts/acquire_r2b_premium_history.py": "351630303de0c9b33f172c33394506478fe3bad75d6abb383199b9993739cc26",
     "scripts/audit_r2b_premium_coverage.py": "8d0816f57f36572135c84c74ae8b8cf720b9b76340221b7b7da9fe74384fbb28",
     "scripts/materialize_r2b_premium_panel.py": "822c3834d076a3146cea2226cf1d23b96bc6ade8710d07085aac5d3a40e9492c",
-    "tests/test_r2b_readiness.py": "7e49fffb0302ac02484bb2e0be36b576106f9310da73c03a100f312b284a214c"
+    "scripts/r2b_signals.py": "25dd52cb804c6dca0757a9ed47bfb2155ae31af066965c335facbafb9f7a8937",
+    "scripts/r2b_qualification.py": "8c6033a4b08e10b2dc24b18915d9cd5118acbfc3762359e578fd31bba0744c0b",
+    "scripts/verify_r2b_registry.py": "31ffd7d2eac325309ffcfaf3bed97cc1547f494bb0562a6c7ea87b3d50b3d64b",
+    "tests/test_r2b_readiness.py": "65f01baa5b2a4fece53609011e121be00e3a04ef89dce5aa16cadaa17320f291",
+    "tests/test_r2b_qualification.py": "862a92b86d593d1c3d5d18378fef37acd98097d2a50f39f88374dce390dcb02f",
+    "tests/test_r2b_signal_semantics.py": "7da3a7d16a1afffa6ef7d88b453ae8fbc70d0eb335bb4d5f19161e5f85168d69"
   },
   "multiple_testing_plan_sha256": "02278e840da6e4b0371f47eeb0e99585ef5041562fa206c02dfd47c287098ca3",
-  "implementation_commit": "7de5e205bd5c8786d810499e9c33bfee4a648355",
-  "source_tree_sha256": "47f7fd6df7ec59eecdb7311de64a12f783746f032c1174d858da2d494d78d7b",
+  "implementation_commit": "7e791f707bef6905fccfb2eb4f2927cf06dc1192",
+  "source_tree_sha256": "d67214c63e722e67cf8af7c4af63ed08afc33e07b3e6ab06fc9399aa76d5c0df",
   "source_tree_scope": ["scripts", "src", "tests", "configs"],
   "signal_semantics": "R2B_SIGNAL_SEMANTICS_AMENDMENT_002; PRESSURE_CONTINUATION and CROWDING_REVERSION; strict zero-centered sign; 72-row family",
-  "signal_semantics_blocker": "implementation and slow-reference qualification pending",
+  "qualification_status": "PASS_SYNTHETIC_REFERENCE_ONLY; repeated deterministic runs",
+  "qualification_receipt_sha256": "65b09b59de4f94d3dc679f29653c3bcc27148a5b57a5bb6551a40ca3f0a60c71",
+  "final_report": "R2B_PREOUTCOME_FREEZE_REPORT_2026-08-28.md",
   "causal_root_tree_sha256": "6eef4e59225cb45c2833452a883249b11f03469298c1ecfb3837c5f4aaa27a7d"
 }
