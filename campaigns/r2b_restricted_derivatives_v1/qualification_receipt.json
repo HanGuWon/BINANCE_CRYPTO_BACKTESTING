@@ -1,11 +1,170 @@
 {
-  "status": "NOT_RUN_BLOCKED_SIGNAL_SEMANTICS",
-  "campaign_id": "r2b_restricted_derivatives_v1",
-  "reason": "No frozen directional signal semantics exist for derivatives.premium or derivatives.premium_zscore; executing a qualification would invent the scientific rule.",
-  "optimized_vs_reference": "NOT_APPLICABLE",
   "final_holdout_status": "UNTOUCHED",
+  "market": "um",
+  "matrix": {
+    "features": [
+      "derivatives.premium",
+      "derivatives.premium_zscore"
+    ],
+    "horizons": {
+      "15m": [
+        4,
+        16,
+        48,
+        96
+      ],
+      "1h": [
+        4,
+        12,
+        24
+      ],
+      "4h": [
+        3,
+        6
+      ]
+    },
+    "sides": [
+      "LONG",
+      "SHORT"
+    ],
+    "timeframes": [
+      "15m",
+      "1h",
+      "4h"
+    ],
+    "variants": [
+      "PRESSURE_CONTINUATION",
+      "CROWDING_REVERSION"
+    ]
+  },
+  "mode": "SYNTHETIC_REFERENCE_ONLY",
   "outcome_run_started": false,
-  "required_fields_if_unblocked": ["decision_time", "symbol", "side", "signal_value", "entry_time", "exit_time", "gross_return", "funding_cashflow", "net_return"],
-  "matrix_required_if_unblocked": ["um_15m_LONG_SHORT", "um_1h_LONG_SHORT", "um_4h_LONG_SHORT", "all_registered_horizons", "positive_and_negative_funding", "gap_segment", "missing_premium", "zscore_warmup", "exact_sign_rejection", "next_open"],
-  "spot_control_status": "OUT_OF_SCOPE_ENGINE_CONTROL_ONLY"
+  "receipt_sha256": "67d4cb6a9777681bde53f32f22ae70219dcbe9241a9eecd1321ffcd8f8fc98e9",
+  "records_compared": 33420,
+  "required_fields": [
+    "decision_time",
+    "symbol",
+    "side",
+    "signal_variant",
+    "signal_value",
+    "source_open_time",
+    "source_available_time",
+    "entry_time",
+    "exit_time",
+    "gross_return",
+    "funding_cashflow",
+    "net_return"
+  ],
+  "scenarios": [
+    {
+      "funding": "positive",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "15m"
+    },
+    {
+      "funding": "negative",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "15m"
+    },
+    {
+      "funding": "none",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "15m"
+    },
+    {
+      "funding": "positive",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "15m"
+    },
+    {
+      "funding": "negative",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "15m"
+    },
+    {
+      "funding": "none",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "15m"
+    },
+    {
+      "funding": "positive",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "1h"
+    },
+    {
+      "funding": "negative",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "1h"
+    },
+    {
+      "funding": "none",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "1h"
+    },
+    {
+      "funding": "positive",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "1h"
+    },
+    {
+      "funding": "negative",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "1h"
+    },
+    {
+      "funding": "none",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "1h"
+    },
+    {
+      "funding": "positive",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "4h"
+    },
+    {
+      "funding": "negative",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "4h"
+    },
+    {
+      "funding": "none",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "4h"
+    },
+    {
+      "funding": "positive",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "4h"
+    },
+    {
+      "funding": "negative",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "4h"
+    },
+    {
+      "funding": "none",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "4h"
+    }
+  ],
+  "spot_control_status": "OUT_OF_SCOPE_ENGINE_CONTROL_ONLY",
+  "status": "PASS"
 }
