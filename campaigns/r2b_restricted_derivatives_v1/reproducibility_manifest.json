@@ -16,6 +16,6 @@
     "scripts/materialize_r2b_premium_panel.py": "9e2bdebf7b117802008a2c1360179b318972d250f027d85a2b23cedf71be8487",
     "tests/test_r2b_readiness.py": "e4782cd037ceebc9f112f00575e333b53a77e34e6791f99296fd447dea6c16fb"
   },
-  "implementation_commit": "recorded by git commit containing this manifest",
+  "implementation_commit": "e04c4a6a57dab1f289daa55acd5a4af7e44398bb",
   "signal_semantics_blocker": "premium and premium_zscore have no frozen directional signal rule"
 }
