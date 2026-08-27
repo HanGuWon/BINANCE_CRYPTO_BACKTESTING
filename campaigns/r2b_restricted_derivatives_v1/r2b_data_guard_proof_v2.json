@@ -10,5 +10,7 @@
   },
   "holdout_cutoff": "2024-02-10T00:00:00+00:00",
   "tree_sha256": "6eef4e59225cb45c2833452a883249b11f03469298c1ecfb3837c5f4aaa27a7d",
-  "causal_guard": "PASS"
+  "causal_guard": "PASS",
+  "strict_availability_rule": "source_available_time < next_executable_open_time",
+  "derived_availability_rule": "maximum constituent 15m close time"
 }

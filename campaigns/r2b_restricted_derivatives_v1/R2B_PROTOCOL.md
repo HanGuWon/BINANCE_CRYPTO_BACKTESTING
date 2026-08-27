@@ -14,10 +14,10 @@ performance claim.
   acquired or materialized.
 - Study timeframes: 15m, 1h, and 4h. The latter are derived only from complete
   contiguous 15m buckets; incomplete buckets and gaps are quarantined.
-- The feature is joined only when `source_available_time` is strictly earlier
-  than the next executable open (`decision_timestamp + timeframe_step`). Source
-  open, close, and maximum constituent close times are retained. No forward fill,
-  interpolation, or cross-venue substitution is permitted.
+- The point-in-time rule is exact: `source_available_time < next_executable_open_time`, where `next_executable_open_time` is `decision_timestamp + timeframe_step`.
+  For native 15m rows, `source_available_time` is the native premium-kline close time. For derived 1h/4h rows, it is the maximum constituent 15m close time from a complete contiguous bucket.
+  Equality at the executable boundary and any later source observation are rejected (`source_available_time >= next_executable_open_time`). Source open, close, and maximum constituent close times are retained.
+  No forward fill, interpolation, or cross-venue substitution is permitted.
 - Universe membership is the causal UM Top-50 selection from
   `universe_monthly.csv`, with membership effective only in the selected
   universe month.

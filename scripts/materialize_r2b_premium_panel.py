@@ -98,11 +98,12 @@ def resample_source(source: pd.DataFrame, timeframe: str) -> pd.DataFrame:
 
 
 def align_source_to_decisions(decisions: pd.DataFrame, source: pd.DataFrame, step: pd.Timedelta) -> pd.DataFrame:
-    """Backward-as-of align premium observations to completed-bar decisions.
+    """Align only observations satisfying source_available_time < next_executable_open_time.
 
-    Keeping this operation as a small pure helper makes the point-in-time and
-    no-forward-fill contract directly testable without reading the D-backed
-    panel.
+    source_available_time is the native 15m close or, for a derived bucket, the
+    maximum constituent close. Exact-boundary observations are rejected by
+    allow_exact_matches=False. Keeping this operation as a small pure helper
+    makes the point-in-time and no-forward-fill contract directly testable.
     """
     left = decisions[["timestamp"]].copy()
     left["decision_timestamp"] = pd.to_datetime(left["timestamp"], utc=True).astype("datetime64[ns, UTC]")

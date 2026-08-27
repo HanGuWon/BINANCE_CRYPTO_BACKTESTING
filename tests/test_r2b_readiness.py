@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import pandas as pd
+from pathlib import Path
 
 from binance_research.features import CORE_FEATURE_SPECS
 from materialize_r2b_premium_panel import align_source_to_decisions, resample_source
 from acquire_r2b_premium_history import candidate_symbols
+from audit_r2b_premium_coverage import validate_premium_manifest
 
 
 def test_r2b_candidate_symbols_is_pre_holdout_and_um_only(tmp_path) -> None:
@@ -91,6 +93,14 @@ def test_r2b_exact_boundary_is_rejected() -> None:
     aligned = align_source_to_decisions(pd.DataFrame({"timestamp": pd.to_datetime(["2024-01-01T00:00Z"])}), source, pd.Timedelta(minutes=15))
     assert aligned["premium"].isna().all()
 
+def test_r2b_causal_contract_names_strict_next_open_and_derived_max_close() -> None:
+    spec = Path("campaigns/r2b_restricted_derivatives_v1/campaign_spec.toml").read_text(encoding="utf-8")
+    protocol = Path("campaigns/r2b_restricted_derivatives_v1/R2B_PROTOCOL.md").read_text(encoding="utf-8")
+    assert 'asof = "source_available_time < next_executable_open_time"' in spec
+    assert "maximum constituent 15m close time" in spec
+    assert "source_available_time < next_executable_open_time" in protocol
+    assert "source_available_time >= next_executable_open_time" in protocol
+
 
 def test_r2b_aggregated_availability_uses_last_constituent_close_for_1h_and_4h() -> None:
     start = pd.Timestamp("2024-01-01T00:00Z")
@@ -144,6 +154,57 @@ def test_r2b_pre_holdout_cutoff_is_strict() -> None:
     )
     cutoff = pd.Timestamp("2024-02-10T00:00Z")
     assert source.loc[source.timestamp < cutoff, "premium"].tolist() == [0.1]
+
+
+def _manifest_row(**overrides):
+    row = {
+        "dataset": "premiumIndexKlines",
+        "market": "um",
+        "interval": "15m",
+        "symbol": "AAAUSDT",
+        "integrity_status": "PASS",
+        "published_sha256": "a" * 64,
+        "computed_sha256": "a" * 64,
+    }
+    row.update(overrides)
+    return row
+
+
+def test_r2b_manifest_contract_accepts_authoritative_shape(tmp_path) -> None:
+    rows = [_manifest_row(symbol=f"S{i}USDT") for i in range(3)]
+    path = tmp_path / "premium_archive_manifest.csv"
+    pd.DataFrame(rows).to_csv(path, index=False)
+    result = validate_premium_manifest(path)
+    assert len(result) == 3
+
+
+def test_r2b_manifest_contract_rejects_wrong_dataset_market_checksum_and_r1_anchor(tmp_path) -> None:
+    base = [_manifest_row(symbol=f"S{i}USDT") for i in range(3)]
+    cases = [
+        ({"dataset": "klines"}, "dataset"),
+        ({"market": "spot"}, "market"),
+        ({"integrity_status": "FAIL"}, "integrity"),
+        ({"computed_sha256": "b" * 64}, "checksum"),
+    ]
+    for override, label in cases:
+        path = tmp_path / f"{label}.csv"
+        rows = [dict(row, **override) for row in base]
+        pd.DataFrame(rows).to_csv(path, index=False)
+        try:
+            validate_premium_manifest(path)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"manifest case {label} was accepted")
+    anchor = tmp_path / "r1_full_history_v1" / "derivative_archive_manifest.csv"
+    anchor.parent.mkdir()
+    pd.DataFrame(base).to_csv(anchor, index=False)
+    try:
+        validate_premium_manifest(anchor)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("historical R1 anchor manifest was accepted")
 
 
 def test_r2b_registry_is_metadata_only_and_explicitly_blocked() -> None:

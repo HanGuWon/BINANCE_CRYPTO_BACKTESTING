@@ -38,6 +38,38 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def validate_premium_manifest(path: Path) -> pd.DataFrame:
+    """Validate the authoritative R2B premium archive manifest.
+
+    The historical R1 derivative manifest is intentionally rejected: accepting
+    it silently recreates the BTC/ETH-only provenance bug this audit is meant
+    to detect.
+    """
+    resolved = path.resolve()
+    if resolved.name == "derivative_archive_manifest.csv" or "r1_full_history_v1" in {p.lower() for p in resolved.parts}:
+        raise ValueError(f"historical R1 anchor manifest is not valid for R2B: {resolved}")
+    manifest = pd.read_csv(resolved)
+    required = {"dataset", "market", "interval", "symbol", "integrity_status", "published_sha256", "computed_sha256"}
+    missing = required - set(manifest.columns)
+    if missing:
+        raise ValueError(f"premium manifest missing required columns: {sorted(missing)}")
+    if set(manifest["dataset"].dropna().astype(str)) != {"premiumIndexKlines"}:
+        raise ValueError("R2B premium manifest must contain only dataset=premiumIndexKlines")
+    if set(manifest["market"].dropna().astype(str)) != {"um"}:
+        raise ValueError("R2B premium manifest must contain only market=um")
+    if set(manifest["interval"].dropna().astype(str)) != {"15m"}:
+        raise ValueError("R2B premium manifest must contain only interval=15m")
+    bad_status = manifest[~manifest["integrity_status"].astype(str).eq("PASS")]
+    if not bad_status.empty:
+        raise ValueError(f"premium manifest contains checksum/integrity failures: {len(bad_status)}")
+    sha_mismatch = manifest["published_sha256"].astype(str).str.lower() != manifest["computed_sha256"].astype(str).str.lower()
+    if sha_mismatch.any():
+        raise ValueError(f"premium manifest contains checksum mismatches: {int(sha_mismatch.sum())}")
+    if manifest.empty or manifest["symbol"].astype(str).nunique() < 3:
+        raise ValueError("premium manifest resolves to an unexpectedly small symbol set; refusing R1-style anchor")
+    return manifest
+
+
 def _cause(
     *,
     feature: str,
@@ -119,14 +151,21 @@ def _rows_for_group(frame: pd.DataFrame, grouping: str, keys: list[str], feature
 
 
 def audit(panel_root: Path, derivative_manifest: Path, dataset_probe: Path, feature_availability: Path) -> tuple[pd.DataFrame, dict[str, object]]:
-    manifest = pd.read_csv(derivative_manifest)
-    premium_manifest = manifest[manifest["dataset"].eq("premiumIndexKlines")]
+    premium_manifest = validate_premium_manifest(derivative_manifest)
     acquired_symbols = set(premium_manifest["symbol"].astype(str))
     files = sorted(panel_root.glob("market=um/symbol=*/timeframe=*/year=*/part-000.parquet"))
     if not files:
         raise FileNotFoundError(f"no UM panel partitions under {panel_root}")
     frames = [_scan_partition(path) for path in files]
     frame = pd.concat(frames, ignore_index=True)
+    panel_symbols = set(frame["symbol"].astype(str).unique())
+    premium_symbols = set(frame.loc[frame["premium"].notna(), "symbol"].astype(str)) if "premium" in frame else set()
+    # Four universe symbols have no premium archive and therefore legitimately
+    # remain NO_PRIOR_OBSERVATION.  A manifest/root conflict is proven by finite
+    # premium observations whose symbols are absent from the acquisition lineage.
+    missing_archives = sorted(premium_symbols - acquired_symbols)
+    if missing_archives:
+        raise ValueError(f"premium manifest conflicts with causal panel root; missing symbols: {missing_archives[:10]}")
     rows: list[dict[str, object]] = []
     for feature in FEATURES:
         for grouping, keys in GROUPINGS.items():
@@ -146,6 +185,8 @@ def audit(panel_root: Path, derivative_manifest: Path, dataset_probe: Path, feat
         "premium_acquired_symbol_count": len(acquired_symbols),
         "premium_manifest_rows": int(len(premium_manifest)),
         "premium_manifest_integrity_failures": int((premium_manifest["integrity_status"] != "PASS").sum()),
+        "premium_manifest_sha256": sha256_file(derivative_manifest.resolve()),
+        "premium_manifest_path": str(derivative_manifest.resolve()),
         "binance_vision_premium_symbol_prefix_count_from_census": source_prefixes,
         "feature_availability_rows": premium_availability,
         "root_cause_before_repair": "ARCHIVE_NOT_ACQUIRED for panel symbols outside BTCUSDT/ETHUSDT; the original anchor acquisition script was hard-coded to those two symbols.",
@@ -160,7 +201,7 @@ def audit(panel_root: Path, derivative_manifest: Path, dataset_probe: Path, feat
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--panel-root", type=Path, default=Path("data/processed/r1_gap_safe_cohort"))
-    parser.add_argument("--derivative-manifest", type=Path, default=Path("data/census/r1_full_history_v1/derivative_archive_manifest.csv"))
+    parser.add_argument("--derivative-manifest", type=Path, default=Path("campaigns/r2b_restricted_derivatives_v1/premium_archive_manifest.csv"))
     parser.add_argument("--dataset-probe", type=Path, default=Path("data/census/r1_full_history_v1/census_summary.json"))
     parser.add_argument("--feature-availability", type=Path, default=Path("campaigns/r1_final_panel_v1/feature_availability_final.csv"))
     parser.add_argument("--out-dir", type=Path, default=Path("campaigns/r2b_restricted_derivatives_v1"))

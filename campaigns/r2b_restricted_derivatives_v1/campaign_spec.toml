@@ -25,6 +25,9 @@ sides = ["LONG", "SHORT"]
 [causal_rules]
 source_interval = "15m"
 aggregation = "complete_contiguous_buckets_only"
-asof = "backward_to_completed_bar_decision_time"
+asof = "source_available_time < next_executable_open_time"
+native_source_available_time = "15m source kline close time"
+derived_source_available_time = "maximum constituent 15m close time for the complete 1h/4h bucket"
+exact_boundary = "reject when source_available_time >= next_executable_open_time"
 missingness = "fail_closed_explicit_status"
 execution = "next_open_with_existing_r2a2_guards"

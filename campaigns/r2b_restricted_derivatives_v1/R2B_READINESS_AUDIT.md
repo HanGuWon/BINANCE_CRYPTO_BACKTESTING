@@ -25,7 +25,7 @@ available at the executable open. A new causal root must be produced by the
 repaired source.
 It has 8,357,398 rows across 1,467 Parquet partitions, with 193 panel symbols;
 four selected symbols have no pre-holdout premium archive. No R1 raw object or
-panel was modified.
+panel was modified. The canonical root is `D:/BINANCE_CRYPTO_BACKTESTING_DATA/processed/r2b_restricted_derivatives_v1_repaired_v2_causal3`; the earlier repaired root is immutable `INVALID/SUPERSEDED` because it admitted source observations before their close-time availability at the next executable open.
 
 ## Corrected availability-conditioned coverage
 
