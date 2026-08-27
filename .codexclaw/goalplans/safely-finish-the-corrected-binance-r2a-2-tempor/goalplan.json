@@ -2,22 +2,137 @@
   "objective": "Safely finish the corrected Binance R2A.2 temporal/horizon research campaign after stopping all prior invalid outcome runs. Scope: audit and fix directional execution so LONG requires SIGNAL_SEMANTICS +1, SHORT requires -1, raw 0 never enters; preserve segment-safe execution, signal caching keyed by market/timeframe/symbol/segment_id/feature/variant, next-open timing, funding-sign cashflow, per-symbol non-overlap, 756-trial registry, and final-holdout exclusion. Preserve checkpoints_v2 and any interrupted outputs as INVALID/SUPERSEDED with SHA256 hashes; never rewrite raw or processed research data. Audit and document R2A/R2A.1 historical directional invalidity without rewriting historical conclusions. Before any new full run, run directional regression tests, slow-reference qualification requiring identical decision_time, symbol, side, signal_value, entry_time, exit_time, gross_return, funding_cashflow, and net_return across Spot/UM, LONG/SHORT, timeframes, representative features and gaps, then full pytest. Commit and record implementation and registry SHAs. Only after those gates pass, execute the 756x8 corrected run into a new clean D-backed checkpoint root, aggregate reproducible fold/horizon/multiple-testing/bootstrap/cohort/yearly/symbol diagnostics without holdout access, run verification, commit/push source and small aggregate artifacts, and report exact verdict. Do not start R2B, do not access final holdout. DONE requires fresh test and artifact evidence, complete checkpoints, aggregate verification, clean git status (apart from intended source/artifacts), and explicit disposition; BLOCKED/UNSAFE/NEEDS_HUMAN/BUDGET_EXHAUSTED require evidence and must not be mislabeled complete.",
   "slug": "safely-finish-the-corrected-binance-r2a-2-tempor",
   "createdAt": "2026-08-26T13:55:52.959Z",
-  "updatedAt": "2026-08-26T13:55:52.961Z",
-  "activeWorkPhaseId": null,
+  "updatedAt": "2026-08-27T07:38:53.011Z",
+  "activeWorkPhaseId": "P3",
   "workPhases": [
-    {"id":"P1","title":"Executor repair and qualification","status":"pending","tasks":[{"id":"P1T1","title":"Archive interrupted checkpoints and finalize sign-safe executor","status":"pending"},{"id":"P1T2","title":"Run directional, segment, qualification, and full pytest gates","status":"pending"},{"id":"P1T3","title":"Commit implementation and registry SHAs","status":"pending"}],"criteriaIds":["C1","C2","C3"]},
-    {"id":"P2","title":"Corrected pre-holdout outcome run","status":"pending","tasks":[{"id":"P2T1","title":"Run 756 trials across 8 folds in clean D-backed root","status":"pending"},{"id":"P2T2","title":"Verify checkpoint completeness and holdout exclusion","status":"pending"}],"criteriaIds":["C4","C5"]},
-    {"id":"P3","title":"Aggregate, verify, and publish","status":"pending","tasks":[{"id":"P3T1","title":"Produce deterministic aggregate diagnostics and errata","status":"pending"},{"id":"P3T2","title":"Run final pytest, commit, push, and report verdict","status":"pending"}],"criteriaIds":["C6","C7","C8"]}
+    {
+      "id": "P1",
+      "title": "Executor repair and qualification",
+      "status": "done",
+      "tasks": [
+        {
+          "id": "P1T1",
+          "title": "Archive interrupted checkpoints and finalize sign-safe executor",
+          "status": "done"
+        },
+        {
+          "id": "P1T2",
+          "title": "Run directional, segment, qualification, and full pytest gates",
+          "status": "done"
+        },
+        {
+          "id": "P1T3",
+          "title": "Commit implementation and registry SHAs",
+          "status": "done"
+        }
+      ],
+      "criteriaIds": [
+        "C1",
+        "C2",
+        "C3"
+      ]
+    },
+    {
+      "id": "P2",
+      "title": "Corrected pre-holdout outcome run",
+      "status": "done",
+      "tasks": [
+        {
+          "id": "P2T1",
+          "title": "Run 756 trials across 8 folds in clean D-backed root",
+          "status": "done"
+        },
+        {
+          "id": "P2T2",
+          "title": "Verify checkpoint completeness and holdout exclusion",
+          "status": "done"
+        }
+      ],
+      "criteriaIds": [
+        "C4",
+        "C5"
+      ]
+    },
+    {
+      "id": "P3",
+      "title": "Aggregate, verify, and publish",
+      "status": "done",
+      "tasks": [
+        {
+          "id": "P3T1",
+          "title": "Produce deterministic aggregate diagnostics and errata",
+          "status": "done"
+        },
+        {
+          "id": "P3T2",
+          "title": "Run final pytest, commit, push, and report verdict",
+          "status": "done"
+        }
+      ],
+      "criteriaIds": [
+        "C6",
+        "C7",
+        "C8"
+      ]
+    }
   ],
   "criteria": [
-    {"id":"C1","scenario":"Directional gates match frozen SIGNAL_SEMANTICS across all listed features and sides.","expectedEvidence":"tests/test_r2a2_direction_gate.py pass receipt","capturedEvidence":"","status":"open"},
-    {"id":"C2","scenario":"Optimized executor equals explicit-sign slow reference on representative gaps/timeframes/markets.","expectedEvidence":"tests/test_r2a2_qualification.py pass receipt","capturedEvidence":"","status":"open"},
-    {"id":"C3","scenario":"Implementation and registry are committed before outcome execution.","expectedEvidence":"git SHA receipt","capturedEvidence":"","status":"open"},
-    {"id":"C4","scenario":"All 756x8 checkpoint units complete with zero failures.","expectedEvidence":"D-backed run_manifest.json","capturedEvidence":"","status":"open"},
-    {"id":"C5","scenario":"No final holdout rows are accessed or present in outputs.","expectedEvidence":"holdout_guard_proof.json and verification report","capturedEvidence":"","status":"open"},
-    {"id":"C6","scenario":"Aggregate artifacts cover fold/horizon/temporal/FDR/bootstrap/cohort/yearly/MFE-MAE/symbol diagnostics.","expectedEvidence":"aggregate artifact inventory","capturedEvidence":"","status":"open"},
-    {"id":"C7","scenario":"R2A/R2A.1 historical directional disposition is explicitly documented without rewriting history.","expectedEvidence":"R2A2_ERRATUM_002.md and verification report","capturedEvidence":"","status":"open"},
-    {"id":"C8","scenario":"Final tests, commit/push, and exact verdict are recorded with clean status.","expectedEvidence":"pytest receipt, git status, remote receipt, final report","capturedEvidence":"","status":"open"}
+    {
+      "id": "C1",
+      "scenario": "Directional gates match frozen SIGNAL_SEMANTICS across all listed features and sides.",
+      "expectedEvidence": "tests/test_r2a2_direction_gate.py pass receipt",
+      "capturedEvidence": "tests/test_r2a2_direction_gate.py: 7 passed; independent audit PASS at scripts/run_r2a2_v2.py:97-101",
+      "status": "met"
+    },
+    {
+      "id": "C2",
+      "scenario": "Optimized executor equals explicit-sign slow reference on representative gaps/timeframes/markets.",
+      "expectedEvidence": "tests/test_r2a2_qualification.py pass receipt",
+      "capturedEvidence": "tests/test_r2a2_qualification.py included in targeted receipt: 33 passed",
+      "status": "met"
+    },
+    {
+      "id": "C3",
+      "scenario": "Implementation and registry are committed before outcome execution.",
+      "expectedEvidence": "git SHA receipt",
+      "capturedEvidence": "outcome implementation commit 99a37ae161d3791fb9a5d040f7cb9772492a5ed4; registry SHA d80fa57832714d7073d1a769c1422eb384b798ed1a929632a58d1948e3b83f3d; source-tree SHA 07572aaae5b70f05958fe36c223b2569439547b2cf99efabc3001038cb4f2777; source_dirty=false",
+      "status": "met"
+    },
+    {
+      "id": "C4",
+      "scenario": "All 756x8 checkpoint units complete with zero failures.",
+      "expectedEvidence": "D-backed run_manifest.json",
+      "capturedEvidence": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r2a2\\checkpoints_v10\\run_manifest.json: completed 6048/6048, failed 0; scripts/verify_r2a2_checkpoints.py PASS: verified_units 6048, sign/holdout/overlap/next_open violations 0",
+      "status": "met"
+    },
+    {
+      "id": "C5",
+      "scenario": "No final holdout rows are accessed or present in outputs.",
+      "expectedEvidence": "holdout_guard_proof.json and verification report",
+      "capturedEvidence": "checkpoint verification report: all decisions/entries/exits pre-holdout; holdout_violations=0; no final holdout access",
+      "status": "met"
+    },
+    {
+      "id": "C6",
+      "scenario": "Aggregate artifacts cover fold/horizon/temporal/FDR/bootstrap/cohort/yearly/MFE-MAE/symbol diagnostics.",
+      "expectedEvidence": "aggregate artifact inventory",
+      "capturedEvidence": "Aggregate artifact inventory and aggregate_manifest.json cover fold, horizon, temporal replication, BH-FDR, calendar-month bootstrap (1000, seed 1729), cohort Top20/50/100, yearly, MFE/MAE, symbol concentration, candidate shortlist, and holdout guard; deterministic rerun hashes match.",
+      "status": "met"
+    },
+    {
+      "id": "C7",
+      "scenario": "R2A/R2A.1 historical directional disposition is explicitly documented without rewriting history.",
+      "expectedEvidence": "R2A2_ERRATUM_002.md and verification report",
+      "capturedEvidence": "campaigns/r2a2_temporal_horizon_v1/R2A2_ERRATUM_002.md and R2A2_VERIFICATION.md document the directionally-invalid R2A/R2A.1 disposition, preserve historical artifacts, and enumerate abandoned roots with implementation commits.",
+      "status": "met"
+    },
+    {
+      "id": "C8",
+      "scenario": "Final tests, commit/push, and exact verdict are recorded with clean status.",
+      "expectedEvidence": "pytest receipt, git status, remote receipt, final report",
+      "capturedEvidence": "Full pytest receipt: .codexclaw/evidence/01a0230d-0a21-7e02-ab97-a10534161680/test-receipt.json (147 passed, 1 warning); aggregate_manifest.json pins v10 identities and artifact hashes; scientific source status clean; branch research/r2a2-temporal-horizon-v1 pushed to origin.",
+      "status": "met"
+    }
   ],
   "host": {
     "armed": false,
