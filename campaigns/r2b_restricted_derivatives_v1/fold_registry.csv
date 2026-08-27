@@ -1,0 +1,9 @@
+fold_id,block,train_end_exclusive,status,selection_basis
+F01,2020-H1,2020-H1,PREREGISTERED,calendar_block_source_availability_only
+F02,2020-H2,2020-H2,PREREGISTERED,calendar_block_source_availability_only
+F03,2021-H1,2021-H1,PREREGISTERED,calendar_block_source_availability_only
+F04,2021-H2,2021-H2,PREREGISTERED,calendar_block_source_availability_only
+F05,2022-H1,2022-H1,PREREGISTERED,calendar_block_source_availability_only
+F06,2022-H2,2022-H2,PREREGISTERED,calendar_block_source_availability_only
+F07,2023-H1,2023-H1,PREREGISTERED,calendar_block_source_availability_only
+F08,2023-H2,2023-H2,PREREGISTERED,calendar_block_source_availability_only

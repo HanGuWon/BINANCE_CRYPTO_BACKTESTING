@@ -1,0 +1,13 @@
+# R2B metrics contract (not executable while blocked)
+
+The eventual outcome executor must report, per trial × fold, the same exact
+decision and cashflow fields as R2A.2: `decision_time`, `symbol`, `side`,
+`signal_value`, `entry_time`, `exit_time`, `gross_return`,
+`funding_cashflow`, and `net_return`. The optimized executor must match a slow
+reference implementation byte-for-byte at the field/value level on Spot/UM
+fixtures before any R2B outcome run.
+
+Missing premium observations are not zero signals and must not be imputed. Any
+trial with no eligible finite observations is reported with an explicit reason;
+it is not silently removed from the registry.
+
