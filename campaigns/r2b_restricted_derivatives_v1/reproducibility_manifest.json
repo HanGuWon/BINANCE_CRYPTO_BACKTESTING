@@ -13,9 +13,10 @@
   "source_sha256": {
     "scripts/acquire_r2b_premium_history.py": "351630303de0c9b33f172c33394506478fe3bad75d6abb383199b9993739cc26",
     "scripts/audit_r2b_premium_coverage.py": "8d0816f57f36572135c84c74ae8b8cf720b9b76340221b7b7da9fe74384fbb28",
-    "scripts/materialize_r2b_premium_panel.py": "9e2bdebf7b117802008a2c1360179b318972d250f027d85a2b23cedf71be8487",
-    "tests/test_r2b_readiness.py": "e4782cd037ceebc9f112f00575e333b53a77e34e6791f99296fd447dea6c16fb"
+    "scripts/materialize_r2b_premium_panel.py": "e78492ebd2221adb25650327543086ad37e698494516e3b52e75b54bf617d7a6",
+    "tests/test_r2b_readiness.py": "8d1df10d806c90dcf04dffa1ad27e942f9f2a855a47da44051514c2d5104a641"
   },
-  "implementation_commit": "e04c4a6a57dab1f289daa55acd5a4af7e44398bb",
+  "multiple_testing_plan_sha256": "02278e840da6e4b0371f47eeb0e99585ef5041562fa206c02dfd47c287098ca3",
+  "implementation_commit": "f321c201b3db305977d0379db67ab267a83b6269",
   "signal_semantics_blocker": "premium and premium_zscore have no frozen directional signal rule"
 }
