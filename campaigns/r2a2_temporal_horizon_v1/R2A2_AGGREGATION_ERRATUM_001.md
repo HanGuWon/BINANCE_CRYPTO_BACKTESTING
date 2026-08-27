@@ -28,5 +28,5 @@ separately pinned as SHA
 `99a37ae161d3791fb9a5d040f7cb9772492a5ed4`; the post-outcome aggregation
 implementation SHA is recorded in `aggregate_manifest.json` when the sealed
 v10 root is aggregated. The executed aggregation implementation commit is
-`6e7854e8b8714e9958cbfb366a06d147e63a5032`; its source was clean at execution.
+`bdbe381ae849dfdb55c6a0d55b4c3a7bc30ebe52`; its source was clean at execution.
 The previous v10 outcome files remain immutable.

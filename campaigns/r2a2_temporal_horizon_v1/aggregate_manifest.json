@@ -1,0 +1,28 @@
+{
+  "checkpoint_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r2a2\\checkpoints_v10",
+  "outcome_manifest_sha256": "09272983998c0f039e3af30cc4f05a1858cdd4d7c0f4aec0d5c7311e5a54b76c",
+  "outcome_implementation_sha": "99a37ae161d3791fb9a5d040f7cb9772492a5ed4",
+  "outcome_registry_sha256": "d80fa57832714d7073d1a769c1422eb384b798ed1a929632a58d1948e3b83f3d",
+  "outcome_source_tree_sha256": "07572aaae5b70f05958fe36c223b2569439547b2cf99efabc3001038cb4f2777",
+  "outcome_source_dirty": false,
+  "registry_sha256": "d80fa57832714d7073d1a769c1422eb384b798ed1a929632a58d1948e3b83f3d",
+  "units": 6048,
+  "expected_units": 6048,
+  "failed_units": 0,
+  "aggregate_implementation_sha": "bdbe381ae849dfdb55c6a0d55b4c3a7bc30ebe52",
+  "aggregate_source_dirty": false,
+  "aggregate_script_sha256": "1177700f98907f41d646c7eac33609a90926b682496976e6fa2653ec7ac0eb0d",
+  "artifact_sha256": {
+    "bootstrap_results.csv": "93d3da59f194b7403d96321aa507ce463a56ba4ef608cec6e4498b326aee6d88",
+    "candidate_shortlist.csv": "67f4f0b5c5cec62c8528223a54cf65b4e5bb7d6740bc20b1a3a6fe1e7d1a1e31",
+    "cohort_diagnostics.csv": "62a8715c77ca454fb9253e13abd5b1ff61db00699a8e20237f4ad436afa348d3",
+    "fold_results.csv": "3ddbb4fd15f2bffce7e7c961a2a78574f0bbf1cd22b820965d5c1b740695a009",
+    "holdout_guard_proof.json": "cc031eac63111efcff8ac9f16b657c2534f486e4b9e46703399fc3cd89eeaf7c",
+    "horizon_results.csv": "c4fb321f5d223ea6364fd88ed787cfba6f24de61de8eb6b8c08b0e5649c2b439",
+    "mfe_mae_diagnostics.csv": "23a95f3e8b03af04bdb9e7c936e8ced4944b8438067dfd289fd7a55c5d6c5030",
+    "multiple_testing.csv": "20770b1ed71253dd46044c1417a7bb185da3db5e283e7e33d098f28a9b54a69b",
+    "symbol_concentration.csv": "7da941ce1ba5c62ad1d2cef2e63cfc8ccca1ab4fe3031563ddca0c6766130f26",
+    "temporal_replication.csv": "11f4bea2996f43131631fd139ac3eccaee018a9b40937e73c8ff1a4d25ab0c9b",
+    "yearly_diagnostics.csv": "e2b28f435e89acc10d33c90bdc7d4513bf18454bb8c59e717808725f4d0a5bd1"
+  }
+}
