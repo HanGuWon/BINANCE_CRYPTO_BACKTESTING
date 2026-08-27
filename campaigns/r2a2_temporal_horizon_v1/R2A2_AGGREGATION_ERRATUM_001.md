@@ -16,6 +16,12 @@ at least 75% of valid folds, aggregate HAC |t| at least 3, maximum top-symbol
 share at most 0.5, and the catastrophic-reversal fail rule. Missing evidence
 fails closed as `INSUFFICIENT_EVIDENCE` or `INSUFFICIENT_FOLDS`.
 
+The frozen `calendar-block` contract does not name a smaller calendar unit;
+this implementation uses calendar months, matching the repository's existing
+pre-registered block-bootstrap convention. The chosen frequency is recorded
+explicitly in every bootstrap artifact (`blocks=calendar_month`) so it cannot
+be mistaken for fold-level or symbol-level resampling.
+
 No hypothesis, feature, side, horizon, threshold, registry entry, outcome
 checkpoint, or holdout boundary was changed. The outcome implementation is
 separately pinned as SHA
