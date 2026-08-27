@@ -14,8 +14,10 @@ performance claim.
   acquired or materialized.
 - Study timeframes: 15m, 1h, and 4h. The latter are derived only from complete
   contiguous 15m buckets; incomplete buckets and gaps are quarantined.
-- The feature is backward-as-of joined to the completed-bar decision time.
-  No forward fill, interpolation, or cross-venue substitution is permitted.
+- The feature is joined only when `source_available_time` is strictly earlier
+  than the next executable open (`decision_timestamp + timeframe_step`). Source
+  open, close, and maximum constituent close times are retained. No forward fill,
+  interpolation, or cross-venue substitution is permitted.
 - Universe membership is the causal UM Top-50 selection from
   `universe_monthly.csv`, with membership effective only in the selected
   universe month.
@@ -37,9 +39,14 @@ blocked until an explicit, reviewed semantics amendment is added.
 No R2B executor, qualification result, outcome checkpoint, final-holdout read,
 or R2B performance verdict may be produced while this blocker remains.
 
+The prior repaired root is preserved as `INVALID/SUPERSEDED` under
+`root_history.md`; its tree SHA256 is recorded in `R2B_ERRATUM_002.md`. The
+candidate causal root is separate and must pass
+`python scripts/verify_r2b_causal_root.py --root <root> --out <proof>` before
+any semantics or qualification gate can advance.
+
 ## Intended preregistered dimensions
 
 The registry contains 36 UM Top-50 rows: two features × three timeframes × two
 sides × the R2A.2 horizon set for each timeframe. Rows are metadata only and
 are marked `BLOCKED_IMPLEMENTATION`; this is not evidence that 36 trials ran.
-

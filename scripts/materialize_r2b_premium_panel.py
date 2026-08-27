@@ -9,12 +9,13 @@ bar decision timestamp.  The final-holdout month is excluded at input.
 from __future__ import annotations
 
 import argparse
+import zipfile
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from binance_research.data import load_kline_archive
+from binance_research.data import load_kline_archive, normalize_klines
 
 
 STEP = {"15m": pd.Timedelta(minutes=15), "1h": pd.Timedelta(hours=1), "4h": pd.Timedelta(hours=4)}
@@ -29,7 +30,16 @@ def _zscore(values: pd.Series, period: int = 90) -> pd.Series:
 def load_source(raw_root: Path, symbol: str, cutoff: pd.Timestamp) -> pd.DataFrame:
     frames = []
     for path in sorted((raw_root / "um" / "premiumIndexKlines" / symbol / "15m").glob("*.zip")):
-        frame = load_kline_archive(path)[["open_time", "close", "close_time"]].rename(
+        try:
+            loaded = load_kline_archive(path)
+        except (ValueError, TypeError):
+            with zipfile.ZipFile(path) as archive:
+                member = next(name for name in archive.namelist() if not name.endswith("/"))
+                with archive.open(member) as handle:
+                    rows = pd.read_csv(handle, header=None)
+            rows = rows[pd.to_numeric(rows.iloc[:, 0], errors="coerce").notna()]
+            loaded = normalize_klines(rows.itertuples(index=False, name=None))
+        frame = loaded[["open_time", "close", "close_time"]].rename(
             columns={"open_time": "source_open_time", "close": "premium", "close_time": "source_close_time"}
         )
         frame["source_open_time"] = pd.to_datetime(frame["source_open_time"], utc=True)
@@ -95,7 +105,7 @@ def align_source_to_decisions(decisions: pd.DataFrame, source: pd.DataFrame, ste
     panel.
     """
     left = decisions[["timestamp"]].copy()
-    left["decision_timestamp"] = pd.to_datetime(left["timestamp"], utc=True)
+    left["decision_timestamp"] = pd.to_datetime(left["timestamp"], utc=True).astype("datetime64[ns, UTC]")
     left["executable_open_time"] = left["decision_timestamp"] + step
     right = source.copy()
     if "source_open_time" not in right and "timestamp" in right:
@@ -107,7 +117,7 @@ def align_source_to_decisions(decisions: pd.DataFrame, source: pd.DataFrame, ste
             right["source_available_time"] = right["source_open_time"]
     for column in ("source_open_time", "source_close_time", "source_available_time", "source_max_constituent_close_time"):
         if column in right:
-            right[column] = pd.to_datetime(right[column], utc=True)
+            right[column] = pd.to_datetime(right[column], utc=True).astype("datetime64[ns, UTC]")
     right = right.sort_values("source_available_time")
     return pd.merge_asof(
         left.sort_values("executable_open_time"),
