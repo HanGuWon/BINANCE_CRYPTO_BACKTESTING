@@ -31,7 +31,8 @@ def test_r2b_qualification_gate_is_open_only_for_frozen_semantics() -> None:
 
 def test_r2b_receipt_has_no_spot_scientific_matrix() -> None:
     receipt = json.loads((CAMPAIGN / "qualification_receipt.json").read_text(encoding="utf-8"))
-    assert all(not item.startswith("spot_") for item in receipt["matrix_required_if_unblocked"])
+    assert receipt["market"] == "um"
+    assert "spot" not in receipt["matrix"]["timeframes"]
     assert receipt["spot_control_status"] == "OUT_OF_SCOPE_ENGINE_CONTROL_ONLY"
 
 
