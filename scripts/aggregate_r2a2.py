@@ -253,7 +253,8 @@ def main() -> int:
                 cs = aggregate_series(subset)
                 cs_mean = float(cs.mean()) if len(cs) else np.nan
                 cs_std = float(cs.std(ddof=0)) if len(cs) else np.nan
-                cohort_rows.append({"trial_id": trial.trial_id, "fold_id": fold.fold_id, "cohort": cohort, "trades": int(len(subset)), "aggregate_observations": int(len(cs)), "mean_net_return": cs_mean, "sharpe": float(cs_mean / cs_std) if np.isfinite(cs_std) and cs_std > 0 else np.nan, "hac_t": float(_hac_t_stat(cs)) if len(cs) > 1 else np.nan})
+                cohort_symbols = {symbol for (mkt, _month, symbol, name), selected in cohort_map.items() if mkt == trial.market and name == cohort and selected}
+                cohort_rows.append({"trial_id": trial.trial_id, "fold_id": fold.fold_id, "cohort": cohort, "cohort_universe_symbol_count": int(len(cohort_symbols)), "trades": int(len(subset)), "aggregate_observations": int(len(cs)), "mean_net_return": cs_mean, "sharpe": float(cs_mean / cs_std) if np.isfinite(cs_std) and cs_std > 0 else np.nan, "hac_t": float(_hac_t_stat(cs)) if len(cs) > 1 else np.nan})
     for trial in registry.itertuples(index=False):
         parts = trial_series[trial.trial_id]
         combined = pd.concat(parts).sort_index() if parts else pd.Series(dtype=float)
