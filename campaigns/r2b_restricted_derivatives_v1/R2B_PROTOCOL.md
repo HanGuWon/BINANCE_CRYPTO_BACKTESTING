@@ -1,6 +1,6 @@
 # R2B Restricted Derivatives — Pre-outcome protocol (blocked)
 
-Status: `R2B_BLOCKED_IMPLEMENTATION`
+Status: `R2B_BLOCKED_SIGNAL_SEMANTICS`
 
 This campaign is a provenance-repaired, pre-outcome protocol for the two
 restricted UM context features `derivatives.premium` and
@@ -30,8 +30,9 @@ performance claim.
 The repository has no frozen directional signal semantics for either premium
 feature. `src/binance_research/features.py` exposes
 `premium_zscore90` as a value feature but does not define `sig_premium` or
-`sig_premium_zscore`; `derivatives_semantics.md` defines the source and
-90-event/bar z-score only. A sign, threshold, or contrarian interpretation
+`sig_premium_zscore`; `src/binance_research/derivatives.py` and
+`src/binance_research/features.py` define source/value transforms only. A sign,
+threshold, or contrarian interpretation
 would therefore be a new scientific rule, not a repair. The registry records
 the intended dimensions with `UNDEFINED_SIGNAL_SEMANTICS` and must remain
 blocked until an explicit, reviewed semantics amendment is added.
@@ -50,3 +51,5 @@ any semantics or qualification gate can advance.
 The registry contains 36 UM Top-50 rows: two features × three timeframes × two
 sides × the R2A.2 horizon set for each timeframe. Rows are metadata only and
 are marked `BLOCKED_IMPLEMENTATION`; this is not evidence that 36 trials ran.
+The qualification contract is UM-only; Spot is not a scientific control family
+for these restricted features.

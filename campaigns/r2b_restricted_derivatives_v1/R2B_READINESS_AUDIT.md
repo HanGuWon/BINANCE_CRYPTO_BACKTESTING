@@ -1,6 +1,6 @@
 # R2B readiness audit
 
-Audit disposition: **`R2B_BLOCKED_IMPLEMENTATION`**
+Audit disposition: **`R2B_BLOCKED_SIGNAL_SEMANTICS`**
 
 This is an adversarial pre-outcome audit. It does not reopen R2A.2, produce an
 R2B result, read the final holdout, or start R2B.
@@ -56,4 +56,4 @@ valid yet.
 Promotion requires an explicit reviewed semantics amendment, implementation,
 directional tests, all-timeframe/both-side slow-reference qualification, clean
 source commit, and a fresh full pytest receipt. Until then the only defensible
-state is `R2B_BLOCKED_IMPLEMENTATION`.
+state is `R2B_BLOCKED_SIGNAL_SEMANTICS`.

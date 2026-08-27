@@ -1,9 +1,9 @@
 {
   "campaign_id": "r2b_restricted_derivatives_v1",
-  "status": "R2B_BLOCKED_IMPLEMENTATION",
+  "status": "R2B_BLOCKED_SIGNAL_SEMANTICS",
   "outcome_run": false,
   "final_holdout_status": "UNTOUCHED",
-  "data_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/processed/r2b_restricted_derivatives_v1_repaired",
+  "data_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/processed/r2b_restricted_derivatives_v1_repaired_v2_causal3",
   "raw_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/raw/um/premiumIndexKlines",
   "registry_sha256": "8c302f31a54ccf783010f48a7e964c4ce6871ac8757965dde603b029f2ef0238",
   "fold_registry_sha256": "f1d6c7c4c03bbd821bf2c6bab08f6d99e43cd9542b376a863ea7ab06d08ec359",
@@ -18,5 +18,6 @@
   },
   "multiple_testing_plan_sha256": "02278e840da6e4b0371f47eeb0e99585ef5041562fa206c02dfd47c287098ca3",
   "implementation_commit": "f321c201b3db305977d0379db67ab267a83b6269",
-  "signal_semantics_blocker": "premium and premium_zscore have no frozen directional signal rule"
+  "signal_semantics_blocker": "premium and premium_zscore have no frozen directional signal rule",
+  "causal_root_tree_sha256": "6eef4e59225cb45c2833452a883249b11f03469298c1ecfb3837c5f4aaa27a7d"
 }
