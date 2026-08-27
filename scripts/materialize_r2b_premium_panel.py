@@ -29,15 +29,20 @@ def _zscore(values: pd.Series, period: int = 90) -> pd.Series:
 def load_source(raw_root: Path, symbol: str, cutoff: pd.Timestamp) -> pd.DataFrame:
     frames = []
     for path in sorted((raw_root / "um" / "premiumIndexKlines" / symbol / "15m").glob("*.zip")):
-        frame = load_kline_archive(path)[["open_time", "close"]].rename(columns={"open_time": "timestamp", "close": "premium"})
+        frame = load_kline_archive(path)[["open_time", "close", "close_time"]].rename(
+            columns={"open_time": "source_open_time", "close": "premium", "close_time": "source_close_time"}
+        )
+        frame["source_open_time"] = pd.to_datetime(frame["source_open_time"], utc=True)
+        frame["source_close_time"] = pd.to_datetime(frame["source_close_time"], utc=True)
+        frame["source_available_time"] = frame["source_close_time"]
+        frame["source_max_constituent_close_time"] = frame["source_close_time"]
         frames.append(frame)
     if not frames:
-        return pd.DataFrame(columns=["timestamp", "premium", "segment_id", "premium_zscore90"])
-    raw = pd.concat(frames, ignore_index=True).drop_duplicates("timestamp").sort_values("timestamp")
-    raw["timestamp"] = pd.to_datetime(raw["timestamp"], utc=True).astype("datetime64[ns, UTC]")
-    raw = raw[raw["timestamp"] < cutoff].reset_index(drop=True)
+        return pd.DataFrame(columns=["source_open_time", "source_close_time", "source_available_time", "source_max_constituent_close_time", "premium", "segment_id", "premium_zscore90"])
+    raw = pd.concat(frames, ignore_index=True).drop_duplicates("source_open_time").sort_values("source_open_time")
+    raw = raw[raw["source_open_time"] < cutoff].reset_index(drop=True)
     expected = STEP["15m"]
-    raw["segment_id"] = raw["timestamp"].diff().fillna(expected).ne(expected).cumsum()
+    raw["segment_id"] = raw["source_open_time"].diff().fillna(expected).ne(expected).cumsum()
     raw["premium_zscore90"] = np.nan
     for _, positions in raw.groupby("segment_id", sort=False).groups.items():
         raw.loc[positions, "premium_zscore90"] = _zscore(raw.loc[positions, "premium"]).to_numpy()
@@ -46,26 +51,40 @@ def load_source(raw_root: Path, symbol: str, cutoff: pd.Timestamp) -> pd.DataFra
 
 def resample_source(source: pd.DataFrame, timeframe: str) -> pd.DataFrame:
     if timeframe == "15m":
-        return source.copy()
+        result = source.copy().sort_values("source_open_time").reset_index(drop=True)
+        if "timestamp" not in result:
+            result["timestamp"] = result["source_open_time"]
+        if "premium_zscore90" not in result:
+            result["premium_zscore90"] = np.nan
+        for _, positions in result.groupby("segment_id", sort=False).groups.items():
+            result.loc[positions, "premium_zscore90"] = _zscore(result.loc[positions, "premium"]).to_numpy()
+        return result
     ratio = int(STEP[timeframe] / STEP["15m"])
     pieces = []
     for segment_id, segment in source.groupby("segment_id", sort=False):
-        indexed = segment.set_index("timestamp")
-        grouped = indexed["premium"].resample(STEP[timeframe], label="left", closed="left")
-        values = grouped.last()
-        counts = grouped.count()
-        values = values[counts == ratio].dropna().rename("premium").to_frame()
+        indexed = segment.set_index("source_open_time", drop=False).sort_index()
+        grouped = indexed.resample(STEP[timeframe], label="left", closed="left")
+        agg = grouped.agg(
+            premium=("premium", "last"),
+            _count=("premium", "count"),
+            source_open_time=("source_open_time", "first"),
+            source_close_time=("source_close_time", "last"),
+            source_max_constituent_close_time=("source_close_time", "max"),
+        )
+        values = agg[(agg["_count"] == ratio) & agg["premium"].notna()].drop(columns="_count")
         if values.empty:
             continue
+        values["source_available_time"] = values["source_max_constituent_close_time"]
         values["segment_id"] = segment_id
-        pieces.append(values.reset_index())
+        values["timestamp"] = values.index
+        pieces.append(values.reset_index(drop=True))
     if not pieces:
-        return pd.DataFrame(columns=["timestamp", "premium", "segment_id", "premium_zscore90"])
+        return pd.DataFrame(columns=["source_open_time", "source_close_time", "source_available_time", "source_max_constituent_close_time", "premium", "segment_id", "premium_zscore90"])
     result = pd.concat(pieces, ignore_index=True).sort_values("timestamp").reset_index(drop=True)
     result["premium_zscore90"] = np.nan
     for _, positions in result.groupby("segment_id", sort=False).groups.items():
         result.loc[positions, "premium_zscore90"] = _zscore(result.loc[positions, "premium"]).to_numpy()
-    return result
+    return result.sort_values("timestamp").reset_index(drop=True)
 
 
 def align_source_to_decisions(decisions: pd.DataFrame, source: pd.DataFrame, step: pd.Timedelta) -> pd.DataFrame:
@@ -76,15 +95,27 @@ def align_source_to_decisions(decisions: pd.DataFrame, source: pd.DataFrame, ste
     panel.
     """
     left = decisions[["timestamp"]].copy()
-    left["decision_timestamp"] = pd.to_datetime(left["timestamp"], utc=True) + step
-    right = source.rename(columns={"timestamp": "premium_source_timestamp"}).copy()
-    right["premium_source_timestamp"] = pd.to_datetime(right["premium_source_timestamp"], utc=True)
+    left["decision_timestamp"] = pd.to_datetime(left["timestamp"], utc=True)
+    left["executable_open_time"] = left["decision_timestamp"] + step
+    right = source.copy()
+    if "source_open_time" not in right and "timestamp" in right:
+        right["source_open_time"] = right["timestamp"]
+    if "source_available_time" not in right:
+        if "source_close_time" in right:
+            right["source_available_time"] = right["source_close_time"]
+        else:
+            right["source_available_time"] = right["source_open_time"]
+    for column in ("source_open_time", "source_close_time", "source_available_time", "source_max_constituent_close_time"):
+        if column in right:
+            right[column] = pd.to_datetime(right[column], utc=True)
+    right = right.sort_values("source_available_time")
     return pd.merge_asof(
-        left.sort_values("decision_timestamp"),
-        right.sort_values("premium_source_timestamp"),
-        left_on="decision_timestamp",
-        right_on="premium_source_timestamp",
+        left.sort_values("executable_open_time"),
+        right,
+        left_on="executable_open_time",
+        right_on="source_available_time",
         direction="backward",
+        allow_exact_matches=False,
     ).reset_index(drop=True)
 
 
@@ -106,7 +137,8 @@ def materialize(panel_root: Path, raw_root: Path, output_root: Path, symbols: li
                 merged = align_source_to_decisions(decisions, source, step)
                 out = bars.reset_index(drop=True).copy()
                 merged = merged.reset_index(drop=True)
-                out["premium_source_timestamp"] = merged["premium_source_timestamp"]
+                out["premium_source_timestamp"] = merged.get("source_open_time")
+                out["premium_source_available_time"] = merged.get("source_available_time")
                 out["premium"] = merged["premium"]
                 out["premium_zscore90"] = merged["premium_zscore90"]
                 out["premium_coverage_status"] = np.where(out["premium"].notna(), "AVAILABLE", "NO_PRIOR_OBSERVATION")
