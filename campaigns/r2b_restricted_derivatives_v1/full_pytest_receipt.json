@@ -1,12 +1,16 @@
 {
   "command": "python -m pytest -q",
   "status": "PASS",
-  "passed": 153,
+  "exit_code": 0,
+  "passed": 163,
   "failed": 0,
-  "warnings": 1,
+  "pytest_summary": "163 passed, 1 warning in 81.50s (0:01:21)",
+  "run_timestamp": "2026-08-27T22:59:33.3323423+09:00",
+  "scientific_source_dirty": false,
+ "warnings": 1,
   "warning_summary": "UserWarning: timezone information dropped when converting a PeriodArray/Index in test_r16_semantics.py",
   "holdout_status": "UNTOUCHED",
-  "source_commit_for_tested_scientific_files": "0a165aca32d0f1d398aaa6daa6f12a281e446dd3",
-  "source_tree_sha256": "6874ba82dac4c0a7d746c9e2fd3fa23fae30ceb9f21dbd04a555b2d65f9b0349",
+  "source_commit_for_tested_scientific_files": "7de5e205bd5c8786d810499e9c33bfee4a648355",
+  "source_tree_sha256": "47f7fd6df7ec59eecdb7311de64a12f783746f032c1174d858da2d494d78d7b",
   "source_tree_scope": ["scripts", "src", "tests", "configs"]
 }
