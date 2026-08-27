@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 
 from binance_research.features import CORE_FEATURE_SPECS
-from materialize_r2b_premium_panel import resample_source
+from materialize_r2b_premium_panel import align_source_to_decisions, resample_source
 from acquire_r2b_premium_history import candidate_symbols
 
 
@@ -43,6 +43,33 @@ def test_r2b_premium_features_have_no_implicit_direction_rule() -> None:
     assert "derivatives.premium_zscore" in specs
     assert specs["derivatives.premium_zscore"].signal_column is None
     assert "derivatives.premium" not in specs
+
+
+def test_r2b_alignment_is_backward_asof_and_never_forward_fills() -> None:
+    source = pd.DataFrame(
+        {
+            "timestamp": pd.to_datetime(["2024-01-01T00:15Z", "2024-01-01T01:15Z"]),
+            "premium": [0.1, 0.2],
+            "premium_zscore90": [float("nan"), 1.0],
+        }
+    )
+    decisions = pd.DataFrame({"timestamp": pd.to_datetime(["2024-01-01T00:00Z", "2024-01-01T00:30Z", "2024-01-01T02:00Z"])})
+    aligned = align_source_to_decisions(decisions, source, pd.Timedelta(minutes=15))
+    assert aligned["premium"].tolist() == [0.1, 0.1, 0.2]
+    assert aligned["premium_source_timestamp"].tolist() == list(pd.to_datetime(["2024-01-01T00:15Z", "2024-01-01T00:15Z", "2024-01-01T01:15Z"]))
+
+
+def test_r2b_pre_holdout_cutoff_is_strict() -> None:
+    source = pd.DataFrame(
+        {
+            "timestamp": pd.to_datetime(["2024-02-09T23:45Z", "2024-02-10T00:00Z"]),
+            "premium": [0.1, 0.9],
+            "segment_id": [0, 0],
+            "premium_zscore90": [float("nan"), float("nan")],
+        }
+    )
+    cutoff = pd.Timestamp("2024-02-10T00:00Z")
+    assert source.loc[source.timestamp < cutoff, "premium"].tolist() == [0.1]
 
 
 def test_r2b_registry_is_metadata_only_and_explicitly_blocked() -> None:

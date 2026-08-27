@@ -68,6 +68,26 @@ def resample_source(source: pd.DataFrame, timeframe: str) -> pd.DataFrame:
     return result
 
 
+def align_source_to_decisions(decisions: pd.DataFrame, source: pd.DataFrame, step: pd.Timedelta) -> pd.DataFrame:
+    """Backward-as-of align premium observations to completed-bar decisions.
+
+    Keeping this operation as a small pure helper makes the point-in-time and
+    no-forward-fill contract directly testable without reading the D-backed
+    panel.
+    """
+    left = decisions[["timestamp"]].copy()
+    left["decision_timestamp"] = pd.to_datetime(left["timestamp"], utc=True) + step
+    right = source.rename(columns={"timestamp": "premium_source_timestamp"}).copy()
+    right["premium_source_timestamp"] = pd.to_datetime(right["premium_source_timestamp"], utc=True)
+    return pd.merge_asof(
+        left.sort_values("decision_timestamp"),
+        right.sort_values("premium_source_timestamp"),
+        left_on="decision_timestamp",
+        right_on="premium_source_timestamp",
+        direction="backward",
+    ).reset_index(drop=True)
+
+
 def materialize(panel_root: Path, raw_root: Path, output_root: Path, symbols: list[str], selected_months: dict[str, set[str]], cutoff_by_timeframe: dict[str, pd.Timestamp]) -> dict[str, int]:
     counts = {timeframe: 0 for timeframe in STEP}
     for symbol in symbols:
@@ -83,10 +103,7 @@ def materialize(panel_root: Path, raw_root: Path, output_root: Path, symbols: li
                 if bars.empty:
                     continue
                 decisions = bars[["timestamp"]].copy()
-                decisions["decision_timestamp"] = decisions["timestamp"] + step
-                right = source.rename(columns={"timestamp": "premium_source_timestamp"}).copy()
-                right["premium_source_timestamp"] = pd.to_datetime(right["premium_source_timestamp"], utc=True).astype("datetime64[ns, UTC]")
-                merged = pd.merge_asof(decisions.sort_values("decision_timestamp"), right.sort_values("premium_source_timestamp"), left_on="decision_timestamp", right_on="premium_source_timestamp", direction="backward")
+                merged = align_source_to_decisions(decisions, source, step)
                 out = bars.reset_index(drop=True).copy()
                 merged = merged.reset_index(drop=True)
                 out["premium_source_timestamp"] = merged["premium_source_timestamp"]
