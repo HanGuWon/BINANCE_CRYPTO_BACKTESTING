@@ -27,6 +27,7 @@ EXPECTED_OUTCOME_SOURCE_TREE_SHA256 = "07572aaae5b70f05958fe36c223b2569439547b2c
 REQUIRED_TRADE_FIELDS = {"decision_time", "symbol", "side", "signal_value", "entry_time", "exit_time", "gross_return", "funding_cashflow", "net_return"}
 CANONICAL_CHECKPOINT_ROOT = Path("D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2a2/checkpoints_v10").resolve()
 SCIENTIFIC_SOURCE_PATHS = ("scripts", "src", "tests", "configs", "campaigns/r2a2_temporal_horizon_v1")
+GENERATED_AGGREGATE_ARTIFACTS = {"fold_results.csv", "horizon_results.csv", "temporal_replication.csv", "multiple_testing.csv", "bootstrap_results.csv", "cohort_diagnostics.csv", "yearly_diagnostics.csv", "symbol_concentration.csv", "mfe_mae_diagnostics.csv", "candidate_shortlist.csv", "holdout_guard_proof.json", "aggregate_manifest.json"}
 
 
 def sha256(path: Path) -> str:
@@ -44,8 +45,14 @@ def aggregate_artifact_hashes(directory: Path, names: list[str]) -> dict[str, st
 
 def aggregation_source_state() -> tuple[str, bool]:
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
-    status = subprocess.check_output(["git", "status", "--porcelain=v1", "--untracked-files=all", "--", *SCIENTIFIC_SOURCE_PATHS], cwd=ROOT, text=True).strip()
-    return commit, bool(status)
+    raw_status = subprocess.check_output(["git", "status", "--porcelain=v1", "--untracked-files=all", "--", *SCIENTIFIC_SOURCE_PATHS], cwd=ROOT, text=True)
+    source_changes = []
+    for line in raw_status.splitlines():
+        relative = line[3:].strip().strip('"').replace("\\", "/")
+        if relative.startswith("campaigns/r2a2_temporal_horizon_v1/") and Path(relative).name in GENERATED_AGGREGATE_ARTIFACTS:
+            continue
+        source_changes.append(line)
+    return commit, bool(source_changes)
 
 
 def p_value(t: float, n: int) -> float:
