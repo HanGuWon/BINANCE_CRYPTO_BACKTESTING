@@ -18,7 +18,8 @@
   },
   "multiple_testing_plan_sha256": "02278e840da6e4b0371f47eeb0e99585ef5041562fa206c02dfd47c287098ca3",
   "implementation_commit": "0a165aca32d0f1d398aaa6daa6f12a281e446dd3",
-  "source_tree_sha256": "a13f0d85a558be1f6f6feed9977112af6e81f2138bf2e8e255855c0ee60abf80",
+  "source_tree_sha256": "6874ba82dac4c0a7d746c9e2fd3fa23fae30ceb9f21dbd04a555b2d65f9b0349",
+  "source_tree_scope": ["scripts", "src", "tests", "configs"],
   "signal_semantics_blocker": "premium and premium_zscore have no frozen directional signal rule",
   "causal_root_tree_sha256": "6eef4e59225cb45c2833452a883249b11f03469298c1ecfb3837c5f4aaa27a7d"
 }

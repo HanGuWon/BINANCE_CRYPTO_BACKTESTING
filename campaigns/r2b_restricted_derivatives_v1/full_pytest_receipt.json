@@ -7,5 +7,6 @@
   "warning_summary": "UserWarning: timezone information dropped when converting a PeriodArray/Index in test_r16_semantics.py",
   "holdout_status": "UNTOUCHED",
   "source_commit_for_tested_scientific_files": "0a165aca32d0f1d398aaa6daa6f12a281e446dd3",
-  "source_tree_sha256": "a13f0d85a558be1f6f6feed9977112af6e81f2138bf2e8e255855c0ee60abf80"
+  "source_tree_sha256": "6874ba82dac4c0a7d746c9e2fd3fa23fae30ceb9f21dbd04a555b2d65f9b0349",
+  "source_tree_scope": ["scripts", "src", "tests", "configs"]
 }
