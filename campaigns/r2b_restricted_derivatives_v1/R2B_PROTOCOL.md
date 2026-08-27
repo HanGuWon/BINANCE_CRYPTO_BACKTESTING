@@ -1,6 +1,6 @@
 # R2B Restricted Derivatives — Pre-outcome protocol (frozen)
 
-Status: `R2B_BLOCKED_IMPLEMENTATION` (semantics frozen; qualification pending)
+Status: `R2B_READY_FOR_PREOUTCOME_FREEZE` (semantics and synthetic qualification frozen; historical outcomes prohibited)
 
 This campaign is a provenance-repaired, pre-outcome protocol for the two
 restricted UM context features `derivatives.premium` and
@@ -33,8 +33,9 @@ zero-centered sign rule; LONG requires `+1`, SHORT requires `-1`, and zero,
 missing, or NaN never enter. Exact equations, warmup, gap reset, and
 next-open behavior are defined in `R2B_SIGNAL_SEMANTICS_AMENDMENT_002.md`.
 
-No R2B executor, qualification result, outcome checkpoint, final-holdout read,
-or R2B performance verdict may be produced while this blocker remains.
+The synthetic executor and qualification receipt are correctness evidence only;
+historical R2B outcomes, final-holdout reads, and performance verdicts remain
+prohibited in this pre-outcome state.
 
 The prior repaired root is preserved as `INVALID/SUPERSEDED` under
 `root_history.md`; its tree SHA256 is recorded in `R2B_ERRATUM_002.md`. The

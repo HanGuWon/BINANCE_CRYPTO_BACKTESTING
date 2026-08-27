@@ -1,6 +1,8 @@
 # R2B promotion policy
 
-`R2B_BLOCKED_IMPLEMENTATION` is the current disposition after amendment 002.
+`R2B_READY_FOR_PREOUTCOME_FREEZE` is the disposition after amendment 002 and
+the passing synthetic slow-reference qualification. This does not authorize a
+historical R2B outcome run or final-holdout access.
 Promotion to `R2B_READY_FOR_PREOUTCOME_FREEZE` requires a reviewed
 signal-semantics amendment for both premium
 features, an executable 72-row registry, explicit

@@ -1,6 +1,6 @@
 schema_version = 1
 campaign_id = "r2b_restricted_derivatives_v1"
-status = "R2B_BLOCKED_IMPLEMENTATION"
+status = "R2B_READY_FOR_PREOUTCOME_FREEZE"
 parent_campaign = "r2a2_temporal_horizon_v1"
 data_root = "D:/BINANCE_CRYPTO_BACKTESTING_DATA/processed/r2b_restricted_derivatives_v1_repaired_v2_causal3"
 raw_root = "D:/BINANCE_CRYPTO_BACKTESTING_DATA/raw/um/premiumIndexKlines"

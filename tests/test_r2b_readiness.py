@@ -207,11 +207,11 @@ def test_r2b_manifest_contract_rejects_wrong_dataset_market_checksum_and_r1_anch
         raise AssertionError("historical R1 anchor manifest was accepted")
 
 
-def test_r2b_registry_is_metadata_only_and_explicitly_blocked() -> None:
+def test_r2b_registry_is_metadata_only_and_preregistered() -> None:
     registry = pd.read_csv("campaigns/r2b_restricted_derivatives_v1/trial_registry.csv")
-    assert len(registry) == 36
-    assert registry.status.eq("BLOCKED_IMPLEMENTATION").all()
-    assert registry.signal_rule.eq("UNDEFINED_SIGNAL_SEMANTICS").all()
+    assert len(registry) == 72
+    assert registry.status.eq("PREREGISTERED_PREOUTCOME").all()
+    assert set(registry.signal_rule) == {"SIGN_SAME_DIRECTION", "SIGN_OPPOSITE_DIRECTION"}
     assert set(registry.feature_id) == {"derivatives.premium", "derivatives.premium_zscore"}
     assert set(registry.timeframe) == {"15m", "1h", "4h"}
     assert set(registry.side) == {"LONG", "SHORT"}
