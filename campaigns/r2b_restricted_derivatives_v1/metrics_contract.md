@@ -1,4 +1,4 @@
-# R2B metrics contract (not executable while blocked)
+# R2B metrics contract (pre-outcome freeze)
 
 The eventual outcome executor must report, per trial × fold, the same exact
 decision and cashflow fields as R2A.2: `decision_time`, `symbol`, `side`,
@@ -9,6 +9,7 @@ fixtures before any R2B outcome run. Spot fixtures are out of scope for this
 restricted-feature family; any shared-engine Spot test must be labelled
 `ENGINE CONTROL ONLY` and cannot satisfy R2B qualification.
 
-Missing premium observations are not zero signals and must not be imputed. Any
+`signal_variant` is reported with every trial. Missing premium observations are
+not zero signals and must not be imputed. Any
 trial with no eligible finite observations is reported with an explicit reason;
 it is not silently removed from the registry.

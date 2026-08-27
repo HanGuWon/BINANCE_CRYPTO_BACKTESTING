@@ -1,12 +1,12 @@
 schema_version = 1
 campaign_id = "r2b_restricted_derivatives_v1"
-status = "R2B_BLOCKED_SIGNAL_SEMANTICS"
+status = "R2B_BLOCKED_IMPLEMENTATION"
 parent_campaign = "r2a2_temporal_horizon_v1"
 data_root = "D:/BINANCE_CRYPTO_BACKTESTING_DATA/processed/r2b_restricted_derivatives_v1_repaired_v2_causal3"
 raw_root = "D:/BINANCE_CRYPTO_BACKTESTING_DATA/raw/um/premiumIndexKlines"
 holdout_boundary_utc = "2024-02-10T00:00:00Z"
 archive_cutoff_month = "2024-01"
-feature_semantics = "BLOCKED_UNTIL_EXPLICIT_PREMIUM_DIRECTION_RULE"
+feature_semantics = "R2B_SIGNAL_SEMANTICS_AMENDMENT_002"
 outcome_run_permitted = false
 final_holdout_accessed = false
 
@@ -31,3 +31,5 @@ derived_source_available_time = "maximum constituent 15m close time for the comp
 exact_boundary = "reject when source_available_time >= next_executable_open_time"
 missingness = "fail_closed_explicit_status"
 execution = "next_open_with_existing_r2a2_guards"
+signal_variants = ["PRESSURE_CONTINUATION", "CROWDING_REVERSION"]
+signal_rule = "strict_zero_centered_sign; LONG requires +1; SHORT requires -1; 0/NaN reject"

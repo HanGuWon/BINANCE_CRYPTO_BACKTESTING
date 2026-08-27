@@ -1,11 +1,12 @@
 {
   "campaign_id": "r2b_restricted_derivatives_v1",
-  "status": "R2B_BLOCKED_SIGNAL_SEMANTICS",
+  "status": "R2B_BLOCKED_IMPLEMENTATION",
   "outcome_run": false,
   "final_holdout_status": "UNTOUCHED",
   "data_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/processed/r2b_restricted_derivatives_v1_repaired_v2_causal3",
   "raw_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/raw/um/premiumIndexKlines",
-  "registry_sha256": "8c302f31a54ccf783010f48a7e964c4ce6871ac8757965dde603b029f2ef0238",
+  "registry_sha256": "3c61d923fe2cf88714c8cd2592264800ef2880db894dd2a21170fdf4fcc85302",
+  "superseded_registry_sha256": "8c302f31a54ccf783010f48a7e964c4ce6871ac8757965dde603b029f2ef0238",
   "fold_registry_sha256": "f1d6c7c4c03bbd821bf2c6bab08f6d99e43cd9542b376a863ea7ab06d08ec359",
   "premium_archive_manifest_sha256": "658247addf91573883613be97f45753359f0f255bf6a70c7ac85efeadde71662",
   "premium_provenance_summary_sha256": "34b1b68348f34a6f837f4f5bf22adc1e6781f3966a730d700452cc280d60aa48",
@@ -21,6 +22,7 @@
   "implementation_commit": "7de5e205bd5c8786d810499e9c33bfee4a648355",
   "source_tree_sha256": "47f7fd6df7ec59eecdb7311de64a12f783746f032c1174d858da2d494d78d7b",
   "source_tree_scope": ["scripts", "src", "tests", "configs"],
-  "signal_semantics_blocker": "premium and premium_zscore have no frozen directional signal rule",
+  "signal_semantics": "R2B_SIGNAL_SEMANTICS_AMENDMENT_002; PRESSURE_CONTINUATION and CROWDING_REVERSION; strict zero-centered sign; 72-row family",
+  "signal_semantics_blocker": "implementation and slow-reference qualification pending",
   "causal_root_tree_sha256": "6eef4e59225cb45c2833452a883249b11f03469298c1ecfb3837c5f4aaa27a7d"
 }

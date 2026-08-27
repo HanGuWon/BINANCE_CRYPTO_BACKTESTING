@@ -1,6 +1,6 @@
-# R2B Restricted Derivatives — Pre-outcome protocol (blocked)
+# R2B Restricted Derivatives — Pre-outcome protocol (frozen)
 
-Status: `R2B_BLOCKED_SIGNAL_SEMANTICS`
+Status: `R2B_BLOCKED_IMPLEMENTATION` (semantics frozen; qualification pending)
 
 This campaign is a provenance-repaired, pre-outcome protocol for the two
 restricted UM context features `derivatives.premium` and
@@ -25,17 +25,13 @@ performance claim.
   per-symbol non-overlap, segment-safe warmups, actual funding-event cashflow,
   and final-holdout guard used by R2A.2.
 
-## Why execution is blocked
+## Frozen signal semantics
 
-The repository has no frozen directional signal semantics for either premium
-feature. `src/binance_research/features.py` exposes
-`premium_zscore90` as a value feature but does not define `sig_premium` or
-`sig_premium_zscore`; `src/binance_research/derivatives.py` and
-`src/binance_research/features.py` define source/value transforms only. A sign,
-threshold, or contrarian interpretation
-would therefore be a new scientific rule, not a repair. The registry records
-the intended dimensions with `UNDEFINED_SIGNAL_SEMANTICS` and must remain
-blocked until an explicit, reviewed semantics amendment is added.
+Amendment 002 freezes `PRESSURE_CONTINUATION` and `CROWDING_REVERSION` as
+separate variants for raw `premium` and `premium_zscore90`. Both use a strict
+zero-centered sign rule; LONG requires `+1`, SHORT requires `-1`, and zero,
+missing, or NaN never enter. Exact equations, warmup, gap reset, and
+next-open behavior are defined in `R2B_SIGNAL_SEMANTICS_AMENDMENT_002.md`.
 
 No R2B executor, qualification result, outcome checkpoint, final-holdout read,
 or R2B performance verdict may be produced while this blocker remains.
@@ -48,8 +44,7 @@ any semantics or qualification gate can advance.
 
 ## Intended preregistered dimensions
 
-The registry contains 36 UM Top-50 rows: two features × three timeframes × two
-sides × the R2A.2 horizon set for each timeframe. Rows are metadata only and
-are marked `BLOCKED_IMPLEMENTATION`; this is not evidence that 36 trials ran.
-The qualification contract is UM-only; Spot is not a scientific control family
-for these restricted features.
+The registry contains 72 UM Top-50 rows: two features × two variants × three
+timeframes × two sides × the fixed horizon set for each timeframe. Rows are
+preregistered metadata only; this is not evidence that any historical trial ran.
+The qualification contract is UM-only; Spot is an engine control only.
