@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from binance_research.collector import AppendOnlyEventStore, ForwardCollector
+from binance_research.collector import AppendOnlyEventStore, ContinuityTracker, ForwardCollector
 from binance_research.registry import ExperimentRecord, ExperimentRegistry
 from binance_research.reporting import REQUIRED_ARTIFACTS, ArtifactWriter
 
@@ -51,6 +51,37 @@ def test_forward_collector_keeps_raw_streams_append_only(tmp_path: Path) -> None
     collector.store.append("depth", "um", "BTCUSDT", {"second": True})
     lines = (tmp_path / "um" / "BTCUSDT" / "depth.jsonl").read_text().splitlines()
     assert len(lines) == 2
-    assert json.loads(lines[0])["schema_version"] == 1
+    envelope = json.loads(lines[0])
+    assert envelope["schema_version"] == 2
+    assert envelope["source_kind"] == "rest_snapshot"
+    assert envelope["source_time_available"] is False
+    assert envelope["continuity_state"] == "SOURCE_TIME_UNAVAILABLE"
     assert all(call[0] == "um" and call[2]["symbol"] == "BTCUSDT" for call in fake.calls)
 
+
+def test_event_and_receipt_time_are_distinct_and_exchange_time_is_preserved(tmp_path: Path) -> None:
+    path = AppendOnlyEventStore(tmp_path).append("depth", "um", "BTCUSDT", {"E": 1700000000000}, source_kind="websocket_event", endpoint="wss://example")
+    envelope = json.loads(path.read_text().splitlines()[0])
+    assert envelope["exchange_event_time"].startswith("2023-11-14T22:13:20")
+    assert envelope["collector_receipt_time"] != envelope["exchange_event_time"]
+    assert envelope["source_time_available"] is True
+    assert envelope["continuity_state"] == "COMPLETE"
+
+
+def test_continuity_tracker_fails_closed_on_restart_and_sequence_gap() -> None:
+    tracker = ContinuityTracker()
+    assert tracker.observe(10) == "RESTART_GAP"
+    assert tracker.observe(11) == "COMPLETE"
+    assert tracker.observe(13) == "SEQUENCE_GAP"
+    assert tracker.restart() == "RESTART_GAP"
+    assert tracker.observe(None) == "SOURCE_TIME_UNAVAILABLE"
+
+
+def test_r3_snapshot_excludes_api_key_streams(tmp_path: Path) -> None:
+    fake = FakeClient()
+    collector = ForwardCollector(AppendOnlyEventStore(tmp_path), fake)  # type: ignore[arg-type]
+    paths = collector.collect_r3_um_snapshot("BTCUSDT")
+    assert len(paths) == len(collector.R3_PUBLIC_STREAMS)
+    assert "top_position_ratio" not in collector.R3_PUBLIC_STREAMS
+    assert "top_account_ratio" not in collector.R3_PUBLIC_STREAMS
+    assert all("topLongShort" not in call[1] for call in fake.calls)

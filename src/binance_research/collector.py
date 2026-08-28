@@ -14,11 +14,21 @@ class AppendOnlyEventStore:
     def __init__(self, root: Path) -> None:
         self.root = Path(root)
 
-    def append(self, stream: str, market: str, symbol: str, payload: Any) -> Path:
+    def append(self, stream: str, market: str, symbol: str, payload: Any, *, source_kind: str = "rest_snapshot", endpoint: str | None = None, request_params: dict[str, Any] | None = None, continuity_state: str = "COMPLETE", sequence_id: int | str | None = None) -> Path:
+        if continuity_state not in {"COMPLETE", "RESTART_GAP", "POLL_GAP", "SOURCE_TIME_UNAVAILABLE", "SEQUENCE_GAP", "SCHEMA_ERROR", "RATE_LIMIT_GAP"}:
+            raise ValueError(f"unknown continuity state: {continuity_state}")
+        receipt_time = datetime.now(UTC).isoformat()
+        event_time = _extract_exchange_event_time(payload)
+        effective_state = continuity_state if event_time is not None or continuity_state != "COMPLETE" else "SOURCE_TIME_UNAVAILABLE"
         destination = self.root / market / symbol / f"{stream.replace('/', '_')}.jsonl"
         destination.parent.mkdir(parents=True, exist_ok=True)
-        envelope = {"schema_version": 1, "source": "binance", "market_type": market,
-                    "symbol": symbol, "stream": stream, "collected_at": datetime.now(UTC).isoformat(), "payload": payload}
+        envelope = {"schema_version": 2, "source": "binance", "market_type": market,
+                    "symbol": symbol, "stream": stream, "endpoint": endpoint,
+                    "source_kind": source_kind, "exchange_event_time": event_time,
+                    "source_time_available": event_time is not None,
+                    "collector_receipt_time": receipt_time, "request_params": request_params,
+                    "sequence_id": sequence_id, "continuity_state": effective_state,
+                    "payload": payload}
         descriptor = os.open(destination, os.O_APPEND | os.O_CREAT | os.O_WRONLY, 0o644)
         try:
             os.write(descriptor, (json.dumps(envelope, separators=(",", ":")) + "\n").encode())
@@ -26,6 +36,49 @@ class AppendOnlyEventStore:
         finally:
             os.close(descriptor)
         return destination
+
+
+def _extract_exchange_event_time(payload: Any) -> str | None:
+    if not isinstance(payload, dict):
+        return None
+    for value in (payload.get("E"), payload.get("T"), payload.get("eventTime"), payload.get("timestamp"), payload.get("time")):
+        if value is None:
+            continue
+        try:
+            number = float(value)
+            if number > 1e11:
+                return datetime.fromtimestamp(number / 1000, UTC).isoformat()
+            if number > 1e9:
+                return datetime.fromtimestamp(number, UTC).isoformat()
+        except (TypeError, ValueError, OverflowError, OSError):
+            if isinstance(value, str) and value:
+                return value
+    return None
+
+
+class ContinuityTracker:
+    """Fail-closed sequence/restart tracking for forward streams."""
+
+    def __init__(self) -> None:
+        self.previous_sequence: int | None = None
+        self.restarted = True
+
+    def restart(self) -> str:
+        self.previous_sequence = None
+        self.restarted = True
+        return "RESTART_GAP"
+
+    def observe(self, sequence_id: int | None) -> str:
+        if sequence_id is None:
+            return "SOURCE_TIME_UNAVAILABLE"
+        state = "COMPLETE"
+        if self.previous_sequence is not None and sequence_id != self.previous_sequence + 1:
+            state = "SEQUENCE_GAP"
+        elif self.restarted:
+            state = "RESTART_GAP"
+        self.previous_sequence = sequence_id
+        self.restarted = False
+        return state
 
 
 def route_liquidation_event(payload: dict[str, Any], requested_symbol: str = "ALL") -> tuple[str, str]:
@@ -63,6 +116,7 @@ class ForwardCollector:
         "top_account_ratio": ("/futures/data/topLongShortAccountRatio", {"period": "5m", "limit": 500}),
     }
     REQUIRES_API_KEY = frozenset({"top_position_ratio", "top_account_ratio"})
+    R3_PUBLIC_STREAMS = frozenset({"open_interest", "premium", "book_ticker", "depth", "agg_trades", "oi_history", "taker_ratio"})
 
     def __init__(self, store: AppendOnlyEventStore, client: BinanceRestClient | None = None) -> None:
         self.store, self.client = store, client or BinanceRestClient()
@@ -73,7 +127,26 @@ class ForwardCollector:
             if stream in self.REQUIRES_API_KEY and not os.getenv("BINANCE_API_KEY"):
                 paths.append(self.store.append("collector_status", "um", symbol, {"stream": stream, "status": "SKIPPED_API_KEY_REQUIRED", "endpoint": endpoint}))
                 continue
-            paths.append(self.store.append(stream, "um", symbol, self.client.get("um", endpoint, {"symbol": symbol, **defaults})))
+            params = {"symbol": symbol, **defaults}
+            paths.append(self.store.append(stream, "um", symbol, self.client.get("um", endpoint, params), source_kind="rest_snapshot", endpoint=endpoint, request_params=params))
+        return paths
+
+    def collect_r3_um_snapshot(self, symbol: str) -> list[Path]:
+        """Collect only the explicitly public R3 v1 streams."""
+        return self._collect_snapshot(symbol, self.R3_PUBLIC_STREAMS)
+
+    def _collect_snapshot(self, symbol: str, streams: frozenset[str]) -> list[Path]:
+        paths: list[Path] = []
+        for stream in sorted(streams):
+            endpoint, defaults = self.UM_ENDPOINTS[stream]
+            params = {"symbol": symbol, **defaults}
+            try:
+                payload = self.client.get("um", endpoint, params)
+            except Exception as exc:
+                state = "RATE_LIMIT_GAP" if "429" in str(exc) or "rate" in str(exc).lower() else "POLL_GAP"
+                paths.append(self.store.append("collector_status", "um", symbol, {"stream": stream, "error": type(exc).__name__}, source_kind="collector_control", endpoint=endpoint, request_params=params, continuity_state=state))
+                continue
+            paths.append(self.store.append(stream, "um", symbol, payload, source_kind="rest_snapshot", endpoint=endpoint, request_params=params))
         return paths
 
     async def stream_liquidations(self, symbol: str = "ALL") -> AsyncIterator[dict[str, Any]]:
@@ -95,10 +168,11 @@ class ForwardCollector:
                         events = decoded if isinstance(decoded, list) else [decoded]
                         for payload in events:
                             market, event_symbol = route_liquidation_event(payload, symbol)
-                            self.store.append("liquidation", market, event_symbol, payload)
+                            self.store.append("liquidation", market, event_symbol, payload, source_kind="websocket_event", endpoint=url, sequence_id=payload.get("u") or payload.get("U"))
                             yield payload
             except asyncio.CancelledError:
                 raise
-            except Exception:
+            except Exception as exc:
+                self.store.append("collector_status", "um", symbol, {"error": type(exc).__name__}, source_kind="collector_control", endpoint=url, continuity_state="RESTART_GAP")
                 await asyncio.sleep(backoff)
                 backoff = min(backoff * 2, 30)
