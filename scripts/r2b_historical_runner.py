@@ -271,6 +271,8 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out-root", type=Path, required=True)
     parser.add_argument("--unit", help="run one F01__R2B0001 unit; omit for all 576")
+    parser.add_argument("--fold-id", help="run all 72 trials for one frozen fold")
+    parser.add_argument("--finalize", action="store_true", help="write the run manifest from all terminal checkpoints")
     args = parser.parse_args()
     identity = _launch_identity()
     trials, folds = load_registry()
@@ -282,8 +284,21 @@ def main() -> int:
         result = run_unit(trial, fold_map[(fold_id, str(trial["timeframe"]), int(trial["horizon_bars"]))], out_root=args.out_root)
         print(json.dumps(result, sort_keys=True))
         return 0
+    if args.finalize:
+        expected = {(fold_id, str(trial["trial_id"])) for fold_id in sorted(set(str(row["fold_id"]) for row in folds)) for trial in trials}
+        results = []
+        for fold_id, trial_id in sorted(expected):
+            path = args.out_root / "units" / f"{fold_id}__{trial_id}.json"
+            if not path.exists():
+                raise RuntimeError(f"missing terminal unit {fold_id}__{trial_id}")
+            results.append(json.loads(path.read_text(encoding="utf-8")))
+        manifest = {"campaign_id": "r2b_restricted_derivatives_v1", "outcome_run_started": True, "final_holdout_status": "UNTOUCHED", "unit_count": len(results), "status_counts": pd.Series([r["status"] for r in results]).value_counts().to_dict(), "implementation_commit": identity["implementation_commit"], "head_commit": identity["head_commit"], "source_tree_sha256": identity["source_tree_sha256"], "registry_sha256": identity["registry_sha256"], "fold_registry_sha256": identity["fold_registry_sha256"], "causal_root_tree_sha256": identity["causal_root_tree_sha256"], "units": results}
+        _atomic_json(args.out_root / "run_manifest.json", manifest)
+        print(json.dumps({"unit_count": len(results), "status_counts": manifest["status_counts"], "final_holdout_status": "UNTOUCHED"}, sort_keys=True))
+        return 0
     results = []
-    for fold_id in sorted(set(str(row["fold_id"]) for row in folds)):
+    fold_ids = [args.fold_id] if args.fold_id else sorted(set(str(row["fold_id"]) for row in folds))
+    for fold_id in fold_ids:
         for trial in trials:
             fold = fold_map[(fold_id, str(trial["timeframe"]), int(trial["horizon_bars"]))]
             results.append(run_unit(trial, fold, out_root=args.out_root))
