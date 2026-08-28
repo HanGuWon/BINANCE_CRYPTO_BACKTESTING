@@ -58,3 +58,10 @@ def test_pilot_receipt_is_operational_only(tmp_path: Path) -> None:
     receipt = json.loads(path.read_text(encoding="utf-8").splitlines()[0])
     assert receipt["mode"] == "ENGINEERING_PILOT"
     assert not {"gross_return", "net_return", "pnl", "sharpe"} & set(receipt)
+
+
+def test_pilot_scope_validator_is_exact() -> None:
+    from scripts.run_r3_prospective_collector import PILOT_SYMBOLS, validate_pilot_inputs
+    validate_pilot_inputs(Path("D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1"), list(PILOT_SYMBOLS))
+    with pytest.raises(ValueError):
+        validate_pilot_inputs(Path("C:/tmp/r3_prospective_context_v1"), list(PILOT_SYMBOLS))
