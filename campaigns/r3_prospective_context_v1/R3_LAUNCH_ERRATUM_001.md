@@ -35,3 +35,22 @@ engineering smoke only. Real pilot payloads must supply per-stream byte
 quantiles and conservative 24h/7d/30d/90d projections.
 
 This erratum is a prerequisite to any corrected launch identity.
+
+## Independent USD-M verification (2026-08-28 KST)
+
+The public USDⓈ-M `GET /fapi/v1/exchangeInfo` response was fetched before any
+collection and returned a `REQUEST_WEIGHT` limit of **2,400 per minute** (and
+order limits of 1,200/minute and 300/10 seconds).  The collector must retain
+that response and calculate its planned request budget from the returned
+`rateLimits`; it must not infer a limit from the Spot API or from a synthetic
+request reservation.
+
+The endpoint-weight table is frozen as a contract input and must be checked
+against the USDⓈ-M REST reference at implementation time: `exchangeInfo=1`,
+`klines=1`, `openInterest=1`, `premiumIndex=1`, single-symbol
+`bookTicker=2`, `depth(limit=100)=5`, and `aggTrades(limit<=1000)=20`.
+The historical open-interest and taker-ratio endpoints are public futures-data
+endpoints with their own documented retention/weight rules; their observed
+weight headers, rather than an invented constant, are authoritative for the
+pilot budget.  A planned schedule must remain materially below the returned
+2,400/minute ceiling and stop on an unverified or contradictory weight.
