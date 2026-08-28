@@ -11,7 +11,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from r2b_qualification import qualification_gate, validate_um_matrix  # noqa: E402
+from r2b_qualification import qualification_gate, validate_um_matrix, qualification_identities  # noqa: E402
 
 CAMPAIGN = ROOT / "campaigns" / "r2b_restricted_derivatives_v1"
 
@@ -60,3 +60,14 @@ def test_qualification_payload_and_file_hashes_are_distinct_and_unambiguous() ->
     file_hash = hashlib.sha256(path.read_bytes()).hexdigest()
     assert file_hash != receipt["qualification_payload_sha256"]
     assert file_hash != receipt["qualification_result_identity"]
+
+
+def test_qualification_identity_helper_names_all_hashes() -> None:
+    identities = qualification_identities()
+    assert set(identities) == {
+        "qualification_payload_sha256", "qualification_result_identity",
+        "qualification_receipt_file_sha256",
+    }
+    assert identities["qualification_receipt_file_sha256"] == hashlib.sha256(
+        (CAMPAIGN / "qualification_receipt.json").read_bytes()
+    ).hexdigest()

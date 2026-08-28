@@ -249,6 +249,20 @@ def write_receipt(result: dict[str, object], path: Path = CAMPAIGN / "qualificat
     return payload
 
 
+def qualification_identities(path: Path = CAMPAIGN / "qualification_receipt.json") -> dict[str, str]:
+    """Return explicitly named payload, result, and serialized-file identities."""
+    receipt = json.loads(path.read_text(encoding="utf-8"))
+    required = {"qualification_payload_sha256", "qualification_result_identity"}
+    missing = required - set(receipt)
+    if missing:
+        raise ValueError(f"qualification receipt missing identity fields: {sorted(missing)}")
+    return {
+        "qualification_payload_sha256": str(receipt["qualification_payload_sha256"]),
+        "qualification_result_identity": str(receipt["qualification_result_identity"]),
+        "qualification_receipt_file_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+    }
+
+
 if __name__ == "__main__":
     result = run_qualification()
     print(json.dumps(result, indent=2, sort_keys=True, default=str))
