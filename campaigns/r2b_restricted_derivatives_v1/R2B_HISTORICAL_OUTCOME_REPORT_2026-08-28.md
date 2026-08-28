@@ -10,6 +10,7 @@ after the launch freeze.
 ## Frozen identities
 
 * Branch: `research/r2b-restricted-derivatives-v1`
+* Final HEAD: `5ee5cee` (metadata/report commits after the pinned executable; scientific source tree remains unchanged)
 * Implementation commit: `ac9ef2cda9f0571a5902d55aee8bbaa427b190a7`
 * Scientific source-tree SHA256 (scripts/src/tests/configs; caches excluded): `11e476ad2b35d2a42ed55afe83a7bf06c68024929aaf1c4aa1cc10b30ce56306`
 * Trial registry SHA256: `3c61d923fe2cf88714c8cd2592264800ef2880db894dd2a21170fdf4fcc85302` (72 rows)
@@ -20,6 +21,8 @@ after the launch freeze.
 
 Canonical checkpoint root:
 `D:\BINANCE_CRYPTO_BACKTESTING_DATA\r2b_restricted_derivatives_v1_checkpoints_v6`
+
+`run_manifest.json` SHA256: `a47ad4d8f2399f2b8cd93650ec483158cbe1b4a54f2ef318eb65d9cbdd84c5e5`.
 
 `run_manifest.json` records exactly 576/576 terminal units, all `VALID`, with
 the launch implementation/source identities pinned. The independent
