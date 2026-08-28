@@ -6,7 +6,18 @@ import time
 from pathlib import Path
 
 from binance_research.collector import AppendOnlyEventStore, ForwardCollector
-from binance_research.r3_operations import append_manifest, build_manifest, require_sha256, single_instance_lock, verify_manifest_chain, write_health_receipt
+from binance_research.r3_operations import append_manifest, build_manifest, require_sha256, single_instance_lock, verify_manifest_chain, write_health_receipt, write_pilot_receipt
+
+PILOT_SYMBOLS = ("BTCUSDT", "ETHUSDT")
+PILOT_ROOT_NAME = "r3_prospective_context_v1"
+
+
+def validate_pilot_inputs(root: Path, symbols: list[str]) -> None:
+    resolved = Path(root).resolve()
+    if resolved.drive.upper() != "D:" or resolved.name != PILOT_ROOT_NAME:
+        raise ValueError("pilot root must be D-backed .../r3_prospective_context_v1")
+    if tuple(sorted(symbols)) != PILOT_SYMBOLS:
+        raise ValueError("pilot symbols are fixed to BTCUSDT and ETHUSDT")
 
 
 def _run_cycle(root: Path, symbols: list[str], roster_sha256: str) -> dict[str, object]:
@@ -42,6 +53,15 @@ def run_forever(root: Path, symbols: list[str], roster_sha256: str, *, interval_
         while True:
             _run_cycle(root, symbols, roster_sha256)
             time.sleep(interval_seconds)
+
+
+def run_pilot(root: Path, roster_sha256: str) -> dict[str, object]:
+    symbols = list(PILOT_SYMBOLS)
+    validate_pilot_inputs(root, symbols)
+    manifest = run_once(root, symbols, roster_sha256)
+    stream_counts = {str(item["path"]).split("/")[-1].removesuffix(".jsonl"): int(item["rows"]) for item in manifest["files"]}
+    write_pilot_receipt(Path(root), symbols=symbols, manifest_sha256=str(manifest["manifest_sha256"]), roster_sha256=roster_sha256, stream_counts=stream_counts, bytes_written=int(manifest["total_bytes"]), latency_seconds={}, gap_counts={})
+    return manifest
 
 
 def main() -> int:

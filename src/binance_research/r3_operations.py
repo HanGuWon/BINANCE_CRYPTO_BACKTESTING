@@ -92,3 +92,19 @@ def write_health_receipt(root: Path, *, campaign_id: str, manifest_sha256: str |
         handle.flush()
         os.fsync(handle.fileno())
     return destination
+
+
+PILOT_ALLOWED_FIELDS = frozenset({"timestamp", "campaign_id", "mode", "symbols", "manifest_sha256", "roster_sha256", "stream_counts", "bytes", "latency_seconds", "gap_counts"})
+
+
+def write_pilot_receipt(root: Path, *, symbols: list[str], manifest_sha256: str, roster_sha256: str, stream_counts: dict[str, int], bytes_written: int, latency_seconds: dict[str, float], gap_counts: dict[str, int]) -> Path:
+    receipt = {"timestamp": datetime.now(UTC).isoformat(), "campaign_id": "r3_prospective_context_v1", "mode": "ENGINEERING_PILOT", "symbols": sorted(symbols), "manifest_sha256": manifest_sha256, "roster_sha256": roster_sha256, "stream_counts": dict(sorted(stream_counts.items())), "bytes": int(bytes_written), "latency_seconds": dict(sorted(latency_seconds.items())), "gap_counts": dict(sorted(gap_counts.items()))}
+    if set(receipt) != PILOT_ALLOWED_FIELDS:
+        raise AssertionError("pilot receipt contains a non-operational field")
+    destination = Path(root) / "health" / "pilot_receipts.jsonl"
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with destination.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(receipt, sort_keys=True, separators=(",", ":")) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    return destination
