@@ -23,7 +23,8 @@ def _timestamp(value: Any) -> pd.Timestamp | None:
 
 def _identity(record: dict[str, Any]) -> str:
     payload = json.dumps(record.get("payload"), sort_keys=True, separators=(",", ":"), default=str)
-    return hashlib.sha256(f"{record.get('market_type', record.get('market'))}|{record.get('stream')}|{record.get('symbol')}|{record.get('sequence_id')}|{payload}".encode()).hexdigest()
+    value = json.dumps(record.get("value"), sort_keys=True, separators=(",", ":"), default=str)
+    return hashlib.sha256(f"{record.get('market_type', record.get('market'))}|{record.get('stream')}|{record.get('symbol')}|{record.get('sequence_id')}|{record.get('exchange_event_time')}|{record.get('collector_receipt_time')}|{payload}|{value}".encode()).hexdigest()
 
 
 def materialize_causal_observations(

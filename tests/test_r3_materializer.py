@@ -52,3 +52,11 @@ def test_out_of_order_and_missing_oi_or_liquidation_are_fail_closed() -> None:
     rows = materialize_causal_observations([out_of_order, earlier, missing_oi, no_liquidation], ["2024-01-01T00:00:03.500Z", "2024-01-01T00:00:04.500Z", "2024-01-01T00:00:05.500Z", "2024-01-01T00:00:06.500Z"])
     assert "SEQUENCE_GAP" in set(rows["data_quality_state"])
     assert "POLL_GAP" in set(rows["data_quality_state"])
+
+
+def test_distinct_no_sequence_observations_are_not_collapsed() -> None:
+    first = _event(1000, "2024-01-01T00:00:01Z", 11, sequence_id=None)
+    later = {**_event(5000, "2024-01-01T00:00:05Z", 55, sequence_id=None), "continuity_state": "SEQUENCE_GAP"}
+    rows = materialize_causal_observations([first, later], ["2024-01-01T00:00:06Z"])
+    assert rows.iloc[-1]["continuity_segment"] == 1
+    assert rows.iloc[-1]["data_quality_state"] == "SEQUENCE_GAP"
