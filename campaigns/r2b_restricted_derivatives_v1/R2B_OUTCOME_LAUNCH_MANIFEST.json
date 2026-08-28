@@ -2,7 +2,7 @@
   "campaign_id": "r2b_restricted_derivatives_v1",
   "launch_status": "READY_TO_EXECUTE_PRE_HOLDOUT",
   "launch_commit": "d808127a16d0eed92031196efb1c4f94ba13aa3b",
-  "manifest_commit": "PENDING_COMMIT",
+  "manifest_commit": "c47482d4ef8439c31966cb9880af9ee648b518eb",
   "implementation_commit": "438380e4a94c2b6bb4fd77e7ebbd6ec49e6a3492",
   "source_tree_sha256": "0cd9d53d9ffd9f4eadf4aa39b970e8394ed9f8bf3a5150856724313ebc07957a",
   "registry_sha256": "3c61d923fe2cf88714c8cd2592264800ef2880db894dd2a21170fdf4fcc85302",
