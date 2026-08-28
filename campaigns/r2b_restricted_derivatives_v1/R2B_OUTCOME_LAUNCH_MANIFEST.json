@@ -1,9 +1,9 @@
 {
   "campaign_id": "r2b_restricted_derivatives_v1",
-  "launch_status": "PROTOCOL_FROZEN_RUNNER_PENDING",
-  "launch_commit": "30333825857b9e7323a2bd5211ebcec505c09a81",
-  "implementation_commit": "30333825857b9e7323a2bd5211ebcec505c09a81",
-  "source_tree_sha256": "59a06a3189ca98d6e67db967d2058e6bf44e04ad714493eca4a7611d48652981",
+  "launch_status": "READY_TO_EXECUTE_PRE_HOLDOUT",
+  "launch_commit": "438380e4a94c2b6bb4fd77e7ebbd6ec49e6a3492",
+  "implementation_commit": "438380e4a94c2b6bb4fd77e7ebbd6ec49e6a3492",
+  "source_tree_sha256": "5c560c340f8f09e0c3d6c1a0a292ea6d4eb2d4533c508e5799027d5806cfafea",
   "registry_sha256": "3c61d923fe2cf88714c8cd2592264800ef2880db894dd2a21170fdf4fcc85302",
   "fold_registry_sha256": "25e479c98867b4cf0d4a7ff767bde306eca8bba0cbf66565191c32a4da5a06f6",
   "causal_root_tree_sha256": "6eef4e59225cb45c2833452a883249b11f03469298c1ecfb3837c5f4aaa27a7d",
@@ -18,7 +18,9 @@
   "pre_holdout_end_utc": "2024-01-01T00:00:00Z",
   "final_holdout_status": "UNTOUCHED",
   "outcome_run_started": false,
-  "outcome_run_permitted": false,
+  "outcome_run_permitted": true,
   "historical_returns_accessed": false,
-  "notes": "Protocol and exact folds are frozen. A dedicated runner must be implemented, qualified on real pre-holdout slices, and pinned in a superseding launch manifest before any historical outcome execution."
+  "runner": "scripts/r2b_historical_runner.py",
+  "parity_qualification": "scripts/r2b_realdata_qualification.py; deterministic PASS twice",
+  "notes": "Final pre-outcome launch freeze after real-data slow-reference parity. Only the 576 UM trial-fold units on the eight pre-holdout blocks are authorized; final holdout and January 2024 remain excluded."
 }
