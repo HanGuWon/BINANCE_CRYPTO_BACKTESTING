@@ -76,8 +76,9 @@ def verify_manifest_chain(path: Path) -> bool:
     return True
 
 
-def write_health_receipt(root: Path, *, campaign_id: str, manifest_sha256: str | None, roster_sha256: str | None, stream_state: dict[str, Any], restart_count: int = 0, gap_count: int = 0) -> Path:
-    receipt = {"timestamp": datetime.now(UTC).isoformat(), "pid": os.getpid(), "campaign_id": campaign_id, "manifest_sha256": manifest_sha256, "roster_sha256": roster_sha256, "raw_root": str(root), "stream_state": stream_state, "restart_count": restart_count, "gap_count": gap_count, "bytes": sum(path.stat().st_size for path in Path(root).rglob("*.jsonl"))}
+def write_health_receipt(root: Path, *, campaign_id: str, manifest_sha256: str | None, roster_sha256: str | None, stream_state: dict[str, Any], raw_root: Path | None = None, restart_count: int = 0, gap_count: int = 0) -> Path:
+    raw_root = Path(raw_root or root)
+    receipt = {"timestamp": datetime.now(UTC).isoformat(), "pid": os.getpid(), "campaign_id": campaign_id, "manifest_sha256": manifest_sha256, "roster_sha256": roster_sha256, "raw_root": str(raw_root), "stream_state": stream_state, "restart_count": restart_count, "gap_count": gap_count, "bytes": sum(path.stat().st_size for path in raw_root.rglob("*.jsonl"))}
     destination = Path(root) / "health" / "health_receipts.jsonl"
     destination.parent.mkdir(parents=True, exist_ok=True)
     with destination.open("a", encoding="utf-8") as handle:

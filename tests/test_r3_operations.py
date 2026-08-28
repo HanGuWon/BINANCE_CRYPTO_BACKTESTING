@@ -35,3 +35,13 @@ def test_health_receipt_contains_operational_identity(tmp_path: Path) -> None:
     assert receipt["campaign_id"] == "r3_prospective_context_v1"
     assert receipt["manifest_sha256"] == "a" * 64
     assert receipt["stream_state"]["premium"] == "OK"
+    assert path.parent.parent == tmp_path
+
+
+def test_manifest_chain_tamper_is_rejected(tmp_path: Path) -> None:
+    raw = tmp_path / "raw_v1"
+    raw.mkdir()
+    first = build_manifest(raw, manifest_id="m1")
+    chain = append_manifest(raw, first)
+    chain.write_text(chain.read_text(encoding="utf-8").replace('"total_rows":0', '"total_rows":1'), encoding="utf-8")
+    assert verify_manifest_chain(chain) is False
