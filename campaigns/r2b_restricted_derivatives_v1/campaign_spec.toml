@@ -1,6 +1,6 @@
 schema_version = 1
 campaign_id = "r2b_restricted_derivatives_v1"
-status = "R2B_READY_FOR_PREOUTCOME_FREEZE"
+status = "R2B_PREOUTCOME_LAUNCH_FROZEN"
 parent_campaign = "r2a2_temporal_horizon_v1"
 data_root = "D:/BINANCE_CRYPTO_BACKTESTING_DATA/processed/r2b_restricted_derivatives_v1_repaired_v2_causal3"
 raw_root = "D:/BINANCE_CRYPTO_BACKTESTING_DATA/raw/um/premiumIndexKlines"
@@ -9,6 +9,12 @@ archive_cutoff_month = "2024-01"
 feature_semantics = "R2B_SIGNAL_SEMANTICS_AMENDMENT_002"
 outcome_run_permitted = false
 final_holdout_accessed = false
+historical_protocol = "R2B_HISTORICAL_OUTCOME_PROTOCOL_001.md"
+fold_registry = "fold_registry.csv"
+cost_contract = "R2B_COST_CONTRACT_001.md"
+statistics_contract = "R2B_STATISTICS_CONTRACT_001.md"
+grading_contract = "R2B_GRADING_CONTRACT_001.md"
+multiple_testing_family_size = 72
 
 [universe]
 market = "um"
