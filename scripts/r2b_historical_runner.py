@@ -38,6 +38,8 @@ REQUIRED_TRADE_FIELDS = (
     "gross_return", "funding_cashflow", "net_return",
 )
 KLINE_COLUMNS = ["open_time", "open", "high", "low", "close", "volume", "close_time", "quote_volume", "count", "taker_buy_volume", "taker_buy_quote_volume", "ignore"]
+_PANEL_CACHE: dict[tuple[str, str, str, str], pd.DataFrame] = {}
+_FUNDING_CACHE: dict[str, pd.DataFrame] = {}
 
 
 def _atomic_json(path: Path, payload: dict[str, object]) -> None:
@@ -140,6 +142,8 @@ def load_raw_klines(symbol: str, timeframe: str, start: pd.Timestamp, end: pd.Ti
 
 
 def load_funding(symbol: str) -> pd.DataFrame:
+    if symbol in _FUNDING_CACHE:
+        return _FUNDING_CACHE[symbol]
     root = RAW_FUNDING / symbol
     pieces = []
     for path in sorted(root.glob(f"{symbol}-*.zip")):
@@ -157,16 +161,25 @@ def load_funding(symbol: str) -> pd.DataFrame:
             piece["timestamp"] = pd.to_datetime(pd.to_numeric(piece.timestamp, errors="coerce"), unit="ms", utc=True)
             pieces.append(piece.dropna(subset=["timestamp"]))
     if not pieces:
-        return pd.DataFrame(columns=["timestamp", "funding_rate"])
-    return pd.concat(pieces, ignore_index=True).drop_duplicates("timestamp").sort_values("timestamp").reset_index(drop=True)
+        result = pd.DataFrame(columns=["timestamp", "funding_rate"])
+        _FUNDING_CACHE[symbol] = result
+        return result
+    result = pd.concat(pieces, ignore_index=True).drop_duplicates("timestamp").sort_values("timestamp").reset_index(drop=True)
+    _FUNDING_CACHE[symbol] = result
+    return result
 
 
 def prepare_symbol(symbol: str, timeframe: str, start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
+    key = (symbol, timeframe, start.isoformat(), end.isoformat())
+    if key in _PANEL_CACHE:
+        return _PANEL_CACHE[key]
     panel = load_causal_symbol(symbol, timeframe, start, end)
     if panel.empty:
         return panel
     prices = load_raw_klines(symbol, timeframe, start, end)
-    return panel.merge(prices, on="timestamp", how="left", validate="one_to_one").sort_values("timestamp").reset_index(drop=True)
+    result = panel.merge(prices, on="timestamp", how="left", validate="one_to_one").sort_values("timestamp").reset_index(drop=True)
+    _PANEL_CACHE[key] = result
+    return result
 
 
 def execute_frame(panel: pd.DataFrame, trial: dict[str, object], validation_start: pd.Timestamp, validation_end: pd.Timestamp, funding: pd.DataFrame) -> pd.DataFrame:
