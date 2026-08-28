@@ -11,7 +11,7 @@
   "premium_archive_manifest_sha256": "658247addf91573883613be97f45753359f0f255bf6a70c7ac85efeadde71662",
   "premium_provenance_summary_sha256": "d7bc02d21416505b34e3c1029398ae2aff3e24cc7bb96b5ff7fbaa6cb4e1702f",
   "r2b_data_guard_proof_sha256": "a3a60c5eb170b63f92cdf78b1e2a7d3537b03ad991fdc9b9127ae954953447dd",
-  "full_pytest_receipt_sha256": "9bd1acf73f691b11bea70208d9e59ec5f48bfde5c4480c468c06e15b20994823",
+  "full_pytest_receipt_sha256": "e665246032795a08ef065a10e37b211576d723a47d6d38c9ef4900839faa6676",
   "source_sha256": {
     "scripts/acquire_r2b_premium_history.py": "351630303de0c9b33f172c33394506478fe3bad75d6abb383199b9993739cc26",
     "scripts/audit_r2b_premium_coverage.py": "8d0816f57f36572135c84c74ae8b8cf720b9b76340221b7b7da9fe74384fbb28",
