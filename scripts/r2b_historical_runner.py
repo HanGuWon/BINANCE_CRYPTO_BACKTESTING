@@ -12,6 +12,7 @@ import hashlib
 import io
 import json
 import os
+import subprocess
 import tempfile
 import zipfile
 from pathlib import Path
@@ -50,6 +51,42 @@ def _atomic_json(path: Path, payload: dict[str, object]) -> None:
     finally:
         if os.path.exists(name):
             os.unlink(name)
+
+
+def _source_tree_sha256() -> str:
+    digest = hashlib.sha256()
+    files = []
+    for directory in ("scripts", "src", "tests", "configs"):
+        path = ROOT / directory
+        if path.exists():
+            files.extend(item for item in path.rglob("*") if item.is_file())
+    for path in sorted(files, key=lambda item: item.relative_to(ROOT).as_posix()):
+        digest.update(path.relative_to(ROOT).as_posix().encode())
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+    return digest.hexdigest()
+
+
+def _git_status_clean() -> bool:
+    output = subprocess.run(["git", "status", "--porcelain", "--", "scripts", "src", "tests", "configs"], cwd=ROOT, capture_output=True, text=True, check=True).stdout
+    return not output.strip()
+
+
+def _launch_identity() -> dict[str, object]:
+    manifest = json.loads((CAMPAIGN / "R2B_OUTCOME_LAUNCH_MANIFEST.json").read_text(encoding="utf-8"))
+    if manifest.get("launch_status") != "READY_TO_EXECUTE_PRE_HOLDOUT" or not manifest.get("outcome_run_permitted"):
+        raise RuntimeError("R2B launch manifest is not executable")
+    if not _git_status_clean():
+        raise RuntimeError("scientific source tree is dirty; refusing historical execution")
+    source_tree = _source_tree_sha256()
+    if source_tree != manifest.get("source_tree_sha256"):
+        raise RuntimeError(f"source-tree hash mismatch: {source_tree} != {manifest.get('source_tree_sha256')}")
+    head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
+    implementation = str(manifest.get("implementation_commit", ""))
+    ancestor = subprocess.run(["git", "merge-base", "--is-ancestor", implementation, head], cwd=ROOT)
+    if ancestor.returncode != 0:
+        raise RuntimeError(f"implementation commit {implementation} is not an ancestor of HEAD {head}")
+    return {"implementation_commit": implementation, "head_commit": head, "source_tree_sha256": source_tree, "registry_sha256": str(manifest["registry_sha256"]), "fold_registry_sha256": str(manifest["fold_registry_sha256"]), "causal_root_tree_sha256": str(manifest["causal_root_tree_sha256"]), "launch_commit": str(manifest["launch_commit"])}
 
 
 def _read_parquet(path: Path) -> pd.DataFrame:
@@ -175,8 +212,16 @@ def execute_frame(panel: pd.DataFrame, trial: dict[str, object], validation_star
 def run_unit(trial: dict[str, object], fold: dict[str, object], *, out_root: Path, symbols: list[str] | None = None) -> dict[str, object]:
     unit_id = f"{fold['fold_id']}__{trial['trial_id']}"
     checkpoint = out_root / "units" / f"{unit_id}.json"
+    identity = _launch_identity()
     if checkpoint.exists():
-        return json.loads(checkpoint.read_text(encoding="utf-8"))
+        prior = json.loads(checkpoint.read_text(encoding="utf-8"))
+        trade_path = out_root / "trades" / f"{unit_id}.parquet"
+        if prior.get("implementation_commit") != identity["implementation_commit"] or prior.get("source_tree_sha256") != identity["source_tree_sha256"] or not trade_path.exists() or hashlib.sha256(trade_path.read_bytes()).hexdigest() != prior.get("trade_file_sha256"):
+            raise RuntimeError(f"stale or mismatched checkpoint: {unit_id}")
+        existing = pd.read_parquet(trade_path)
+        if set(REQUIRED_TRADE_FIELDS) != set(existing.columns) or len(existing) != int(prior.get("executed_trades", -1)):
+            raise RuntimeError(f"invalid checkpoint trade schema/count: {unit_id}")
+        return prior
     validation_start = pd.Timestamp(fold["validation_start_utc"])
     validation_end = pd.Timestamp(fold["validation_end_exclusive_utc"])
     history_start = validation_start - pd.Timedelta(days=370)
@@ -196,7 +241,7 @@ def run_unit(trial: dict[str, object], fold: dict[str, object], *, out_root: Pat
     trade_path = out_root / "trades" / f"{unit_id}.parquet"
     trade_path.parent.mkdir(parents=True, exist_ok=True)
     trades.to_parquet(trade_path, index=False)
-    result = {"unit_id": unit_id, "fold_id": fold["fold_id"], "trial_id": trial["trial_id"], "status": status, "executed_trades": int(len(trades),), "eligible_rows": int(eligible), "trade_file_sha256": hashlib.sha256(trade_path.read_bytes()).hexdigest(), "holdout_status": "UNTOUCHED", "january_2024_rows": 0}
+    result = {"unit_id": unit_id, "fold_id": fold["fold_id"], "trial_id": trial["trial_id"], "timeframe": trial["timeframe"], "horizon_bars": int(trial["horizon_bars"]), "side": trial["side"], "feature_id": trial["feature_id"], "signal_variant": trial["signal_variant"], "status": status, "executed_trades": int(len(trades)), "eligible_rows": int(eligible), "trade_file_sha256": hashlib.sha256(trade_path.read_bytes()).hexdigest(), "implementation_commit": identity["implementation_commit"], "source_tree_sha256": identity["source_tree_sha256"], "holdout_status": "UNTOUCHED", "january_2024_rows": 0}
     _atomic_json(checkpoint, result)
     return result
 
@@ -214,6 +259,7 @@ def main() -> int:
     parser.add_argument("--out-root", type=Path, required=True)
     parser.add_argument("--unit", help="run one F01__R2B0001 unit; omit for all 576")
     args = parser.parse_args()
+    identity = _launch_identity()
     trials, folds = load_registry()
     fold_map = {(str(row["fold_id"]), str(row["timeframe"]), int(row["horizon_bars"])): row for row in folds}
     trial_map = {str(row["trial_id"]): row for row in trials}
@@ -228,7 +274,7 @@ def main() -> int:
         for trial in trials:
             fold = fold_map[(fold_id, str(trial["timeframe"]), int(trial["horizon_bars"]))]
             results.append(run_unit(trial, fold, out_root=args.out_root))
-    manifest = {"campaign_id": "r2b_restricted_derivatives_v1", "outcome_run_started": True, "final_holdout_status": "UNTOUCHED", "unit_count": len(results), "status_counts": pd.Series([r["status"] for r in results]).value_counts().to_dict(), "units": results}
+    manifest = {"campaign_id": "r2b_restricted_derivatives_v1", "outcome_run_started": True, "final_holdout_status": "UNTOUCHED", "unit_count": len(results), "status_counts": pd.Series([r["status"] for r in results]).value_counts().to_dict(), "implementation_commit": identity["implementation_commit"], "head_commit": identity["head_commit"], "source_tree_sha256": identity["source_tree_sha256"], "registry_sha256": identity["registry_sha256"], "fold_registry_sha256": identity["fold_registry_sha256"], "causal_root_tree_sha256": identity["causal_root_tree_sha256"], "units": results}
     _atomic_json(args.out_root / "run_manifest.json", manifest)
     print(json.dumps({"unit_count": len(results), "status_counts": manifest["status_counts"], "final_holdout_status": "UNTOUCHED"}, sort_keys=True))
     return 0
