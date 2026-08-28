@@ -34,7 +34,7 @@ def _month_bounds(month: str) -> tuple[str, str]:
 
 def freeze_um_top50(ranking: Iterable[dict[str, Any]], *, effective_month: str, source_sha256: str) -> Roster:
     rows = [dict(row) for row in ranking]
-    if not source_sha256 or len(source_sha256) != 64:
+    if not source_sha256 or len(source_sha256) != 64 or any(char not in "0123456789abcdefABCDEF" for char in source_sha256):
         raise UniverseContractError("source SHA256 is required")
     frame = pd.DataFrame(rows)
     required = {"market", "symbol"}

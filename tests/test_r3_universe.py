@@ -21,6 +21,8 @@ def test_roster_rejects_wrong_market_or_count() -> None:
         freeze_um_top50([{**row, "market": "spot"} for row in _ranking()], effective_month="2026-08", source_sha256="a" * 64)
     with pytest.raises(UniverseContractError):
         freeze_um_top50(_ranking(49), effective_month="2026-08", source_sha256="a" * 64)
+    with pytest.raises(UniverseContractError):
+        freeze_um_top50(_ranking(), effective_month="2026-08", source_sha256="z" * 64)
 
 
 def test_rollover_suspends_when_september_unavailable_then_reenters() -> None:
