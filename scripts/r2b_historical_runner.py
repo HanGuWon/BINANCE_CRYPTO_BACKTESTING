@@ -61,7 +61,7 @@ def _source_tree_sha256() -> str:
     for directory in ("scripts", "src", "tests", "configs"):
         path = ROOT / directory
         if path.exists():
-            files.extend(item for item in path.rglob("*") if item.is_file())
+            files.extend(item for item in path.rglob("*") if item.is_file() and "__pycache__" not in item.parts and item.suffix != ".pyc")
     for path in sorted(files, key=lambda item: item.relative_to(ROOT).as_posix()):
         digest.update(path.relative_to(ROOT).as_posix().encode())
         digest.update(b"\0")
