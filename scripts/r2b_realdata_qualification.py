@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from r2b_historical_runner import (
-    REQUIRED_TRADE_FIELDS, STEP, execute_frame, load_funding, load_registry,
+    REQUIRED_TRADE_FIELDS, STEP, derive_execution_segments, execute_frame, load_funding, load_registry,
     prepare_symbol,
 )
 from r2b_signals import FEATURE_COLUMNS
@@ -27,7 +27,8 @@ def slow_execute(panel: pd.DataFrame, trial: dict[str, object], validation_start
     required = 1.0 if side == "LONG" else -1.0
     horizon = int(trial["horizon_bars"])
     rows = []
-    for _, segment in panel.groupby("segment_id", sort=False):
+    segment_column = "execution_segment_id" if "execution_segment_id" in panel else "segment_id"
+    for _, segment in panel.groupby(segment_column, sort=False):
         positions = segment.index.to_list()
         next_available = -1
         values = panel.loc[positions, feature].tolist() if feature in panel else [math.nan] * len(positions)
@@ -65,6 +66,14 @@ def slow_execute(panel: pd.DataFrame, trial: dict[str, object], validation_start
     return pd.DataFrame(rows, columns=REQUIRED_TRADE_FIELDS)
 
 
+def _adversarial_fixtures() -> list[dict[str, object]]:
+    ts = pd.to_datetime(["2020-10-31 23:45Z", "2020-12-01 00:00Z", "2020-12-01 00:15Z", "2020-12-01 00:30Z"])
+    base = pd.DataFrame({"timestamp": ts, "segment_id": [0, 0, 0, 0], "symbol": ["IOTAUSDT"] * 4, "open": [100.0, 101.0, 102.0, 103.0], "premium": [1.0, -1.0, -1.0, -1.0], "source_open_time": ts, "source_available_time": ts - pd.Timedelta(minutes=1)})
+    price_gap = base.copy(); price_gap.loc[1, "open"] = np.nan
+    segment_gap = base.copy(); segment_gap.loc[2:, "segment_id"] = 1
+    return [{"name": "membership_gap", "panel": base}, {"name": "original_segment_gap", "panel": segment_gap}, {"name": "missing_execution_price", "panel": price_gap}]
+
+
 def _canon(frame: pd.DataFrame) -> list[tuple[object, ...]]:
     if frame.empty:
         return []
@@ -80,14 +89,25 @@ def run_realdata_qualification() -> dict[str, object]:
     trials, folds = load_registry()
     # F02 is the first deterministic block with complete BTCUSDT UM history
     # in the repaired root; F01 predates the archive's causal start.
+    # Use a deterministic pre-holdout slice that contains both observed
+    # positive and negative BTC funding events (September 2020).
     fold_by_tf = {tf: next(f for f in folds if f["timeframe"] == tf and f["fold_id"] == "F02") for tf in STEP}
     compared = 0
     matrix = []
+    adversarial = []
+    fixture_trial = {"timeframe": "15m", "side": "LONG", "horizon_bars": 1, "feature_id": "derivatives.premium", "signal_variant": "PRESSURE_CONTINUATION"}
+    for fixture in _adversarial_fixtures():
+        panel = derive_execution_segments(fixture["panel"], "15m")
+        fast = execute_frame(panel, fixture_trial, pd.Timestamp("2020-10-01", tz="UTC"), pd.Timestamp("2021-01-01", tz="UTC"), pd.DataFrame(columns=["timestamp", "funding_rate"]))
+        slow = slow_execute(panel, fixture_trial, pd.Timestamp("2020-10-01", tz="UTC"), pd.Timestamp("2021-01-01", tz="UTC"), pd.DataFrame(columns=["timestamp", "funding_rate"]))
+        if _canon(fast) != _canon(slow) or not fast.empty:
+            raise AssertionError(f"adversarial continuity failure: {fixture['name']}")
+        adversarial.append({"name": fixture["name"], "execution_segments": int(panel.execution_segment_id.nunique()), "records": len(fast)})
     actual_funding_signs = set()
     for tf, fold in fold_by_tf.items():
-        start = pd.Timestamp("2020-03-01T00:00:00Z")
-        validation_start = pd.Timestamp(fold["validation_start_utc"])
-        validation_end = pd.Timestamp("2020-08-01T00:00:00Z")
+        start = pd.Timestamp("2020-08-01T00:00:00Z")
+        validation_start = pd.Timestamp("2020-09-14T00:00:00Z")
+        validation_end = pd.Timestamp("2020-09-20T00:00:00Z")
         panel = prepare_symbol("BTCUSDT", tf, start, validation_end)
         if panel.empty:
             raise RuntimeError(f"missing real panel for {tf}")
@@ -98,6 +118,7 @@ def run_realdata_qualification() -> dict[str, object]:
             gap_at = len(panel) // 2
             panel = panel.drop(index=gap_at).reset_index(drop=True)
             panel.loc[gap_at:, "segment_id"] = panel.loc[gap_at:, "segment_id"].astype(int) + 1
+            panel = derive_execution_segments(panel, tf)
         funding = load_funding("BTCUSDT")
         funding = funding[(funding.timestamp >= panel.timestamp.min()) & (funding.timestamp <= panel.timestamp.max())].reset_index(drop=True)
         in_slice = funding[(funding.timestamp >= validation_start) & (funding.timestamp < validation_end)]
@@ -116,7 +137,7 @@ def run_realdata_qualification() -> dict[str, object]:
                     raise AssertionError(f"real-data parity mismatch {tf}/{trial['trial_id']}/{funding_case}")
                 compared += len(fast)
         matrix.append({"timeframe": tf, "symbol": "BTCUSDT", "sides": ["LONG", "SHORT"], "horizons": sorted({int(t["horizon_bars"]) for t in tf_trials}), "trials": len(tf_trials), "gap_segments_observed": bool(panel.segment_id.nunique() > 1)})
-    return {"status": "PASS", "mode": "REAL_PRE_HOLDOUT_REFERENCE", "symbol": "BTCUSDT", "matrix": matrix, "records_compared": compared, "actual_funding_signs": sorted(actual_funding_signs), "synthetic_funding_cases": ["positive_synthetic", "negative_synthetic", "none"], "final_holdout_status": "UNTOUCHED", "outcome_run_started": False}
+    return {"status": "PASS", "mode": "REAL_PRE_HOLDOUT_REFERENCE", "symbol": "BTCUSDT", "matrix": matrix, "adversarial_fixtures": adversarial, "records_compared": compared, "actual_funding_signs": sorted(actual_funding_signs), "synthetic_funding_cases": ["positive_synthetic", "negative_synthetic", "none"], "final_holdout_status": "UNTOUCHED", "outcome_run_started": False}
 
 
 if __name__ == "__main__":
