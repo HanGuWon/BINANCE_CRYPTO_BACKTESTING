@@ -11,14 +11,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from verify_r2b_checkpoints import verify  # noqa: E402
-
-
-V6 = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r2b_restricted_derivatives_v1_checkpoints_v6")
+from evidence_paths import resolve_preserved_v6_root  # noqa: E402
 
 
 def test_verifier_rejects_v6_execution_gap_with_exact_counts() -> None:
-    if not (V6 / "run_manifest.json").exists():
-        pytest.skip("D-backed v6 evidence root is unavailable")
+    V6 = resolve_preserved_v6_root()
+    if V6 is None:
+        pytest.skip("preserved v6 evidence root is unavailable or fails manifest lineage checks")
     with pytest.raises(SystemExit) as raised:
         verify(V6)
     result = json.loads(str(raised.value))
