@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from binance_research.r3_operations import CollectorLockError, append_manifest, build_manifest, single_instance_lock, verify_manifest_chain, write_health_receipt
+from binance_research.r3_operations import CollectorLockError, append_manifest, build_manifest, require_sha256, single_instance_lock, verify_manifest_chain, write_health_receipt
 
 
 def test_manifest_chain_is_hash_linked_and_append_only(tmp_path: Path) -> None:
@@ -45,3 +45,9 @@ def test_manifest_chain_tamper_is_rejected(tmp_path: Path) -> None:
     chain = append_manifest(raw, first)
     chain.write_text(chain.read_text(encoding="utf-8").replace('"total_rows":0', '"total_rows":1'), encoding="utf-8")
     assert verify_manifest_chain(chain) is False
+
+
+def test_roster_identity_must_be_hex_sha256() -> None:
+    assert require_sha256("A" * 64, "roster").islower()
+    with pytest.raises(ValueError):
+        require_sha256("not-a-sha", "roster")

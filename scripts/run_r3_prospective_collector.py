@@ -6,10 +6,11 @@ import time
 from pathlib import Path
 
 from binance_research.collector import AppendOnlyEventStore, ForwardCollector
-from binance_research.r3_operations import append_manifest, build_manifest, single_instance_lock, verify_manifest_chain, write_health_receipt
+from binance_research.r3_operations import append_manifest, build_manifest, require_sha256, single_instance_lock, verify_manifest_chain, write_health_receipt
 
 
 def _run_cycle(root: Path, symbols: list[str], roster_sha256: str) -> dict[str, object]:
+    roster_sha256 = require_sha256(roster_sha256, "roster_sha256")
     collector = ForwardCollector(AppendOnlyEventStore(root / "raw_v1"))
     for symbol in symbols:
         collector.collect_r3_um_snapshot(symbol)

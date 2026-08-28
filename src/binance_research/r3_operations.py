@@ -15,6 +15,12 @@ class CollectorLockError(RuntimeError):
     pass
 
 
+def require_sha256(value: str, field: str) -> str:
+    if len(value) != 64 or any(char not in "0123456789abcdefABCDEF" for char in value):
+        raise ValueError(f"{field} must be a hexadecimal SHA256")
+    return value.lower()
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
