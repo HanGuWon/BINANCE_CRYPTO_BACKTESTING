@@ -1,7 +1,7 @@
 {
   "campaign_id": "r3_prospective_context_v1",
   "status": "READY_FOR_PROSPECTIVE_COLLECTION",
-  "implementation_commit": "b397407de680ae4a77c73ff6e20cc4afd719db32",
+  "implementation_commit": "46d89afa8cbd39420f9083c610c6a7650df36316",
   "source_tree_sha256": "6574793ddd6e52c1084ddd2ab55f01b0dc1a07365afaf625c63beef9287de7b6",
   "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
   "universe_rule_sha256": "1ef199bbce6fe8893cad023dc9d73729df484a595ce09acc31090d433a928ca7",
