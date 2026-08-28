@@ -34,6 +34,6 @@
   "qualification_receipt_file_sha256": "3a6d60eb6f79a47e7883c3fccc9ac330d3af9aef7fc4225e190b2bbd7e661898",
   "final_report": "R2B_HISTORICAL_OUTCOME_REPORT_2026-08-28.md",
   "checkpoint_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2b_restricted_derivatives_v1_checkpoints_v6",
-  "checkpoint_manifest_sha256": "e261909d1be97585e1235f181680bef5f64794c360bf1e92c54c1e772ab9c85d",
+  "checkpoint_manifest_sha256": "a47ad4d8f2399f2b8cd93650ec483158cbe1b4a54f2ef318eb65d9cbdd84c5e5",
   "causal_root_tree_sha256": "6eef4e59225cb45c2833452a883249b11f03469298c1ecfb3837c5f4aaa27a7d"
 }
