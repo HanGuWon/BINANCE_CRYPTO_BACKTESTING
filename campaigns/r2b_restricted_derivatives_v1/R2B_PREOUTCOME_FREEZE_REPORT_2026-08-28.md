@@ -61,8 +61,11 @@ LONG/SHORT, every registered horizon, both variants, positive/negative/no
 funding, missing premium, z-score warmup, gap segments, next-open timing, and
 opposite-sign rejection. It compared 33,420 records field-for-field across
 `decision_time`, symbol/side/variant/signal, source and execution timestamps,
-gross return, funding cashflow, and net return. Two runs produced identical
-receipt SHA256 `65b09b59de4f94d3dc679f29653c3bcc27148a5b57a5bb6551a40ca3f0a60c71`.
+gross return, funding cashflow, and net return. The canonical payload SHA256 is
+`90995f4b4e76948c83e0cb62044264bb5bc093f17dfc9ce899baf78decceae3f`, the
+result identity is `4d50f019220d949d727465b2780c8b01eefe7a18cfab79c4d0d33c376d8fe027`,
+and the serialized receipt file SHA256 is
+`3a6d60eb6f79a47e7883c3fccc9ac330d3af9aef7fc4225e190b2bbd7e661898`.
 No historical R2B outcome was started.
 
 The canonical full pytest receipt records the actual command `python -m pytest

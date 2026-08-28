@@ -39,7 +39,8 @@
   },
   "mode": "SYNTHETIC_REFERENCE_ONLY",
   "outcome_run_started": false,
-  "receipt_sha256": "67d4cb6a9777681bde53f32f22ae70219dcbe9241a9eecd1321ffcd8f8fc98e9",
+  "qualification_payload_sha256": "90995f4b4e76948c83e0cb62044264bb5bc093f17dfc9ce899baf78decceae3f",
+  "qualification_result_identity": "4d50f019220d949d727465b2780c8b01eefe7a18cfab79c4d0d33c376d8fe027",
   "records_compared": 33420,
   "required_fields": [
     "decision_time",

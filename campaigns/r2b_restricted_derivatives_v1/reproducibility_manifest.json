@@ -29,7 +29,9 @@
   "source_tree_scope": ["scripts", "src", "tests", "configs"],
   "signal_semantics": "R2B_SIGNAL_SEMANTICS_AMENDMENT_002; PRESSURE_CONTINUATION and CROWDING_REVERSION; strict zero-centered sign; 72-row family",
   "qualification_status": "PASS_SYNTHETIC_REFERENCE_ONLY; repeated deterministic runs",
-  "qualification_receipt_sha256": "65b09b59de4f94d3dc679f29653c3bcc27148a5b57a5bb6551a40ca3f0a60c71",
+  "qualification_payload_sha256": "90995f4b4e76948c83e0cb62044264bb5bc093f17dfc9ce899baf78decceae3f",
+  "qualification_result_identity": "4d50f019220d949d727465b2780c8b01eefe7a18cfab79c4d0d33c376d8fe027",
+  "qualification_receipt_file_sha256": "3a6d60eb6f79a47e7883c3fccc9ac330d3af9aef7fc4225e190b2bbd7e661898",
   "final_report": "R2B_PREOUTCOME_FREEZE_REPORT_2026-08-28.md",
   "causal_root_tree_sha256": "6eef4e59225cb45c2833452a883249b11f03469298c1ecfb3837c5f4aaa27a7d"
 }

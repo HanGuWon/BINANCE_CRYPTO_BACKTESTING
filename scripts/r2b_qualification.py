@@ -237,9 +237,14 @@ def run_qualification() -> dict[str, object]:
 
 def write_receipt(result: dict[str, object], path: Path = CAMPAIGN / "qualification_receipt.json") -> dict[str, object]:
     payload = dict(result)
-    payload["receipt_sha256"] = None
+    # The payload identity hashes only the result object. The serialized file
+    # hash is intentionally kept separate and is recorded by the launch
+    # manifest after writing; no self-referential hash is embedded here.
     encoded = json.dumps(payload, sort_keys=True, indent=2, default=str).encode("utf-8")
-    payload["receipt_sha256"] = hashlib.sha256(encoded).hexdigest()
+    payload["qualification_payload_sha256"] = hashlib.sha256(encoded).hexdigest()
+    payload["qualification_result_identity"] = hashlib.sha256(
+        json.dumps(result, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
+    ).hexdigest()
     path.write_text(json.dumps(payload, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     return payload
 

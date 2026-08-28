@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 import sys
 
@@ -48,3 +49,14 @@ def test_r2b_slow_reference_qualification_passes_without_outcomes() -> None:
         "decision_time", "signal_value", "source_available_time", "entry_time",
         "exit_time", "gross_return", "funding_cashflow", "net_return",
     }
+
+
+def test_qualification_payload_and_file_hashes_are_distinct_and_unambiguous() -> None:
+    path = CAMPAIGN / "qualification_receipt.json"
+    receipt = json.loads(path.read_text(encoding="utf-8"))
+    assert "qualification_payload_sha256" in receipt
+    assert "qualification_result_identity" in receipt
+    assert "receipt_sha256" not in receipt
+    file_hash = hashlib.sha256(path.read_bytes()).hexdigest()
+    assert file_hash != receipt["qualification_payload_sha256"]
+    assert file_hash != receipt["qualification_result_identity"]
