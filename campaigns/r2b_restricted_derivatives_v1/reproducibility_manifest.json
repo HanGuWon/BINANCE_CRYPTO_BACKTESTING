@@ -1,6 +1,6 @@
 {
   "campaign_id": "r2b_restricted_derivatives_v1",
-  "status": "VERIFIED_R2B_PREHOLDOUT_COMPLETED_NULL_REPLICATION",
+  "status": "VERIFIED_R2B_CORRECTED_PREHOLDOUT_COMPLETED_NO_ROBUST_TEMPORAL_REPLICATION",
   "outcome_run": true,
   "final_holdout_status": "UNTOUCHED",
   "data_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/processed/r2b_restricted_derivatives_v1_repaired_v2_causal3",
@@ -24,8 +24,8 @@
     "tests/test_r2b_signal_semantics.py": "7da3a7d16a1afffa6ef7d88b453ae8fbc70d0eb335bb4d5f19161e5f85168d69"
   },
   "multiple_testing_plan_sha256": "02278e840da6e4b0371f47eeb0e99585ef5041562fa206c02dfd47c287098ca3",
-  "implementation_commit": "ac9ef2cda9f0571a5902d55aee8bbaa427b190a7",
-  "source_tree_sha256": "11e476ad2b35d2a42ed55afe83a7bf06c68024929aaf1c4aa1cc10b30ce56306",
+  "implementation_commit": "67d006ae3205384e08a3e8ed68f8225708077305",
+  "source_tree_sha256": "0c3c264e6685b8d3704f4cccc1214448af0ae9036a1d8977d29f086553b98d93",
   "source_tree_scope": ["scripts", "src", "tests", "configs"],
   "signal_semantics": "R2B_SIGNAL_SEMANTICS_AMENDMENT_002; PRESSURE_CONTINUATION and CROWDING_REVERSION; strict zero-centered sign; 72-row family",
   "qualification_status": "PASS_REAL_PRE_HOLDOUT_REFERENCE; repeated deterministic runs",
@@ -33,7 +33,9 @@
   "qualification_result_identity": "4d50f019220d949d727465b2780c8b01eefe7a18cfab79c4d0d33c376d8fe027",
   "qualification_receipt_file_sha256": "3a6d60eb6f79a47e7883c3fccc9ac330d3af9aef7fc4225e190b2bbd7e661898",
   "final_report": "R2B_HISTORICAL_OUTCOME_REPORT_2026-08-28.md",
-  "checkpoint_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2b_restricted_derivatives_v1_checkpoints_v6",
-  "checkpoint_manifest_sha256": "a47ad4d8f2399f2b8cd93650ec483158cbe1b4a54f2ef318eb65d9cbdd84c5e5",
+  "checkpoint_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2b_restricted_derivatives_v1_checkpoints_v7",
+  "checkpoint_manifest_sha256": "8ce7f75620c578dab808ddf7d7e7b2d610135680d5ed4515999cd899753f0602",
+  "aggregate_manifest_sha256": "30f217f4635878a1b6a754900ab6027b9666aaef72d0ade3a8afc25d37e1722d",
+  "aggregation_summary": {"family_size": 72, "fdr_survivors": 55, "positive_fold_gate_count": 3, "hac_gate_count": 46, "concentration_gate_count": 72, "catastrophic_reversal_pass_count": 19, "catastrophic_reversal_fail_count": 53, "temporal_replication_count": 0, "bootstrap_samples": 1000, "bootstrap_seed": 1729},
   "causal_root_tree_sha256": "6eef4e59225cb45c2833452a883249b11f03469298c1ecfb3837c5f4aaa27a7d"
 }

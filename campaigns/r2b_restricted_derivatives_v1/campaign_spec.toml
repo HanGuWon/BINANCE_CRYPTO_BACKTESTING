@@ -1,6 +1,6 @@
 schema_version = 1
 campaign_id = "r2b_restricted_derivatives_v1"
-status = "R2B_PREHOLDOUT_COMPLETED_NULL_REPLICATION"
+status = "VERIFIED_R2B_CORRECTED_PREHOLDOUT_COMPLETED_NO_ROBUST_TEMPORAL_REPLICATION"
 parent_campaign = "r2a2_temporal_horizon_v1"
 data_root = "D:/BINANCE_CRYPTO_BACKTESTING_DATA/processed/r2b_restricted_derivatives_v1_repaired_v2_causal3"
 raw_root = "D:/BINANCE_CRYPTO_BACKTESTING_DATA/raw/um/premiumIndexKlines"
@@ -16,8 +16,9 @@ cost_contract = "R2B_COST_CONTRACT_001.md"
 statistics_contract = "R2B_STATISTICS_CONTRACT_001.md"
 grading_contract = "R2B_GRADING_CONTRACT_001.md"
 multiple_testing_family_size = 72
-outcome_checkpoint_root = "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2b_restricted_derivatives_v1_checkpoints_v6"
-outcome_report = "R2B_HISTORICAL_OUTCOME_REPORT_2026-08-28.md"
+outcome_checkpoint_root = "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2b_restricted_derivatives_v1_checkpoints_v7"
+outcome_report = "R2B_CORRECTED_HISTORICAL_OUTCOME_REPORT_2026-08-28.md"
+aggregation_root = "campaigns/r2b_restricted_derivatives_v1/corrected_aggregation_v7"
 
 [universe]
 market = "um"

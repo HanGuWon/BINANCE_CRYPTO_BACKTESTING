@@ -1,6 +1,10 @@
 # R2B restricted derivatives v1 — historical pre-holdout outcome report
 
-Status: `VERIFIED R2B PRE-HOLDOUT COMPLETED — NULL REPLICATION`
+Status: `INVALID/SUPERSEDED — EXECUTION MEMBERSHIP-GAP CONTINUITY DEFECT`
+
+This v6 report is retained for historical provenance only. It is superseded by
+`R2B_CORRECTED_HISTORICAL_OUTCOME_REPORT_2026-08-28.md` after the independent
+v6 execution-gap audit documented in `R2B_EXECUTION_ERRATUM_003.md`.
 
 The preregistered 72-row UM family was executed once over the eight frozen
 half-year UTC folds. No final-holdout or January-2024 observation was used.
