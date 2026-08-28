@@ -26,14 +26,16 @@ rate-limit-gap records; no gap is silently bridged.
 
 ## Cadence and rate budget
 
-Binance documents a 2,400 request-weight/minute IP limit and requires backoff
-after HTTP 429 responses. The R3 public snapshot set has seven endpoints per
-symbol. For the conservative, source-independent upper bound of 100 weight
-per request, 50 symbols polled every 15 minutes consume
-`50 × 7 × 100 / 15 = 2,333.3 weight/minute`, below the 2,400 limit. This is a
-worst-case budget, not a performance-tuned cadence; endpoint-specific weights
-and response headers must be logged at launch. WebSocket depth continuity is
-checked using Binance's documented `U`/`u` sequence rule.
+Binance's USDⓈ-M `exchangeInfo` response is the launch authority for the
+`REQUEST_WEIGHT` limit and must be retained with its response metadata. The
+2026-08-28 verification returned 2,400 weight/minute. The rejected historical
+smoke formula `50 × 7 × 100 / 15 = 2,333.3` is not a valid budget: it combines
+an invented per-request weight with a mistaken cadence denominator and must not
+be used for scheduling or a readiness claim. Launch scheduling instead sums the
+verified endpoint weights for each request, uses the observed
+`X-MBX-USED-WEIGHT-*` headers, and maintains substantial headroom. REST depth
+snapshots are independent observations; only a true diff-depth WebSocket may
+claim Binance `U`/`u` sequence continuity.
 
 The collector writes one envelope per response. Storage is therefore bounded
 by `symbols × public_streams × snapshots × measured_envelope_bytes`; the
