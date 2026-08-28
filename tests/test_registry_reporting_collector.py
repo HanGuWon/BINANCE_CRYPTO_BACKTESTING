@@ -6,6 +6,7 @@ from pathlib import Path
 import pandas as pd
 
 from binance_research.collector import AppendOnlyEventStore, ContinuityTracker, ForwardCollector
+from binance_research.data import RestResponseMetadata
 from binance_research.registry import ExperimentRecord, ExperimentRegistry
 from binance_research.reporting import REQUIRED_ARTIFACTS, ArtifactWriter
 
@@ -93,3 +94,18 @@ def test_r3_endpoint_weights_are_explicit_and_cover_public_streams() -> None:
         "open_interest": 1, "premium": 1, "book_ticker": 2, "depth": 5,
         "agg_trades": 20, "oi_history": 0, "taker_ratio": 0, "klines_15m": 1,
     }
+
+
+def test_r3_collector_persists_response_metadata(tmp_path: Path) -> None:
+    class MetadataClient(FakeClient):
+        def get_with_metadata(self, market: str, path: str, params: dict):
+            self.calls.append((market, path, params))
+            return {"symbol": params["symbol"], "time": 1_700_000_000_000}, RestResponseMetadata(
+                200, {"x-mbx-used-weight-1m": "11"}, "2024-01-01T00:00:00+00:00", "2024-01-01T00:00:00.100000+00:00", 0.1, "https://fapi.binance.com" + path
+            )
+
+    path = ForwardCollector(AppendOnlyEventStore(tmp_path), MetadataClient()).collect_r3_um_snapshot("BTCUSDT")[0]
+    envelope = json.loads(path.read_text(encoding="utf-8").splitlines()[0])
+    assert envelope["http_status"] == 200
+    assert envelope["response_headers"]["x-mbx-used-weight-1m"] == "11"
+    assert envelope["latency_seconds"] == 0.1
