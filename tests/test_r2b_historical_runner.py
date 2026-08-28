@@ -78,3 +78,10 @@ def test_missing_execution_price_breaks_continuity() -> None:
     segmented = derive_execution_segments(panel, "15m")
     assert segmented.loc[0, "execution_segment_id"] != segmented.loc[1, "execution_segment_id"]
     assert segmented.loc[1, "execution_segment_id"] != segmented.loc[2, "execution_segment_id"]
+
+
+def test_original_causal_segment_boundary_is_preserved() -> None:
+    panel = _gap_fixture()
+    panel["segment_id"] = [0, 0, 1, 1]
+    segmented = derive_execution_segments(panel, "15m")
+    assert segmented.loc[1, "execution_segment_id"] != segmented.loc[2, "execution_segment_id"]
