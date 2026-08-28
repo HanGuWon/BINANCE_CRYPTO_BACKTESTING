@@ -34,7 +34,10 @@ def run_smoke(symbol: str = "BTCUSDT") -> dict[str, Any]:
             "source_time_available_count": sum(bool(item["source_time_available"]) for item in envelopes),
             "api_key_streams_present": sorted(set(collector.R3_PUBLIC_STREAMS) & collector.REQUIRES_API_KEY),
             "outcome_fields_present": sorted(set().union(*(item.keys() for item in envelopes)) & {"gross_return", "net_return", "pnl", "sharpe", "hit_rate"}),
-            "request_weight_budget_per_minute_upper_bound": 50 * len(collector.R3_PUBLIC_STREAMS) * 100 / 15,
+            # Engineering-only estimate using the verified USD-M weights for
+            # this exact request set; this is not real storage evidence.
+            "request_weight_budget_per_minute_upper_bound": 50 * sum(collector.R3_ENDPOINT_WEIGHTS.values()) / 15,
+            "endpoint_weights": dict(sorted(collector.R3_ENDPOINT_WEIGHTS.items())),
         }
 
 

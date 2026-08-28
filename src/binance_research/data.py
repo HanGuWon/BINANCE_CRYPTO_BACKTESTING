@@ -307,6 +307,7 @@ class BinanceArchiveClient:
 class BinanceRestClient:
     """Read-only public market-data client. No order or account methods exist."""
     BASE_URLS = {"spot": "https://data-api.binance.vision", "um": "https://fapi.binance.com", "cm": "https://dapi.binance.com"}
+    MAX_RETRY_AFTER_SECONDS = 60.0
     def __init__(self, timeout: float = 15.0, max_retries: int = 3) -> None: self.timeout, self.max_retries = timeout, max_retries
 
     def get_with_metadata(self, market: str, path: str, params: dict[str, Any] | None = None) -> tuple[Any, RestResponseMetadata]:
@@ -338,7 +339,9 @@ class BinanceRestClient:
             except (TimeoutError, urllib.error.URLError):
                 if attempt == self.max_retries: raise
                 retry_after = 0
-            time.sleep(max(retry_after, min(2 ** attempt, 8)))
+            # Honor the server delay while bounding a single blocked request;
+            # the original Retry-After remains in RateLimitGapError telemetry.
+            time.sleep(min(max(retry_after, min(2 ** attempt, 8)), self.MAX_RETRY_AFTER_SECONDS))
         raise AssertionError("retry loop exhausted")
 
     def get(self, market: str, path: str, params: dict[str, Any] | None = None) -> Any:
