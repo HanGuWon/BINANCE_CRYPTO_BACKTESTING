@@ -42,6 +42,30 @@ _PANEL_CACHE: dict[tuple[str, str, str, str], pd.DataFrame] = {}
 _FUNDING_CACHE: dict[str, pd.DataFrame] = {}
 
 
+def derive_execution_segments(panel: pd.DataFrame, timeframe: str) -> pd.DataFrame:
+    """Split execution continuity at source, timestamp, or price boundaries."""
+    if timeframe not in STEP:
+        raise ValueError(timeframe)
+    result = panel.sort_values("timestamp", kind="stable").reset_index(drop=True).copy()
+    if result.empty:
+        result["execution_segment_id"] = pd.Series(dtype="int64")
+        return result
+    timestamps = pd.to_datetime(result["timestamp"], utc=True)
+    expected = STEP[timeframe]
+    original = result["segment_id"].ne(result["segment_id"].shift())
+    timestamp_gap = timestamps.diff().ne(expected)
+    if "open" in result:
+        price = pd.to_numeric(result["open"], errors="coerce").to_numpy(dtype=float)
+    else:
+        price = np.full(len(result), np.nan, dtype=float)
+    unavailable_price = ~np.isfinite(price) | (price <= 0)
+    price_boundary = pd.Series(unavailable_price, index=result.index) | pd.Series(unavailable_price, index=result.index).shift(fill_value=False)
+    starts = (original | timestamp_gap | price_boundary).astype("int64")
+    starts.iloc[0] = 1
+    result["execution_segment_id"] = starts.cumsum().astype("int64")
+    return result
+
+
 def _atomic_json(path: Path, payload: dict[str, object]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, name = tempfile.mkstemp(prefix=path.name + ".", dir=path.parent, text=True)
@@ -146,13 +170,17 @@ def load_funding(symbol: str) -> pd.DataFrame:
         return _FUNDING_CACHE[symbol]
     root = RAW_FUNDING / symbol
     pieces = []
+    archive_count = 0
+    parse_errors = []
     for path in sorted(root.glob(f"{symbol}-*.zip")):
+        archive_count += 1
         try:
             with zipfile.ZipFile(path) as archive:
                 name = next(n for n in archive.namelist() if n.endswith(".csv"))
                 with archive.open(name) as handle:
                     raw = pd.read_csv(io.TextIOWrapper(handle, encoding="utf-8"))
-        except (OSError, KeyError, StopIteration, ValueError):
+        except (OSError, KeyError, StopIteration, ValueError) as exc:
+            parse_errors.append(f"{path.name}: {exc}")
             continue
         stamp = next((c for c in ("calc_time", "open_time", "timestamp") if c in raw), None)
         rate = next((c for c in ("last_funding_rate", "funding_rate", "close") if c in raw), None)
@@ -161,9 +189,10 @@ def load_funding(symbol: str) -> pd.DataFrame:
             piece["timestamp"] = pd.to_datetime(pd.to_numeric(piece.timestamp, errors="coerce"), unit="ms", utc=True)
             pieces.append(piece.dropna(subset=["timestamp"]))
     if not pieces:
-        result = pd.DataFrame(columns=["timestamp", "funding_rate"])
-        _FUNDING_CACHE[symbol] = result
-        return result
+        detail = "; ".join(parse_errors[:3]) or "no archives"
+        raise RuntimeError(f"funding source unavailable or corrupt for {symbol}: {detail}")
+    if parse_errors:
+        raise RuntimeError(f"funding source contains corrupt archives for {symbol}: {parse_errors[0]}")
     result = pd.concat(pieces, ignore_index=True).drop_duplicates("timestamp").sort_values("timestamp").reset_index(drop=True)
     _FUNDING_CACHE[symbol] = result
     return result
@@ -178,6 +207,7 @@ def prepare_symbol(symbol: str, timeframe: str, start: pd.Timestamp, end: pd.Tim
         return panel
     prices = load_raw_klines(symbol, timeframe, start, end)
     result = panel.merge(prices, on="timestamp", how="left", validate="one_to_one").sort_values("timestamp").reset_index(drop=True)
+    result = derive_execution_segments(result, timeframe)
     _PANEL_CACHE[key] = result
     return result
 
@@ -187,12 +217,12 @@ def execute_frame(panel: pd.DataFrame, trial: dict[str, object], validation_star
         return pd.DataFrame(columns=REQUIRED_TRADE_FIELDS)
     timeframe, side = str(trial["timeframe"]), str(trial["side"])
     horizon = int(trial["horizon_bars"])
-    signals = signal_from_frame(panel, str(trial["feature_id"]), str(trial["signal_variant"]), segment_column="segment_id")
+    signals = signal_from_frame(panel, str(trial["feature_id"]), str(trial["signal_variant"]), segment_column="execution_segment_id")
     direction = 1.0 if side == "LONG" else -1.0
     funding_times = funding["timestamp"].map(lambda value: pd.Timestamp(value).value).to_numpy(dtype="int64") if len(funding) else np.array([], dtype="int64")
     funding_cumulative = np.cumsum(funding["funding_rate"].astype(float).to_numpy()) if len(funding) else np.array([], dtype=float)
     rows = []
-    for _, segment in panel.groupby("segment_id", sort=False):
+    for _, segment in panel.groupby("execution_segment_id", sort=False):
         positions = segment.index.to_list()
         next_available = -1
         for local, pos in enumerate(positions):
