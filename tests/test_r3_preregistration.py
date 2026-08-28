@@ -1,0 +1,28 @@
+from __future__ import annotations
+
+import csv
+import hashlib
+import json
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+CAMPAIGN = ROOT / "campaigns" / "r3_prospective_context_v1"
+
+
+def test_r3_registry_is_small_and_deterministic() -> None:
+    path = CAMPAIGN / "trial_registry.csv"
+    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    rows = list(csv.DictReader(path.open(encoding="utf-8", newline="")))
+    assert len(rows) == 6
+    assert digest == "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a"
+    assert all(row["primary"] == "TRUE" for row in rows)
+
+
+def test_launch_manifest_pins_required_contracts() -> None:
+    manifest = json.loads((CAMPAIGN / "R3_LAUNCH_MANIFEST.json").read_text(encoding="utf-8"))
+    required = {"implementation_commit", "source_tree_sha256", "registry_sha256", "universe_rule_sha256", "collection_contract_sha256", "feature_semantics_sha256", "statistics_contract_sha256", "final_holdout_status"}
+    assert required <= manifest.keys()
+    assert manifest["primary_hypothesis_count"] == 6
+    assert manifest["final_holdout_status"] == "UNTOUCHED"
+    assert manifest["outcome_analysis_status"] == "NOT_STARTED"
