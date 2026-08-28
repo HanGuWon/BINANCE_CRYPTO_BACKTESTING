@@ -1,0 +1,21 @@
+{
+  "command": "python -m pytest -q",
+  "status": "PASS",
+  "exit_code": 0,
+  "passed": 200,
+  "failed": 0,
+  "warnings": 1,
+  "pytest_summary": "200 passed, 1 warning in 118.67s (0:01:58)",
+  "run_timestamp": "2026-08-28T22:14:15.976+09:00",
+  "implementation_commit": "b49336b9d54a29d8bd4006963c66de57dab6b0fe",
+  "source_tree_sha256": "6462235e1c926e2e9c043be8dd9a408fb7a7f867ecc87d8abf527857946dd9d1",
+  "scientific_source_dirty": false,
+  "holdout_status": "UNTOUCHED",
+  "outcome_analysis_status": "NOT_STARTED",
+  "receipt_source_identity": {
+    "cxc_commit_sha": "95736e9b6a002a3e867b3f582191ea1db5f234e8",
+    "cxc_tree_hash": "cf651591133d25bb5fff61b5942c709772840b1647187b5392f2d5983a0857fc",
+    "cxc_global_dirty": true,
+    "scientific_scope_status": "clean"
+  }
+}

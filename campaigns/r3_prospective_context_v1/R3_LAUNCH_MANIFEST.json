@@ -12,5 +12,6 @@
   "final_holdout_status": "UNTOUCHED",
   "r2b2_status": "NOT_STARTED",
   "outcome_analysis_status": "NOT_STARTED",
-  "primary_hypothesis_count": 6
+  "primary_hypothesis_count": 6,
+  "full_pytest_receipt_sha256": "2e06ccd5fe9ee6fef4a72d57230c452819fa60669afade2c381dcd5129729a9f"
 }
