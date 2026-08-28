@@ -1,5 +1,5 @@
 campaign_id = "r3_prospective_context_v1"
-status = "READY_FOR_PROSPECTIVE_COLLECTION"
+status = "R3_LAUNCH_BLOCKED_CONFORMANCE_REPAIR"
 market = "um"
 data_scope = "binance_public_market_data_only"
 final_holdout_status = "UNTOUCHED"
