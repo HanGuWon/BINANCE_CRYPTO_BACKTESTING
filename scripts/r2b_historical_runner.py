@@ -189,6 +189,8 @@ def execute_frame(panel: pd.DataFrame, trial: dict[str, object], validation_star
     horizon = int(trial["horizon_bars"])
     signals = signal_from_frame(panel, str(trial["feature_id"]), str(trial["signal_variant"]), segment_column="segment_id")
     direction = 1.0 if side == "LONG" else -1.0
+    funding_times = pd.to_datetime(funding["timestamp"], utc=True).astype("int64").to_numpy() if len(funding) else np.array([], dtype="int64")
+    funding_cumulative = np.cumsum(funding["funding_rate"].astype(float).to_numpy()) if len(funding) else np.array([], dtype=float)
     rows = []
     for _, segment in panel.groupby("segment_id", sort=False):
         positions = segment.index.to_list()
@@ -208,8 +210,10 @@ def execute_frame(panel: pd.DataFrame, trial: dict[str, object], validation_star
             if not np.isfinite(entry_open) or not np.isfinite(exit_open) or float(entry_open) <= 0:
                 continue
             entry_time, exit_time = panel.at[entry_pos, "timestamp"], panel.at[exit_pos, "timestamp"]
-            crossed = funding[(funding.timestamp > entry_time) & (funding.timestamp <= exit_time)]
-            funding_cashflow = -direction * float(crossed.funding_rate.sum())
+            left = int(np.searchsorted(funding_times, entry_time.value, side="right"))
+            right = int(np.searchsorted(funding_times, exit_time.value, side="right"))
+            crossed_sum = float(funding_cumulative[right - 1] - (funding_cumulative[left - 1] if left else 0.0)) if right > left else 0.0
+            funding_cashflow = -direction * crossed_sum
             gross = direction * (float(exit_open) / float(entry_open) - 1.0)
             rows.append({
                 "decision_time": decision_time, "symbol": str(panel.at[pos, "symbol"]), "side": side,
