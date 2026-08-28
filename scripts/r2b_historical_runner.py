@@ -189,7 +189,7 @@ def execute_frame(panel: pd.DataFrame, trial: dict[str, object], validation_star
     horizon = int(trial["horizon_bars"])
     signals = signal_from_frame(panel, str(trial["feature_id"]), str(trial["signal_variant"]), segment_column="segment_id")
     direction = 1.0 if side == "LONG" else -1.0
-    funding_times = pd.to_datetime(funding["timestamp"], utc=True).astype("int64").to_numpy() if len(funding) else np.array([], dtype="int64")
+    funding_times = funding["timestamp"].map(lambda value: pd.Timestamp(value).value).to_numpy(dtype="int64") if len(funding) else np.array([], dtype="int64")
     funding_cumulative = np.cumsum(funding["funding_rate"].astype(float).to_numpy()) if len(funding) else np.array([], dtype=float)
     rows = []
     for _, segment in panel.groupby("segment_id", sort=False):
