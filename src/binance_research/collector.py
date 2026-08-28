@@ -7,14 +7,14 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, AsyncIterator
 
-from .data import BinanceRestClient
+from .data import BinanceRestClient, IPBanFatalError, RateLimitGapError, RestResponseMetadata
 
 
 class AppendOnlyEventStore:
     def __init__(self, root: Path) -> None:
         self.root = Path(root)
 
-    def append(self, stream: str, market: str, symbol: str, payload: Any, *, source_kind: str = "rest_snapshot", endpoint: str | None = None, request_params: dict[str, Any] | None = None, continuity_state: str = "COMPLETE", sequence_id: int | str | None = None) -> Path:
+    def append(self, stream: str, market: str, symbol: str, payload: Any, *, source_kind: str = "rest_snapshot", endpoint: str | None = None, request_params: dict[str, Any] | None = None, continuity_state: str = "COMPLETE", sequence_id: int | str | None = None, response_metadata: RestResponseMetadata | dict[str, Any] | None = None) -> Path:
         if continuity_state not in {"COMPLETE", "RESTART_GAP", "POLL_GAP", "SOURCE_TIME_UNAVAILABLE", "SEQUENCE_GAP", "SCHEMA_ERROR", "RATE_LIMIT_GAP"}:
             raise ValueError(f"unknown continuity state: {continuity_state}")
         receipt_time = datetime.now(UTC).isoformat()
@@ -29,6 +29,14 @@ class AppendOnlyEventStore:
                     "collector_receipt_time": receipt_time, "request_params": request_params,
                     "sequence_id": sequence_id, "continuity_state": effective_state,
                     "payload": payload}
+        if response_metadata is not None:
+            metadata = response_metadata if isinstance(response_metadata, dict) else response_metadata.__dict__
+            envelope.update({"http_status": metadata.get("http_status"),
+                             "response_headers": metadata.get("headers", {}),
+                             "request_started_at": metadata.get("request_started_at"),
+                             "response_received_at": metadata.get("response_received_at"),
+                             "latency_seconds": metadata.get("latency_seconds"),
+                             "request_url": metadata.get("url")})
         descriptor = os.open(destination, os.O_APPEND | os.O_CREAT | os.O_WRONLY, 0o644)
         try:
             os.write(descriptor, (json.dumps(envelope, separators=(",", ":")) + "\n").encode())
@@ -112,11 +120,25 @@ class ForwardCollector:
         "agg_trades": ("/fapi/v1/aggTrades", {"limit": 1000}),
         "oi_history": ("/futures/data/openInterestHist", {"period": "5m", "limit": 500}),
         "taker_ratio": ("/futures/data/takerlongshortRatio", {"period": "5m", "limit": 500}),
+        "klines_15m": ("/fapi/v1/klines", {"interval": "15m", "limit": 3}),
         "top_position_ratio": ("/futures/data/topLongShortPositionRatio", {"period": "5m", "limit": 500}),
         "top_account_ratio": ("/futures/data/topLongShortAccountRatio", {"period": "5m", "limit": 500}),
     }
     REQUIRES_API_KEY = frozenset({"top_position_ratio", "top_account_ratio"})
-    R3_PUBLIC_STREAMS = frozenset({"open_interest", "premium", "book_ticker", "depth", "agg_trades", "oi_history", "taker_ratio"})
+    R3_PUBLIC_STREAMS = frozenset({"open_interest", "premium", "book_ticker", "depth", "agg_trades", "oi_history", "taker_ratio", "klines_15m"})
+    # USD-M REST reference weights for the exact request shapes above.  The
+    # two /futures/data endpoints are documented as IP weight 0; telemetry is
+    # still retained and any contradictory header fails the launch gate.
+    R3_ENDPOINT_WEIGHTS = {
+        "open_interest": 1,
+        "premium": 1,
+        "book_ticker": 2,
+        "depth": 5,
+        "agg_trades": 20,
+        "oi_history": 0,
+        "taker_ratio": 0,
+        "klines_15m": 1,
+    }
 
     def __init__(self, store: AppendOnlyEventStore, client: BinanceRestClient | None = None) -> None:
         self.store, self.client = store, client or BinanceRestClient()
@@ -141,12 +163,22 @@ class ForwardCollector:
             endpoint, defaults = self.UM_ENDPOINTS[stream]
             params = {"symbol": symbol, **defaults}
             try:
-                payload = self.client.get("um", endpoint, params)
+                response_metadata = None
+                if hasattr(self.client, "get_with_metadata"):
+                    payload, response_metadata = self.client.get_with_metadata("um", endpoint, params)
+                else:
+                    payload = self.client.get("um", endpoint, params)
+            except IPBanFatalError as exc:
+                paths.append(self.store.append("collector_status", "um", symbol, {"stream": stream, "error": type(exc).__name__, "fatal": True}, source_kind="collector_control", endpoint=endpoint, request_params=params, continuity_state="POLL_GAP"))
+                raise
+            except RateLimitGapError as exc:
+                paths.append(self.store.append("collector_status", "um", symbol, {"stream": stream, "error": type(exc).__name__, "retry_after": exc.retry_after}, source_kind="collector_control", endpoint=endpoint, request_params=params, continuity_state="RATE_LIMIT_GAP", response_metadata={"headers": exc.headers}))
+                continue
             except Exception as exc:
                 state = "RATE_LIMIT_GAP" if "429" in str(exc) or "rate" in str(exc).lower() else "POLL_GAP"
                 paths.append(self.store.append("collector_status", "um", symbol, {"stream": stream, "error": type(exc).__name__}, source_kind="collector_control", endpoint=endpoint, request_params=params, continuity_state=state))
                 continue
-            paths.append(self.store.append(stream, "um", symbol, payload, source_kind="rest_snapshot", endpoint=endpoint, request_params=params))
+            paths.append(self.store.append(stream, "um", symbol, payload, source_kind="rest_snapshot", endpoint=endpoint, request_params=params, response_metadata=response_metadata))
         return paths
 
     async def stream_liquidations(self, symbol: str = "ALL") -> AsyncIterator[dict[str, Any]]:

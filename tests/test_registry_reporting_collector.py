@@ -85,3 +85,11 @@ def test_r3_snapshot_excludes_api_key_streams(tmp_path: Path) -> None:
     assert "top_position_ratio" not in collector.R3_PUBLIC_STREAMS
     assert "top_account_ratio" not in collector.R3_PUBLIC_STREAMS
     assert all("topLongShort" not in call[1] for call in fake.calls)
+
+
+def test_r3_endpoint_weights_are_explicit_and_cover_public_streams() -> None:
+    assert set(ForwardCollector.R3_ENDPOINT_WEIGHTS) == set(ForwardCollector.R3_PUBLIC_STREAMS)
+    assert ForwardCollector.R3_ENDPOINT_WEIGHTS == {
+        "open_interest": 1, "premium": 1, "book_ticker": 2, "depth": 5,
+        "agg_trades": 20, "oi_history": 0, "taker_ratio": 0, "klines_15m": 1,
+    }

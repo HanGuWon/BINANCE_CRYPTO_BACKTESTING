@@ -30,6 +30,39 @@ class DataIntegrityError(RuntimeError):
     pass
 
 
+class RateLimitGapError(RuntimeError):
+    """HTTP 429 remained after the bounded retry/backoff budget."""
+
+    def __init__(self, retry_after: float, *, headers: dict[str, str] | None = None) -> None:
+        self.retry_after = retry_after
+        self.headers = headers or {}
+        super().__init__(f"Binance HTTP 429; retry_after={retry_after:g}s")
+
+
+class IPBanFatalError(RuntimeError):
+    """Binance HTTP 418 is fatal and must never be retried."""
+
+
+@dataclass(frozen=True)
+class RestResponseMetadata:
+    http_status: int
+    headers: dict[str, str]
+    request_started_at: str
+    response_received_at: str
+    latency_seconds: float
+    url: str
+
+
+def parse_rate_limits(payload: Any) -> tuple[dict[str, Any], ...]:
+    """Return the exchangeInfo rateLimits without inventing a local limit."""
+    if not isinstance(payload, dict) or not isinstance(payload.get("rateLimits"), list):
+        raise DataIntegrityError("exchangeInfo response lacks rateLimits")
+    limits = tuple(item for item in payload["rateLimits"] if isinstance(item, dict))
+    if len(limits) != len(payload["rateLimits"]):
+        raise DataIntegrityError("exchangeInfo rateLimits contains a malformed entry")
+    return limits
+
+
 @dataclass(frozen=True)
 class ArchiveObject:
     """Metadata returned by the Binance Vision S3 listing."""
@@ -275,21 +308,43 @@ class BinanceRestClient:
     """Read-only public market-data client. No order or account methods exist."""
     BASE_URLS = {"spot": "https://data-api.binance.vision", "um": "https://fapi.binance.com", "cm": "https://dapi.binance.com"}
     def __init__(self, timeout: float = 15.0, max_retries: int = 3) -> None: self.timeout, self.max_retries = timeout, max_retries
-    def get(self, market: str, path: str, params: dict[str, Any] | None = None) -> Any:
+
+    def get_with_metadata(self, market: str, path: str, params: dict[str, Any] | None = None) -> tuple[Any, RestResponseMetadata]:
         if market not in self.BASE_URLS: raise ValueError(f"unsupported market: {market}")
         url = self.BASE_URLS[market] + path + (("?" + urllib.parse.urlencode(params)) if params else ""); headers = {"User-Agent": "binance-indicator-research/0.1"}
         if api_key := os.getenv("BINANCE_API_KEY"): headers["X-MBX-APIKEY"] = api_key
         for attempt in range(self.max_retries + 1):
+            started = datetime.now(UTC)
+            started_clock = time.perf_counter()
             try:
-                with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=self.timeout) as response: return json.loads(response.read())
+                with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=self.timeout) as response:
+                    body = response.read()
+                    received = datetime.now(UTC)
+                    response_headers = {str(key).lower(): str(value) for key, value in response.headers.items()}
+                    metadata = RestResponseMetadata(response.status, response_headers, started.isoformat(), received.isoformat(), time.perf_counter() - started_clock, url)
+                    return json.loads(body), metadata
             except urllib.error.HTTPError as exc:
-                if exc.code not in {418, 429, 500, 502, 503, 504} or attempt == self.max_retries: raise
-                retry_after = float(exc.headers.get("Retry-After", 0) or 0)
+                error_headers = {str(key).lower(): str(value) for key, value in exc.headers.items()}
+                if exc.code == 418:
+                    raise IPBanFatalError("Binance HTTP 418 IP ban; collection is stopped") from exc
+                if exc.code == 429:
+                    retry_after = float(error_headers.get("retry-after", 0) or 0)
+                    if attempt == self.max_retries:
+                        raise RateLimitGapError(retry_after, headers=error_headers) from exc
+                elif exc.code not in {500, 502, 503, 504} or attempt == self.max_retries:
+                    raise
+                else:
+                    retry_after = 0.0
             except (TimeoutError, urllib.error.URLError):
                 if attempt == self.max_retries: raise
                 retry_after = 0
             time.sleep(max(retry_after, min(2 ** attempt, 8)))
         raise AssertionError("retry loop exhausted")
+
+    def get(self, market: str, path: str, params: dict[str, Any] | None = None) -> Any:
+        """Backward-compatible payload-only API; use get_with_metadata for R3."""
+        payload, _ = self.get_with_metadata(market, path, params)
+        return payload
 
 def dataset_hash(frame: pd.DataFrame) -> str:
     normalized = frame.reindex(sorted(frame.columns), axis=1)
