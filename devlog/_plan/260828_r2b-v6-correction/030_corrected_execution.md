@@ -8,3 +8,7 @@ runner, finalize the manifest, and run the enhanced verifier before any
 aggregation. Acceptance requires 576 terminal units, no failures, and zero for
 all execution, sign, availability, overlap, net-return, January, and holdout
 violation counters.
+
+The final qualification receipt is generated only from the identity-pinned
+source after the corrected campaign and is retained as the canonical full
+pytest evidence; stale pre-correction receipts are not treated as proof.

@@ -11,7 +11,7 @@
   "premium_archive_manifest_sha256": "658247addf91573883613be97f45753359f0f255bf6a70c7ac85efeadde71662",
   "premium_provenance_summary_sha256": "d7bc02d21416505b34e3c1029398ae2aff3e24cc7bb96b5ff7fbaa6cb4e1702f",
   "r2b_data_guard_proof_sha256": "a3a60c5eb170b63f92cdf78b1e2a7d3537b03ad991fdc9b9127ae954953447dd",
-  "full_pytest_receipt_sha256": "3d8095bf8c2ad82c5cfc4b2338be647470cd3d3fedccc3b234f64b5d23c82e67",
+  "full_pytest_receipt_sha256": "9bd1acf73f691b11bea70208d9e59ec5f48bfde5c4480c468c06e15b20994823",
   "source_sha256": {
     "scripts/acquire_r2b_premium_history.py": "351630303de0c9b33f172c33394506478fe3bad75d6abb383199b9993739cc26",
     "scripts/audit_r2b_premium_coverage.py": "8d0816f57f36572135c84c74ae8b8cf720b9b76340221b7b7da9fe74384fbb28",
@@ -32,7 +32,7 @@
   "qualification_payload_sha256": "90995f4b4e76948c83e0cb62044264bb5bc093f17dfc9ce899baf78decceae3f",
   "qualification_result_identity": "4d50f019220d949d727465b2780c8b01eefe7a18cfab79c4d0d33c376d8fe027",
   "qualification_receipt_file_sha256": "3a6d60eb6f79a47e7883c3fccc9ac330d3af9aef7fc4225e190b2bbd7e661898",
-  "final_report": "R2B_HISTORICAL_OUTCOME_REPORT_2026-08-28.md",
+  "final_report": "R2B_CORRECTED_HISTORICAL_OUTCOME_REPORT_2026-08-28.md",
   "checkpoint_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2b_restricted_derivatives_v1_checkpoints_v7",
   "checkpoint_manifest_sha256": "8ce7f75620c578dab808ddf7d7e7b2d610135680d5ed4515999cd899753f0602",
   "aggregate_manifest_sha256": "30f217f4635878a1b6a754900ab6027b9666aaef72d0ade3a8afc25d37e1722d",

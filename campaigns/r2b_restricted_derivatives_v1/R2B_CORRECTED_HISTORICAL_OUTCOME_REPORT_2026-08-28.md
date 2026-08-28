@@ -84,6 +84,7 @@ The candidate shortlist is empty. Therefore the corrected result is
 
 Targeted R2B tests pass (including execution-gap, verifier, signal, and
 aggregation contract tests). Full `python -m pytest -q` was run after the
-correction; the canonical receipt is updated separately with its exact stdout,
-exit code, source identity, and warning count. Final holdout remains
+correction and returned `182 passed, 1 warning in 114.00s (0:01:54)` with exit
+code 0; the canonical receipt records its source identity and warning count.
+Final holdout remains
 `UNTOUCHED`; R2B2 is `NOT STARTED`.
