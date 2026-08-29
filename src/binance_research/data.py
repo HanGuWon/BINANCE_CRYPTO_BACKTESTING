@@ -19,6 +19,7 @@ import numpy as np
 import pandas as pd
 
 from .models import CoverageStatus, DatasetManifest, IntegrityIssue
+from .r3_timing import ClockCalibration, calibrate_server_clock
 
 KLINE_COLUMNS = ("open_time", "open", "high", "low", "close", "volume", "close_time", "quote_volume", "trade_count", "taker_buy_volume", "taker_buy_quote_volume", "ignore")
 INTERVAL_MS = {"1s": 1_000, "1m": 60_000, "3m": 180_000, "5m": 300_000, "15m": 900_000, "30m": 1_800_000, "1h": 3_600_000, "2h": 7_200_000, "4h": 14_400_000, "6h": 21_600_000, "8h": 28_800_000, "12h": 43_200_000, "1d": 86_400_000, "3d": 259_200_000, "1w": 604_800_000}
@@ -309,6 +310,15 @@ class BinanceRestClient:
     BASE_URLS = {"spot": "https://data-api.binance.vision", "um": "https://fapi.binance.com", "cm": "https://dapi.binance.com"}
     MAX_RETRY_AFTER_SECONDS = 60.0
     def __init__(self, timeout: float = 15.0, max_retries: int = 3) -> None: self.timeout, self.max_retries = timeout, max_retries
+
+    def calibrate_server_clock(self, market: str = "um") -> ClockCalibration:
+        """Measure exchange-vs-local clock offset using a request midpoint."""
+        before = int(datetime.now(UTC).timestamp() * 1000)
+        payload, _ = self.get_with_metadata(market, "/fapi/v1/time" if market == "um" else "/api/v3/time")
+        after = int(datetime.now(UTC).timestamp() * 1000)
+        if not isinstance(payload, dict) or "serverTime" not in payload:
+            raise DataIntegrityError("Binance time response lacks serverTime")
+        return calibrate_server_clock(local_before_ms=before, server_ms=int(payload["serverTime"]), local_after_ms=after)
 
     def get_with_metadata(self, market: str, path: str, params: dict[str, Any] | None = None) -> tuple[Any, RestResponseMetadata]:
         if market not in self.BASE_URLS: raise ValueError(f"unsupported market: {market}")

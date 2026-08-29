@@ -3,9 +3,11 @@ from __future__ import annotations
 
 import argparse
 import time
+from datetime import UTC, datetime
 from pathlib import Path
 
 from binance_research.collector import AppendOnlyEventStore, ForwardCollector
+from binance_research.r3_timing import calibrated_now, next_quarter_hour
 from binance_research.r3_operations import append_manifest, build_manifest, require_sha256, single_instance_lock, verify_manifest_chain, write_health_receipt, write_pilot_receipt
 
 PILOT_SYMBOLS = ("BTCUSDT", "ETHUSDT")
@@ -45,14 +47,17 @@ def run_once(root: Path, symbols: list[str], roster_sha256: str) -> dict[str, ob
 
 
 def run_forever(root: Path, symbols: list[str], roster_sha256: str, *, interval_seconds: int = 900) -> None:
-    """Run deterministic polling cycles until a graceful keyboard stop."""
-    if interval_seconds < 60:
-        raise ValueError("R3 polling interval must be at least one minute")
+    """Run polling cycles on an absolute, calibrated UTC epoch grid."""
+    if interval_seconds < 60 or 3600 % interval_seconds:
+        raise ValueError("R3 polling interval must be a positive divisor of one hour")
     root = Path(root)
     with single_instance_lock(root / "control" / "collector.lock"):
         while True:
             _run_cycle(root, symbols, roster_sha256)
-            time.sleep(interval_seconds)
+            clock = ForwardCollector(AppendOnlyEventStore(root / "raw_v1")).client.calibrate_server_clock("um")
+            server_now = calibrated_now(datetime.now(UTC), clock)
+            boundary = next_quarter_hour(server_now, interval_seconds=interval_seconds)
+            time.sleep(max(0.0, (boundary - server_now).total_seconds()))
 
 
 def run_pilot(root: Path, roster_sha256: str) -> dict[str, object]:
