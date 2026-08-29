@@ -18,6 +18,14 @@ scientific launch identity:
 9. the collector clock is not calibrated to Binance server time;
 10. collection and feature contracts retain stale pre-repair wording.
 
+The p1 repair adds a reproducible causal roster path for future collection:
+`rosters/2026-08.json` is derived from the complete July 2026 UM ranking with
+source SHA256 `4776921533f2b26331bd43b659e3ddf346481372d33ddb5dd4e6768076ed3b9a`
+and roster SHA256
+`ec2609bb7df0019984d41be3c5f18154591f5c8735a71557de7207c5606a00cc`.
+This does not rewrite the historical pilot metadata: its two-symbol synthetic
+identity remains unresolved and the pilot remains engineering-only.
+
 Operational status is therefore `R3_BLOCKED_FINAL_LAUNCH_CONFORMANCE`.
 The existing `raw_v1` remains immutable engineering evidence only and must not
 be mixed into a future scientific root. No historical outcomes, final holdout,

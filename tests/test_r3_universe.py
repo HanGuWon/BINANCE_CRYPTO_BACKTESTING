@@ -1,8 +1,16 @@
 from __future__ import annotations
 
 import pytest
+from pathlib import Path
 
-from binance_research.r3_universe import RolloverStateMachine, UniverseContractError, freeze_um_top50
+from binance_research.r3_universe import (
+    RolloverStateMachine,
+    UniverseContractError,
+    build_causal_monthly_roster,
+    freeze_um_top50,
+    replay_roster_artifact,
+    write_roster_artifact,
+)
 
 
 def _ranking(count: int = 50, month: str = "2026-08") -> list[dict[str, object]]:
@@ -32,3 +40,47 @@ def test_rollover_suspends_when_september_unavailable_then_reenters() -> None:
     september = freeze_um_top50(_ranking(), effective_month="2026-09", source_sha256="b" * 64)
     assert machine.rollover(effective_month="2026-09", next_roster=september) == "ACTIVE"
     assert [item["state"] for item in machine.receipts] == ["UNIVERSE_ROLLOVER_GAP", "LEAVE", "REENTER"]
+
+
+def test_causal_monthly_roster_build_and_replay_from_completed_prior_month(tmp_path: Path) -> None:
+    source = tmp_path / "universe_monthly.csv"
+    rows = [
+        {
+            "market": "um",
+            "symbol": f"S{i:03d}USDT",
+            "volume_month": "2026-08",
+            "universe_month": "2026-09",
+            "coverage_ratio": 1.0,
+            "eligibility_reason": "ELIGIBLE_COMPLETE_PRIOR_MONTH",
+            "selected_top50": "True",
+        }
+        for i in range(50)
+    ]
+    import pandas as pd
+
+    pd.DataFrame(rows).to_csv(source, index=False)
+    roster = build_causal_monthly_roster(source, effective_month="2026-09")
+    artifact = write_roster_artifact(roster, tmp_path / "2026-09.json", source_path=source)
+    replay = replay_roster_artifact(artifact, effective_month="2026-09")
+    assert replay == roster
+
+
+def test_causal_monthly_roster_rejects_incomplete_prior_month(tmp_path: Path) -> None:
+    source = tmp_path / "universe_monthly.csv"
+    rows = [
+        {
+            "market": "um",
+            "symbol": f"S{i:03d}USDT",
+            "volume_month": "2026-08",
+            "universe_month": "2026-09",
+            "coverage_ratio": 0.5 if i == 0 else 1.0,
+            "eligibility_reason": "PARTIAL_PRIOR_MONTH_EXCLUDED" if i == 0 else "ELIGIBLE_COMPLETE_PRIOR_MONTH",
+            "selected_top50": "True",
+        }
+        for i in range(50)
+    ]
+    import pandas as pd
+
+    pd.DataFrame(rows).to_csv(source, index=False)
+    with pytest.raises(UniverseContractError, match="non-complete|incomplete"):
+        build_causal_monthly_roster(source, effective_month="2026-09")
