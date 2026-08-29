@@ -26,3 +26,12 @@ def test_launch_manifest_pins_required_contracts() -> None:
     assert manifest["primary_hypothesis_count"] == 6
     assert manifest["final_holdout_status"] == "UNTOUCHED"
     assert manifest["outcome_analysis_status"] == "NOT_STARTED"
+
+
+def test_launch_manifest_blocks_unverified_pilot_boundary() -> None:
+    """The conformance erratum must remain the canonical launch disposition."""
+    manifest = json.loads((CAMPAIGN / "R3_LAUNCH_MANIFEST.json").read_text(encoding="utf-8"))
+    assert manifest["status"] == "R3_BLOCKED_FINAL_LAUNCH_CONFORMANCE"
+    assert manifest["pilot_status"] == "ENGINEERING_PILOT_ONLY"
+    assert manifest["final_holdout_status"] == "UNTOUCHED"
+    assert manifest["r2b2_status"] == "NOT_STARTED"

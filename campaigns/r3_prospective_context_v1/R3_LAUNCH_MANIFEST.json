@@ -6,9 +6,16 @@
   "implementation_commit": "da6869c43303cb21c89a76b031f71f21abc06f14",
   "source_tree_sha256": "134268865234f9cef6c6fc3f47a682a88184bfe78b6ad7b972675f3487597a51",
   "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "universe_rule_sha256": "1ef199bbce6fe8893cad023dc9d73729df484a595ce09acc31090d433a928ca7",
+  "collection_contract_sha256": "dd29fa969f841f39f22eff12a3f54c5bb7b69f6c05027f50486c12e2f1bf1a1f",
+  "feature_semantics_sha256": "3a7b7f4cadf5b9b2dbb9f622d349801c41cd9e9824e4c4cc6f16b8b511dea093",
+  "statistics_contract_sha256": "78d0fad8b5742395585d2bf7638d12f2289d3be1851b459bb0191cfd1b5c58b5",
+  "multiple_testing_sha256": "bcec88cd185efd29153f6dbeb176c4f714094695e69de8a839d2611b027062b5",
+  "canonical_raw_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1/raw_v1",
   "pilot_receipt_sha256": "e8309d227977cc450fb44af0521d1c8e512ea7286309a2a1a1720e2586a0a1c9",
   "pilot_status": "ENGINEERING_PILOT_ONLY",
   "final_holdout_status": "UNTOUCHED",
   "r2b2_status": "NOT_STARTED",
-  "outcome_analysis_status": "NOT_STARTED"
+  "outcome_analysis_status": "NOT_STARTED",
+  "primary_hypothesis_count": 6
 }
