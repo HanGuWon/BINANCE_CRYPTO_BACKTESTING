@@ -17,4 +17,5 @@ closed on tampering.
 The August 2026 artifact is therefore an ex-ante 50-symbol roster derived from
 the completed July 2026 ranking, not a claim that the two-symbol engineering
 pilot used that roster. September rollover remains suspended until a completed
-August ranking is available; no outcome data is consulted.
+August ranking is available. The explicit `rosters/2026-09_BLOCKED.json`
+receipt records this fail-closed disposition; no outcome data is consulted.
