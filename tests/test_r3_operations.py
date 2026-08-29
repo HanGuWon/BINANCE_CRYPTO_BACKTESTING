@@ -54,7 +54,7 @@ def test_roster_identity_must_be_hex_sha256() -> None:
 
 
 def test_pilot_receipt_is_operational_only(tmp_path: Path) -> None:
-    path = write_pilot_receipt(tmp_path, symbols=["BTCUSDT", "ETHUSDT"], manifest_sha256="a" * 64, roster_sha256="b" * 64, stream_counts={"premium": 2}, bytes_written=10, latency_seconds={"premium": 0.1}, gap_counts={})
+    path = write_pilot_receipt(tmp_path, symbols=["BTCUSDT", "ETHUSDT"], manifest_sha256="a" * 64, roster_sha256="b" * 64, stream_counts={"premium": 2}, bytes_written=10, latency_seconds={"premium": 0.1}, gap_counts={}, storage_projection_bytes={"24h": 960}, liquidation_state={"connected": True})
     receipt = json.loads(path.read_text(encoding="utf-8").splitlines()[0])
     assert receipt["mode"] == "ENGINEERING_PILOT"
     assert not {"gross_return", "net_return", "pnl", "sharpe"} & set(receipt)

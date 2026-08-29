@@ -60,7 +60,14 @@ def run_pilot(root: Path, roster_sha256: str) -> dict[str, object]:
     validate_pilot_inputs(root, symbols)
     manifest = run_once(root, symbols, roster_sha256)
     stream_counts = {str(item["path"]).split("/")[-1].removesuffix(".jsonl"): int(item["rows"]) for item in manifest["files"]}
-    write_pilot_receipt(Path(root), symbols=symbols, manifest_sha256=str(manifest["manifest_sha256"]), roster_sha256=roster_sha256, stream_counts=stream_counts, bytes_written=int(manifest["total_bytes"]), latency_seconds={}, gap_counts={})
+    import asyncio
+    try:
+        from scripts.r3_liquidation_probe import probe
+        liquidation_state = asyncio.run(probe(5))
+    except Exception as exc:
+        liquidation_state = {"connected": False, "received": False, "error": type(exc).__name__}
+    projections = {period: int(manifest["total_bytes"] * factor) for period, factor in (("24h", 96), ("7d", 672), ("30d", 2880), ("90d", 8640))}
+    write_pilot_receipt(Path(root), symbols=symbols, manifest_sha256=str(manifest["manifest_sha256"]), roster_sha256=roster_sha256, stream_counts=stream_counts, bytes_written=int(manifest["total_bytes"]), latency_seconds={}, gap_counts={}, storage_projection_bytes=projections, liquidation_state=liquidation_state)
     return manifest
 
 
