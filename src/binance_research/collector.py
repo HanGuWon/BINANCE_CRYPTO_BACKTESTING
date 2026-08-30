@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import os
 from datetime import UTC, datetime
@@ -91,18 +92,57 @@ class ContinuityTracker:
         return state
 
 
-def route_liquidation_event(payload: dict[str, Any], requested_symbol: str = "ALL") -> tuple[str, str]:
+def route_liquidation_event(payload: dict[str, Any], requested_symbol: str = "ALL", *, endpoint: str | None = None) -> tuple[str, str]:
     """Return explicit market/symbol provenance for a raw liquidation payload."""
     order = payload.get("o") if isinstance(payload.get("o"), dict) else {}
     symbol = str(order.get("s") or payload.get("s") or requested_symbol)
-    discriminator = payload.get("market_type", payload.get("marketType", payload.get("st")))
-    market = {1: "um", 2: "cm", "1": "um", "2": "cm", "um": "um", "cm": "cm"}.get(discriminator)
+    raw_discriminators = []
+    if order.get("st") is not None:
+        raw_discriminators.append(order["st"])
+    for key in ("market_type", "marketType", "st"):
+        if payload.get(key) is not None:
+            raw_discriminators.append(payload[key])
+    normalized = [{1: "um", 2: "cm", "1": "um", "2": "cm", "um": "um", "cm": "cm"}.get(value) for value in raw_discriminators]
+    known = {value for value in normalized if value is not None}
+    if len(known) > 1:
+        raise ValueError("contradictory forceOrder market discriminators")
+    market = next(iter(known), None)
     stream = str(payload.get("stream", "")).lower()
     if market is None and ("@cm" in stream or "coin" in stream):
         market = "cm"
+    if market is None and endpoint and "fstream.binance.com" in endpoint:
+        market = "um"
     if market is None and requested_symbol != "ALL":
         market = "um"
     return market or "unknown", symbol
+
+
+def observed_forceorder_pressure(payload: dict[str, Any], *, endpoint: str | None = None) -> dict[str, Any]:
+    """Create the frozen observable; forced SELL is positive pressure."""
+    order = payload.get("o") if isinstance(payload.get("o"), dict) else {}
+    side = str(order.get("S") or payload.get("S") or "").upper()
+    qty = float(order.get("l") or 0.0)
+    avg_price = float(order.get("ap") or order.get("p") or 0.0)
+    signed = qty * avg_price if side == "SELL" else -qty * avg_price if side == "BUY" else None
+    market, symbol = route_liquidation_event(payload, endpoint=endpoint)
+    return {
+        "observable": "observed_forceorder_pressure",
+        "status": "OBSERVED_FORCEORDER_EVENT",
+        "market": market,
+        "symbol": symbol,
+        "exchange_event_time": payload.get("E"),
+        "trade_order_time": order.get("T") or order.get("t"),
+        "side": side or None,
+        "original_quantity": order.get("q"),
+        "last_filled_quantity": order.get("l"),
+        "accumulated_filled_quantity": order.get("z"),
+        "order_price": order.get("p"),
+        "average_fill_price": order.get("ap"),
+        "position_side": order.get("ps"),
+        "subtype": order.get("st") or payload.get("st"),
+        "signed_observed_notional": signed,
+        "raw_payload_sha256": hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
+    }
 
 
 def liquidation_stream_url(symbol: str = "ALL") -> str:
@@ -207,7 +247,7 @@ class ForwardCollector:
                         decoded = json.loads(message)
                         events = decoded if isinstance(decoded, list) else [decoded]
                         for payload in events:
-                            market, event_symbol = route_liquidation_event(payload, symbol)
+                            market, event_symbol = route_liquidation_event(payload, symbol, endpoint=url)
                             self.store.append("liquidation", market, event_symbol, payload, source_kind="websocket_event", endpoint=url, sequence_id=payload.get("u") or payload.get("U"), evidence_mode=evidence_mode)
                             yield payload
             except asyncio.CancelledError:

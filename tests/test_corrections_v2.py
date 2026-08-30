@@ -6,7 +6,7 @@ import pytest
 
 from binance_research.alignment import PointInTimeSource, build_research_panel, causal_asof_join
 from binance_research.backtest import CostModel, run_backtest
-from binance_research.collector import liquidation_stream_url, route_liquidation_event
+from binance_research.collector import liquidation_stream_url, observed_forceorder_pressure, route_liquidation_event
 from binance_research.data import ArchiveRequest, CoverageStatus, normalize_klines, resample_klines, rest_coverage_status
 from binance_research.registry import code_hash
 
@@ -101,6 +101,25 @@ def test_v2_liquidation_routing_preserves_event_symbol() -> None:
     assert route_liquidation_event({"st": 2, "o": {"s": "BTCUSD_PERP"}}) == ("cm", "BTCUSD_PERP")
     assert route_liquidation_event({"o": {"s": "ETHUSDT"}}, "ETHUSDT") == ("um", "ETHUSDT")
     assert route_liquidation_event({"st": 99, "o": {"s": "XRPUSDT"}}) == ("unknown", "XRPUSDT")
+
+
+def test_forceorder_nested_usdm_discriminator_routes_um() -> None:
+    payload = {"e": "forceOrder", "E": 1788079329592, "o": {"s": "ZKCUSDT", "S": "BUY", "st": 1}}
+    assert route_liquidation_event(payload) == ("um", "ZKCUSDT")
+
+
+def test_forceorder_contradictory_discriminators_fail_closed() -> None:
+    with pytest.raises(ValueError, match="contradictory"):
+        route_liquidation_event({"st": 2, "o": {"s": "BTCUSDT", "st": 1}})
+
+
+def test_observed_forceorder_pressure_is_signed_and_hashed() -> None:
+    payload = {"e": "forceOrder", "E": 1, "o": {"s": "ZKCUSDT", "S": "SELL", "q": "4", "l": "2", "z": "2", "p": "10", "ap": "11", "ps": "BOTH", "st": 1}}
+    observed = observed_forceorder_pressure(payload)
+    assert observed["status"] == "OBSERVED_FORCEORDER_EVENT"
+    assert observed["market"] == "um"
+    assert observed["signed_observed_notional"] == 22.0
+    assert len(observed["raw_payload_sha256"]) == 64
 
 
 def test_v2_liquidation_uses_market_stream_namespace() -> None:
