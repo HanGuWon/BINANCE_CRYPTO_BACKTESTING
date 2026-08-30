@@ -62,6 +62,20 @@ def test_spot_archive_cannot_enter_um_discovery(tmp_path: Path) -> None:
         build_forward_ranking_from_raw(tmp_path, tmp_path, tmp_path / "out", effective_month="2026-08")
 
 
+def test_wrong_market_sidecar_fails_closed(tmp_path: Path) -> None:
+    archive_dir = tmp_path / "um" / "klines" / "AAAUSDT" / "1d"
+    archive_dir.mkdir(parents=True)
+    archive = archive_dir / "AAAUSDT-1d-2026-07.zip"
+    archive.write_bytes(b"wrong-scope")
+    digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+    (archive.with_suffix(archive.suffix + ".manifest.json")).write_text(json.dumps({
+        "market_type": "spot", "dataset": "klines", "interval": "1d",
+        "computed_sha256": digest, "published_sha256": digest,
+    }), encoding="utf-8")
+    with pytest.raises(RuntimeError, match="ARCHIVE_MANIFEST_SCOPE_MISMATCH"):
+        build_forward_ranking_from_raw(tmp_path, tmp_path, tmp_path / "out", effective_month="2026-08")
+
+
 def test_ranking_semantic_hash_is_type_stable_and_provenance_independent() -> None:
     import pandas as pd
     rows = [{"market": "UM", "symbol": "AAAUSDT", "volume_month": "2026-07", "universe_month": "2026-08",
