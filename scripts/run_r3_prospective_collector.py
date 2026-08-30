@@ -31,11 +31,13 @@ def validate_scientific_inputs(manifest_path: Path, *, roster_sha256: str, imple
     return verify_launch_identity(manifest_path, roster_sha256=roster_sha256, implementation_commit=implementation_commit)
 
 
-def validate_engineering_shadow_inputs(root: Path, roster_artifact: Path, *, at_utc: datetime | None = None) -> tuple[list[str], str]:
+def validate_engineering_shadow_inputs(root: Path, roster_artifact: Path, *, at_utc: datetime | None = None, require_fresh: bool = False) -> tuple[list[str], str]:
     """Load the August roster; manual symbol lists are not accepted."""
     resolved = Path(root).resolve()
     if resolved.drive.upper() != "D:" or resolved.name in {"raw_v1", "scientific_raw_v1"}:
         raise ValueError("ENGINEERING_SHADOW requires a fresh D-backed non-scientific root")
+    if require_fresh and resolved.exists() and any(resolved.iterdir()):
+        raise ValueError("ENGINEERING_SHADOW root must be fresh and empty")
     roster = replay_roster_artifact(Path(roster_artifact), effective_month="2026-08")
     now = (at_utc or datetime.now(UTC)).astimezone(UTC)
     if not (datetime.fromisoformat(roster.effective_start) <= now < datetime.fromisoformat(roster.effective_end)):
@@ -44,7 +46,7 @@ def validate_engineering_shadow_inputs(root: Path, roster_artifact: Path, *, at_
 
 
 def run_engineering_shadow(root: Path, roster_artifact: Path, *, at_utc: datetime | None = None) -> dict[str, object]:
-    symbols, roster_sha256 = validate_engineering_shadow_inputs(root, roster_artifact, at_utc=at_utc)
+    symbols, roster_sha256 = validate_engineering_shadow_inputs(root, roster_artifact, at_utc=at_utc, require_fresh=True)
     return _run_cycle(Path(root), symbols, roster_sha256, evidence_mode="ENGINEERING_SHADOW", ws_seconds=SHADOW_WS_SECONDS)
 
 
@@ -97,6 +99,8 @@ async def _shadow_rest_and_ws(collector: ForwardCollector, symbols: list[str], *
 def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_mode: str | None = None, ws_seconds: int = SHADOW_WS_SECONDS) -> dict[str, object]:
     roster_sha256 = require_sha256(roster_sha256, "roster_sha256")
     collector = ForwardCollector(AppendOnlyEventStore(root / "raw_v1"))
+    clock = collector.client.calibrate_server_clock("um")
+    collector.clock_calibration = clock
     ws_result: dict[str, object] | None = None
     if evidence_mode in {"ENGINEERING_SHADOW", "SCIENTIFIC"}:
         ws_result = asyncio.run(_shadow_rest_and_ws(collector, symbols, ws_seconds=ws_seconds))
@@ -108,6 +112,11 @@ def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_m
     else:
         for symbol in symbols:
             collector.collect_r3_um_snapshot(symbol)
+    collector.store.append(
+        "clock_calibration", "um", "ALL",
+        {"calibration_id": f"cal-{datetime.now(UTC).strftime('%Y%m%dT%H%M%S%fZ')}", "offset_ms": clock.offset_ms, "round_trip_ms": clock.round_trip_ms, "uncertainty_ms": clock.round_trip_ms / 2.0 + 1.0},
+        source_kind="collector_control", endpoint="/fapi/v1/time", continuity_state="COMPLETE", evidence_mode=evidence_mode,
+    )
     previous = None
     chain = root / "raw_v1" / "manifest_chain.jsonl"
     if chain.exists() and chain.read_text(encoding="utf-8").strip():

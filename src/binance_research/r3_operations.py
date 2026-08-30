@@ -127,6 +127,12 @@ def verify_launch_identity(manifest_path: Path, *, roster_sha256: str, implement
         raise LaunchIdentityError("engineering pilot identity cannot authorize scientific collection")
     if manifest.get("roster_sha256") != roster_sha256:
         raise LaunchIdentityError("roster SHA does not match launch manifest")
+    for field in ("implementation_commit", "source_tree_sha256", "registry_sha256"):
+        value = manifest.get(field)
+        if not isinstance(value, str) or not value.strip():
+            raise LaunchIdentityError(f"launch manifest lacks exact {field}")
+        if field != "implementation_commit":
+            require_sha256(value, field)
     if implementation_commit and manifest.get("implementation_commit") != implementation_commit:
         raise LaunchIdentityError("implementation commit does not match launch manifest")
     return manifest
@@ -197,6 +203,8 @@ def verify_engineering_shadow_root(root: Path, *, expected_symbols: list[str], r
     rows = 0
     bytes_total = 0
     symbols: set[str] = set()
+    per_symbol_streams: dict[str, set[str]] = {}
+    per_symbol_gaps: dict[str, set[str]] = {}
     modes: set[str | None] = set()
     primary_streams = {"book_ticker", "klines_15m", "open_interest", "premium", "premium_klines_15m"}
     for path in files:
@@ -207,13 +215,30 @@ def verify_engineering_shadow_root(root: Path, *, expected_symbols: list[str], r
             envelope = json.loads(line)
             rows += 1
             if envelope.get("stream") in primary_streams:
-                symbols.add(str(envelope.get("symbol")))
+                symbol = str(envelope.get("symbol"))
+                stream = str(envelope.get("stream"))
+                symbols.add(symbol)
+                per_symbol_streams.setdefault(symbol, set()).add(stream)
+                if stream in {"klines_15m", "premium_klines_15m"}:
+                    payload = envelope.get("payload")
+                    if not isinstance(payload, dict) or not payload.get("source_open_time") or not payload.get("source_available_time"):
+                        raise ValueError("normalized kline envelope lacks source timing")
+            elif envelope.get("stream") == "collector_status":
+                payload = envelope.get("payload") or {}
+                symbol = str(envelope.get("symbol"))
+                stream = payload.get("stream")
+                if stream in primary_streams and envelope.get("continuity_state") in {"POLL_GAP", "RATE_LIMIT_GAP", "RESTART_GAP", "SEQUENCE_GAP"}:
+                    per_symbol_gaps.setdefault(symbol, set()).add(str(stream))
             modes.add(envelope.get("evidence_mode"))
     if modes != {"ENGINEERING_SHADOW"}:
         raise ValueError("shadow raw envelopes are not uniformly labeled")
     expected = {str(symbol).upper() for symbol in expected_symbols}
     if (symbols - {"ALL"}) != expected:
         raise ValueError("shadow symbol set does not match roster")
+    for symbol in expected:
+        missing = primary_streams - per_symbol_streams.get(symbol, set()) - per_symbol_gaps.get(symbol, set())
+        if missing:
+            raise ValueError(f"shadow symbol {symbol} missing primary streams: {sorted(missing)}")
     latest = json.loads([line for line in chain.read_text(encoding="utf-8").splitlines() if line.strip()][-1])
     if latest.get("manifest_sha256") != health.get("manifest_sha256"):
         raise ValueError("health receipt does not bind the latest manifest")

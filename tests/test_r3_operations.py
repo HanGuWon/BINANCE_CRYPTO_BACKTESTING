@@ -52,13 +52,17 @@ def test_shadow_event_envelopes_are_explicitly_labeled(tmp_path: Path) -> None:
 def test_engineering_shadow_root_verifier_binds_manifest_health_and_roster(tmp_path: Path) -> None:
     raw = tmp_path / "raw_v1" / "um" / "BTCUSDT"
     raw.mkdir(parents=True)
-    envelope = {"symbol": "BTCUSDT", "stream": "premium", "evidence_mode": "ENGINEERING_SHADOW", "continuity_state": "COMPLETE"}
-    (raw / "premium.jsonl").write_text(json.dumps(envelope) + "\n", encoding="utf-8")
+    for stream in ("premium", "book_ticker", "open_interest"):
+        envelope = {"symbol": "BTCUSDT", "stream": stream, "evidence_mode": "ENGINEERING_SHADOW", "continuity_state": "COMPLETE"}
+        (raw / f"{stream}.jsonl").write_text(json.dumps(envelope) + "\n", encoding="utf-8")
+    for stream in ("klines_15m", "premium_klines_15m"):
+        envelope = {"symbol": "BTCUSDT", "stream": stream, "evidence_mode": "ENGINEERING_SHADOW", "continuity_state": "COMPLETE", "payload": {"source_open_time": "2026-08-30T00:00:00+00:00", "source_available_time": "2026-08-30T00:15:00+00:00"}}
+        (raw / f"{stream}.jsonl").write_text(json.dumps(envelope) + "\n", encoding="utf-8")
     manifest = build_manifest(tmp_path / "raw_v1", manifest_id="shadow")
     append_manifest(tmp_path / "raw_v1", manifest)
     write_health_receipt(tmp_path, campaign_id="r3_prospective_context_v1", manifest_sha256=manifest["manifest_sha256"], roster_sha256="a" * 64, stream_state={"status": "CYCLE_COMPLETE"}, evidence_mode="ENGINEERING_SHADOW")
     result = verify_engineering_shadow_root(tmp_path, expected_symbols=["BTCUSDT"], roster_sha256="a" * 64)
-    assert result["rows"] == 1
+    assert result["rows"] == 5
     assert result["symbols"] == 1
 
 

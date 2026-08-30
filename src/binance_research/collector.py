@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, AsyncIterator
 
 from .data import BinanceRestClient, IPBanFatalError, RateLimitGapError, RestResponseMetadata
+from .r3_streams import normalize_stream_payload
 
 
 class AppendOnlyEventStore:
@@ -38,6 +39,10 @@ class AppendOnlyEventStore:
                              "response_headers": metadata.get("headers", {}),
                              "request_started_at": metadata.get("request_started_at"),
                              "response_received_at": metadata.get("response_received_at"),
+                             "corrected_response_receipt_time": metadata.get("corrected_response_receipt_time"),
+                             "clock_offset_ms": metadata.get("clock_offset_ms"),
+                             "clock_round_trip_ms": metadata.get("clock_round_trip_ms"),
+                             "clock_uncertainty_ms": metadata.get("clock_uncertainty_ms"),
                              "latency_seconds": metadata.get("latency_seconds"),
                              "request_url": metadata.get("url")})
         descriptor = os.open(destination, os.O_APPEND | os.O_CREAT | os.O_WRONLY, 0o644)
@@ -52,7 +57,7 @@ class AppendOnlyEventStore:
 def _extract_exchange_event_time(payload: Any) -> str | None:
     if not isinstance(payload, dict):
         return None
-    for value in (payload.get("E"), payload.get("T"), payload.get("eventTime"), payload.get("timestamp"), payload.get("time")):
+    for value in (payload.get("E"), payload.get("T"), payload.get("eventTime"), payload.get("timestamp"), payload.get("time"), payload.get("observation_time")):
         if value is None:
             continue
         try:
@@ -185,6 +190,7 @@ class ForwardCollector:
 
     def __init__(self, store: AppendOnlyEventStore, client: BinanceRestClient | None = None) -> None:
         self.store, self.client = store, client or BinanceRestClient()
+        self.clock_calibration = None
 
     def collect_um_snapshot(self, symbol: str) -> list[Path]:
         paths: list[Path] = []
@@ -225,7 +231,35 @@ class ForwardCollector:
                 state = "RATE_LIMIT_GAP" if "429" in str(exc) or "rate" in str(exc).lower() else "POLL_GAP"
                 paths.append(self.store.append("collector_status", "um", symbol, {"stream": stream, "error": type(exc).__name__}, source_kind="collector_control", endpoint=endpoint, request_params=params, continuity_state=state, evidence_mode=evidence_mode))
                 continue
-            paths.append(self.store.append(stream, "um", symbol, payload, source_kind="rest_snapshot", endpoint=endpoint, request_params=params, response_metadata=response_metadata, evidence_mode=evidence_mode))
+            if response_metadata is not None and self.clock_calibration is not None:
+                received = datetime.fromisoformat(response_metadata.response_received_at.replace("Z", "+00:00"))
+                corrected = received.timestamp() + float(self.clock_calibration.offset_ms) / 1000.0
+                response_metadata = {
+                    "http_status": response_metadata.http_status,
+                    "headers": response_metadata.headers,
+                    "request_started_at": response_metadata.request_started_at,
+                    "response_received_at": response_metadata.response_received_at,
+                    "corrected_response_receipt_time": datetime.fromtimestamp(corrected, UTC).isoformat(),
+                    "clock_offset_ms": float(self.clock_calibration.offset_ms),
+                    "clock_round_trip_ms": int(self.clock_calibration.round_trip_ms),
+                    "clock_uncertainty_ms": float(self.clock_calibration.round_trip_ms) / 2.0 + 1.0,
+                    "latency_seconds": response_metadata.latency_seconds,
+                    "url": response_metadata.url,
+                }
+            if stream in {"klines_15m", "premium_klines_15m"}:
+                receipt_time = (response_metadata.get("corrected_response_receipt_time") or response_metadata.get("response_received_at")) if isinstance(response_metadata, dict) else (getattr(response_metadata, "response_received_at", None) if response_metadata is not None else None)
+                receipt_time = receipt_time or datetime.now(UTC).isoformat()
+                try:
+                    normalized = normalize_stream_payload(stream, symbol, payload, receipt_time=receipt_time)
+                except Exception as exc:
+                    paths.append(self.store.append("collector_status", "um", symbol, {"stream": stream, "error": type(exc).__name__}, source_kind="collector_control", endpoint=endpoint, request_params=params, response_metadata=response_metadata, continuity_state="SCHEMA_ERROR", evidence_mode=evidence_mode))
+                    continue
+                if not normalized:
+                    paths.append(self.store.append("collector_status", "um", symbol, {"stream": stream, "status": "NO_COMPLETED_ROWS"}, source_kind="collector_control", endpoint=endpoint, request_params=params, response_metadata=response_metadata, continuity_state="POLL_GAP", evidence_mode=evidence_mode))
+                for row in normalized:
+                    paths.append(self.store.append(stream, "um", symbol, row, source_kind="rest_snapshot_normalized", endpoint=endpoint, request_params=params, response_metadata=response_metadata, evidence_mode=evidence_mode))
+            else:
+                paths.append(self.store.append(stream, "um", symbol, payload, source_kind="rest_snapshot", endpoint=endpoint, request_params=params, response_metadata=response_metadata, evidence_mode=evidence_mode))
         return paths
 
     async def stream_liquidations(self, symbol: str = "ALL", *, evidence_mode: str | None = None) -> AsyncIterator[dict[str, Any]]:
