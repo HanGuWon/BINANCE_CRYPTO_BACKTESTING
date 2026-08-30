@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 
 import pytest
+import pandas as pd
 
 from binance_research.r3_streams import StreamSchemaError, normalize_stream_payload
 
@@ -27,7 +28,7 @@ def test_premium_kline_uses_same_closed_row_and_receipt_availability_rule() -> N
 def test_kline_availability_never_precedes_response_receipt_when_clock_is_ahead_or_behind() -> None:
     for receipt in ("1970-01-01T00:15:00Z", "1970-01-01T00:15:02Z"):
         rows = normalize_stream_payload("klines_15m", "BTCUSDT", [_kline(899_999)], receipt_time=receipt)
-        assert rows[0]["source_available_time"] >= receipt
+        assert pd.Timestamp(rows[0]["source_available_time"]) >= pd.Timestamp(receipt)
 
 
 def test_array_streams_keep_each_row_identity_and_observation_time() -> None:
