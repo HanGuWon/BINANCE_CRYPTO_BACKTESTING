@@ -42,3 +42,11 @@ def test_temporal_gate_distinguishes_waiting_from_permanent_block() -> None:
     assert gate["stage"] == "A"
     assert gate["september_roster_status"] == "R3_WAITING_FOR_COMPLETED_AUGUST_RANKING"
     assert gate["required_boundary_utc"] == "2026-09-01T00:00:00Z"
+
+
+def test_stage_a_shadow_state_cannot_authorize_scientific_collection() -> None:
+    state = json.loads((CAMPAIGN / "R3_STAGE_A_STATE.json").read_text(encoding="utf-8"))
+    assert state["state"] == "R3_ENGINEERING_SHADOW_VERIFIED_WAITING_FOR_AUGUST_CLOSE"
+    assert state["scientific_collection"] == "NOT_ACTIVE"
+    assert state["september_roster_state"] == "R3_WAITING_FOR_COMPLETED_AUGUST_RANKING"
+    assert state["final_holdout"] == "UNTOUCHED"
