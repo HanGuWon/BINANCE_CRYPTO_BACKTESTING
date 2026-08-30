@@ -26,6 +26,14 @@ def validate_pilot_inputs(root: Path, symbols: list[str]) -> None:
         raise ValueError("pilot symbols are fixed to BTCUSDT and ETHUSDT")
 
 
+def _load_roster(roster_artifact: Path):
+    payload = json.loads(Path(roster_artifact).read_text(encoding="utf-8"))
+    month = payload.get("effective_month")
+    if not isinstance(month, str) or len(month) != 7:
+        raise ValueError("roster artifact must declare effective_month")
+    return replay_roster_artifact(Path(roster_artifact), effective_month=month)
+
+
 def validate_scientific_inputs(manifest_path: Path, *, roster_sha256: str, implementation_commit: str | None = None) -> dict[str, object]:
     """Require an unblocked launch manifest before any scientific collection."""
     return verify_launch_identity(manifest_path, roster_sha256=roster_sha256, implementation_commit=implementation_commit)
@@ -38,7 +46,7 @@ def validate_engineering_shadow_inputs(root: Path, roster_artifact: Path, *, at_
         raise ValueError("ENGINEERING_SHADOW requires a fresh D-backed non-scientific root")
     if require_fresh and resolved.exists() and any(resolved.iterdir()):
         raise ValueError("ENGINEERING_SHADOW root must be fresh and empty")
-    roster = replay_roster_artifact(Path(roster_artifact), effective_month="2026-08")
+    roster = _load_roster(roster_artifact)
     now = (at_utc or datetime.now(UTC)).astimezone(UTC)
     if not (datetime.fromisoformat(roster.effective_start) <= now < datetime.fromisoformat(roster.effective_end)):
         raise ValueError("August roster is outside its engineering-shadow validity window")
@@ -47,12 +55,16 @@ def validate_engineering_shadow_inputs(root: Path, roster_artifact: Path, *, at_
 
 def run_engineering_shadow(root: Path, roster_artifact: Path, *, at_utc: datetime | None = None) -> dict[str, object]:
     symbols, roster_sha256 = validate_engineering_shadow_inputs(root, roster_artifact, at_utc=at_utc, require_fresh=True)
-    return _run_cycle(Path(root), symbols, roster_sha256, evidence_mode="ENGINEERING_SHADOW", ws_seconds=SHADOW_WS_SECONDS)
+    context_only = set()
+    if "BTCUSDT" not in symbols:
+        symbols = [*symbols, "BTCUSDT"]
+        context_only.add("BTCUSDT")
+    return _run_cycle(Path(root), symbols, roster_sha256, evidence_mode="ENGINEERING_SHADOW", ws_seconds=SHADOW_WS_SECONDS, context_only_symbols=context_only)
 
 
 def run_scientific(root: Path, roster_artifact: Path, launch_manifest: Path) -> dict[str, object]:
     """Run the same primary collector path, authorized only by a frozen launch manifest."""
-    roster = replay_roster_artifact(Path(roster_artifact), effective_month="2026-08")
+    roster = _load_roster(roster_artifact)
     manifest = validate_scientific_inputs(launch_manifest, roster_sha256=roster.roster_sha256)
     resolved = Path(root).resolve()
     if resolved.drive.upper() != "D:" or resolved.name in {"raw_v1", "scientific_raw_v1"}:
@@ -96,14 +108,14 @@ async def _shadow_rest_and_ws(collector: ForwardCollector, symbols: list[str], *
     return ws_result
 
 
-def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_mode: str | None = None, ws_seconds: int = SHADOW_WS_SECONDS) -> dict[str, object]:
+def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_mode: str | None = None, ws_seconds: int = SHADOW_WS_SECONDS, context_only_symbols: set[str] | None = None, include_ws: bool = True) -> dict[str, object]:
     cycle_started = datetime.now(UTC)
     roster_sha256 = require_sha256(roster_sha256, "roster_sha256")
     collector = ForwardCollector(AppendOnlyEventStore(root / "raw_v1"))
     clock = collector.client.calibrate_server_clock("um")
     collector.clock_calibration = clock
     ws_result: dict[str, object] | None = None
-    if evidence_mode in {"ENGINEERING_SHADOW", "SCIENTIFIC"}:
+    if evidence_mode in {"ENGINEERING_SHADOW", "SCIENTIFIC"} and include_ws:
         ws_result = asyncio.run(_shadow_rest_and_ws(collector, symbols, ws_seconds=ws_seconds))
         collector.store.append(
             "force_order_status", "um", "ALL", ws_result,
@@ -138,6 +150,8 @@ def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_m
     manifest = build_manifest(root / "raw_v1", previous_manifest_sha256=previous)
     append_manifest(root / "raw_v1", manifest)
     stream_state = {"symbols": symbols, "status": "CYCLE_COMPLETE"}
+    if context_only_symbols:
+        stream_state["context_only_symbols"] = sorted(context_only_symbols)
     if ws_result is not None:
         stream_state["force_order_ws"] = ws_result
     gap_states = {"POLL_GAP", "RATE_LIMIT_GAP", "SEQUENCE_GAP", "RESTART_GAP"}
@@ -155,6 +169,53 @@ def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_m
             restart_count += int(state == "RESTART_GAP")
     write_health_receipt(root, raw_root=root / "raw_v1", campaign_id="r3_prospective_context_v1", manifest_sha256=manifest["manifest_sha256"], roster_sha256=roster_sha256, stream_state=stream_state, restart_count=restart_count, gap_count=gap_count, evidence_mode=evidence_mode)
     return manifest
+
+
+def run_scientific_forever(root: Path, roster_artifact: Path, launch_manifest: Path, *, max_cycles: int | None = None, interval_seconds: int = 900, stop_event: asyncio.Event | None = None) -> None:
+    """Persistent scientific architecture with one WS worker and grid REST cycles.
+
+    The function is intentionally not invoked by the CLI before launch gates
+    authorize it.  ``max_cycles`` exists only for outcome-blind qualification.
+    """
+    roster = _load_roster(roster_artifact)
+    manifest = validate_scientific_inputs(launch_manifest, roster_sha256=roster.roster_sha256)
+    resolved = Path(root).resolve()
+    if resolved.drive.upper() != "D:":
+        raise ValueError("SCIENTIFIC requires a D-backed root")
+    symbols = list(roster.symbols)
+    context_only = set()
+    if "BTCUSDT" not in symbols:
+        symbols.append("BTCUSDT")
+        context_only.add("BTCUSDT")
+
+    async def _run() -> None:
+        collector = ForwardCollector(AppendOnlyEventStore(resolved / "raw_v1"))
+        ws_stop = asyncio.Event()
+        async def ws_worker() -> None:
+            try:
+                async for _ in collector.stream_liquidations("ALL", evidence_mode="SCIENTIFIC"):
+                    if ws_stop.is_set():
+                        return
+            except asyncio.CancelledError:
+                return
+        ws_task = asyncio.create_task(ws_worker())
+        cycles = 0
+        try:
+            while max_cycles is None or cycles < max_cycles:
+                if stop_event is not None and stop_event.is_set():
+                    break
+                _run_cycle(resolved, symbols, roster.roster_sha256, evidence_mode="SCIENTIFIC", context_only_symbols=context_only, include_ws=False)
+                cycles += 1
+                if max_cycles is not None and cycles >= max_cycles:
+                    break
+                await asyncio.sleep(interval_seconds)
+        finally:
+            ws_stop.set()
+            ws_task.cancel()
+            await asyncio.gather(ws_task, return_exceptions=True)
+            (resolved / "health" / "shutdown_receipt.json").parent.mkdir(parents=True, exist_ok=True)
+            (resolved / "health" / "shutdown_receipt.json").write_text(json.dumps({"evidence_mode": "SCIENTIFIC", "cycles": cycles, "status": "SHUTDOWN_FINALIZED", "launch_manifest": str(launch_manifest), "implementation_commit": manifest.get("implementation_commit")}, sort_keys=True) + "\n", encoding="utf-8")
+    asyncio.run(_run())
 
 
 def run_once(root: Path, symbols: list[str], roster_sha256: str) -> dict[str, object]:
@@ -220,7 +281,7 @@ def main() -> int:
         if args.symbols:
             parser.error("--symbols cannot be combined with --roster-artifact")
         if args.launch_manifest is not None:
-            validate_scientific_inputs(args.launch_manifest, roster_sha256=replay_roster_artifact(args.roster_artifact, effective_month="2026-08").roster_sha256)
+            validate_scientific_inputs(args.launch_manifest, roster_sha256=_load_roster(args.roster_artifact).roster_sha256)
         if args.interval_seconds is not None:
             parser.error("roster-driven ENGINEERING_SHADOW is one-shot; do not use --interval-seconds")
         run_engineering_shadow(args.root, args.roster_artifact)
