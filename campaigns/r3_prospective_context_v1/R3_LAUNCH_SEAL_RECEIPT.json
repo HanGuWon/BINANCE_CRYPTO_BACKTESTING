@@ -1,0 +1,17 @@
+{
+  "campaign_id": "r3_prospective_context_v1",
+  "seal_type": "BLOCKING_SEAL",
+  "status": "R3_BLOCKED_ROSTER_PROVENANCE",
+  "implementation_commit": "0d6a56dca2d36d1ac759528bcd0d3ea47baa42b4",
+  "source_tree_sha256": "16adf9ce429ab04172a8244cf6b4e1b3644b8e9fdb4648167924e6ad15d990b4",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "superseded_ready_manifest_sha256": "e56319f1f5880acbd9d852f428796f8dff66ad66305a9d2afe1091d1d908b4e9",
+  "blocked_manifest_sha256": "6bed78e0c544249ece7faad9d8bdb1fd4ae3488c721eb029a9e4d65d3bbd1cc5",
+  "canonical_august_roster_sha256": "ec2609bb7df0019984d41be3c5f18154591f5c8735a71557de7207c5606a00cc",
+  "september_roster_status": "BLOCKED_NO_COMPLETED_AUGUST_RANKING",
+  "engineering_shadow_status": "NOT_RUN",
+  "scientific_activation": "NOT_ACTIVATED",
+  "final_holdout_status": "UNTOUCHED",
+  "r2b2_status": "NOT_STARTED",
+  "sealed_at": "2026-08-30T11:31:58.1175107+09:00"
+}

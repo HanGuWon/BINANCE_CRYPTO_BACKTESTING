@@ -1,5 +1,5 @@
 campaign_id = "r3_prospective_context_v1"
-status = "R3_BLOCKED_FINAL_LAUNCH_CONFORMANCE"
+status = "R3_BLOCKED_ROSTER_PROVENANCE"
 market = "um"
 data_scope = "binance_public_market_data_only"
 final_holdout_status = "UNTOUCHED"
