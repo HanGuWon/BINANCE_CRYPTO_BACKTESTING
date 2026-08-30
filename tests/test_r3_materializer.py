@@ -72,3 +72,8 @@ def test_normalized_kline_uses_payload_value_and_causal_availability() -> None:
 def test_scientific_materializer_rejects_engineering_rows() -> None:
     with pytest.raises(ValueError, match="SCIENTIFIC"):
         materialize_causal_observations([_event(1000, "2024-01-01T00:00:01Z", 1, evidence_mode="ENGINEERING_SHADOW")], ["2024-01-01T00:00:02Z"], evidence_mode="SCIENTIFIC")
+
+
+def test_clock_uncertainty_gap_is_preserved() -> None:
+    rows = materialize_causal_observations([_event(1000, "2024-01-01T00:00:01Z", 1, continuity_state="CLOCK_UNCERTAINTY_GAP")], ["2024-01-01T00:00:02Z"])
+    assert rows.iloc[0]["data_quality_state"] == "CLOCK_UNCERTAINTY_GAP"
