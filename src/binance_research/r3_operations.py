@@ -132,6 +132,37 @@ def verify_launch_identity(manifest_path: Path, *, roster_sha256: str, implement
     return manifest
 
 
+def verify_scientific_launch_identity(manifest_path: Path, *, expected: dict[str, Any]) -> dict[str, Any]:
+    """Fail closed when any pinned scientific contract identity is absent or mismatched."""
+    manifest = verify_launch_identity(manifest_path, roster_sha256=str(expected["roster_sha256"]), implementation_commit=str(expected.get("implementation_commit")) if expected.get("implementation_commit") else None)
+    for field, value in expected.items():
+        if manifest.get(field) != value:
+            raise LaunchIdentityError(f"scientific launch identity mismatch: {field}")
+    return manifest
+
+
+def cycle_metadata(*, cycle_id: str, target_bar_open: str, target_bar_close: str, scheduled_collection_time: str, actual_collection_start: str, cycle_completed_at: str, clock_calibration_id: str, eligible_next_execution_time: str) -> dict[str, str]:
+    """Return the canonical machine-readable cycle timing record."""
+    return {"cycle_id": cycle_id, "target_bar_open": target_bar_open, "target_bar_close": target_bar_close, "scheduled_collection_time": scheduled_collection_time, "actual_collection_start": actual_collection_start, "cycle_completed_at": cycle_completed_at, "clock_calibration_id": clock_calibration_id, "eligible_next_execution_time": eligible_next_execution_time}
+
+
+def finalize_segment(segment_path: Path, receipt_path: Path) -> dict[str, Any]:
+    """Write or verify an immutable bounded segment receipt."""
+    segment_path, receipt_path = Path(segment_path), Path(receipt_path)
+    if not segment_path.is_file():
+        raise ValueError("segment does not exist")
+    rows = [json.loads(line) for line in segment_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    record = {"path": str(segment_path), "rows": len(rows), "bytes": segment_path.stat().st_size, "sha256": _sha256(segment_path), "first_event_time": next((r.get("exchange_event_time") for r in rows if r.get("exchange_event_time") is not None), None), "last_event_time": next((r.get("exchange_event_time") for r in reversed(rows) if r.get("exchange_event_time") is not None), None), "first_receipt_time": next((r.get("collector_receipt_time") for r in rows if r.get("collector_receipt_time") is not None), None), "last_receipt_time": next((r.get("collector_receipt_time") for r in reversed(rows) if r.get("collector_receipt_time") is not None), None), "status": "FINALIZED"}
+    if receipt_path.exists():
+        prior = json.loads(receipt_path.read_text(encoding="utf-8"))
+        if prior != record:
+            raise ValueError("finalized segment is immutable and receipt changed")
+        return prior
+    receipt_path.parent.mkdir(parents=True, exist_ok=True)
+    receipt_path.write_text(json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n", encoding="utf-8")
+    return record
+
+
 def verify_manifest_chain(path: Path) -> bool:
     previous = None
     for line in Path(path).read_text(encoding="utf-8").splitlines():

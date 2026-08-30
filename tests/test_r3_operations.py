@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from binance_research.collector import AppendOnlyEventStore
-from binance_research.r3_operations import CollectorLockError, LaunchIdentityError, append_manifest, append_segment_manifest, build_manifest, require_sha256, single_instance_lock, verify_engineering_shadow_root, verify_launch_identity, verify_manifest_chain, write_health_receipt, write_pilot_receipt
+from binance_research.r3_operations import CollectorLockError, LaunchIdentityError, append_manifest, append_segment_manifest, build_manifest, cycle_metadata, finalize_segment, require_sha256, single_instance_lock, verify_engineering_shadow_root, verify_launch_identity, verify_manifest_chain, verify_scientific_launch_identity, write_health_receipt, write_pilot_receipt
 
 
 def test_manifest_chain_is_hash_linked_and_append_only(tmp_path: Path) -> None:
@@ -60,6 +60,28 @@ def test_engineering_shadow_root_verifier_binds_manifest_health_and_roster(tmp_p
     result = verify_engineering_shadow_root(tmp_path, expected_symbols=["BTCUSDT"], roster_sha256="a" * 64)
     assert result["rows"] == 1
     assert result["symbols"] == 1
+
+
+def test_scientific_identity_requires_exact_roster_and_contract_fields(tmp_path: Path) -> None:
+    launch = tmp_path / "launch.json"
+    body = {"status": "R3_READY_FOR_PROSPECTIVE_LAUNCH", "pilot_status": "VERIFIED", "campaign_id": "r3_prospective_context_v1", "roster_sha256": "a" * 64, "implementation_commit": "c"}
+    launch.write_text(json.dumps(body), encoding="utf-8")
+    with pytest.raises(LaunchIdentityError, match="source_tree_sha256"):
+        verify_scientific_launch_identity(launch, expected={**body, "source_tree_sha256": "b" * 64})
+
+
+def test_cycle_metadata_and_finalized_segment_are_immutable(tmp_path: Path) -> None:
+    metadata = cycle_metadata(cycle_id="c1", target_bar_open="2026-08-30T00:00:00Z", target_bar_close="2026-08-30T00:15:00Z", scheduled_collection_time="2026-08-30T00:15:01Z", actual_collection_start="2026-08-30T00:15:01Z", cycle_completed_at="2026-08-30T00:15:02Z", clock_calibration_id="clk1", eligible_next_execution_time="2026-08-30T00:30:00Z")
+    assert metadata["cycle_id"] == "c1"
+    segment = tmp_path / "segment.jsonl"
+    segment.write_text(json.dumps({"exchange_event_time": "2026-08-30T00:15:00Z", "collector_receipt_time": "2026-08-30T00:15:01Z"}) + "\n", encoding="utf-8")
+    receipt = tmp_path / "segment.receipt.json"
+    first = finalize_segment(segment, receipt)
+    assert first["status"] == "FINALIZED"
+    assert finalize_segment(segment, receipt) == first
+    segment.write_text(segment.read_text(encoding="utf-8") + "{}\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="immutable"):
+        finalize_segment(segment, receipt)
 
 
 def test_manifest_chain_tamper_is_rejected(tmp_path: Path) -> None:
