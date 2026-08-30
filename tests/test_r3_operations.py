@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from binance_research.collector import AppendOnlyEventStore
 from binance_research.r3_operations import CollectorLockError, LaunchIdentityError, append_manifest, append_segment_manifest, build_manifest, require_sha256, single_instance_lock, verify_launch_identity, verify_manifest_chain, write_health_receipt, write_pilot_receipt
 
 
@@ -36,6 +37,16 @@ def test_health_receipt_contains_operational_identity(tmp_path: Path) -> None:
     assert receipt["manifest_sha256"] == "a" * 64
     assert receipt["stream_state"]["premium"] == "OK"
     assert path.parent.parent == tmp_path
+
+
+def test_shadow_event_envelopes_are_explicitly_labeled(tmp_path: Path) -> None:
+    path = AppendOnlyEventStore(tmp_path).append(
+        "premium", "um", "BTCUSDT", {"value": 0.0},
+        endpoint="/fapi/v1/premiumIndex", evidence_mode="ENGINEERING_SHADOW",
+    )
+    envelope = json.loads(path.read_text(encoding="utf-8").splitlines()[0])
+    assert envelope["evidence_mode"] == "ENGINEERING_SHADOW"
+    assert envelope["source_kind"] == "rest_snapshot"
 
 
 def test_manifest_chain_tamper_is_rejected(tmp_path: Path) -> None:

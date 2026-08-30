@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
+import json
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -45,24 +47,78 @@ def run_engineering_shadow(root: Path, roster_artifact: Path, *, at_utc: datetim
     return _run_cycle(Path(root), symbols, roster_sha256, evidence_mode="ENGINEERING_SHADOW")
 
 
+async def _shadow_rest_and_ws(collector: ForwardCollector, symbols: list[str], *, ws_seconds: int = 5) -> dict[str, object]:
+    """Run the roster REST snapshot while a forceOrder WS listener is alive."""
+    def collect_rest() -> None:
+        for symbol in symbols:
+            collector.collect_engineering_shadow_snapshot(symbol)
+
+    async def collect_ws() -> dict[str, object]:
+        try:
+            async for _ in collector.stream_liquidations("ALL", evidence_mode="ENGINEERING_SHADOW"):
+                return {"connected": True, "received": True, "event_policy": "persist_raw_only"}
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            return {"connected": False, "received": False, "error": type(exc).__name__}
+        return {"connected": False, "received": False, "error": "stream_ended"}
+
+    ws_task = asyncio.create_task(collect_ws())
+    rest_task = asyncio.create_task(asyncio.to_thread(collect_rest))
+    await rest_task
+    try:
+        ws_result = await asyncio.wait_for(ws_task, timeout=max(1, ws_seconds))
+    except asyncio.TimeoutError:
+        ws_task.cancel()
+        try:
+            await ws_task
+        except asyncio.CancelledError:
+            pass
+        ws_result = {"connected": True, "received": False, "timeout_seconds": max(1, ws_seconds), "event_policy": "persist_raw_only"}
+    except Exception as exc:
+        ws_result = {"connected": False, "received": False, "error": type(exc).__name__}
+    return ws_result
+
+
 def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_mode: str | None = None) -> dict[str, object]:
     roster_sha256 = require_sha256(roster_sha256, "roster_sha256")
     collector = ForwardCollector(AppendOnlyEventStore(root / "raw_v1"))
-    for symbol in symbols:
-        if evidence_mode == "ENGINEERING_SHADOW":
-            collector.collect_engineering_shadow_snapshot(symbol)
-        else:
+    ws_result: dict[str, object] | None = None
+    if evidence_mode == "ENGINEERING_SHADOW":
+        ws_result = asyncio.run(_shadow_rest_and_ws(collector, symbols))
+        collector.store.append(
+            "force_order_status", "um", "ALL", ws_result,
+            source_kind="collector_control", endpoint="wss://fstream.binance.com/market/ws/!forceOrder@arr",
+            continuity_state="SOURCE_TIME_UNAVAILABLE", evidence_mode=evidence_mode,
+        )
+    else:
+        for symbol in symbols:
             collector.collect_r3_um_snapshot(symbol)
     previous = None
     chain = root / "raw_v1" / "manifest_chain.jsonl"
     if chain.exists() and chain.read_text(encoding="utf-8").strip():
-        import json
         if not verify_manifest_chain(chain):
             raise RuntimeError(f"manifest chain failed verification: {chain}")
         previous = json.loads(chain.read_text(encoding="utf-8").splitlines()[-1])["manifest_sha256"]
     manifest = build_manifest(root / "raw_v1", previous_manifest_sha256=previous)
     append_manifest(root / "raw_v1", manifest)
-    write_health_receipt(root, raw_root=root / "raw_v1", campaign_id="r3_prospective_context_v1", manifest_sha256=manifest["manifest_sha256"], roster_sha256=roster_sha256, stream_state={"symbols": symbols, "status": "CYCLE_COMPLETE"}, evidence_mode=evidence_mode)
+    stream_state = {"symbols": symbols, "status": "CYCLE_COMPLETE"}
+    if ws_result is not None:
+        stream_state["force_order_ws"] = ws_result
+    gap_states = {"POLL_GAP", "RATE_LIMIT_GAP", "SEQUENCE_GAP", "RESTART_GAP"}
+    gap_count = 0
+    restart_count = 0
+    for path in (root / "raw_v1").rglob("*.jsonl"):
+        if path.name == "manifest_chain.jsonl":
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                state = json.loads(line).get("continuity_state")
+            except json.JSONDecodeError:
+                continue
+            gap_count += int(state in gap_states)
+            restart_count += int(state == "RESTART_GAP")
+    write_health_receipt(root, raw_root=root / "raw_v1", campaign_id="r3_prospective_context_v1", manifest_sha256=manifest["manifest_sha256"], roster_sha256=roster_sha256, stream_state=stream_state, restart_count=restart_count, gap_count=gap_count, evidence_mode=evidence_mode)
     return manifest
 
 
@@ -78,6 +134,12 @@ def run_forever(root: Path, symbols: list[str], roster_sha256: str, *, interval_
         raise ValueError("R3 polling interval must be a positive divisor of one hour")
     root = Path(root)
     with single_instance_lock(root / "control" / "collector.lock"):
+        # Align the first cycle to the next absolute UTC grid as well as all
+        # subsequent cycles; this prevents a launch-time phase offset.
+        clock = ForwardCollector(AppendOnlyEventStore(root / "raw_v1")).client.calibrate_server_clock("um")
+        server_now = calibrated_now(datetime.now(UTC), clock)
+        boundary = next_quarter_hour(server_now, interval_seconds=interval_seconds)
+        time.sleep(max(0.0, (boundary - server_now).total_seconds()))
         while True:
             _run_cycle(root, symbols, roster_sha256)
             clock = ForwardCollector(AppendOnlyEventStore(root / "raw_v1")).client.calibrate_server_clock("um")
@@ -105,11 +167,23 @@ def run_pilot(root: Path, roster_sha256: str) -> dict[str, object]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, required=True)
-    parser.add_argument("--symbols", nargs="+", required=True)
+    parser.add_argument("--symbols", nargs="+")
+    parser.add_argument("--roster-artifact", type=Path, default=None, help="Use the frozen roster (required for shadow/scientific mode)")
     parser.add_argument("--roster-sha256", required=True)
     parser.add_argument("--launch-manifest", type=Path, default=None)
     parser.add_argument("--interval-seconds", type=int, default=None)
     args = parser.parse_args()
+    if args.roster_artifact is not None:
+        if args.symbols:
+            parser.error("--symbols cannot be combined with --roster-artifact")
+        if args.launch_manifest is not None:
+            validate_scientific_inputs(args.launch_manifest, roster_sha256=replay_roster_artifact(args.roster_artifact, effective_month="2026-08").roster_sha256)
+        if args.interval_seconds is not None:
+            parser.error("roster-driven ENGINEERING_SHADOW is one-shot; do not use --interval-seconds")
+        run_engineering_shadow(args.root, args.roster_artifact)
+        return 0
+    if not args.symbols:
+        parser.error("--symbols is required for legacy engineering pilot mode; scientific/shadow mode requires --roster-artifact")
     symbols = [str(symbol).upper() for symbol in args.symbols]
     if args.launch_manifest is not None:
         validate_scientific_inputs(args.launch_manifest, roster_sha256=args.roster_sha256)
