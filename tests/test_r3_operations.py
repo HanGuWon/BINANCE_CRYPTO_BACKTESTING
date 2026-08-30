@@ -67,6 +67,19 @@ def test_pilot_scope_validator_is_exact() -> None:
         validate_pilot_inputs(Path("C:/tmp/r3_prospective_context_v1"), list(PILOT_SYMBOLS))
 
 
+def test_engineering_shadow_loads_symbols_only_from_valid_roster() -> None:
+    from datetime import UTC, datetime
+    from scripts.run_r3_prospective_collector import validate_engineering_shadow_inputs
+
+    symbols, roster_sha = validate_engineering_shadow_inputs(
+        Path("D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1/engineering_shadow_august_v1"),
+        Path("campaigns/r3_prospective_context_v1/rosters/2026-08.json"),
+        at_utc=datetime(2026, 8, 30, 12, tzinfo=UTC),
+    )
+    assert len(symbols) == 50
+    assert roster_sha == "ec2609bb7df0019984d41be3c5f18154591f5c8735a71557de7207c5606a00cc"
+
+
 def test_stale_pid_lock_is_recovered_but_malformed_lock_is_not(tmp_path: Path) -> None:
     stale = tmp_path / "stale.lock"
     stale.write_text("99999999", encoding="utf-8")

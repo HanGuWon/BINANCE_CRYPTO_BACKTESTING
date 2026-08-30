@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from binance_research.collector import AppendOnlyEventStore, ForwardCollector
+from binance_research.r3_universe import replay_roster_artifact
 from binance_research.r3_timing import calibrated_now, next_quarter_hour
 from binance_research.r3_operations import append_manifest, build_manifest, require_sha256, single_instance_lock, verify_launch_identity, verify_manifest_chain, write_health_receipt, write_pilot_receipt
 
@@ -27,11 +28,31 @@ def validate_scientific_inputs(manifest_path: Path, *, roster_sha256: str, imple
     return verify_launch_identity(manifest_path, roster_sha256=roster_sha256, implementation_commit=implementation_commit)
 
 
-def _run_cycle(root: Path, symbols: list[str], roster_sha256: str) -> dict[str, object]:
+def validate_engineering_shadow_inputs(root: Path, roster_artifact: Path, *, at_utc: datetime | None = None) -> tuple[list[str], str]:
+    """Load the August roster; manual symbol lists are not accepted."""
+    resolved = Path(root).resolve()
+    if resolved.drive.upper() != "D:" or resolved.name in {"raw_v1", "scientific_raw_v1"}:
+        raise ValueError("ENGINEERING_SHADOW requires a fresh D-backed non-scientific root")
+    roster = replay_roster_artifact(Path(roster_artifact), effective_month="2026-08")
+    now = (at_utc or datetime.now(UTC)).astimezone(UTC)
+    if not (datetime.fromisoformat(roster.effective_start) <= now < datetime.fromisoformat(roster.effective_end)):
+        raise ValueError("August roster is outside its engineering-shadow validity window")
+    return list(roster.symbols), roster.roster_sha256
+
+
+def run_engineering_shadow(root: Path, roster_artifact: Path, *, at_utc: datetime | None = None) -> dict[str, object]:
+    symbols, roster_sha256 = validate_engineering_shadow_inputs(root, roster_artifact, at_utc=at_utc)
+    return _run_cycle(Path(root), symbols, roster_sha256, evidence_mode="ENGINEERING_SHADOW")
+
+
+def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_mode: str | None = None) -> dict[str, object]:
     roster_sha256 = require_sha256(roster_sha256, "roster_sha256")
     collector = ForwardCollector(AppendOnlyEventStore(root / "raw_v1"))
     for symbol in symbols:
-        collector.collect_r3_um_snapshot(symbol)
+        if evidence_mode == "ENGINEERING_SHADOW":
+            collector.collect_engineering_shadow_snapshot(symbol)
+        else:
+            collector.collect_r3_um_snapshot(symbol)
     previous = None
     chain = root / "raw_v1" / "manifest_chain.jsonl"
     if chain.exists() and chain.read_text(encoding="utf-8").strip():
@@ -41,7 +62,7 @@ def _run_cycle(root: Path, symbols: list[str], roster_sha256: str) -> dict[str, 
         previous = json.loads(chain.read_text(encoding="utf-8").splitlines()[-1])["manifest_sha256"]
     manifest = build_manifest(root / "raw_v1", previous_manifest_sha256=previous)
     append_manifest(root / "raw_v1", manifest)
-    write_health_receipt(root, raw_root=root / "raw_v1", campaign_id="r3_prospective_context_v1", manifest_sha256=manifest["manifest_sha256"], roster_sha256=roster_sha256, stream_state={"symbols": symbols, "status": "CYCLE_COMPLETE"})
+    write_health_receipt(root, raw_root=root / "raw_v1", campaign_id="r3_prospective_context_v1", manifest_sha256=manifest["manifest_sha256"], roster_sha256=roster_sha256, stream_state={"symbols": symbols, "status": "CYCLE_COMPLETE"}, evidence_mode=evidence_mode)
     return manifest
 
 

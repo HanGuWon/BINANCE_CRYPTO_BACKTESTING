@@ -14,7 +14,7 @@ class AppendOnlyEventStore:
     def __init__(self, root: Path) -> None:
         self.root = Path(root)
 
-    def append(self, stream: str, market: str, symbol: str, payload: Any, *, source_kind: str = "rest_snapshot", endpoint: str | None = None, request_params: dict[str, Any] | None = None, continuity_state: str = "COMPLETE", sequence_id: int | str | None = None, response_metadata: RestResponseMetadata | dict[str, Any] | None = None) -> Path:
+    def append(self, stream: str, market: str, symbol: str, payload: Any, *, source_kind: str = "rest_snapshot", endpoint: str | None = None, request_params: dict[str, Any] | None = None, continuity_state: str = "COMPLETE", sequence_id: int | str | None = None, response_metadata: RestResponseMetadata | dict[str, Any] | None = None, evidence_mode: str | None = None) -> Path:
         if continuity_state not in {"COMPLETE", "RESTART_GAP", "POLL_GAP", "SOURCE_TIME_UNAVAILABLE", "SEQUENCE_GAP", "SCHEMA_ERROR", "RATE_LIMIT_GAP"}:
             raise ValueError(f"unknown continuity state: {continuity_state}")
         receipt_time = datetime.now(UTC).isoformat()
@@ -29,6 +29,8 @@ class AppendOnlyEventStore:
                     "collector_receipt_time": receipt_time, "request_params": request_params,
                     "sequence_id": sequence_id, "continuity_state": effective_state,
                     "payload": payload}
+        if evidence_mode is not None:
+            envelope["evidence_mode"] = evidence_mode
         if response_metadata is not None:
             metadata = response_metadata if isinstance(response_metadata, dict) else response_metadata.__dict__
             envelope.update({"http_status": metadata.get("http_status"),
@@ -121,11 +123,13 @@ class ForwardCollector:
         "oi_history": ("/futures/data/openInterestHist", {"period": "5m", "limit": 500}),
         "taker_ratio": ("/futures/data/takerlongshortRatio", {"period": "5m", "limit": 500}),
         "klines_15m": ("/fapi/v1/klines", {"interval": "15m", "limit": 3}),
+        "premium_klines_15m": ("/fapi/v1/premiumIndexKlines", {"interval": "15m", "limit": 3}),
         "top_position_ratio": ("/futures/data/topLongShortPositionRatio", {"period": "5m", "limit": 500}),
         "top_account_ratio": ("/futures/data/topLongShortAccountRatio", {"period": "5m", "limit": 500}),
     }
     REQUIRES_API_KEY = frozenset({"top_position_ratio", "top_account_ratio"})
     R3_PUBLIC_STREAMS = frozenset({"open_interest", "premium", "book_ticker", "depth", "agg_trades", "oi_history", "taker_ratio", "klines_15m"})
+    R3_SHADOW_STREAMS = frozenset({"open_interest", "premium", "book_ticker", "klines_15m", "premium_klines_15m"})
     # USD-M REST reference weights for the exact request shapes above.  The
     # two /futures/data endpoints are documented as IP weight 0; telemetry is
     # still retained and any contradictory header fails the launch gate.
@@ -157,7 +161,11 @@ class ForwardCollector:
         """Collect only the explicitly public R3 v1 streams."""
         return self._collect_snapshot(symbol, self.R3_PUBLIC_STREAMS)
 
-    def _collect_snapshot(self, symbol: str, streams: frozenset[str]) -> list[Path]:
+    def collect_engineering_shadow_snapshot(self, symbol: str) -> list[Path]:
+        """Collect roster-required primary sources with explicit evidence mode."""
+        return self._collect_snapshot(symbol, self.R3_SHADOW_STREAMS, evidence_mode="ENGINEERING_SHADOW")
+
+    def _collect_snapshot(self, symbol: str, streams: frozenset[str], *, evidence_mode: str | None = None) -> list[Path]:
         paths: list[Path] = []
         for stream in sorted(streams):
             endpoint, defaults = self.UM_ENDPOINTS[stream]
@@ -169,19 +177,19 @@ class ForwardCollector:
                 else:
                     payload = self.client.get("um", endpoint, params)
             except IPBanFatalError as exc:
-                paths.append(self.store.append("collector_status", "um", symbol, {"stream": stream, "error": type(exc).__name__, "fatal": True}, source_kind="collector_control", endpoint=endpoint, request_params=params, continuity_state="POLL_GAP"))
+                paths.append(self.store.append("collector_status", "um", symbol, {"stream": stream, "error": type(exc).__name__, "fatal": True}, source_kind="collector_control", endpoint=endpoint, request_params=params, continuity_state="POLL_GAP", evidence_mode=evidence_mode))
                 raise
             except RateLimitGapError as exc:
-                paths.append(self.store.append("collector_status", "um", symbol, {"stream": stream, "error": type(exc).__name__, "retry_after": exc.retry_after}, source_kind="collector_control", endpoint=endpoint, request_params=params, continuity_state="RATE_LIMIT_GAP", response_metadata={"headers": exc.headers}))
+                paths.append(self.store.append("collector_status", "um", symbol, {"stream": stream, "error": type(exc).__name__, "retry_after": exc.retry_after}, source_kind="collector_control", endpoint=endpoint, request_params=params, continuity_state="RATE_LIMIT_GAP", response_metadata={"headers": exc.headers}, evidence_mode=evidence_mode))
                 continue
             except Exception as exc:
                 state = "RATE_LIMIT_GAP" if "429" in str(exc) or "rate" in str(exc).lower() else "POLL_GAP"
-                paths.append(self.store.append("collector_status", "um", symbol, {"stream": stream, "error": type(exc).__name__}, source_kind="collector_control", endpoint=endpoint, request_params=params, continuity_state=state))
+                paths.append(self.store.append("collector_status", "um", symbol, {"stream": stream, "error": type(exc).__name__}, source_kind="collector_control", endpoint=endpoint, request_params=params, continuity_state=state, evidence_mode=evidence_mode))
                 continue
-            paths.append(self.store.append(stream, "um", symbol, payload, source_kind="rest_snapshot", endpoint=endpoint, request_params=params, response_metadata=response_metadata))
+            paths.append(self.store.append(stream, "um", symbol, payload, source_kind="rest_snapshot", endpoint=endpoint, request_params=params, response_metadata=response_metadata, evidence_mode=evidence_mode))
         return paths
 
-    async def stream_liquidations(self, symbol: str = "ALL") -> AsyncIterator[dict[str, Any]]:
+    async def stream_liquidations(self, symbol: str = "ALL", *, evidence_mode: str | None = None) -> AsyncIterator[dict[str, Any]]:
         """Yield and persist raw USD-M force-order stream events."""
         try:
             import websockets
@@ -200,11 +208,11 @@ class ForwardCollector:
                         events = decoded if isinstance(decoded, list) else [decoded]
                         for payload in events:
                             market, event_symbol = route_liquidation_event(payload, symbol)
-                            self.store.append("liquidation", market, event_symbol, payload, source_kind="websocket_event", endpoint=url, sequence_id=payload.get("u") or payload.get("U"))
+                            self.store.append("liquidation", market, event_symbol, payload, source_kind="websocket_event", endpoint=url, sequence_id=payload.get("u") or payload.get("U"), evidence_mode=evidence_mode)
                             yield payload
             except asyncio.CancelledError:
                 raise
             except Exception as exc:
-                self.store.append("collector_status", "um", symbol, {"error": type(exc).__name__}, source_kind="collector_control", endpoint=url, continuity_state="RESTART_GAP")
+                self.store.append("collector_status", "um", symbol, {"error": type(exc).__name__}, source_kind="collector_control", endpoint=url, continuity_state="RESTART_GAP", evidence_mode=evidence_mode)
                 await asyncio.sleep(backoff)
                 backoff = min(backoff * 2, 30)

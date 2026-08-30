@@ -35,3 +35,10 @@ def test_launch_manifest_blocks_unverified_pilot_boundary() -> None:
     assert manifest["pilot_status"] == "ENGINEERING_PILOT_ONLY"
     assert manifest["final_holdout_status"] == "UNTOUCHED"
     assert manifest["r2b2_status"] == "NOT_STARTED"
+
+
+def test_temporal_gate_distinguishes_waiting_from_permanent_block() -> None:
+    gate = json.loads((CAMPAIGN / "R3_TEMPORAL_GATE_RECEIPT.json").read_text(encoding="utf-8"))
+    assert gate["stage"] == "A"
+    assert gate["september_roster_status"] == "R3_WAITING_FOR_COMPLETED_AUGUST_RANKING"
+    assert gate["required_boundary_utc"] == "2026-09-01T00:00:00Z"
