@@ -1,0 +1,24 @@
+{
+  "campaign_id": "r3_prospective_context_v1",
+  "exact_set_match": true,
+  "final_holdout": "UNTOUCHED",
+  "generated_at": "2026-08-30T10:22:26.329794+00:00",
+  "implementation_commit": "b9f1f2a3b14b24b8f72629fe57d0e1748040aa03",
+  "outcomes_accessed": false,
+  "reason": "launch manifest remains blocked by September roster provenance; parity is path/stream contract only",
+  "scientific_mode_authorized": false,
+  "scientific_primary_streams": [
+    "book_ticker",
+    "klines_15m",
+    "open_interest",
+    "premium",
+    "premium_klines_15m"
+  ],
+  "shadow_primary_streams": [
+    "book_ticker",
+    "klines_15m",
+    "open_interest",
+    "premium",
+    "premium_klines_15m"
+  ]
+}
