@@ -8,7 +8,7 @@ from pathlib import Path
 
 from binance_research.collector import AppendOnlyEventStore, ForwardCollector
 from binance_research.r3_timing import calibrated_now, next_quarter_hour
-from binance_research.r3_operations import append_manifest, build_manifest, require_sha256, single_instance_lock, verify_manifest_chain, write_health_receipt, write_pilot_receipt
+from binance_research.r3_operations import append_manifest, build_manifest, require_sha256, single_instance_lock, verify_launch_identity, verify_manifest_chain, write_health_receipt, write_pilot_receipt
 
 PILOT_SYMBOLS = ("BTCUSDT", "ETHUSDT")
 PILOT_ROOT_NAME = "r3_prospective_context_v1"
@@ -20,6 +20,11 @@ def validate_pilot_inputs(root: Path, symbols: list[str]) -> None:
         raise ValueError("pilot root must be D-backed .../r3_prospective_context_v1")
     if tuple(sorted(symbols)) != PILOT_SYMBOLS:
         raise ValueError("pilot symbols are fixed to BTCUSDT and ETHUSDT")
+
+
+def validate_scientific_inputs(manifest_path: Path, *, roster_sha256: str, implementation_commit: str | None = None) -> dict[str, object]:
+    """Require an unblocked launch manifest before any scientific collection."""
+    return verify_launch_identity(manifest_path, roster_sha256=roster_sha256, implementation_commit=implementation_commit)
 
 
 def _run_cycle(root: Path, symbols: list[str], roster_sha256: str) -> dict[str, object]:
@@ -81,9 +86,12 @@ def main() -> int:
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--symbols", nargs="+", required=True)
     parser.add_argument("--roster-sha256", required=True)
+    parser.add_argument("--launch-manifest", type=Path, default=None)
     parser.add_argument("--interval-seconds", type=int, default=None)
     args = parser.parse_args()
     symbols = [str(symbol).upper() for symbol in args.symbols]
+    if args.launch_manifest is not None:
+        validate_scientific_inputs(args.launch_manifest, roster_sha256=args.roster_sha256)
     if args.interval_seconds is None:
         run_once(args.root, symbols, args.roster_sha256)
     else:

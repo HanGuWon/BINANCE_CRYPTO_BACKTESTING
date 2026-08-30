@@ -15,6 +15,32 @@ class CollectorLockError(RuntimeError):
     pass
 
 
+class LaunchIdentityError(RuntimeError):
+    pass
+
+
+def _pid_is_alive(pid: int) -> bool:
+    """Probe a PID without Windows ``os.kill(..., 0)`` console side effects."""
+    if pid == os.getpid():
+        return True
+    if os.name != "nt":
+        try:
+            os.kill(pid, 0)
+            return True
+        except OSError:
+            return False
+    try:
+        import ctypes
+
+        handle = ctypes.windll.kernel32.OpenProcess(0x1000, False, pid)  # QUERY_LIMITED_INFORMATION
+        if handle:
+            ctypes.windll.kernel32.CloseHandle(handle)
+            return True
+    except Exception:
+        pass
+    return False
+
+
 def require_sha256(value: str, field: str) -> str:
     if len(value) != 64 or any(char not in "0123456789abcdefABCDEF" for char in value):
         raise ValueError(f"{field} must be a hexadecimal SHA256")
@@ -36,7 +62,18 @@ def single_instance_lock(path: Path) -> Iterator[None]:
     try:
         descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
     except FileExistsError as exc:
-        raise CollectorLockError(f"collector lock already held: {path}") from exc
+        # Recover only demonstrably stale PID locks; a live or malformed lock
+        # remains a hard collision and is never silently removed.
+        try:
+            pid = int(path.read_text(encoding="utf-8").strip())
+            if _pid_is_alive(pid):
+                raise CollectorLockError(f"collector lock already held: {path}") from exc
+            path.unlink(missing_ok=True)
+            descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except (ValueError, FileNotFoundError):
+            raise CollectorLockError(f"collector lock already held: {path}") from exc
+        except OSError as probe:
+            raise CollectorLockError(f"collector lock owner cannot be inspected: {path}") from probe
     try:
         os.write(descriptor, str(os.getpid()).encode())
         yield
@@ -66,6 +103,33 @@ def append_manifest(root: Path, manifest: dict[str, Any]) -> Path:
         handle.flush()
         os.fsync(handle.fileno())
     return destination
+
+
+def append_segment_manifest(root: Path, manifest: dict[str, Any], *, segment_id: str) -> Path:
+    """Append a hash-linked manifest to an isolated segment file."""
+    if not segment_id or any(char in segment_id for char in "/\\"):
+        raise ValueError("segment_id must be a non-empty path-safe identifier")
+    destination = Path(root) / "segments" / f"segment_{segment_id}.jsonl"
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with destination.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(manifest, sort_keys=True, separators=(",", ":")) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    return destination
+
+
+def verify_launch_identity(manifest_path: Path, *, roster_sha256: str, implementation_commit: str | None = None) -> dict[str, Any]:
+    """Load a launch manifest and fail closed on blocked/mismatched identity."""
+    manifest = json.loads(Path(manifest_path).read_text(encoding="utf-8"))
+    if manifest.get("status") != "R3_READY_FOR_PROSPECTIVE_LAUNCH":
+        raise LaunchIdentityError(f"launch manifest status is {manifest.get('status')!r}")
+    if manifest.get("pilot_status") == "ENGINEERING_PILOT_ONLY":
+        raise LaunchIdentityError("engineering pilot identity cannot authorize scientific collection")
+    if manifest.get("roster_sha256") not in {None, roster_sha256}:
+        raise LaunchIdentityError("roster SHA does not match launch manifest")
+    if implementation_commit and manifest.get("implementation_commit") != implementation_commit:
+        raise LaunchIdentityError("implementation commit does not match launch manifest")
+    return manifest
 
 
 def verify_manifest_chain(path: Path) -> bool:

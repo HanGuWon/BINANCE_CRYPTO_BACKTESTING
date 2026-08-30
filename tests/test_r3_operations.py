@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from binance_research.r3_operations import CollectorLockError, append_manifest, build_manifest, require_sha256, single_instance_lock, verify_manifest_chain, write_health_receipt, write_pilot_receipt
+from binance_research.r3_operations import CollectorLockError, LaunchIdentityError, append_manifest, append_segment_manifest, build_manifest, require_sha256, single_instance_lock, verify_launch_identity, verify_manifest_chain, write_health_receipt, write_pilot_receipt
 
 
 def test_manifest_chain_is_hash_linked_and_append_only(tmp_path: Path) -> None:
@@ -65,3 +65,27 @@ def test_pilot_scope_validator_is_exact() -> None:
     validate_pilot_inputs(Path("D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1"), list(PILOT_SYMBOLS))
     with pytest.raises(ValueError):
         validate_pilot_inputs(Path("C:/tmp/r3_prospective_context_v1"), list(PILOT_SYMBOLS))
+
+
+def test_stale_pid_lock_is_recovered_but_malformed_lock_is_not(tmp_path: Path) -> None:
+    stale = tmp_path / "stale.lock"
+    stale.write_text("99999999", encoding="utf-8")
+    with single_instance_lock(stale):
+        assert stale.exists()
+    malformed = tmp_path / "malformed.lock"
+    malformed.write_text("not-a-pid", encoding="utf-8")
+    with pytest.raises(CollectorLockError):
+        with single_instance_lock(malformed):
+            pass
+
+
+def test_segment_manifest_and_launch_identity_fail_closed(tmp_path: Path) -> None:
+    raw = tmp_path / "raw_v1"
+    raw.mkdir()
+    manifest = build_manifest(raw, manifest_id="segment-1")
+    segment = append_segment_manifest(raw, manifest, segment_id="20260829T1200Z")
+    assert segment.exists()
+    launch = tmp_path / "launch.json"
+    launch.write_text(json.dumps({"status": "R3_BLOCKED_FINAL_LAUNCH_CONFORMANCE"}), encoding="utf-8")
+    with pytest.raises(LaunchIdentityError):
+        verify_launch_identity(launch, roster_sha256="a" * 64)
