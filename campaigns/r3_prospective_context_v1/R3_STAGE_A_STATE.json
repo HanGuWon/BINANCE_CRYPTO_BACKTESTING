@@ -1,0 +1,14 @@
+{
+  "campaign_id": "r3_prospective_context_v1",
+  "state": "R3_ENGINEERING_SHADOW_VERIFIED_WAITING_FOR_AUGUST_CLOSE",
+  "stage": "A",
+  "boundary_utc": "2026-09-01T00:00:00Z",
+  "august_roster": "campaigns/r3_prospective_context_v1/rosters/2026-08.json",
+  "august_shadow_receipt": "campaigns/r3_prospective_context_v1/R3_ENGINEERING_SHADOW_AUGUST_RECEIPT.json",
+  "september_roster_state": "R3_WAITING_FOR_COMPLETED_AUGUST_RANKING",
+  "scientific_collection": "NOT_ACTIVE",
+  "historical_outcomes": "NOT_ACCESSED",
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED",
+  "next_action": "After boundary, acquire completed August daily data, build forward September ranking, and rerun all launch gates."
+}

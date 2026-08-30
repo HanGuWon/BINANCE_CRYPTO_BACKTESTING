@@ -1,0 +1,47 @@
+{
+  "campaign_id": "r3_prospective_context_v1",
+  "mode": "ENGINEERING_SHADOW",
+  "status": "VERIFIED_WAITING_FOR_AUGUST_CLOSE",
+  "as_of_utc": "2026-08-30T08:42:29Z",
+  "implementation_commit": "8140320",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "roster_artifact": "campaigns/r3_prospective_context_v1/rosters/2026-08.json",
+  "roster_sha256": "ec2609bb7df0019984d41be3c5f18154591f5c8735a71557de7207c5606a00cc",
+  "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\engineering_shadow_august_v3",
+  "manifest_id": "20260830T084229Z",
+  "manifest_sha256": "1dcc3ed4e6e893a39b6004a130aae0ec783afbbfc6b7d9986a35ad985222b8db",
+  "manifest_chain_verified": true,
+  "symbols": 50,
+  "files": 252,
+  "rows": 252,
+  "bytes": 477038,
+  "stream_rows": {
+    "book_ticker": 50,
+    "klines_15m": 50,
+    "open_interest": 49,
+    "premium": 50,
+    "premium_klines_15m": 50,
+    "force_order_status": 1,
+    "liquidation": 1,
+    "collector_status": 1
+  },
+  "evidence_mode_rows": {"ENGINEERING_SHADOW": 252},
+  "continuity": {"COMPLETE": 150, "POLL_GAP": 1, "SOURCE_TIME_UNAVAILABLE": 101},
+  "gap_count": 1,
+  "restart_count": 0,
+  "force_order_ws": {
+    "connected": true,
+    "received": true,
+    "event_policy": "persist_raw_only",
+    "private_or_order_api": false
+  },
+  "outcomes_accessed": false,
+  "returns_or_pnl_computed": false,
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED",
+  "prior_root_disposition": {
+    "engineering_shadow_august_v1": "SUPERSEDED_INCOMPLETE_WS_TELEMETRY",
+    "engineering_shadow_august_v2": "SUPERSEDED_HEALTH_GAP_TELEMETRY_FIX"
+  },
+  "september_roster": "R3_WAITING_FOR_COMPLETED_AUGUST_RANKING"
+}
