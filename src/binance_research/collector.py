@@ -43,6 +43,7 @@ class AppendOnlyEventStore:
                              "clock_offset_ms": metadata.get("clock_offset_ms"),
                              "clock_round_trip_ms": metadata.get("clock_round_trip_ms"),
                              "clock_uncertainty_ms": metadata.get("clock_uncertainty_ms"),
+                             "clock_calibration_id": metadata.get("clock_calibration_id"),
                              "latency_seconds": metadata.get("latency_seconds"),
                              "request_url": metadata.get("url")})
         descriptor = os.open(destination, os.O_APPEND | os.O_CREAT | os.O_WRONLY, 0o644)
@@ -243,6 +244,7 @@ class ForwardCollector:
                     "clock_offset_ms": float(self.clock_calibration.offset_ms),
                     "clock_round_trip_ms": int(self.clock_calibration.round_trip_ms),
                     "clock_uncertainty_ms": float(self.clock_calibration.round_trip_ms) / 2.0 + 1.0,
+                    "clock_calibration_id": self.clock_calibration.calibration_id,
                     "latency_seconds": response_metadata.latency_seconds,
                     "url": response_metadata.url,
                 }
@@ -281,7 +283,10 @@ class ForwardCollector:
                         events = decoded if isinstance(decoded, list) else [decoded]
                         for payload in events:
                             market, event_symbol = route_liquidation_event(payload, symbol, endpoint=url)
-                            self.store.append("liquidation", market, event_symbol, payload, source_kind="websocket_event", endpoint=url, sequence_id=payload.get("u") or payload.get("U"), evidence_mode=evidence_mode)
+                            response_metadata = None
+                            if self.clock_calibration is not None:
+                                response_metadata = {"corrected_response_receipt_time": datetime.now(UTC).isoformat(), "clock_offset_ms": float(self.clock_calibration.offset_ms), "clock_round_trip_ms": int(self.clock_calibration.round_trip_ms), "clock_uncertainty_ms": float(self.clock_calibration.round_trip_ms) / 2.0 + 1.0, "clock_calibration_id": self.clock_calibration.calibration_id}
+                            self.store.append("liquidation", market, event_symbol, payload, source_kind="websocket_event", endpoint=url, sequence_id=payload.get("u") or payload.get("U"), response_metadata=response_metadata, evidence_mode=evidence_mode)
                             yield payload
             except asyncio.CancelledError:
                 raise

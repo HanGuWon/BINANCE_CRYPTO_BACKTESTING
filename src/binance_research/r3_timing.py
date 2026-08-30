@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+import hashlib
 
 COLLECTION_DELAY_SECONDS = 5
 
@@ -17,6 +18,11 @@ class ClockCalibration:
     server_ms: int
     offset_ms: float
     round_trip_ms: int
+
+    @property
+    def calibration_id(self) -> str:
+        body = f"{self.local_before_ms}|{self.local_after_ms}|{self.server_ms}|{self.offset_ms:.6f}|{self.round_trip_ms}"
+        return "cal-" + hashlib.sha256(body.encode("ascii")).hexdigest()[:24]
 
 
 def calibrate_server_clock(*, local_before_ms: int, server_ms: int, local_after_ms: int) -> ClockCalibration:

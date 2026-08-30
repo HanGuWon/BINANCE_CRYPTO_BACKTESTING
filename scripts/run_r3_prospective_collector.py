@@ -5,17 +5,27 @@ import argparse
 import asyncio
 import json
 import time
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from binance_research.collector import AppendOnlyEventStore, ForwardCollector
 from binance_research.r3_universe import replay_roster_artifact
-from binance_research.r3_timing import calibrated_now, next_quarter_hour
+from binance_research.r3_timing import calibrated_now, cycle_boundaries, next_quarter_hour
 from binance_research.r3_operations import append_manifest, build_manifest, cycle_metadata, require_sha256, single_instance_lock, verify_launch_identity, verify_manifest_chain, write_health_receipt, write_pilot_receipt
 
 PILOT_SYMBOLS = ("BTCUSDT", "ETHUSDT")
 PILOT_ROOT_NAME = "r3_prospective_context_v1"
 SHADOW_WS_SECONDS = 5
+
+
+def first_scheduled_boundary(local_now: datetime, calibration, *, interval_seconds: int = 900) -> tuple[datetime, datetime]:
+    """Return the next absolute boundary and its frozen collection time."""
+    boundary = next_quarter_hour(calibrated_now(local_now, calibration), interval_seconds=interval_seconds)
+    return boundary, boundary + timedelta(seconds=5)
+
+
+def clock_uncertainty_eligible(uncertainty_ms: float, *, threshold_ms: float = 2000.0) -> bool:
+    return float(uncertainty_ms) <= float(threshold_ms)
 
 
 def validate_pilot_inputs(root: Path, symbols: list[str]) -> None:
@@ -113,33 +123,36 @@ async def _shadow_rest_and_ws(collector: ForwardCollector, symbols: list[str], *
     return ws_result
 
 
-def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_mode: str | None = None, ws_seconds: int = SHADOW_WS_SECONDS, context_only_symbols: set[str] | None = None, include_ws: bool = True) -> dict[str, object]:
+def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_mode: str | None = None, ws_seconds: int = SHADOW_WS_SECONDS, context_only_symbols: set[str] | None = None, include_ws: bool = True, boundary: datetime | None = None) -> dict[str, object]:
     cycle_started = datetime.now(UTC)
     roster_sha256 = require_sha256(roster_sha256, "roster_sha256")
     collector = ForwardCollector(AppendOnlyEventStore(root / "raw_v1"))
     clock = collector.client.calibrate_server_clock("um")
     collector.clock_calibration = clock
     clock_uncertainty_ms = clock.round_trip_ms / 2.0 + 1.0
+    calibration_id = clock.calibration_id
+    scientifically_eligible = clock_uncertainty_eligible(clock_uncertainty_ms)
     if clock_uncertainty_ms > 2000:
         collector.store.append(
             "clock_status", "um", "ALL",
-            {"status": "CLOCK_UNCERTAINTY_GAP", "offset_ms": clock.offset_ms, "round_trip_ms": clock.round_trip_ms, "uncertainty_ms": clock_uncertainty_ms},
+            {"status": "CLOCK_UNCERTAINTY_GAP", "calibration_id": calibration_id, "offset_ms": clock.offset_ms, "round_trip_ms": clock.round_trip_ms, "uncertainty_ms": clock_uncertainty_ms},
             source_kind="collector_control", endpoint="/fapi/v1/time", continuity_state="CLOCK_UNCERTAINTY_GAP", evidence_mode=evidence_mode,
         )
     ws_result: dict[str, object] | None = None
-    if evidence_mode in {"ENGINEERING_SHADOW", "SCIENTIFIC"} and include_ws:
+    target_boundary = (boundary or next_quarter_hour(calibrated_now(cycle_started, clock))).astimezone(UTC)
+    if scientifically_eligible and evidence_mode in {"ENGINEERING_SHADOW", "SCIENTIFIC"} and include_ws:
         ws_result = asyncio.run(_shadow_rest_and_ws(collector, symbols, evidence_mode=evidence_mode or "ENGINEERING_SHADOW", ws_seconds=ws_seconds))
         collector.store.append(
             "force_order_status", "um", "ALL", ws_result,
             source_kind="collector_control", endpoint="wss://fstream.binance.com/market/ws/!forceOrder@arr",
             continuity_state="SOURCE_TIME_UNAVAILABLE", evidence_mode=evidence_mode,
         )
-    else:
+    elif scientifically_eligible:
         for symbol in symbols:
             collector.collect_r3_um_snapshot(symbol, evidence_mode=evidence_mode)
     collector.store.append(
         "clock_calibration", "um", "ALL",
-        {"calibration_id": f"cal-{datetime.now(UTC).strftime('%Y%m%dT%H%M%S%fZ')}", "offset_ms": clock.offset_ms, "round_trip_ms": clock.round_trip_ms, "uncertainty_ms": clock.round_trip_ms / 2.0 + 1.0},
+        {"calibration_id": calibration_id, "offset_ms": clock.offset_ms, "round_trip_ms": clock.round_trip_ms, "uncertainty_ms": clock.round_trip_ms / 2.0 + 1.0},
         source_kind="collector_control", endpoint="/fapi/v1/time", continuity_state="COMPLETE", evidence_mode=evidence_mode,
     )
     cycle_finished = datetime.now(UTC)
@@ -147,10 +160,10 @@ def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_m
         "cycle_metadata", "um", "ALL",
         cycle_metadata(
             cycle_id=f"cycle-{cycle_started.strftime('%Y%m%dT%H%M%S%fZ')}",
-            target_bar_open=cycle_started.isoformat(), target_bar_close=cycle_finished.isoformat(),
-            scheduled_collection_time=cycle_started.isoformat(), actual_collection_start=cycle_started.isoformat(),
-            cycle_completed_at=cycle_finished.isoformat(), clock_calibration_id=f"cal-{cycle_started.strftime('%Y%m%dT%H%M%S%fZ')}",
-            eligible_next_execution_time=datetime.fromtimestamp(cycle_finished.timestamp() + 900, UTC).isoformat(),
+            target_bar_open=cycle_boundaries(target_boundary, actual_start=cycle_started, required_available=cycle_finished)["target_bar_open"], target_bar_close=cycle_boundaries(target_boundary, actual_start=cycle_started, required_available=cycle_finished)["target_bar_close"],
+            scheduled_collection_time=cycle_boundaries(target_boundary, actual_start=cycle_started, required_available=cycle_finished)["scheduled_collection_time"], actual_collection_start=cycle_started.isoformat(),
+            cycle_completed_at=cycle_finished.isoformat(), clock_calibration_id=calibration_id,
+            eligible_next_execution_time=cycle_boundaries(target_boundary, actual_start=cycle_started, required_available=cycle_finished)["eligible_next_execution_time"],
         ), source_kind="collector_control", endpoint="/fapi/v1/time", continuity_state="COMPLETE", evidence_mode=evidence_mode,
     )
     previous = None
@@ -161,7 +174,7 @@ def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_m
         previous = json.loads(chain.read_text(encoding="utf-8").splitlines()[-1])["manifest_sha256"]
     manifest = build_manifest(root / "raw_v1", previous_manifest_sha256=previous)
     append_manifest(root / "raw_v1", manifest)
-    stream_state = {"symbols": symbols, "status": "CYCLE_COMPLETE"}
+    stream_state = {"symbols": symbols, "status": "CYCLE_COMPLETE" if scientifically_eligible else "CLOCK_UNCERTAINTY_GAP", "scientifically_eligible": scientifically_eligible, "calibration_id": calibration_id}
     if context_only_symbols:
         stream_state["context_only_symbols"] = sorted(context_only_symbols)
     if ws_result is not None:
@@ -204,6 +217,8 @@ def run_scientific_forever(root: Path, roster_artifact: Path, launch_manifest: P
 
     async def _run() -> None:
         collector = ForwardCollector(AppendOnlyEventStore(resolved / "raw_v1"))
+        calibration = collector.client.calibrate_server_clock("um")
+        collector.clock_calibration = calibration
         ws_stop = asyncio.Event()
         async def ws_worker() -> None:
             try:
@@ -215,16 +230,18 @@ def run_scientific_forever(root: Path, roster_artifact: Path, launch_manifest: P
         ws_task = asyncio.create_task(ws_worker())
         cycles = 0
         try:
+            boundary, scheduled = first_scheduled_boundary(datetime.now(UTC), calibration, interval_seconds=interval_seconds)
+            await asyncio.sleep(max(0.0, (scheduled - calibrated_now(datetime.now(UTC), calibration)).total_seconds()))
             while max_cycles is None or cycles < max_cycles:
                 if stop_event is not None and stop_event.is_set():
                     break
-                await asyncio.to_thread(_run_cycle, resolved, symbols, roster.roster_sha256, evidence_mode="SCIENTIFIC", context_only_symbols=context_only, include_ws=False)
+                await asyncio.to_thread(_run_cycle, resolved, symbols, roster.roster_sha256, evidence_mode="SCIENTIFIC", context_only_symbols=context_only, include_ws=False, boundary=boundary)
                 cycles += 1
                 if max_cycles is not None and cycles >= max_cycles:
                     break
-                now = datetime.now(UTC)
-                boundary = next_quarter_hour(now, interval_seconds=interval_seconds)
-                await asyncio.sleep(max(0.0, (boundary - now).total_seconds()))
+                boundary = next_quarter_hour(boundary, interval_seconds=interval_seconds)
+                now = calibrated_now(datetime.now(UTC), calibration)
+                await asyncio.sleep(max(0.0, (boundary.timestamp() + 5.0) - now.timestamp()))
         finally:
             ws_stop.set()
             ws_task.cancel()
