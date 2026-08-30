@@ -15,6 +15,7 @@ from binance_research.r3_operations import append_manifest, build_manifest, requ
 
 PILOT_SYMBOLS = ("BTCUSDT", "ETHUSDT")
 PILOT_ROOT_NAME = "r3_prospective_context_v1"
+SHADOW_WS_SECONDS = 5
 
 
 def validate_pilot_inputs(root: Path, symbols: list[str]) -> None:
@@ -44,7 +45,7 @@ def validate_engineering_shadow_inputs(root: Path, roster_artifact: Path, *, at_
 
 def run_engineering_shadow(root: Path, roster_artifact: Path, *, at_utc: datetime | None = None) -> dict[str, object]:
     symbols, roster_sha256 = validate_engineering_shadow_inputs(root, roster_artifact, at_utc=at_utc)
-    return _run_cycle(Path(root), symbols, roster_sha256, evidence_mode="ENGINEERING_SHADOW")
+    return _run_cycle(Path(root), symbols, roster_sha256, evidence_mode="ENGINEERING_SHADOW", ws_seconds=SHADOW_WS_SECONDS)
 
 
 async def _shadow_rest_and_ws(collector: ForwardCollector, symbols: list[str], *, ws_seconds: int = 5) -> dict[str, object]:
@@ -80,12 +81,12 @@ async def _shadow_rest_and_ws(collector: ForwardCollector, symbols: list[str], *
     return ws_result
 
 
-def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_mode: str | None = None) -> dict[str, object]:
+def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_mode: str | None = None, ws_seconds: int = SHADOW_WS_SECONDS) -> dict[str, object]:
     roster_sha256 = require_sha256(roster_sha256, "roster_sha256")
     collector = ForwardCollector(AppendOnlyEventStore(root / "raw_v1"))
     ws_result: dict[str, object] | None = None
     if evidence_mode == "ENGINEERING_SHADOW":
-        ws_result = asyncio.run(_shadow_rest_and_ws(collector, symbols))
+        ws_result = asyncio.run(_shadow_rest_and_ws(collector, symbols, ws_seconds=ws_seconds))
         collector.store.append(
             "force_order_status", "um", "ALL", ws_result,
             source_kind="collector_control", endpoint="wss://fstream.binance.com/market/ws/!forceOrder@arr",
