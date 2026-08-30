@@ -9,7 +9,7 @@ from typing import Any, Iterable
 
 import pandas as pd
 
-GAP_STATES = frozenset({"COMPLETE", "RESTART_GAP", "POLL_GAP", "SOURCE_TIME_UNAVAILABLE", "SEQUENCE_GAP", "SCHEMA_ERROR", "RATE_LIMIT_GAP"})
+GAP_STATES = frozenset({"COMPLETE", "RESTART_GAP", "POLL_GAP", "SOURCE_TIME_UNAVAILABLE", "SEQUENCE_GAP", "SCHEMA_ERROR", "RATE_LIMIT_GAP", "CLOCK_UNCERTAINTY_GAP"})
 
 
 def _timestamp(value: Any) -> pd.Timestamp | None:
@@ -32,6 +32,7 @@ def materialize_causal_observations(
     decision_times: Iterable[Any],
     *,
     value_key: str = "value",
+    evidence_mode: str | None = None,
 ) -> pd.DataFrame:
     """Attach only observations known strictly before each decision time.
 
@@ -46,12 +47,21 @@ def materialize_causal_observations(
     last_events: dict[tuple[str, str, str], pd.Timestamp] = {}
     for raw in envelopes:
         record = dict(raw)
+        if evidence_mode == "SCIENTIFIC" and record.get("evidence_mode") != "SCIENTIFIC":
+            raise ValueError("scientific materialization requires SCIENTIFIC evidence_mode")
+        if evidence_mode is None and record.get("evidence_mode") in {"ENGINEERING_PILOT", "ENGINEERING_SHADOW"}:
+            pass
         identity = str(record.get("source_identity") or _identity(record))
         if identity in seen:
             continue
         seen.add(identity)
         event_time = _timestamp(record.get("exchange_event_time"))
         receipt_time = _timestamp(record.get("collector_receipt_time"))
+        corrected_receipt = _timestamp(record.get("corrected_response_receipt_time"))
+        payload = record.get("payload") if isinstance(record.get("payload"), dict) else {}
+        payload_available = _timestamp(payload.get("source_available_time"))
+        availability = payload_available or corrected_receipt or receipt_time
+        value = payload.get(value_key) if value_key in payload else record.get(value_key)
         key = (str(record.get("market_type", record.get("market", "unknown"))), str(record.get("symbol", "")), str(record.get("stream", "")))
         segments.setdefault(key, 0)
         state = str(record.get("continuity_state") or "COMPLETE")
@@ -67,8 +77,8 @@ def materialize_causal_observations(
             "market": key[0], "symbol": key[1], "stream": key[2],
             "source_event_time": event_time,
             "source_receipt_time": receipt_time,
-            "availability_time": receipt_time,
-            "feature_value": record.get(value_key) if state == "COMPLETE" and event_time is not None else None,
+            "availability_time": availability,
+            "feature_value": value if state == "COMPLETE" and event_time is not None else None,
             "source_identity": identity,
             "continuity_segment": segments[key],
             "data_quality_state": state if event_time is not None or state != "COMPLETE" else "SOURCE_TIME_UNAVAILABLE",

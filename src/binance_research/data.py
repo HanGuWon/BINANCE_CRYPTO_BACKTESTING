@@ -311,14 +311,20 @@ class BinanceRestClient:
     MAX_RETRY_AFTER_SECONDS = 60.0
     def __init__(self, timeout: float = 15.0, max_retries: int = 3) -> None: self.timeout, self.max_retries = timeout, max_retries
 
-    def calibrate_server_clock(self, market: str = "um") -> ClockCalibration:
-        """Measure exchange-vs-local clock offset using a request midpoint."""
-        before = int(datetime.now(UTC).timestamp() * 1000)
-        payload, _ = self.get_with_metadata(market, "/fapi/v1/time" if market == "um" else "/api/v3/time")
-        after = int(datetime.now(UTC).timestamp() * 1000)
-        if not isinstance(payload, dict) or "serverTime" not in payload:
-            raise DataIntegrityError("Binance time response lacks serverTime")
-        return calibrate_server_clock(local_before_ms=before, server_ms=int(payload["serverTime"]), local_after_ms=after)
+    def calibrate_server_clock(self, market: str = "um", *, sample_count: int = 5) -> ClockCalibration:
+        """Select the minimum-RTT midpoint calibration from a frozen sample set."""
+        if sample_count <= 0:
+            raise ValueError("sample_count must be positive")
+        samples: list[ClockCalibration] = []
+        endpoint = "/fapi/v1/time" if market == "um" else "/api/v3/time"
+        for _ in range(sample_count):
+            before = int(datetime.now(UTC).timestamp() * 1000)
+            payload, _ = self.get_with_metadata(market, endpoint)
+            after = int(datetime.now(UTC).timestamp() * 1000)
+            if not isinstance(payload, dict) or "serverTime" not in payload:
+                raise DataIntegrityError("Binance time response lacks serverTime")
+            samples.append(calibrate_server_clock(local_before_ms=before, server_ms=int(payload["serverTime"]), local_after_ms=after))
+        return min(samples, key=lambda sample: sample.round_trip_ms)
 
     def get_with_metadata(self, market: str, path: str, params: dict[str, Any] | None = None) -> tuple[Any, RestResponseMetadata]:
         if market not in self.BASE_URLS: raise ValueError(f"unsupported market: {market}")

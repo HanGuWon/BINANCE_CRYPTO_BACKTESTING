@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
+COLLECTION_DELAY_SECONDS = 5
+
 
 @dataclass(frozen=True)
 class ClockCalibration:
@@ -47,3 +49,16 @@ def next_quarter_hour(now: datetime, *, interval_seconds: int = 900) -> datetime
 def calibrated_now(local_now: datetime, calibration: ClockCalibration) -> datetime:
     """Apply the measured server offset to a local UTC timestamp."""
     return local_now.astimezone(UTC) + timedelta(milliseconds=calibration.offset_ms)
+
+
+def cycle_boundaries(boundary: datetime, *, actual_start: datetime | None = None, required_available: datetime | None = None, collection_delay_seconds: int = COLLECTION_DELAY_SECONDS) -> dict[str, str]:
+    """Return causal 15-minute candle and next-open timing for one boundary."""
+    close = boundary.astimezone(UTC).replace(second=0, microsecond=0)
+    if close.minute % 15:
+        raise ValueError("boundary must be on an absolute 15-minute grid")
+    open_time = close - timedelta(minutes=15)
+    scheduled = close + timedelta(seconds=collection_delay_seconds)
+    start = (actual_start or scheduled).astimezone(UTC)
+    available = (required_available or start).astimezone(UTC)
+    next_open = next_quarter_hour(available - timedelta(microseconds=1))
+    return {"target_bar_open": open_time.isoformat(), "target_bar_close": close.isoformat(), "scheduled_collection_time": scheduled.isoformat(), "actual_collection_start": start.isoformat(), "eligible_next_execution_time": next_open.isoformat()}

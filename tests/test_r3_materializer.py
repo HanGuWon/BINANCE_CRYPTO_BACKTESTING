@@ -60,3 +60,15 @@ def test_distinct_no_sequence_observations_are_not_collapsed() -> None:
     rows = materialize_causal_observations([first, later], ["2024-01-01T00:00:06Z"])
     assert rows.iloc[-1]["continuity_segment"] == 1
     assert rows.iloc[-1]["data_quality_state"] == "SEQUENCE_GAP"
+
+
+def test_normalized_kline_uses_payload_value_and_causal_availability() -> None:
+    record = {"stream": "klines_15m", "symbol": "BTCUSDT", "exchange_event_time": "2024-01-01T00:14:59.999Z", "collector_receipt_time": "2024-01-01T00:15:01Z", "corrected_response_receipt_time": "2024-01-01T00:15:02Z", "continuity_state": "COMPLETE", "evidence_mode": "SCIENTIFIC", "payload": {"value": "101.5", "source_open_time": "2024-01-01T00:00:00Z", "source_available_time": "2024-01-01T00:15:02Z"}}
+    rows = materialize_causal_observations([record], ["2024-01-01T00:16:00Z"], evidence_mode="SCIENTIFIC")
+    assert rows.iloc[0]["feature_value"] == "101.5"
+    assert rows.iloc[0]["availability_time"] == pd.Timestamp("2024-01-01T00:15:02Z")
+
+
+def test_scientific_materializer_rejects_engineering_rows() -> None:
+    with pytest.raises(ValueError, match="SCIENTIFIC"):
+        materialize_causal_observations([_event(1000, "2024-01-01T00:00:01Z", 1, evidence_mode="ENGINEERING_SHADOW")], ["2024-01-01T00:00:02Z"], evidence_mode="SCIENTIFIC")

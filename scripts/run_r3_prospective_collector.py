@@ -71,19 +71,24 @@ def run_scientific(root: Path, roster_artifact: Path, launch_manifest: Path) -> 
         raise ValueError("SCIENTIFIC requires a fresh D-backed scientific root")
     if manifest.get("campaign_id") != "r3_prospective_context_v1":
         raise ValueError("launch manifest campaign mismatch")
+    symbols = list(roster.symbols)
+    context_only = set()
+    if "BTCUSDT" not in symbols:
+        symbols.append("BTCUSDT")
+        context_only.add("BTCUSDT")
     with single_instance_lock(resolved / "control" / "collector.lock"):
-        return _run_cycle(resolved, list(roster.symbols), roster.roster_sha256, evidence_mode="SCIENTIFIC", ws_seconds=SHADOW_WS_SECONDS)
+        return _run_cycle(resolved, symbols, roster.roster_sha256, evidence_mode="SCIENTIFIC", ws_seconds=SHADOW_WS_SECONDS, context_only_symbols=context_only)
 
 
-async def _shadow_rest_and_ws(collector: ForwardCollector, symbols: list[str], *, ws_seconds: int = 5) -> dict[str, object]:
+async def _shadow_rest_and_ws(collector: ForwardCollector, symbols: list[str], *, evidence_mode: str, ws_seconds: int = 5) -> dict[str, object]:
     """Run the roster REST snapshot while a forceOrder WS listener is alive."""
     def collect_rest() -> None:
         for symbol in symbols:
-            collector.collect_engineering_shadow_snapshot(symbol)
+            collector.collect_engineering_shadow_snapshot(symbol, evidence_mode=evidence_mode)
 
     async def collect_ws() -> dict[str, object]:
         try:
-            async for _ in collector.stream_liquidations("ALL", evidence_mode="ENGINEERING_SHADOW"):
+            async for _ in collector.stream_liquidations("ALL", evidence_mode=evidence_mode):
                 return {"connected": True, "received": True, "event_policy": "persist_raw_only"}
         except asyncio.CancelledError:
             raise
@@ -114,9 +119,16 @@ def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_m
     collector = ForwardCollector(AppendOnlyEventStore(root / "raw_v1"))
     clock = collector.client.calibrate_server_clock("um")
     collector.clock_calibration = clock
+    clock_uncertainty_ms = clock.round_trip_ms / 2.0 + 1.0
+    if clock_uncertainty_ms > 2000:
+        collector.store.append(
+            "clock_status", "um", "ALL",
+            {"status": "CLOCK_UNCERTAINTY_GAP", "offset_ms": clock.offset_ms, "round_trip_ms": clock.round_trip_ms, "uncertainty_ms": clock_uncertainty_ms},
+            source_kind="collector_control", endpoint="/fapi/v1/time", continuity_state="CLOCK_UNCERTAINTY_GAP", evidence_mode=evidence_mode,
+        )
     ws_result: dict[str, object] | None = None
     if evidence_mode in {"ENGINEERING_SHADOW", "SCIENTIFIC"} and include_ws:
-        ws_result = asyncio.run(_shadow_rest_and_ws(collector, symbols, ws_seconds=ws_seconds))
+        ws_result = asyncio.run(_shadow_rest_and_ws(collector, symbols, evidence_mode=evidence_mode or "ENGINEERING_SHADOW", ws_seconds=ws_seconds))
         collector.store.append(
             "force_order_status", "um", "ALL", ws_result,
             source_kind="collector_control", endpoint="wss://fstream.binance.com/market/ws/!forceOrder@arr",
@@ -124,7 +136,7 @@ def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_m
         )
     else:
         for symbol in symbols:
-            collector.collect_r3_um_snapshot(symbol)
+            collector.collect_r3_um_snapshot(symbol, evidence_mode=evidence_mode)
     collector.store.append(
         "clock_calibration", "um", "ALL",
         {"calibration_id": f"cal-{datetime.now(UTC).strftime('%Y%m%dT%H%M%S%fZ')}", "offset_ms": clock.offset_ms, "round_trip_ms": clock.round_trip_ms, "uncertainty_ms": clock.round_trip_ms / 2.0 + 1.0},
@@ -182,6 +194,8 @@ def run_scientific_forever(root: Path, roster_artifact: Path, launch_manifest: P
     resolved = Path(root).resolve()
     if resolved.drive.upper() != "D:":
         raise ValueError("SCIENTIFIC requires a D-backed root")
+    if resolved.exists() and any(resolved.iterdir()):
+        raise ValueError("SCIENTIFIC root must be fresh and empty")
     symbols = list(roster.symbols)
     context_only = set()
     if "BTCUSDT" not in symbols:
@@ -204,18 +218,21 @@ def run_scientific_forever(root: Path, roster_artifact: Path, launch_manifest: P
             while max_cycles is None or cycles < max_cycles:
                 if stop_event is not None and stop_event.is_set():
                     break
-                _run_cycle(resolved, symbols, roster.roster_sha256, evidence_mode="SCIENTIFIC", context_only_symbols=context_only, include_ws=False)
+                await asyncio.to_thread(_run_cycle, resolved, symbols, roster.roster_sha256, evidence_mode="SCIENTIFIC", context_only_symbols=context_only, include_ws=False)
                 cycles += 1
                 if max_cycles is not None and cycles >= max_cycles:
                     break
-                await asyncio.sleep(interval_seconds)
+                now = datetime.now(UTC)
+                boundary = next_quarter_hour(now, interval_seconds=interval_seconds)
+                await asyncio.sleep(max(0.0, (boundary - now).total_seconds()))
         finally:
             ws_stop.set()
             ws_task.cancel()
             await asyncio.gather(ws_task, return_exceptions=True)
             (resolved / "health" / "shutdown_receipt.json").parent.mkdir(parents=True, exist_ok=True)
             (resolved / "health" / "shutdown_receipt.json").write_text(json.dumps({"evidence_mode": "SCIENTIFIC", "cycles": cycles, "status": "SHUTDOWN_FINALIZED", "launch_manifest": str(launch_manifest), "implementation_commit": manifest.get("implementation_commit")}, sort_keys=True) + "\n", encoding="utf-8")
-    asyncio.run(_run())
+    with single_instance_lock(resolved / "control" / "collector.lock"):
+        asyncio.run(_run())
 
 
 def run_once(root: Path, symbols: list[str], roster_sha256: str) -> dict[str, object]:
@@ -268,12 +285,16 @@ def main() -> int:
     parser.add_argument("--roster-artifact", type=Path, default=None, help="Use the frozen roster (required for shadow/scientific mode)")
     parser.add_argument("--roster-sha256")
     parser.add_argument("--launch-manifest", type=Path, default=None)
+    parser.add_argument("--persistent", action="store_true", help="run the authorized scientific path continuously")
     parser.add_argument("--interval-seconds", type=int, default=None)
     args = parser.parse_args()
     if args.mode == "SCIENTIFIC":
         if args.roster_artifact is None or args.launch_manifest is None or args.symbols or args.roster_sha256:
             parser.error("SCIENTIFIC requires --roster-artifact and --launch-manifest and rejects --symbols/--roster-sha256")
-        run_scientific(args.root, args.roster_artifact, args.launch_manifest)
+        if args.persistent:
+            run_scientific_forever(args.root, args.roster_artifact, args.launch_manifest, interval_seconds=args.interval_seconds or 900)
+        else:
+            run_scientific(args.root, args.roster_artifact, args.launch_manifest)
         return 0
     if args.mode == "ENGINEERING_SHADOW" or args.roster_artifact is not None:
         if args.roster_artifact is None:

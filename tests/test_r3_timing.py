@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from binance_research.r3_timing import calibrate_server_clock, calibrated_now, next_quarter_hour
+from binance_research.r3_timing import calibrate_server_clock, calibrated_now, cycle_boundaries, next_quarter_hour
 from binance_research.data import BinanceRestClient
 
 
@@ -25,6 +25,14 @@ def test_next_quarter_hour_is_absolute_and_utc() -> None:
 def test_scheduler_rejects_non_grid_interval() -> None:
     with pytest.raises(ValueError):
         next_quarter_hour(datetime.now(UTC), interval_seconds=901)
+
+
+def test_cycle_boundaries_use_candle_boundary_and_strict_next_open() -> None:
+    result = cycle_boundaries(datetime(2026, 8, 30, 12, 15, tzinfo=UTC), actual_start=datetime(2026, 8, 30, 12, 15, 6, tzinfo=UTC), required_available=datetime(2026, 8, 30, 12, 15, 6, tzinfo=UTC))
+    assert result["target_bar_open"] == "2026-08-30T12:00:00+00:00"
+    assert result["target_bar_close"] == "2026-08-30T12:15:00+00:00"
+    assert result["scheduled_collection_time"] == "2026-08-30T12:15:05+00:00"
+    assert result["eligible_next_execution_time"] == "2026-08-30T12:30:00+00:00"
 
 
 def test_rest_client_clock_calibration_requires_server_time(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -17,7 +17,7 @@ class AppendOnlyEventStore:
         self.root = Path(root)
 
     def append(self, stream: str, market: str, symbol: str, payload: Any, *, source_kind: str = "rest_snapshot", endpoint: str | None = None, request_params: dict[str, Any] | None = None, continuity_state: str = "COMPLETE", sequence_id: int | str | None = None, response_metadata: RestResponseMetadata | dict[str, Any] | None = None, evidence_mode: str | None = None) -> Path:
-        if continuity_state not in {"COMPLETE", "RESTART_GAP", "POLL_GAP", "SOURCE_TIME_UNAVAILABLE", "SEQUENCE_GAP", "SCHEMA_ERROR", "RATE_LIMIT_GAP"}:
+        if continuity_state not in {"COMPLETE", "RESTART_GAP", "POLL_GAP", "SOURCE_TIME_UNAVAILABLE", "SEQUENCE_GAP", "SCHEMA_ERROR", "RATE_LIMIT_GAP", "CLOCK_UNCERTAINTY_GAP"}:
             raise ValueError(f"unknown continuity state: {continuity_state}")
         receipt_time = datetime.now(UTC).isoformat()
         event_time = _extract_exchange_event_time(payload)
@@ -202,13 +202,13 @@ class ForwardCollector:
             paths.append(self.store.append(stream, "um", symbol, self.client.get("um", endpoint, params), source_kind="rest_snapshot", endpoint=endpoint, request_params=params))
         return paths
 
-    def collect_r3_um_snapshot(self, symbol: str) -> list[Path]:
+    def collect_r3_um_snapshot(self, symbol: str, *, evidence_mode: str | None = None) -> list[Path]:
         """Collect only the explicitly public R3 v1 streams."""
-        return self._collect_snapshot(symbol, self.R3_PUBLIC_STREAMS)
+        return self._collect_snapshot(symbol, self.R3_PUBLIC_STREAMS, evidence_mode=evidence_mode)
 
-    def collect_engineering_shadow_snapshot(self, symbol: str) -> list[Path]:
+    def collect_engineering_shadow_snapshot(self, symbol: str, *, evidence_mode: str = "ENGINEERING_SHADOW") -> list[Path]:
         """Collect roster-required primary sources with explicit evidence mode."""
-        return self._collect_snapshot(symbol, self.R3_SHADOW_STREAMS, evidence_mode="ENGINEERING_SHADOW")
+        return self._collect_snapshot(symbol, self.R3_SHADOW_STREAMS, evidence_mode=evidence_mode)
 
     def _collect_snapshot(self, symbol: str, streams: frozenset[str], *, evidence_mode: str | None = None) -> list[Path]:
         paths: list[Path] = []

@@ -17,7 +17,7 @@ def test_registry_hypotheses_join_to_exact_source_matrix() -> None:
         "R3_H02": ("PRICE_OI_QUADRANT", "klines_15m+open_interest"),
         "R3_H03": ("LIQUIDATION_CONTINUATION", "forceOrder"),
         "R3_H04": ("LIQUIDATION_REVERSION", "forceOrder"),
-        "R3_H05": ("CROWDING_STRESS_MODIFIER", "premium"),
+        "R3_H05": ("CROWDING_STRESS_MODIFIER", "premium+premium_klines_15m"),
         "R3_H06": ("BTC_BREADTH_CONCORDANCE", "klines_15m"),
     }
     assert set(row["hypothesis_id"] for row in registry) == set(expected)

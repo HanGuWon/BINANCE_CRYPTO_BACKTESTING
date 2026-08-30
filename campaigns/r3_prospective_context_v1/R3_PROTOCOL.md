@@ -7,9 +7,11 @@ profitability. No outcome analysis, return ranking, threshold tuning, or
 final-holdout access is permitted before a separately approved evaluation
 phase.
 
-The primary public Binance UM streams are open interest, premium index,
-book-ticker, depth, aggregate trades, open-interest history, and taker ratio.
-Liquidation force-order events are collected through the public market stream.
+The authoritative primary Binance UM streams are closed 15-minute klines,
+premium-index klines, premium index, open interest, book-ticker, and continuous
+liquidation force-order events. Depth, aggregate trades, open-interest history,
+and taker ratio are diagnostic-only. Liquidation force-order events are
+collected through the public market stream.
 Top-trader ratio endpoints, private APIs, balances, positions, and orders are
 excluded from R3 v1.
 
