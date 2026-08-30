@@ -20,10 +20,10 @@ def build_forward_ranking_from_raw(raw_root: Path, census_dir: Path, output_dir:
     """Rebuild a causal ranking from verified native 1d archives."""
     prior_month = str(pd.Period(effective_month, freq="M") - 1)
     rows: list[dict[str, object]] = []
-    for path in sorted(Path(raw_root).glob(f"*/klines/*/1d/*-1d-{prior_month}.zip")):
+    for path in sorted(Path(raw_root).glob(f"um/klines/*/1d/*-1d-{prior_month}.zip")):
         market = path.parts[-5]
-        if market not in {"spot", "um"}:
-            continue
+        if market != "um":
+            raise RuntimeError(f"R3_RANKING_SCOPE_MISMATCH:{path}")
         symbol = path.parent.parent.name
         sidecar = path.with_suffix(path.suffix + ".manifest.json")
         if not sidecar.is_file():

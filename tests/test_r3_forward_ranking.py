@@ -52,3 +52,11 @@ def test_precomputed_control_is_explicitly_non_scientific() -> None:
     result = qualify(source, roster)
     assert result["outcomes_accessed"] is False
     assert result["september_roster"] == "NOT_BUILT_BEFORE_BOUNDARY"
+
+
+def test_spot_archive_cannot_enter_um_discovery(tmp_path: Path) -> None:
+    spot = tmp_path / "spot" / "klines" / "UMAUSDT" / "1d"
+    spot.mkdir(parents=True)
+    (spot / "UMAUSDT-1d-2026-07.zip").write_bytes(b"spot-only")
+    with pytest.raises(RuntimeError, match="NO_RAW_1D_ARCHIVES"):
+        build_forward_ranking_from_raw(tmp_path, tmp_path, tmp_path / "out", effective_month="2026-08")
