@@ -20,7 +20,7 @@ CAMPAIGN = ROOT / "campaigns" / "r3_prospective_context_v1"
 DATA_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1")
 ROSTER_PATH = CAMPAIGN / "rosters" / "2026-08.json"
 V3_ROOT = DATA_ROOT / "engineering_shadow_august_v3"
-V4_ROOT = DATA_ROOT / "engineering_shadow_august_v4_final"
+V4_ROOT = DATA_ROOT / "engineering_shadow_august_v4_final2"
 
 
 def sha256_tree(root: Path) -> str:
