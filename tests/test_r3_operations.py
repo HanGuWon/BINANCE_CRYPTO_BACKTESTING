@@ -91,6 +91,17 @@ def test_engineering_shadow_loads_symbols_only_from_valid_roster() -> None:
     assert roster_sha == "ec2609bb7df0019984d41be3c5f18154591f5c8735a71557de7207c5606a00cc"
 
 
+def test_engineering_shadow_rejects_scientific_roots_and_post_boundary() -> None:
+    from datetime import UTC, datetime
+    from scripts.run_r3_prospective_collector import validate_engineering_shadow_inputs
+
+    roster = Path("campaigns/r3_prospective_context_v1/rosters/2026-08.json")
+    with pytest.raises(ValueError):
+        validate_engineering_shadow_inputs(Path("D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1/raw_v1"), roster, at_utc=datetime(2026, 8, 30, tzinfo=UTC))
+    with pytest.raises(ValueError):
+        validate_engineering_shadow_inputs(Path("D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1/engineering_shadow_august_v4"), roster, at_utc=datetime(2026, 9, 1, tzinfo=UTC))
+
+
 def test_stale_pid_lock_is_recovered_but_malformed_lock_is_not(tmp_path: Path) -> None:
     stale = tmp_path / "stale.lock"
     stale.write_text("99999999", encoding="utf-8")
