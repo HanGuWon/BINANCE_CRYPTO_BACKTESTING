@@ -11,12 +11,20 @@ outside a continuity segment; NaN is never imputed from future data.
 2. `PRICE_OI_QUADRANT`: `price_sign=sign(close_t-close_{t-1})`,
    `oi_sign=sign(OI_t-OI_{t-1})`; state is the ordered pair in
    `{(+,+),(+,-),(-,+),(-,-)}`. Zero or missing components produce `NaN`.
-3. `LIQUIDATION_CONTINUATION`: `L_t` is signed liquidation notional in the
-   preceding complete event bucket, positive for forced sell orders and
-   negative for forced buy orders. The context is continuous `L_t`.
-4. `LIQUIDATION_REVERSION`: same causal `L_t` input as (3), with the response
-   sign predeclared opposite to the impulse; it is a distinct hypothesis, not
-   a post-outcome polarity switch.
+3. `LIQUIDATION_CONTINUATION`: `observed_forceorder_pressure_t` is the sum of
+   observed forceOrder events only; it is not complete market liquidation
+   notional. For an event `e`,
+   `p_e = sign_e * last_filled_quantity_e * average_fill_price_e`, with
+   `sign_e=+1` for forced `SELL` and `sign_e=-1` for forced `BUY`.
+   The retained observable includes market, symbol, exchange event time,
+   order/trade time, side, original/last/accumulated quantities, order/average
+   prices, position side, subtype, and canonical raw-payload SHA. Its states
+   are `OBSERVED_FORCEORDER_EVENT`, `NO_FORCEORDER_EVENT_OBSERVED`,
+   `FORCEORDER_STREAM_GAP`, `FORCEORDER_RESTART_GAP`, and
+   `FORCEORDER_STREAM_UNAVAILABLE`; silence is never imputed as zero.
+4. `LIQUIDATION_REVERSION`: the same `observed_forceorder_pressure_t` input
+   as (3), with the response sign predeclared opposite to the impulse; it is a
+   distinct hypothesis, not a post-outcome polarity switch.
 5. `CROWDING_STRESS_MODIFIER`: fixed context tuple
    `(funding_rate_t, premium_t)` with no standalone entry and no new polarity;
    missing either component yields `NaN` for the modifier.
