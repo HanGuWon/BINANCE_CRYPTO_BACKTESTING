@@ -146,6 +146,49 @@ def verify_manifest_chain(path: Path) -> bool:
     return True
 
 
+def verify_engineering_shadow_root(root: Path, *, expected_symbols: list[str], roster_sha256: str) -> dict[str, Any]:
+    """Verify an outcome-blind roster shadow root without reading market outcomes."""
+    root = Path(root)
+    raw = root / "raw_v1"
+    chain = raw / "manifest_chain.jsonl"
+    health_path = root / "health" / "health_receipts.jsonl"
+    if not raw.is_dir() or not chain.is_file() or not verify_manifest_chain(chain):
+        raise ValueError("shadow manifest chain is missing or invalid")
+    if not health_path.is_file():
+        raise ValueError("shadow health receipt is missing")
+    health_lines = [line for line in health_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    health = json.loads(health_lines[-1])
+    if health.get("evidence_mode") != "ENGINEERING_SHADOW":
+        raise ValueError("shadow health receipt has the wrong evidence mode")
+    if health.get("roster_sha256") != require_sha256(roster_sha256, "roster_sha256"):
+        raise ValueError("shadow roster identity mismatch")
+    files = [path for path in raw.rglob("*.jsonl") if path.name != "manifest_chain.jsonl"]
+    rows = 0
+    bytes_total = 0
+    symbols: set[str] = set()
+    modes: set[str | None] = set()
+    for path in files:
+        bytes_total += path.stat().st_size
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            envelope = json.loads(line)
+            rows += 1
+            symbols.add(str(envelope.get("symbol")))
+            modes.add(envelope.get("evidence_mode"))
+    if modes != {"ENGINEERING_SHADOW"}:
+        raise ValueError("shadow raw envelopes are not uniformly labeled")
+    expected = {str(symbol).upper() for symbol in expected_symbols}
+    if (symbols - {"ALL"}) != expected:
+        raise ValueError("shadow symbol set does not match roster")
+    latest = json.loads([line for line in chain.read_text(encoding="utf-8").splitlines() if line.strip()][-1])
+    if latest.get("manifest_sha256") != health.get("manifest_sha256"):
+        raise ValueError("health receipt does not bind the latest manifest")
+    if latest.get("total_rows") != rows or latest.get("total_bytes") != bytes_total or len(latest.get("files", [])) != len(files):
+        raise ValueError("manifest totals do not match shadow files")
+    return {"manifest_sha256": latest["manifest_sha256"], "files": len(files), "rows": rows, "bytes": bytes_total, "symbols": len(expected), "gap_count": health.get("gap_count", 0)}
+
+
 def write_health_receipt(root: Path, *, campaign_id: str, manifest_sha256: str | None, roster_sha256: str | None, stream_state: dict[str, Any], raw_root: Path | None = None, restart_count: int = 0, gap_count: int = 0, evidence_mode: str | None = None) -> Path:
     raw_root = Path(raw_root or root)
     receipt = {"timestamp": datetime.now(UTC).isoformat(), "pid": os.getpid(), "campaign_id": campaign_id, "manifest_sha256": manifest_sha256, "roster_sha256": roster_sha256, "raw_root": str(raw_root), "stream_state": stream_state, "restart_count": restart_count, "gap_count": gap_count, "bytes": sum(path.stat().st_size for path in raw_root.rglob("*.jsonl"))}

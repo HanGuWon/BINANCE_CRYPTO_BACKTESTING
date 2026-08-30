@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from binance_research.collector import AppendOnlyEventStore
-from binance_research.r3_operations import CollectorLockError, LaunchIdentityError, append_manifest, append_segment_manifest, build_manifest, require_sha256, single_instance_lock, verify_launch_identity, verify_manifest_chain, write_health_receipt, write_pilot_receipt
+from binance_research.r3_operations import CollectorLockError, LaunchIdentityError, append_manifest, append_segment_manifest, build_manifest, require_sha256, single_instance_lock, verify_engineering_shadow_root, verify_launch_identity, verify_manifest_chain, write_health_receipt, write_pilot_receipt
 
 
 def test_manifest_chain_is_hash_linked_and_append_only(tmp_path: Path) -> None:
@@ -47,6 +47,19 @@ def test_shadow_event_envelopes_are_explicitly_labeled(tmp_path: Path) -> None:
     envelope = json.loads(path.read_text(encoding="utf-8").splitlines()[0])
     assert envelope["evidence_mode"] == "ENGINEERING_SHADOW"
     assert envelope["source_kind"] == "rest_snapshot"
+
+
+def test_engineering_shadow_root_verifier_binds_manifest_health_and_roster(tmp_path: Path) -> None:
+    raw = tmp_path / "raw_v1" / "um" / "BTCUSDT"
+    raw.mkdir(parents=True)
+    envelope = {"symbol": "BTCUSDT", "stream": "premium", "evidence_mode": "ENGINEERING_SHADOW", "continuity_state": "COMPLETE"}
+    (raw / "premium.jsonl").write_text(json.dumps(envelope) + "\n", encoding="utf-8")
+    manifest = build_manifest(tmp_path / "raw_v1", manifest_id="shadow")
+    append_manifest(tmp_path / "raw_v1", manifest)
+    write_health_receipt(tmp_path, campaign_id="r3_prospective_context_v1", manifest_sha256=manifest["manifest_sha256"], roster_sha256="a" * 64, stream_state={"status": "CYCLE_COMPLETE"}, evidence_mode="ENGINEERING_SHADOW")
+    result = verify_engineering_shadow_root(tmp_path, expected_symbols=["BTCUSDT"], roster_sha256="a" * 64)
+    assert result["rows"] == 1
+    assert result["symbols"] == 1
 
 
 def test_manifest_chain_tamper_is_rejected(tmp_path: Path) -> None:
