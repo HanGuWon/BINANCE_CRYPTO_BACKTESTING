@@ -252,7 +252,7 @@ def run_scientific_forever(root: Path, roster_artifact: Path, launch_manifest: P
         asyncio.run(_run())
 
 
-def run_engineering_shadow_forever(root: Path, roster_artifact: Path, *, max_cycles: int = 4, interval_seconds: int = 900, stop_event: asyncio.Event | None = None, wait_for_boundary: bool = True) -> dict[str, object]:
+def run_engineering_shadow_forever(root: Path, roster_artifact: Path, *, max_cycles: int = 4, interval_seconds: int = 900, stop_event: asyncio.Event | None = None, wait_for_boundary: bool = True, initial_boundary: datetime | None = None) -> dict[str, object]:
     """Run the persistent August engineering architecture without outcomes."""
     symbols, roster_sha256 = validate_engineering_shadow_inputs(Path(root), roster_artifact, require_fresh=True)
     context_only = set()
@@ -266,6 +266,11 @@ def run_engineering_shadow_forever(root: Path, roster_artifact: Path, *, max_cyc
         calibration = collector.client.calibrate_server_clock("um")
         collector.clock_calibration = calibration
         boundary, scheduled = first_scheduled_boundary(datetime.now(UTC), calibration, interval_seconds=interval_seconds)
+        if initial_boundary is not None:
+            boundary = initial_boundary.astimezone(UTC)
+            if boundary.minute % 15 or boundary.second or boundary.microsecond:
+                raise ValueError("initial_boundary must be an absolute 15-minute boundary")
+            scheduled = boundary + timedelta(seconds=5)
         ws_stop = asyncio.Event()
         async def ws_worker() -> None:
             try:
