@@ -167,6 +167,7 @@ def verify_engineering_shadow_root(root: Path, *, expected_symbols: list[str], r
     bytes_total = 0
     symbols: set[str] = set()
     modes: set[str | None] = set()
+    primary_streams = {"book_ticker", "klines_15m", "open_interest", "premium", "premium_klines_15m"}
     for path in files:
         bytes_total += path.stat().st_size
         for line in path.read_text(encoding="utf-8").splitlines():
@@ -174,7 +175,8 @@ def verify_engineering_shadow_root(root: Path, *, expected_symbols: list[str], r
                 continue
             envelope = json.loads(line)
             rows += 1
-            symbols.add(str(envelope.get("symbol")))
+            if envelope.get("stream") in primary_streams:
+                symbols.add(str(envelope.get("symbol")))
             modes.add(envelope.get("evidence_mode"))
     if modes != {"ENGINEERING_SHADOW"}:
         raise ValueError("shadow raw envelopes are not uniformly labeled")
