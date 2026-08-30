@@ -1,8 +1,9 @@
 {
   "campaign_id": "r3_prospective_context_v1",
-  "status": "R3_BLOCKED_FINAL_LAUNCH_CONFORMANCE",
+  "status": "R3_BLOCKED_ROSTER_PROVENANCE",
   "superseded_ready_manifest": "R3_LAUNCH_MANIFEST_SUPERSEDED_READY_002.json",
   "conformance_erratum": "R3_LAUNCH_ERRATUM_002.md",
+  "engineering_shadow": "R3_ENGINEERING_SHADOW_BLOCKED.json",
   "implementation_commit": "da6869c43303cb21c89a76b031f71f21abc06f14",
   "source_tree_sha256": "134268865234f9cef6c6fc3f47a682a88184bfe78b6ad7b972675f3487597a51",
   "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",

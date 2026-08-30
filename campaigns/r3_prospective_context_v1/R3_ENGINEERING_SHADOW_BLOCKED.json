@@ -1,0 +1,11 @@
+{
+  "campaign_id": "r3_prospective_context_v1",
+  "mode": "ENGINEERING_SHADOW",
+  "status": "BLOCKED",
+  "blocker": "R3_BLOCKED_ROSTER_PROVENANCE",
+  "reason": "The September 2026 Top50 roster requires a completed August ranking that is absent from the authoritative universe artifact. Running a full-roster shadow would require inventing membership.",
+  "symbols_collected": 0,
+  "outcomes_accessed": false,
+  "final_holdout_status": "UNTOUCHED",
+  "r2b2_status": "NOT_STARTED"
+}
