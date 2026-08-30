@@ -5,7 +5,7 @@ import json
 import pytest
 
 import scripts.qualify_r3_forward_ranking as forward_ranking
-from scripts.qualify_r3_forward_ranking import build_forward_ranking_from_raw, qualify
+from scripts.qualify_r3_forward_ranking import build_forward_ranking_from_raw, qualify, ranking_semantic_sha256, compare_um_rankings
 
 
 def test_raw_forward_ranking_requires_archive_sidecar(tmp_path: Path) -> None:
@@ -60,3 +60,27 @@ def test_spot_archive_cannot_enter_um_discovery(tmp_path: Path) -> None:
     (spot / "UMAUSDT-1d-2026-07.zip").write_bytes(b"spot-only")
     with pytest.raises(RuntimeError, match="NO_RAW_1D_ARCHIVES"):
         build_forward_ranking_from_raw(tmp_path, tmp_path, tmp_path / "out", effective_month="2026-08")
+
+
+def test_ranking_semantic_hash_is_type_stable_and_provenance_independent() -> None:
+    import pandas as pd
+    rows = [{"market": "UM", "symbol": "AAAUSDT", "volume_month": "2026-07", "universe_month": "2026-08",
+             "coverage_ratio": 1, "prior_month_quote_volume": 12.0, "eligibility_reason": "ELIGIBLE_COMPLETE_PRIOR_MONTH",
+             "rank": 1.0, "selected_top50": "true"}]
+    frame = pd.DataFrame(rows)
+    equivalent = frame.copy()
+    equivalent["coverage_ratio"] = 1.0
+    equivalent["rank"] = 1
+    equivalent["selected_top50"] = True
+    assert ranking_semantic_sha256(frame, effective_month="2026-08") == ranking_semantic_sha256(equivalent, effective_month="2026-08")
+
+
+def test_full_um_comparison_reports_candidate_and_top50_parity(tmp_path: Path) -> None:
+    import pandas as pd
+    columns = ["market", "symbol", "volume_month", "universe_month", "coverage_ratio", "prior_month_quote_volume", "eligibility_reason", "rank", "selected_top50"]
+    frame = pd.DataFrame([["um", "AAAUSDT", "2026-07", "2026-08", 1.0, 12.0, "ELIGIBLE_COMPLETE_PRIOR_MONTH", 1, True]], columns=columns)
+    left, right = tmp_path / "left.csv", tmp_path / "right.csv"
+    frame.to_csv(left, index=False); frame.to_csv(right, index=False)
+    result = compare_um_rankings(left, right, effective_month="2026-08")
+    assert result["semantic_parity"] is True
+    assert result["common_row_count"] == 1

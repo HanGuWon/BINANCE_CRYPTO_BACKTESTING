@@ -15,6 +15,63 @@ from binance_research.r3_universe import build_causal_monthly_roster, replay_ros
 from binance_research.data import load_kline_archive, validate_klines
 from build_r16_1d_universe import _summarize_1d_archive, build_monthly_cohorts
 
+SEMANTIC_FIELDS = ("market", "symbol", "volume_month", "universe_month", "coverage_ratio",
+                   "prior_month_quote_volume", "eligibility_reason", "rank", "selected_top50")
+
+
+def _semantic_rows(frame: pd.DataFrame, *, effective_month: str, selected_only: bool = False) -> list[dict[str, object]]:
+    rows = frame[(frame["market"].astype(str).str.lower() == "um") &
+                 (frame["universe_month"].astype(str) == effective_month)].copy()
+    if selected_only:
+        rows = rows[rows["selected_top50"].astype(str).str.lower().isin({"true", "1"})]
+    normalized: list[dict[str, object]] = []
+    for record in rows.to_dict(orient="records"):
+        item = {field: record.get(field) for field in SEMANTIC_FIELDS}
+        item["market"] = str(item["market"]).lower()
+        item["symbol"] = str(item["symbol"]).upper()
+        item["volume_month"] = str(item["volume_month"])
+        item["universe_month"] = str(item["universe_month"])
+        item["eligibility_reason"] = str(item["eligibility_reason"])
+        item["coverage_ratio"] = None if pd.isna(item["coverage_ratio"]) else round(float(item["coverage_ratio"]), 12)
+        item["prior_month_quote_volume"] = None if pd.isna(item["prior_month_quote_volume"]) else float(item["prior_month_quote_volume"])
+        item["rank"] = None if pd.isna(item["rank"]) else int(item["rank"])
+        item["selected_top50"] = str(item["selected_top50"]).lower() in {"true", "1"}
+        normalized.append(item)
+    return sorted(normalized, key=lambda row: (row["symbol"], row["volume_month"], row["rank"] is None, row["rank"] or 0))
+
+
+def ranking_semantic_sha256(frame: pd.DataFrame, *, effective_month: str, selected_only: bool = True) -> str:
+    payload = json.dumps(_semantic_rows(frame, effective_month=effective_month, selected_only=selected_only),
+                         sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def compare_um_rankings(reconstructed: Path, historical: Path, *, effective_month: str) -> dict[str, object]:
+    left = pd.read_csv(reconstructed)
+    right = pd.read_csv(historical)
+    left_rows = _semantic_rows(left, effective_month=effective_month, selected_only=False)
+    right_rows = _semantic_rows(right, effective_month=effective_month, selected_only=False)
+    left_by_symbol = {row["symbol"]: row for row in left_rows}
+    right_by_symbol = {row["symbol"]: row for row in right_rows}
+    common = sorted(set(left_by_symbol) & set(right_by_symbol))
+    mismatches = {field: sum(left_by_symbol[symbol][field] != right_by_symbol[symbol][field] for symbol in common)
+                  for field in SEMANTIC_FIELDS if field not in {"market", "symbol"}}
+    top50_left = {row["symbol"] for row in left_rows if row["selected_top50"]}
+    top50_right = {row["symbol"] for row in right_rows if row["selected_top50"]}
+    missing_eligible = [symbol for symbol in set(right_by_symbol) - set(left_by_symbol)
+                        if right_by_symbol[symbol]["eligibility_reason"] == "ELIGIBLE_COMPLETE_PRIOR_MONTH"]
+    return {
+        "effective_month": effective_month, "common_row_count": len(common),
+        "missing_historical_symbols": sorted(set(right_by_symbol) - set(left_by_symbol)),
+        "missing_eligible_historical_symbols": sorted(missing_eligible),
+        "extra_reconstructed_symbols": sorted(set(left_by_symbol) - set(right_by_symbol)),
+        "field_mismatches": mismatches, "top50_mismatches": sorted(top50_left ^ top50_right),
+        "reconstructed_selected_top50_count": len(top50_left), "historical_selected_top50_count": len(top50_right),
+        "reconstructed_ranking_semantic_sha256": ranking_semantic_sha256(left, effective_month=effective_month),
+        "historical_ranking_semantic_sha256": ranking_semantic_sha256(right, effective_month=effective_month),
+        "semantic_parity": not (missing_eligible or any(mismatches.values()) or top50_left ^ top50_right),
+    }
+
 
 def build_forward_ranking_from_raw(raw_root: Path, census_dir: Path, output_dir: Path, *, effective_month: str) -> Path:
     """Rebuild a causal ranking from verified native 1d archives."""

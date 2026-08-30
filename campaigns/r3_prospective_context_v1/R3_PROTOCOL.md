@@ -7,6 +7,13 @@ profitability. No outcome analysis, return ranking, threshold tuning, or
 final-holdout access is permitted before a separately approved evaluation
 phase.
 
+Ranking identity has two distinct domains. `ranking_semantic_sha256` is a
+canonical hash over normalized UM candidate/rank fields and is used for raw to
+ranking parity. Raw manifest, ranking artifact, and roster hashes are
+provenance identities and must change when input bytes change. A roster-hash
+mismatch therefore records different provenance, not different ranking
+semantics.
+
 The authoritative primary Binance UM streams are closed 15-minute klines,
 premium-index klines, premium index, open interest, book-ticker, and continuous
 liquidation force-order events. Depth, aggregate trades, open-interest history,
