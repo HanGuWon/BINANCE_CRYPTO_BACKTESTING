@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
 from binance_research.collector import AppendOnlyEventStore, ContinuityTracker, ForwardCollector
 from binance_research.data import RestResponseMetadata
@@ -100,6 +101,18 @@ def test_shadow_and_scientific_primary_stream_sets_are_identical() -> None:
     assert ForwardCollector.R3_SHADOW_STREAMS == ForwardCollector.R3_PRIMARY_STREAMS
     assert ForwardCollector.R3_PUBLIC_STREAMS == ForwardCollector.R3_PRIMARY_STREAMS
     assert ForwardCollector.R3_PRIMARY_STREAMS.isdisjoint(ForwardCollector.R3_DIAGNOSTIC_STREAMS)
+
+
+def test_scientific_cli_rejects_manual_symbol_authority() -> None:
+    from scripts.run_r3_prospective_collector import main
+    import sys
+    old = sys.argv
+    try:
+        sys.argv = ["collector", "--mode", "SCIENTIFIC", "--root", "D:/r3", "--symbols", "BTCUSDT", "--roster-sha256", "a" * 64]
+        with pytest.raises(SystemExit):
+            main()
+    finally:
+        sys.argv = old
 
 
 def test_r3_collector_persists_response_metadata(tmp_path: Path) -> None:
