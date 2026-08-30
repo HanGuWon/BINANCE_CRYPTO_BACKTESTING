@@ -24,6 +24,12 @@ def test_premium_kline_uses_same_closed_row_and_receipt_availability_rule() -> N
     assert rows[0]["source_available_time"] == "1970-01-01T00:15:02+00:00"
 
 
+def test_kline_availability_never_precedes_response_receipt_when_clock_is_ahead_or_behind() -> None:
+    for receipt in ("1970-01-01T00:14:00Z", "1970-01-01T00:15:02Z"):
+        rows = normalize_stream_payload("klines_15m", "BTCUSDT", [_kline(899_999)], receipt_time=receipt)
+        assert rows[0]["source_available_time"] >= receipt
+
+
 def test_array_streams_keep_each_row_identity_and_observation_time() -> None:
     payload = [{"symbol": "BTCUSDT", "timestamp": 1_700_000_000_000, "sumOpenInterest": "1"}, {"symbol": "ETHUSDT", "timestamp": 1_700_000_005_000, "sumOpenInterest": "2"}]
     rows = normalize_stream_payload("oi_history", "BTCUSDT", payload, receipt_time="2024-01-01T00:00:00Z")
