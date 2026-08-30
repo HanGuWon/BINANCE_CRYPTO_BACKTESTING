@@ -168,8 +168,10 @@ class ForwardCollector:
         "top_account_ratio": ("/futures/data/topLongShortAccountRatio", {"period": "5m", "limit": 500}),
     }
     REQUIRES_API_KEY = frozenset({"top_position_ratio", "top_account_ratio"})
-    R3_PUBLIC_STREAMS = frozenset({"open_interest", "premium", "book_ticker", "depth", "agg_trades", "oi_history", "taker_ratio", "klines_15m"})
-    R3_SHADOW_STREAMS = frozenset({"open_interest", "premium", "book_ticker", "klines_15m", "premium_klines_15m"})
+    R3_PRIMARY_STREAMS = frozenset({"open_interest", "premium", "book_ticker", "klines_15m", "premium_klines_15m"})
+    R3_DIAGNOSTIC_STREAMS = frozenset({"depth", "agg_trades", "oi_history", "taker_ratio"})
+    R3_PUBLIC_STREAMS = R3_PRIMARY_STREAMS
+    R3_SHADOW_STREAMS = R3_PRIMARY_STREAMS
     # USD-M REST reference weights for the exact request shapes above.  The
     # two /futures/data endpoints are documented as IP weight 0; telemetry is
     # still retained and any contradictory header fails the launch gate.
@@ -177,11 +179,8 @@ class ForwardCollector:
         "open_interest": 1,
         "premium": 1,
         "book_ticker": 2,
-        "depth": 5,
-        "agg_trades": 20,
-        "oi_history": 0,
-        "taker_ratio": 0,
         "klines_15m": 1,
+        "premium_klines_15m": 1,
     }
 
     def __init__(self, store: AppendOnlyEventStore, client: BinanceRestClient | None = None) -> None:

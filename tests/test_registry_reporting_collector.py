@@ -91,9 +91,15 @@ def test_r3_snapshot_excludes_api_key_streams(tmp_path: Path) -> None:
 def test_r3_endpoint_weights_are_explicit_and_cover_public_streams() -> None:
     assert set(ForwardCollector.R3_ENDPOINT_WEIGHTS) == set(ForwardCollector.R3_PUBLIC_STREAMS)
     assert ForwardCollector.R3_ENDPOINT_WEIGHTS == {
-        "open_interest": 1, "premium": 1, "book_ticker": 2, "depth": 5,
-        "agg_trades": 20, "oi_history": 0, "taker_ratio": 0, "klines_15m": 1,
+        "open_interest": 1, "premium": 1, "book_ticker": 2,
+        "klines_15m": 1, "premium_klines_15m": 1,
     }
+
+
+def test_shadow_and_scientific_primary_stream_sets_are_identical() -> None:
+    assert ForwardCollector.R3_SHADOW_STREAMS == ForwardCollector.R3_PRIMARY_STREAMS
+    assert ForwardCollector.R3_PUBLIC_STREAMS == ForwardCollector.R3_PRIMARY_STREAMS
+    assert ForwardCollector.R3_PRIMARY_STREAMS.isdisjoint(ForwardCollector.R3_DIAGNOSTIC_STREAMS)
 
 
 def test_r3_collector_persists_response_metadata(tmp_path: Path) -> None:

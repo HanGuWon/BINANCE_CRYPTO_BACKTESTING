@@ -48,6 +48,19 @@ def run_engineering_shadow(root: Path, roster_artifact: Path, *, at_utc: datetim
     return _run_cycle(Path(root), symbols, roster_sha256, evidence_mode="ENGINEERING_SHADOW", ws_seconds=SHADOW_WS_SECONDS)
 
 
+def run_scientific(root: Path, roster_artifact: Path, launch_manifest: Path) -> dict[str, object]:
+    """Run the same primary collector path, authorized only by a frozen launch manifest."""
+    roster = replay_roster_artifact(Path(roster_artifact), effective_month="2026-08")
+    manifest = validate_scientific_inputs(launch_manifest, roster_sha256=roster.roster_sha256)
+    resolved = Path(root).resolve()
+    if resolved.drive.upper() != "D:" or resolved.name in {"raw_v1", "scientific_raw_v1"}:
+        raise ValueError("SCIENTIFIC requires a fresh D-backed scientific root")
+    if manifest.get("campaign_id") != "r3_prospective_context_v1":
+        raise ValueError("launch manifest campaign mismatch")
+    with single_instance_lock(resolved / "control" / "collector.lock"):
+        return _run_cycle(resolved, list(roster.symbols), roster.roster_sha256, evidence_mode="SCIENTIFIC", ws_seconds=SHADOW_WS_SECONDS)
+
+
 async def _shadow_rest_and_ws(collector: ForwardCollector, symbols: list[str], *, ws_seconds: int = 5) -> dict[str, object]:
     """Run the roster REST snapshot while a forceOrder WS listener is alive."""
     def collect_rest() -> None:
@@ -85,7 +98,7 @@ def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_m
     roster_sha256 = require_sha256(roster_sha256, "roster_sha256")
     collector = ForwardCollector(AppendOnlyEventStore(root / "raw_v1"))
     ws_result: dict[str, object] | None = None
-    if evidence_mode == "ENGINEERING_SHADOW":
+    if evidence_mode in {"ENGINEERING_SHADOW", "SCIENTIFIC"}:
         ws_result = asyncio.run(_shadow_rest_and_ws(collector, symbols, ws_seconds=ws_seconds))
         collector.store.append(
             "force_order_status", "um", "ALL", ws_result,
@@ -168,13 +181,21 @@ def run_pilot(root: Path, roster_sha256: str) -> dict[str, object]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, required=True)
+    parser.add_argument("--mode", choices=("ENGINEERING_PILOT", "ENGINEERING_SHADOW", "SCIENTIFIC"), default="ENGINEERING_PILOT")
     parser.add_argument("--symbols", nargs="+")
     parser.add_argument("--roster-artifact", type=Path, default=None, help="Use the frozen roster (required for shadow/scientific mode)")
-    parser.add_argument("--roster-sha256", required=True)
+    parser.add_argument("--roster-sha256")
     parser.add_argument("--launch-manifest", type=Path, default=None)
     parser.add_argument("--interval-seconds", type=int, default=None)
     args = parser.parse_args()
-    if args.roster_artifact is not None:
+    if args.mode == "SCIENTIFIC":
+        if args.roster_artifact is None or args.launch_manifest is None or args.symbols or args.roster_sha256:
+            parser.error("SCIENTIFIC requires --roster-artifact and --launch-manifest and rejects --symbols/--roster-sha256")
+        run_scientific(args.root, args.roster_artifact, args.launch_manifest)
+        return 0
+    if args.mode == "ENGINEERING_SHADOW" or args.roster_artifact is not None:
+        if args.roster_artifact is None:
+            parser.error("ENGINEERING_SHADOW requires --roster-artifact")
         if args.symbols:
             parser.error("--symbols cannot be combined with --roster-artifact")
         if args.launch_manifest is not None:
@@ -183,7 +204,7 @@ def main() -> int:
             parser.error("roster-driven ENGINEERING_SHADOW is one-shot; do not use --interval-seconds")
         run_engineering_shadow(args.root, args.roster_artifact)
         return 0
-    if not args.symbols:
+    if not args.symbols or not args.roster_sha256:
         parser.error("--symbols is required for legacy engineering pilot mode; scientific/shadow mode requires --roster-artifact")
     symbols = [str(symbol).upper() for symbol in args.symbols]
     if args.launch_manifest is not None:

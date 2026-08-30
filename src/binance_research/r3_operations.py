@@ -125,7 +125,7 @@ def verify_launch_identity(manifest_path: Path, *, roster_sha256: str, implement
         raise LaunchIdentityError(f"launch manifest status is {manifest.get('status')!r}")
     if manifest.get("pilot_status") == "ENGINEERING_PILOT_ONLY":
         raise LaunchIdentityError("engineering pilot identity cannot authorize scientific collection")
-    if manifest.get("roster_sha256") not in {None, roster_sha256}:
+    if manifest.get("roster_sha256") != roster_sha256:
         raise LaunchIdentityError("roster SHA does not match launch manifest")
     if implementation_commit and manifest.get("implementation_commit") != implementation_commit:
         raise LaunchIdentityError("implementation commit does not match launch manifest")

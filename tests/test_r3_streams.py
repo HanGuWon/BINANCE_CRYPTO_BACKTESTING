@@ -14,7 +14,14 @@ def _kline(close_time: int) -> list[object]:
 def test_closed_kline_normalizer_rejects_forming_candle() -> None:
     rows = normalize_stream_payload("klines_15m", "BTCUSDT", [_kline(899_999), _kline(1_800_000)], receipt_time="1970-01-01T00:30:00Z")
     assert len(rows) == 1
-    assert rows[0]["source_available_time"].startswith("1970-01-01T00:14:59")
+    assert rows[0]["source_available_time"] == "1970-01-01T00:30:00+00:00"
+
+
+def test_premium_kline_uses_same_closed_row_and_receipt_availability_rule() -> None:
+    rows = normalize_stream_payload("premium_klines_15m", "BTCUSDT", [_kline(899_999), _kline(1_800_000)], receipt_time="1970-01-01T00:15:02Z")
+    assert len(rows) == 1
+    assert rows[0]["stream"] == "premium_klines_15m"
+    assert rows[0]["source_available_time"] == "1970-01-01T00:15:02+00:00"
 
 
 def test_array_streams_keep_each_row_identity_and_observation_time() -> None:

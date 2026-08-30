@@ -38,7 +38,7 @@ def normalize_stream_payload(stream: str, symbol: str, payload: Any, *, receipt_
     only after their native close time; the final forming candle is rejected.
     """
     receipt = _timestamp(receipt_time)
-    if stream == "klines_15m":
+    if stream in {"klines_15m", "premium_klines_15m"}:
         if not isinstance(payload, list):
             raise StreamSchemaError("klines payload must be an array")
         records: list[dict[str, Any]] = []
@@ -48,10 +48,11 @@ def normalize_stream_payload(stream: str, symbol: str, payload: Any, *, receipt_
             close_time = pd.to_datetime(pd.to_numeric(row[6]), unit="ms", utc=True)
             if close_time >= receipt:
                 continue
+            available = max(close_time, receipt)
             records.append({"stream": stream, "symbol": symbol, "source_row_index": index,
                             "source_row_identity": _row_identity(stream, symbol, row),
                             "source_open_time": pd.to_datetime(pd.to_numeric(row[0]), unit="ms", utc=True).isoformat(),
-                            "source_available_time": close_time.isoformat(),
+                            "source_available_time": available.isoformat(),
                             "observation_time": close_time.isoformat(), "value": row[4],
                             "row": list(row)})
         return records

@@ -26,8 +26,12 @@ outside a continuity segment; NaN is never imputed from future data.
    as (3), with the response sign predeclared opposite to the impulse; it is a
    distinct hypothesis, not a post-outcome polarity switch.
 5. `CROWDING_STRESS_MODIFIER`: fixed context tuple
-   `(funding_rate_t, premium_t)` with no standalone entry and no new polarity;
-   missing either component yields `NaN` for the modifier.
+   `(funding_rate_t, premium_t)` with no standalone entry and no new polarity.
+   `funding_rate_t` is exactly `lastFundingRate` from `/fapi/v1/premiumIndex`;
+   `premium_t` is the close of the most recent fully completed row from
+   `/fapi/v1/premiumIndexKlines?interval=15m`. Mark price is never substituted.
+   Both values must be available before the next executable open; missing either
+   component yields `NaN` for the modifier.
 6. `BTC_BREADTH_CONCORDANCE`: at each decision time,
    `C_t = mean(sign(r_symbol)*sign(r_BTC))` over the frozen selected universe;
    symbols without a valid return are excluded from the denominator.

@@ -8,7 +8,7 @@ outcome_analysis_status = "NOT_STARTED"
 primary_hypothesis_count = 6
 universe_rule = "causal_monthly_um_top50_reused_when_operationally_available"
 collection_cadence = "15m_rest_snapshots_plus_continuous_public_liquidation_stream"
-source_available_rule = "source_available_time < next_executable_open_time; native premium kline close for 15m and maximum constituent close for derived buckets"
+source_available_rule = "source_available_time < next_executable_open_time; source_available_time=max(native_close_time, corrected_response_receipt_time)"
 pilot_status = "ENGINEERING_PILOT_ONLY"
 canonical_price_endpoint = "/fapi/v1/klines?interval=15m"
 canonical_raw_root = "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1/raw_v1"
