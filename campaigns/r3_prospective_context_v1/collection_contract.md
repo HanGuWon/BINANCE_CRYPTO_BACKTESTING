@@ -1,10 +1,10 @@
 # R3 collection contract
 
-Only Binance public market data is collected. The primary source matrix is
-closed 15-minute UM klines, premium index, open interest, book ticker, depth,
-aggregate trades, and continuous `@forceOrder` events. OI history and taker
-ratio are diagnostic context only; top-trader ratio endpoints are excluded
-when credentials would be required. A force-order event is an event-time
+Only Binance public market data is collected. The authoritative primary source
+matrix is closed 15-minute UM klines, premium-index klines, premium index,
+open interest, book ticker, and continuous `@forceOrder` events. Depth,
+aggregate trades, OI history, and taker ratio are diagnostic-only; top-trader
+ratio endpoints are excluded when credentials would be required. A force-order event is an event-time
 liquidation observation, not a periodic sample; absent events are recorded as
 no observation rather than zero.
 
