@@ -123,11 +123,11 @@ async def _shadow_rest_and_ws(collector: ForwardCollector, symbols: list[str], *
     return ws_result
 
 
-def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_mode: str | None = None, ws_seconds: int = SHADOW_WS_SECONDS, context_only_symbols: set[str] | None = None, include_ws: bool = True, boundary: datetime | None = None) -> dict[str, object]:
+def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_mode: str | None = None, ws_seconds: int = SHADOW_WS_SECONDS, context_only_symbols: set[str] | None = None, include_ws: bool = True, boundary: datetime | None = None, collector: ForwardCollector | None = None, clock=None) -> dict[str, object]:
     cycle_started = datetime.now(UTC)
     roster_sha256 = require_sha256(roster_sha256, "roster_sha256")
-    collector = ForwardCollector(AppendOnlyEventStore(root / "raw_v1"))
-    clock = collector.client.calibrate_server_clock("um")
+    collector = collector or ForwardCollector(AppendOnlyEventStore(root / "raw_v1"))
+    clock = clock or collector.client.calibrate_server_clock("um")
     collector.clock_calibration = clock
     clock_uncertainty_ms = clock.round_trip_ms / 2.0 + 1.0
     calibration_id = clock.calibration_id
@@ -250,6 +250,49 @@ def run_scientific_forever(root: Path, roster_artifact: Path, launch_manifest: P
             (resolved / "health" / "shutdown_receipt.json").write_text(json.dumps({"evidence_mode": "SCIENTIFIC", "cycles": cycles, "status": "SHUTDOWN_FINALIZED", "launch_manifest": str(launch_manifest), "implementation_commit": manifest.get("implementation_commit")}, sort_keys=True) + "\n", encoding="utf-8")
     with single_instance_lock(resolved / "control" / "collector.lock"):
         asyncio.run(_run())
+
+
+def run_engineering_shadow_forever(root: Path, roster_artifact: Path, *, max_cycles: int = 4, interval_seconds: int = 900, stop_event: asyncio.Event | None = None, wait_for_boundary: bool = True) -> dict[str, object]:
+    """Run the persistent August engineering architecture without outcomes."""
+    symbols, roster_sha256 = validate_engineering_shadow_inputs(Path(root), roster_artifact, require_fresh=True)
+    context_only = set()
+    if "BTCUSDT" not in symbols:
+        symbols = [*symbols, "BTCUSDT"]
+        context_only.add("BTCUSDT")
+    resolved = Path(root).resolve()
+
+    async def _run() -> dict[str, object]:
+        collector = ForwardCollector(AppendOnlyEventStore(resolved / "raw_v1"))
+        calibration = collector.client.calibrate_server_clock("um")
+        collector.clock_calibration = calibration
+        boundary, scheduled = first_scheduled_boundary(datetime.now(UTC), calibration, interval_seconds=interval_seconds)
+        ws_stop = asyncio.Event()
+        async def ws_worker() -> None:
+            try:
+                async for _ in collector.stream_liquidations("ALL", evidence_mode="ENGINEERING_SHADOW"):
+                    if ws_stop.is_set():
+                        return
+            except asyncio.CancelledError:
+                return
+        ws_task = asyncio.create_task(ws_worker())
+        manifests: list[dict[str, object]] = []
+        try:
+            for _ in range(max_cycles):
+                if wait_for_boundary:
+                    now = calibrated_now(datetime.now(UTC), calibration)
+                    await asyncio.sleep(max(0.0, (scheduled - now).total_seconds()))
+                manifests.append(await asyncio.to_thread(_run_cycle, resolved, symbols, roster_sha256, evidence_mode="ENGINEERING_SHADOW", context_only_symbols=context_only, include_ws=False, boundary=boundary, collector=collector, clock=calibration))
+                boundary = next_quarter_hour(boundary, interval_seconds=interval_seconds)
+                scheduled = boundary + timedelta(seconds=5)
+                if stop_event is not None and stop_event.is_set():
+                    break
+        finally:
+            ws_stop.set(); ws_task.cancel(); await asyncio.gather(ws_task, return_exceptions=True)
+            (resolved / "health" / "shutdown_receipt.json").parent.mkdir(parents=True, exist_ok=True)
+            (resolved / "health" / "shutdown_receipt.json").write_text(json.dumps({"evidence_mode": "ENGINEERING_SHADOW", "cycles": len(manifests), "status": "SHUTDOWN_FINALIZED", "roster_sha256": roster_sha256}, sort_keys=True) + "\n", encoding="utf-8")
+        return {"cycles": len(manifests), "manifests": manifests, "roster_sha256": roster_sha256, "evidence_mode": "ENGINEERING_SHADOW"}
+    with single_instance_lock(resolved / "control" / "collector.lock"):
+        return asyncio.run(_run())
 
 
 def run_once(root: Path, symbols: list[str], roster_sha256: str) -> dict[str, object]:

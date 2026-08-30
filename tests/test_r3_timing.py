@@ -58,3 +58,9 @@ def test_first_persistent_cycle_is_next_absolute_boundary_plus_delay() -> None:
 def test_clock_uncertainty_threshold_is_fail_closed() -> None:
     assert clock_uncertainty_eligible(2000.0)
     assert not clock_uncertainty_eligible(2000.1)
+
+
+def test_calibration_id_changes_when_selected_sample_changes() -> None:
+    first = calibrate_server_clock(local_before_ms=1_000, server_ms=1_125, local_after_ms=1_050)
+    second = calibrate_server_clock(local_before_ms=1_000, server_ms=1_130, local_after_ms=1_050)
+    assert first.calibration_id != second.calibration_id
