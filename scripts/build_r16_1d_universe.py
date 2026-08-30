@@ -155,7 +155,7 @@ def acquire_1d(manifest: pd.DataFrame, *, workers: int = 2) -> pd.DataFrame:
     return pd.DataFrame(records).sort_values(["market", "symbol", "archive_month"])
 
 
-def build_monthly_cohorts(manifest: pd.DataFrame, taxonomy: pd.DataFrame, output_dir: Path) -> pd.DataFrame:
+def build_monthly_cohorts(manifest: pd.DataFrame, taxonomy: pd.DataFrame, output_dir: Path, *, census_dir: Path | None = None) -> pd.DataFrame:
     """Aggregate complete prior calendar months and freeze diagnostic cohorts."""
     census_rows = []
     for row in manifest.itertuples():
@@ -189,8 +189,9 @@ def build_monthly_cohorts(manifest: pd.DataFrame, taxonomy: pd.DataFrame, output
         census_rows.append({"market": row.market, "symbol": row.symbol, "volume_month": str(month), "prior_month_expected_days": expected_days, "prior_month_observed_days": observed_days, "coverage_ratio": coverage, "prior_month_quote_volume": float(summary["quote_volume"]), "volume_integrity_status": summary["integrity_status"], "issue_codes": summary["issue_codes"]})
     volumes = pd.DataFrame(census_rows)
     census_frames = []
+    census_dir = Path(census_dir) if census_dir is not None else Path("data/census/r1_full_history_v1")
     for market in ("spot", "um"):
-        census = pd.read_csv(Path("data/census/r1_full_history_v1") / f"{market}_archive_symbol_census.csv")
+        census = pd.read_csv(census_dir / f"{market}_archive_symbol_census.csv")
         census_frames.append(census[["market", "symbol", "first_archive_month"]])
     census = pd.concat(census_frames, ignore_index=True).rename(columns={"first_archive_month": "first_archive_observed"})
     volumes = volumes.merge(census, on=["market", "symbol"], how="left")
