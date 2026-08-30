@@ -11,7 +11,7 @@ from pathlib import Path
 from binance_research.collector import AppendOnlyEventStore, ForwardCollector
 from binance_research.r3_universe import replay_roster_artifact
 from binance_research.r3_timing import calibrated_now, next_quarter_hour
-from binance_research.r3_operations import append_manifest, build_manifest, require_sha256, single_instance_lock, verify_launch_identity, verify_manifest_chain, write_health_receipt, write_pilot_receipt
+from binance_research.r3_operations import append_manifest, build_manifest, cycle_metadata, require_sha256, single_instance_lock, verify_launch_identity, verify_manifest_chain, write_health_receipt, write_pilot_receipt
 
 PILOT_SYMBOLS = ("BTCUSDT", "ETHUSDT")
 PILOT_ROOT_NAME = "r3_prospective_context_v1"
@@ -97,6 +97,7 @@ async def _shadow_rest_and_ws(collector: ForwardCollector, symbols: list[str], *
 
 
 def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_mode: str | None = None, ws_seconds: int = SHADOW_WS_SECONDS) -> dict[str, object]:
+    cycle_started = datetime.now(UTC)
     roster_sha256 = require_sha256(roster_sha256, "roster_sha256")
     collector = ForwardCollector(AppendOnlyEventStore(root / "raw_v1"))
     clock = collector.client.calibrate_server_clock("um")
@@ -116,6 +117,17 @@ def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_m
         "clock_calibration", "um", "ALL",
         {"calibration_id": f"cal-{datetime.now(UTC).strftime('%Y%m%dT%H%M%S%fZ')}", "offset_ms": clock.offset_ms, "round_trip_ms": clock.round_trip_ms, "uncertainty_ms": clock.round_trip_ms / 2.0 + 1.0},
         source_kind="collector_control", endpoint="/fapi/v1/time", continuity_state="COMPLETE", evidence_mode=evidence_mode,
+    )
+    cycle_finished = datetime.now(UTC)
+    collector.store.append(
+        "cycle_metadata", "um", "ALL",
+        cycle_metadata(
+            cycle_id=f"cycle-{cycle_started.strftime('%Y%m%dT%H%M%S%fZ')}",
+            target_bar_open=cycle_started.isoformat(), target_bar_close=cycle_finished.isoformat(),
+            scheduled_collection_time=cycle_started.isoformat(), actual_collection_start=cycle_started.isoformat(),
+            cycle_completed_at=cycle_finished.isoformat(), clock_calibration_id=f"cal-{cycle_started.strftime('%Y%m%dT%H%M%S%fZ')}",
+            eligible_next_execution_time=datetime.fromtimestamp(cycle_finished.timestamp() + 900, UTC).isoformat(),
+        ), source_kind="collector_control", endpoint="/fapi/v1/time", continuity_state="COMPLETE", evidence_mode=evidence_mode,
     )
     previous = None
     chain = root / "raw_v1" / "manifest_chain.jsonl"
