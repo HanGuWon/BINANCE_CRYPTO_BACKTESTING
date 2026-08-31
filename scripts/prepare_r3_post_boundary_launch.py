@@ -185,6 +185,7 @@ def build_project_production_callbacks() -> dict[str, StageCallback]:
 
 def _acquire_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     """Acquire completed August UM 1d archives through existing R1.6 code."""
+    import pandas as pd
     from scripts.build_r16_1d_universe import acquire_1d, census_1d
     census_dir = Path(ctx.get("census_dir", "data/census/r1_full_history_v1"))
     raw_root = Path(ctx.get("raw_root", "data/raw"))
@@ -195,19 +196,28 @@ def _acquire_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     if august.empty:
         return _acquire_daily_august_fallback(ctx, raw_root=raw_root, census_dir=census_dir)
     acquired = acquire_1d(august, workers=2, raw_root=raw_root)
-    if acquired.empty or not acquired["integrity_status"].astype(str).eq("PASS").all():
-        raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "monthly August acquisition contains incomplete objects")
+    if acquired.empty:
+        acquired = pd.DataFrame(columns=["market", "symbol", "archive_month", "raw_path", "published_sha256", "computed_sha256", "integrity_status"])
     acquired["source_mode"] = "MONTHLY_ARCHIVE"
+    expected_symbols = set(august["symbol"].astype(str).str.upper())
+    monthly_symbols = set(acquired.loc[acquired["integrity_status"].astype(str).eq("PASS"), "symbol"].astype(str).str.upper())
+    missing = sorted(expected_symbols - monthly_symbols)
+    if missing:
+        fallback = _acquire_daily_august_fallback(ctx, raw_root=raw_root, census_dir=census_dir, symbols=missing)
+        fallback_frame = pd.read_csv(fallback["manifest_path"])
+        acquired = pd.concat([acquired, fallback_frame], ignore_index=True)
+    if acquired.empty or not acquired["integrity_status"].astype(str).eq("PASS").all():
+        raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "August acquisition contains incomplete objects")
     acquired.to_csv(out / "august_2026_acquisition.csv", index=False)
     return {"manifest_path": str((out / "august_2026_acquisition.csv").resolve()), "manifest_sha256": hashlib.sha256((out / "august_2026_acquisition.csv").read_bytes()).hexdigest(), "candidate_count": int(len(acquired)), "raw_root": str(raw_root), "source_mode": "MONTHLY_ARCHIVE"}
 
 
-def _acquire_daily_august_fallback(ctx: Mapping[str, Any], *, raw_root: Path, census_dir: Path) -> Mapping[str, Any]:
+def _acquire_daily_august_fallback(ctx: Mapping[str, Any], *, raw_root: Path, census_dir: Path, symbols: list[str] | None = None) -> Mapping[str, Any]:
     """Acquire one verified public daily UM archive per August calendar day."""
     from binance_research.data import ArchiveRequest, BinanceArchiveClient
     import pandas as pd
     census = pd.read_csv(census_dir / "um_archive_symbol_census.csv")
-    symbols = sorted(set(census["symbol"].astype(str).str.upper()))
+    symbols = sorted(set(symbols or census["symbol"].astype(str).str.upper()))
     if not symbols:
         raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "UM census has no fallback symbols")
     client = BinanceArchiveClient(raw_root, timeout=90, max_retries=3)
@@ -241,6 +251,11 @@ def _verify_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     if frame["archive_month"].astype(str).str.contains("2026-09").any():
         raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "September observation entered August source")
     expected_days = set(pd.date_range("2026-08-01", "2026-08-31", freq="D", tz="UTC"))
+    census_path = Path(ctx.get("census_dir", "data/census/r1_full_history_v1")) / "um_archive_symbol_census.csv"
+    if census_path.is_file():
+        expected_symbols = set(pd.read_csv(census_path)["symbol"].astype(str).str.upper())
+    else:
+        expected_symbols = set(frame["symbol"].astype(str).str.upper())
     verified_inputs: list[dict[str, Any]] = []
     grouped_days: dict[str, set[pd.Timestamp]] = {}
     for record in frame.to_dict(orient="records"):
@@ -266,9 +281,14 @@ def _verify_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     for symbol, days in grouped_days.items():
         if days != expected_days:
             raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"{symbol} does not have complete August calendar coverage")
+    verified_symbols = set(grouped_days)
+    missing_symbols = sorted(expected_symbols - verified_symbols)
+    extra_symbols = sorted(verified_symbols - expected_symbols)
+    if missing_symbols or extra_symbols:
+        raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"candidate set mismatch missing={missing_symbols} extra={extra_symbols}")
     semantic_sha = _digest({"month": "2026-08", "inputs": verified_inputs})
     receipt = Path(ctx["control_root"]) / "R3_AUGUST_2026_SOURCE_VERIFICATION_RECEIPT.json"
-    payload = {"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "rows": int(frame.shape[0]), "manifest_path": str(manifest_path), "manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(), "verified_source_semantic_sha256": semantic_sha, "verified_inputs": verified_inputs}
+    payload = {"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "rows": int(frame.shape[0]), "manifest_path": str(manifest_path), "manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(), "verified_source_semantic_sha256": semantic_sha, "expected_symbols": sorted(expected_symbols), "verified_symbols": sorted(verified_symbols), "missing_symbols": missing_symbols, "extra_symbols": extra_symbols, "source_mode_by_symbol": {symbol: sorted({str(item.get("source_mode", "MONTHLY_ARCHIVE")) for item in verified_inputs if item["symbol"] == symbol}) for symbol in sorted(verified_symbols)}, "verified_inputs": verified_inputs}
     if receipt.exists():
         prior = json.loads(receipt.read_text(encoding="utf-8"))
         if prior != payload:
@@ -279,9 +299,12 @@ def _verify_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
 
 
 def _build_september_ranking(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
-    from scripts.qualify_r3_forward_ranking import build_forward_ranking_from_raw, ranking_semantic_sha256
+    from scripts.qualify_r3_forward_ranking import build_forward_ranking_from_verified_source, ranking_semantic_sha256
     output = Path(ctx["control_root"]) / "ranking"
-    ranked = build_forward_ranking_from_raw(Path(ctx.get("raw_root", "data/raw")), Path(ctx.get("census_dir", "data/census/r1_full_history_v1")), output, effective_month="2026-09")
+    receipt_path = Path(ctx.get("AUGUST_SOURCE_VERIFICATION", {}).get("receipt_path", ""))
+    if not receipt_path.is_file():
+        raise PostBoundaryBlocked("R3_BLOCKED_SEPTEMBER_RANKING", "ranking requires verified August source receipt")
+    ranked = build_forward_ranking_from_verified_source(receipt_path, Path(ctx.get("census_dir", "data/census/r1_full_history_v1")), output, effective_month="2026-09")
     frame = __import__("pandas").read_csv(ranked)
     if not frame["volume_month"].astype(str).eq("2026-08").all() or not frame["universe_month"].astype(str).eq("2026-09").all():
         raise PostBoundaryBlocked("R3_BLOCKED_SEPTEMBER_RANKING", "ranking month contract mismatch")
@@ -352,7 +375,7 @@ def _freeze_launch_identity(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     implementation = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
     registry = _registry_identity()
     contract_dir = Path("campaigns/r3_prospective_context_v1")
-    contracts = {name: hashlib.sha256((contract_dir / filename).read_bytes()).hexdigest() for name, filename in {"source_dependency_matrix_sha256": "data_contract.md", "collection_contract_sha256": "collection_contract.md", "feature_semantics_sha256": "feature_semantics.md", "clock_contract_sha256": "R3_CLOCK_CONTRACT.md", "universe_contract_sha256": "universe_contract.md", "metrics_contract_sha256": "metrics_contract.md"}.items()}
+    contracts = {name: hashlib.sha256((contract_dir / filename).read_bytes()).hexdigest() for name, filename in {"data_contract_sha256": "data_contract.md", "source_dependency_matrix_sha256": "R3_SOURCE_DEPENDENCY_MATRIX.json", "collection_contract_sha256": "collection_contract.md", "feature_semantics_sha256": "feature_semantics.md", "clock_contract_sha256": "R3_CLOCK_CONTRACT.md", "universe_contract_sha256": "universe_contract.md", "metrics_contract_sha256": "metrics_contract.md", "multiple_testing_plan_sha256": "multiple_testing_plan.md", "promotion_policy_sha256": "promotion_policy.md"}.items()}
     verification = ctx["AUGUST_SOURCE_VERIFICATION"]
     ranking = ctx["SEPTEMBER_RANKING"]
     roster = ctx["SEPTEMBER_ROSTER_FREEZE"]

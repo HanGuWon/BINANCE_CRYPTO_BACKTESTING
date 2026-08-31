@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from binance_research.r3_universe import build_causal_monthly_roster, replay_roster_artifact
 from binance_research.data import load_kline_archive, validate_klines
 from build_r16_1d_universe import _summarize_1d_archive, build_monthly_cohorts
+from binance_research.panel import select_verified_causal_liquidity_universe
 
 SEMANTIC_FIELDS = ("market", "symbol", "volume_month", "universe_month", "coverage_ratio",
                    "prior_month_quote_volume", "eligibility_reason", "rank", "selected_top50")
@@ -120,6 +121,58 @@ def build_forward_ranking_from_raw(raw_root: Path, census_dir: Path, output_dir:
     if not ranked_path.is_file() or ranked.empty:
         raise RuntimeError("RAW_RANKING_EMPTY")
     return ranked_path
+
+
+def build_forward_ranking_from_verified_source(receipt_path: Path, census_dir: Path, output_dir: Path, *, effective_month: str) -> Path:
+    """Rank only the exact verified August source objects, independent of transport cadence."""
+    receipt = json.loads(Path(receipt_path).read_text(encoding="utf-8"))
+    if receipt.get("status") != "PASS" or receipt.get("market") != "um" or receipt.get("interval") != "1d":
+        raise RuntimeError("R3_RANKING_INPUT_NOT_VERIFIED")
+    inputs = receipt.get("verified_inputs")
+    expected = {str(symbol).upper() for symbol in receipt.get("expected_symbols", [])}
+    if not isinstance(inputs, list) or not inputs:
+        raise RuntimeError("R3_RANKING_INPUT_NOT_VERIFIED")
+    by_symbol: dict[str, list[dict[str, object]]] = {}
+    for item in inputs:
+        symbol = str(item.get("symbol", "")).upper()
+        path = Path(str(item.get("path", "")))
+        if not symbol or not path.is_file():
+            raise RuntimeError("R3_RANKING_INPUT_MISSING_OBJECT")
+        actual = hashlib.sha256(path.read_bytes()).hexdigest()
+        if actual != str(item.get("sha256", "")):
+            raise RuntimeError("R3_RANKING_INPUT_CHECKSUM_MISMATCH")
+        by_symbol.setdefault(symbol, []).append(item)
+    verified = set(by_symbol)
+    if expected and verified != expected:
+        raise RuntimeError(f"R3_RANKING_INPUT_SYMBOL_SET_MISMATCH:expected={sorted(expected)}:verified={sorted(verified)}")
+    prior_month = str(pd.Period(effective_month, freq="M") - 1)
+    rows: list[dict[str, object]] = []
+    for symbol in sorted(verified):
+        candles = pd.concat([load_kline_archive(Path(str(item["path"]))) for item in by_symbol[symbol]], ignore_index=True)
+        days = pd.to_datetime(candles["open_time"], utc=True).dt.floor("D")
+        if candles.empty or days.nunique() != pd.Period(prior_month, freq="M").days_in_month or days.duplicated().any():
+            raise RuntimeError(f"R3_RANKING_INPUT_INCOMPLETE:{symbol}")
+        quote_volume = float(pd.to_numeric(candles["quote_volume"], errors="coerce").fillna(0).sum())
+        rows.append({"market": "um", "symbol": symbol, "archive_month": prior_month, "raw_path": str(by_symbol[symbol][0]["path"]), "published_sha256": str(by_symbol[symbol][0]["sha256"]), "computed_sha256": str(by_symbol[symbol][0]["sha256"]), "integrity_status": "PASS", "row_count": int(len(candles)), "verified_quote_volume": quote_volume})
+    taxonomy = pd.read_csv(Path(census_dir) / "um_archive_symbol_census.csv")
+    taxonomy["market"] = "um"
+    volumes = pd.DataFrame(rows)
+    volumes["volume_month"] = prior_month
+    volumes["prior_month_expected_days"] = pd.Period(prior_month, freq="M").days_in_month
+    volumes["prior_month_observed_days"] = volumes["prior_month_expected_days"]
+    volumes["coverage_ratio"] = 1.0
+    volumes["prior_month_quote_volume"] = volumes.pop("verified_quote_volume")
+    volumes["volume_integrity_status"] = "PASS"
+    volumes["issue_codes"] = ""
+    volumes = volumes.merge(taxonomy[["market", "symbol", "first_archive_month"]].rename(columns={"first_archive_month": "first_archive_observed"}), on=["market", "symbol"], how="left")
+    volumes["universe_month"] = (pd.PeriodIndex(volumes["volume_month"], freq="M") + 1).astype(str)
+    volumes["first_observed"] = pd.to_datetime(volumes["first_archive_observed"].astype(str) + "-01", utc=True, errors="coerce")
+    ranked = select_verified_causal_liquidity_universe(volumes, top_n=50, minimum_coverage_ratio=1.0)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    ranked.to_csv(output_dir / "universe_monthly.csv", index=False)
+    if ranked.empty:
+        raise RuntimeError("RAW_RANKING_EMPTY")
+    return output_dir / "universe_monthly.csv"
 
 
 def qualify(source: Path, august_roster: Path, *, months: tuple[str, ...] = ("2025-06", "2025-08", "2026-07", "2026-08")) -> dict[str, object]:

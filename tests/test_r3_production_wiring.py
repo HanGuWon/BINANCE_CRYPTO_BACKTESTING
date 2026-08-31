@@ -169,3 +169,13 @@ def test_canonical_receipt_records_current_full_suite() -> None:
     assert receipt["passed"] == 298 and receipt["failed"] == 0
     assert receipt["scientific_source_dirty"] is False
     assert receipt["holdout_status"] == "UNTOUCHED"
+
+
+def test_contract_hash_fields_map_to_distinct_canonical_files() -> None:
+    root = Path("campaigns/r3_prospective_context_v1")
+    data_hash = hashlib.sha256((root / "data_contract.md").read_bytes()).hexdigest()
+    dependency_hash = hashlib.sha256((root / "R3_SOURCE_DEPENDENCY_MATRIX.json").read_bytes()).hexdigest()
+    assert data_hash != dependency_hash
+    identity = executor._freeze_launch_identity({"SEPTEMBER_ROSTER_REPLAY": {"roster_sha256": "a" * 64}, "SEPTEMBER_ROSTER_FREEZE": {}, "AUGUST_SOURCE_VERIFICATION": {}, "SEPTEMBER_RANKING": {}, "SEPTEMBER_ENGINEERING_SHADOW": {}, "scientific_root": "D:/scientific"})
+    assert identity["data_contract_sha256"] == data_hash
+    assert identity["source_dependency_matrix_sha256"] == dependency_hash
