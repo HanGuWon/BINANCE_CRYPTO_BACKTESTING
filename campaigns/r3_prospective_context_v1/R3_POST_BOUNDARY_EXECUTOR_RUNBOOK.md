@@ -16,9 +16,12 @@ gate maps to the explicit `R3_BLOCKED_*` states in the goal objective. The old
 blocked `R3_LAUNCH_MANIFEST.json` is never edited into authority.
 
 Implementation: `scripts/prepare_r3_post_boundary_launch.py` exposes the
-calibrated `execute_post_boundary` state machine. Every stage requires an
-explicit proof-producing callback and writes a hashed, replay-checked JSON
-receipt. The default callbacks fail closed, so no network or collector action
-is implicit. Before the boundary, the calibrated gate returns without creating
-the receipt directory or invoking any callback. Synthetic qualification uses
-temporary D-backed paths and injected callbacks only.
+calibrated `execute_post_boundary` state machine and
+`build_project_production_callbacks` factory. Production control receipts use
+`D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09`;
+scientific raw evidence uses the separate `scientific_raw_v1` root. Every stage
+requires a proof-producing adapter and writes a hashed, replay-checked control
+receipt. `supervise_scientific_process` requires a verified first cycle before
+activation is acknowledged. Before the boundary, the calibrated gate returns
+without creating either root or invoking any callback. Synthetic qualification
+uses temporary paths and local adapters only.

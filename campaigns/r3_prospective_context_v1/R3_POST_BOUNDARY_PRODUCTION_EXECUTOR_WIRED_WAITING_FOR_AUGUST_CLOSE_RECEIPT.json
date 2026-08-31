@@ -1,0 +1,39 @@
+{
+  "status": "R3_POST_BOUNDARY_PRODUCTION_EXECUTOR_WIRED_WAITING_FOR_AUGUST_CLOSE",
+  "recorded_at_utc": "2026-08-31T07:28:00Z",
+  "boundary_utc": "2026-09-01T00:00:00Z",
+  "implementation_commit": "853f8cb7c8c14208ccd23b6bee4fcbe190ef69d5",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "scientific_source_tree_sha256": "8b1a22303c49ff6135a2d6c1a7ea240e95b82433ca93d074c5cf007af95cb245",
+  "control_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09",
+  "scientific_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v1",
+  "entry_point": "scripts/prepare_r3_post_boundary_launch.py --execute-production",
+  "production_callback_factory": "build_project_production_callbacks",
+  "adapters": [
+    "AUGUST_SOURCE_ACQUISITION",
+    "AUGUST_SOURCE_VERIFICATION",
+    "SEPTEMBER_RANKING",
+    "SEPTEMBER_ROSTER_FREEZE",
+    "SEPTEMBER_ROSTER_REPLAY",
+    "SEPTEMBER_ENGINEERING_SHADOW",
+    "LAUNCH_IDENTITY_FREEZE",
+    "LAUNCH_MANIFEST_BUILD",
+    "LAUNCH_SEAL",
+    "SCIENTIFIC_ROOT_GATE",
+    "SCIENTIFIC_ACTIVATION"
+  ],
+  "replay": "control receipts are hash-validated and reused; scientific root checked only at activation gate",
+  "supervisor": "supervise_scientific_process requires one verified cycle, manifest chain, health, and terminates unverified child",
+  "qualification": {
+    "targeted_tests": "33 passed in 0.21s",
+    "full_pytest": "293 passed, 1 warning in 197.37s (0:03:17)",
+    "synthetic_and_local_fixture_only": true
+  },
+  "september_ranking": "NOT_BUILT",
+  "september_roster": "NOT_BUILT",
+  "scientific_collection": "NOT_ACTIVATED",
+  "outcomes": "NOT_STARTED",
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED",
+  "preserved_roots": ["v3", "v4", "v5", "v6"]
+}
