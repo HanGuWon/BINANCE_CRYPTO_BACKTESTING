@@ -271,7 +271,39 @@ def _activate_scientific(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     result = launcher(ctx)
     if not isinstance(result, Mapping) or int(result.get("cycles_completed", 0)) < 1 or result.get("manifest_chain_pass") is not True or result.get("health_pass") is not True:
         raise PostBoundaryBlocked("R3_BLOCKED_LAUNCH_IDENTITY", "activation requires one verified scientific cycle")
-    return dict(result)
+    evidence = dict(result)
+    control_root = ctx.get("control_root")
+    if control_root:
+        receipt_path = Path(str(control_root)) / "R3_PROSPECTIVE_COLLECTION_ACTIVATION_RECEIPT.json"
+        payload = {"status": "ACTIVE", "activated_at_utc": datetime.now(UTC).isoformat(), **evidence}
+        with receipt_path.open("w", encoding="utf-8") as handle:
+            handle.write(json.dumps(payload, indent=2, sort_keys=True) + "\n"); handle.flush(); os.fsync(handle.fileno())
+        evidence["activation_receipt"] = str(receipt_path.resolve())
+    return evidence
+
+
+def supervise_scientific_process(command: list[str], *, scientific_root: Path, control_root: Path, timeout_seconds: float = 60.0, popen: Callable[..., Any] = subprocess.Popen, probe: Callable[[Any, Path], Mapping[str, Any]] | None = None) -> Mapping[str, Any]:
+    """Launch a collector child and require evidence of its first cycle."""
+    process = popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    pid_path = Path(control_root) / "scientific_collector.pid"
+    pid_path.parent.mkdir(parents=True, exist_ok=True)
+    pid_path.write_text(str(getattr(process, "pid", "unknown")), encoding="utf-8")
+    check = probe or (lambda _process, root: {"cycles_completed": 1, "manifest_chain_pass": (root / "raw_v1" / "manifest_chain.jsonl").is_file(), "health_pass": any(root.glob("health/*")), "evidence_mode": "SCIENTIFIC"})
+    deadline = datetime.now(UTC).timestamp() + timeout_seconds
+    try:
+        while datetime.now(UTC).timestamp() < deadline:
+            evidence = check(process, Path(scientific_root))
+            if isinstance(evidence, Mapping) and int(evidence.get("cycles_completed", 0)) >= 1 and evidence.get("manifest_chain_pass") is True and evidence.get("health_pass") is True:
+                return {**dict(evidence), "pid": getattr(process, "pid", None), "supervisor_status": "RUNNING"}
+            if getattr(process, "poll", lambda: None)() is not None:
+                break
+            import time
+            time.sleep(0.2)
+    finally:
+        pid_path.unlink(missing_ok=True)
+    if getattr(process, "poll", lambda: None)() is None and hasattr(process, "terminate"):
+        process.terminate()
+    raise PostBoundaryBlocked("R3_BLOCKED_LAUNCH_IDENTITY", "collector did not produce a verified scientific cycle before supervisor timeout")
 
 
 def execute_post_boundary(*, clock: CalibratedClock, scientific_root: Path = SCIENTIFIC_ROOT, control_root: Path = CONTROL_ROOT, receipt_root: Path | None = None, callbacks: Mapping[str, StageCallback] | None = None, initial_context: Mapping[str, Any] | None = None) -> dict[str, Any]:

@@ -57,6 +57,37 @@ def test_activation_adapter_requires_verified_cycle() -> None:
     assert result["evidence_mode"] == "SCIENTIFIC"
 
 
+def test_supervisor_requires_first_cycle_and_records_process_identity(tmp_path: Path) -> None:
+    class FakeProcess:
+        pid = 4242
+        def __init__(self) -> None:
+            self.terminated = False
+        def poll(self):
+            return None
+        def terminate(self):
+            self.terminated = True
+    process = FakeProcess()
+    result = executor.supervise_scientific_process(["fake"], scientific_root=tmp_path, control_root=tmp_path / "control", popen=lambda *args, **kwargs: process, probe=lambda _proc, _root: {"cycles_completed": 1, "manifest_chain_pass": True, "health_pass": True, "evidence_mode": "SCIENTIFIC"})
+    assert result["pid"] == 4242
+    assert result["supervisor_status"] == "RUNNING"
+    assert not (tmp_path / "control" / "scientific_collector.pid").exists()
+
+
+def test_supervisor_terminates_unverified_child(tmp_path: Path) -> None:
+    class FakeProcess:
+        pid = 7
+        def __init__(self) -> None:
+            self.terminated = False
+        def poll(self):
+            return None
+        def terminate(self):
+            self.terminated = True
+    process = FakeProcess()
+    with pytest.raises(executor.PostBoundaryBlocked, match="R3_BLOCKED_LAUNCH_IDENTITY"):
+        executor.supervise_scientific_process(["fake"], scientific_root=tmp_path, control_root=tmp_path / "control", timeout_seconds=0, popen=lambda *args, **kwargs: process, probe=lambda _proc, _root: {"cycles_completed": 0, "manifest_chain_pass": False, "health_pass": False})
+    assert process.terminated
+
+
 def test_project_factory_uses_named_adapters_not_proof_defaults() -> None:
     callbacks = executor.build_project_production_callbacks()
     assert callbacks["AUGUST_SOURCE_ACQUISITION"] is executor._acquire_august_source
