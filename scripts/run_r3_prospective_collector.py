@@ -11,7 +11,7 @@ from pathlib import Path
 from binance_research.collector import AppendOnlyEventStore, ForwardCollector
 from binance_research.r3_universe import replay_roster_artifact
 from binance_research.r3_timing import calibrated_now, cycle_boundaries, next_quarter_hour
-from binance_research.r3_operations import append_manifest, build_manifest, cycle_metadata, require_sha256, single_instance_lock, verify_launch_identity, verify_manifest_chain, write_health_receipt, write_pilot_receipt
+from binance_research.r3_operations import append_manifest, build_manifest, cycle_metadata, require_sha256, single_instance_lock, verify_launch_identity, verify_launch_seal, verify_manifest_chain, write_health_receipt, write_pilot_receipt
 
 PILOT_SYMBOLS = ("BTCUSDT", "ETHUSDT")
 PILOT_ROOT_NAME = "r3_prospective_context_v1"
@@ -44,9 +44,12 @@ def _load_roster(roster_artifact: Path):
     return replay_roster_artifact(Path(roster_artifact), effective_month=month)
 
 
-def validate_scientific_inputs(manifest_path: Path, *, roster_sha256: str, implementation_commit: str | None = None) -> dict[str, object]:
+def validate_scientific_inputs(manifest_path: Path, *, roster_sha256: str, implementation_commit: str | None = None, launch_seal: Path | None = None, scientific_root: Path | None = None) -> dict[str, object]:
     """Require an unblocked launch manifest before any scientific collection."""
-    return verify_launch_identity(manifest_path, roster_sha256=roster_sha256, implementation_commit=implementation_commit)
+    manifest = verify_launch_identity(manifest_path, roster_sha256=roster_sha256, implementation_commit=implementation_commit)
+    seal = Path(launch_seal) if launch_seal is not None else Path(manifest_path).with_name("R3_PROSPECTIVE_LAUNCH_SEAL_RECEIPT.json")
+    verify_launch_seal(seal, Path(manifest_path), roster_sha256=roster_sha256, scientific_root=scientific_root)
+    return manifest
 
 
 def validate_engineering_shadow_inputs(root: Path, roster_artifact: Path, *, at_utc: datetime | None = None, require_fresh: bool = False) -> tuple[list[str], str]:
@@ -75,7 +78,7 @@ def run_engineering_shadow(root: Path, roster_artifact: Path, *, at_utc: datetim
 def run_scientific(root: Path, roster_artifact: Path, launch_manifest: Path) -> dict[str, object]:
     """Run the same primary collector path, authorized only by a frozen launch manifest."""
     roster = _load_roster(roster_artifact)
-    manifest = validate_scientific_inputs(launch_manifest, roster_sha256=roster.roster_sha256)
+    manifest = validate_scientific_inputs(launch_manifest, roster_sha256=roster.roster_sha256, scientific_root=root)
     resolved = Path(root).resolve()
     if resolved.drive.upper() != "D:" or resolved.name in {"raw_v1", "scientific_raw_v1"}:
         raise ValueError("SCIENTIFIC requires a fresh D-backed scientific root")
@@ -203,7 +206,7 @@ def run_scientific_forever(root: Path, roster_artifact: Path, launch_manifest: P
     authorize it.  ``max_cycles`` exists only for outcome-blind qualification.
     """
     roster = _load_roster(roster_artifact)
-    manifest = validate_scientific_inputs(launch_manifest, roster_sha256=roster.roster_sha256)
+    manifest = validate_scientific_inputs(launch_manifest, roster_sha256=roster.roster_sha256, scientific_root=root)
     resolved = Path(root).resolve()
     if resolved.drive.upper() != "D:":
         raise ValueError("SCIENTIFIC requires a D-backed root")

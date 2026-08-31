@@ -147,6 +147,35 @@ def verify_scientific_launch_identity(manifest_path: Path, *, expected: dict[str
     return manifest
 
 
+def verify_launch_seal(seal_path: Path, manifest_path: Path, *, roster_sha256: str, scientific_root: Path | None = None) -> dict[str, Any]:
+    """Require a sealed, content-addressed launch before scientific collection."""
+    seal_path, manifest_path = Path(seal_path), Path(manifest_path)
+    if not seal_path.is_file():
+        raise LaunchIdentityError("launch seal is missing")
+    try:
+        seal = json.loads(seal_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise LaunchIdentityError("launch seal is invalid") from exc
+    if seal.get("status") != "SEALED":
+        raise LaunchIdentityError("launch seal is not SEALED")
+    actual_manifest_sha = _sha256(manifest_path)
+    if seal.get("manifest_sha256") != actual_manifest_sha:
+        raise LaunchIdentityError("launch seal manifest SHA does not match manifest")
+    sealed_manifest = Path(str(seal.get("manifest_path", ""))).resolve()
+    if sealed_manifest != manifest_path.resolve():
+        raise LaunchIdentityError("launch seal manifest path mismatch")
+    if seal.get("roster_sha256") != roster_sha256:
+        raise LaunchIdentityError("launch seal roster SHA does not match")
+    manifest = verify_launch_identity(manifest_path, roster_sha256=roster_sha256)
+    if scientific_root is not None and Path(str(manifest.get("scientific_root", ""))).resolve() != Path(scientific_root).resolve():
+        raise LaunchIdentityError("launch seal scientific root mismatch")
+    try:
+        sealed_at = datetime.fromisoformat(str(seal["sealed_at_utc"]).replace("Z", "+00:00"))
+    except (KeyError, ValueError) as exc:
+        raise LaunchIdentityError("launch seal lacks valid completion time") from exc
+    return {"seal": seal, "manifest": manifest, "manifest_sha256": actual_manifest_sha, "sealed_at_utc": sealed_at.astimezone(UTC).isoformat()}
+
+
 def cycle_metadata(*, cycle_id: str, target_bar_open: str, target_bar_close: str, scheduled_collection_time: str, actual_collection_start: str, cycle_completed_at: str, clock_calibration_id: str, eligible_next_execution_time: str) -> dict[str, str]:
     """Return the canonical machine-readable cycle timing record."""
     return {"cycle_id": cycle_id, "target_bar_open": target_bar_open, "target_bar_close": target_bar_close, "scheduled_collection_time": scheduled_collection_time, "actual_collection_start": actual_collection_start, "cycle_completed_at": cycle_completed_at, "clock_calibration_id": clock_calibration_id, "eligible_next_execution_time": eligible_next_execution_time}

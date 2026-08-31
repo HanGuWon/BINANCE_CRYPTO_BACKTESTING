@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import io
+import zipfile
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pandas as pd
@@ -37,7 +40,16 @@ def test_real_roster_freeze_replay_and_identity_artifacts(tmp_path: Path) -> Non
 
 def test_real_august_verifier_rejects_scope_and_accepts_complete_fixture(tmp_path: Path) -> None:
     raw = tmp_path / "archive.zip"
-    raw.write_bytes(b"fixture")
+    rows = []
+    for day in range(1, 32):
+        stamp = int(pd.Timestamp(f"2026-08-{day:02d}", tz="UTC").timestamp() * 1000)
+        close = stamp + 86_400_000 - 1
+        rows.append([stamp, 1, 2, 0.5, 1.5, 10, close, 15, 1, 5, 7, 0])
+    payload = io.StringIO()
+    for row in rows:
+        payload.write(",".join(map(str, row)) + "\n")
+    with zipfile.ZipFile(raw, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("FIXUSDT-1d-2026-08.csv", payload.getvalue())
     sha = hashlib.sha256(raw.read_bytes()).hexdigest()
     manifest = tmp_path / "acquisition.csv"
     pd.DataFrame([{"market": "um", "symbol": "FIXUSDT", "archive_month": "2026-08", "integrity_status": "PASS", "published_sha256": sha, "computed_sha256": sha, "raw_path": str(raw)}]).to_csv(manifest, index=False)
@@ -48,6 +60,33 @@ def test_real_august_verifier_rejects_scope_and_accepts_complete_fixture(tmp_pat
     bad.to_csv(manifest, index=False)
     with pytest.raises(executor.PostBoundaryBlocked, match="R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE"):
         executor._verify_august_source({"control_root": str(tmp_path), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest)}})
+
+
+def test_production_clock_uses_binance_rest_client_five_samples(monkeypatch: pytest.MonkeyPatch) -> None:
+    import binance_research.data as data
+    calls: list[tuple[str, int]] = []
+    class FakeRest:
+        def calibrate_server_clock(self, market: str, *, sample_count: int = 5):
+            calls.append((market, sample_count))
+            return type("Calibration", (), {"round_trip_ms": 12, "offset_ms": 0, "calibration_id": "fake"})()
+    monkeypatch.setattr(data, "BinanceRestClient", FakeRest)
+    clock = executor._production_clock()
+    assert calls == [("um", 5)]
+    assert clock.uncertainty_ms == 7
+
+
+def test_august_acquisition_filters_spot_before_download(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    import scripts.build_r16_1d_universe as builder
+    listed = pd.DataFrame([{"market": "spot", "symbol": "SPOTUSDT", "archive_month": "2026-08", "interval": "1d"}, {"market": "um", "symbol": "UMUSDT", "archive_month": "2026-08", "interval": "1d"}])
+    monkeypatch.setattr(builder, "census_1d", lambda *_args, **_kwargs: (pd.DataFrame(), listed))
+    captured: list[pd.DataFrame] = []
+    def fake_acquire(frame: pd.DataFrame, **_kwargs):
+        captured.append(frame.copy())
+        return pd.DataFrame([{"market": "um", "symbol": "UMUSDT", "archive_month": "2026-08", "raw_path": str(tmp_path / "um.zip"), "published_sha256": "a" * 64, "computed_sha256": "a" * 64, "integrity_status": "PASS"}])
+    monkeypatch.setattr(builder, "acquire_1d", fake_acquire)
+    result = executor._acquire_august_source({"control_root": str(tmp_path), "raw_root": str(tmp_path / "raw"), "census_dir": str(tmp_path / "census")})
+    assert captured and set(captured[0]["market"]) == {"um"}
+    assert result["source_mode"] == "MONTHLY_ARCHIVE"
 
 
 def test_activation_adapter_requires_verified_cycle() -> None:
