@@ -1,12 +1,12 @@
 {
   "state": "R3_POST_BOUNDARY_PRODUCTION_EXECUTOR_LAUNCHABLE_WAITING_FOR_AUGUST_CLOSE",
   "branch": "research/r2b-restricted-derivatives-v1",
-  "implementation_commit": "6ac29243f3ef94f03a7b0d7a546909fb6a004b03",
+  "implementation_commit": "541fe1368db226cd9f20314e0f009ef22dac0700",
   "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
-  "source_tree_sha256": "9afdaae6eeb61aeeead44052f33f91465b51983b61a0f0f2f930f3e4988d0366",
+  "source_tree_sha256": "a5a118b2c5904e35aa86204e580808d2b048c40f948d2f4f3254c91bcc0b32b8",
   "scientific_source_dirty": false,
-  "full_pytest": "298 passed, 1 warning in 99.25s (0:01:39)",
-  "focused_pytest": "35 passed in 0.44s",
+  "full_pytest": "302 passed, 1 warning in 89.81s (0:01:29)",
+  "focused_pytest": "39 passed in 0.72s",
   "preboundary_cli": {
     "command": "python scripts/prepare_r3_post_boundary_launch.py",
     "exit_code": 1,
