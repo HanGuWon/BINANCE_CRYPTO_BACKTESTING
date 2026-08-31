@@ -156,3 +156,8 @@ def test_project_factory_uses_named_adapters_not_proof_defaults() -> None:
     assert callbacks["AUGUST_SOURCE_ACQUISITION"] is executor._acquire_august_source
     assert callbacks["SEPTEMBER_RANKING"] is executor._build_september_ranking
     assert callbacks["LAUNCH_SEAL"] is executor._build_launch_seal
+
+
+def test_rollover_gap_blocks_without_next_roster() -> None:
+    assert executor.rollover_state(now=datetime(2026, 10, 1, tzinfo=UTC), has_next_roster=False) == "UNIVERSE_ROLLOVER_GAP"
+    assert executor.rollover_state(now=datetime(2026, 9, 30, 23, 59, tzinfo=UTC), has_next_roster=False) == "ACTIVE"
