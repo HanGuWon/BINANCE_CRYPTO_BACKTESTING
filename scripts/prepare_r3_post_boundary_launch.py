@@ -37,6 +37,7 @@ class CalibratedClock:
 
     server_time: datetime
     uncertainty_ms: float
+    sample_count: int = 5
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "server_time", self.server_time.astimezone(UTC))
@@ -47,9 +48,9 @@ StageCallback = Callable[[Mapping[str, Any]], Mapping[str, Any]]
 
 def require_calibrated_boundary(clock: CalibratedClock) -> None:
     if clock.uncertainty_ms > MAX_CLOCK_UNCERTAINTY_MS:
-        raise PostBoundaryBlocked("R3_BLOCKED_CLOCK_CAUSALITY", f"Binance clock uncertainty {clock.uncertainty_ms:.3f}ms exceeds {MAX_CLOCK_UNCERTAINTY_MS}ms")
+        raise PostBoundaryBlocked("R3_BLOCKED_CLOCK_CAUSALITY", f"Binance clock calibration samples={clock.sample_count}; uncertainty {clock.uncertainty_ms:.3f}ms exceeds {MAX_CLOCK_UNCERTAINTY_MS}ms")
     if clock.server_time < BOUNDARY_UTC:
-        raise PostBoundaryBlocked("R3_BLOCKED_SEPTEMBER_ROSTER", f"calibrated Binance time {clock.server_time.isoformat()} is before {BOUNDARY_UTC.isoformat()}")
+        raise PostBoundaryBlocked("R3_BLOCKED_SEPTEMBER_ROSTER", f"calibrated Binance time {clock.server_time.isoformat()} from samples={clock.sample_count} is before {BOUNDARY_UTC.isoformat()}")
 
 
 def require_boundary(now: datetime) -> None:
@@ -539,7 +540,7 @@ def _production_clock() -> CalibratedClock:
     from binance_research.r3_timing import calibrated_now
     calibration = BinanceRestClient().calibrate_server_clock("um", sample_count=5)
     current = calibrated_now(datetime.now(UTC), calibration)
-    return CalibratedClock(current, calibration.round_trip_ms / 2.0 + 1.0)
+    return CalibratedClock(current, calibration.round_trip_ms / 2.0 + 1.0, sample_count=5)
 
 
 def _production_collector_launcher(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
