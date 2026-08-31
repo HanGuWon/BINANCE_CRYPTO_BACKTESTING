@@ -134,6 +134,23 @@ def test_supervisor_terminates_unverified_child(tmp_path: Path) -> None:
     assert process.terminated
 
 
+def test_supervisor_default_probe_rejects_file_only_evidence(tmp_path: Path) -> None:
+    class FakeProcess:
+        pid = 8
+        def __init__(self) -> None:
+            self.terminated = False
+        def poll(self):
+            return None
+        def terminate(self):
+            self.terminated = True
+    process = FakeProcess()
+    (tmp_path / "raw_v1").mkdir(parents=True)
+    (tmp_path / "health").mkdir()
+    with pytest.raises(executor.PostBoundaryBlocked, match="R3_BLOCKED_LAUNCH_IDENTITY"):
+        executor.supervise_scientific_process(["fake"], scientific_root=tmp_path, control_root=tmp_path / "control", timeout_seconds=0, popen=lambda *args, **kwargs: process)
+    assert process.terminated
+
+
 def test_project_factory_uses_named_adapters_not_proof_defaults() -> None:
     callbacks = executor.build_project_production_callbacks()
     assert callbacks["AUGUST_SOURCE_ACQUISITION"] is executor._acquire_august_source

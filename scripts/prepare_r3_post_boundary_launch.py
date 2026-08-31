@@ -400,13 +400,53 @@ def _activate_scientific(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     return evidence
 
 
-def supervise_scientific_process(command: list[str], *, scientific_root: Path, control_root: Path, timeout_seconds: float = 60.0, popen: Callable[..., Any] = subprocess.Popen, probe: Callable[[Any, Path], Mapping[str, Any]] | None = None) -> Mapping[str, Any]:
+def _probe_scientific_evidence(process: Any, root: Path, *, manifest_path: Path | None = None, seal_path: Path | None = None, roster_sha256: str | None = None) -> Mapping[str, Any]:
+    """Verify actual scientific cycle, health, chain, and launch authorization."""
+    if getattr(process, "poll", lambda: None)() is not None:
+        return {"cycles_completed": 0, "manifest_chain_pass": False, "health_pass": False}
+    chain = root / "raw_v1" / "manifest_chain.jsonl"
+    health_path = root / "health" / "health_receipts.jsonl"
+    if not chain.is_file() or not verify_manifest_chain(chain) or not health_path.is_file():
+        return {"cycles_completed": 0, "manifest_chain_pass": False, "health_pass": False}
+    lines = [line for line in health_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    try:
+        health = json.loads(lines[-1])
+    except (IndexError, json.JSONDecodeError):
+        return {"cycles_completed": 0, "manifest_chain_pass": True, "health_pass": False}
+    if health.get("evidence_mode") != "SCIENTIFIC" or (roster_sha256 and health.get("roster_sha256") != roster_sha256):
+        return {"cycles_completed": 0, "manifest_chain_pass": True, "health_pass": False, "evidence_mode": health.get("evidence_mode")}
+    latest = json.loads([line for line in chain.read_text(encoding="utf-8").splitlines() if line.strip()][-1])
+    if latest.get("manifest_sha256") != health.get("manifest_sha256"):
+        return {"cycles_completed": 0, "manifest_chain_pass": True, "health_pass": False}
+    cycle_count = 0
+    for path in (root / "raw_v1").rglob("*.jsonl"):
+        if path.name == "manifest_chain.jsonl":
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                envelope = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if envelope.get("evidence_mode") != "SCIENTIFIC":
+                return {"cycles_completed": 0, "manifest_chain_pass": True, "health_pass": False, "evidence_mode": envelope.get("evidence_mode")}
+            cycle_count += int(envelope.get("stream") == "cycle_metadata")
+    if cycle_count < 1:
+        return {"cycles_completed": 0, "manifest_chain_pass": True, "health_pass": False, "evidence_mode": "SCIENTIFIC"}
+    if manifest_path is not None and seal_path is not None and roster_sha256:
+        try:
+            verify_launch_seal(seal_path, manifest_path, roster_sha256=roster_sha256, scientific_root=root)
+        except Exception:
+            return {"cycles_completed": cycle_count, "manifest_chain_pass": True, "health_pass": False, "evidence_mode": "SCIENTIFIC"}
+    return {"cycles_completed": cycle_count, "manifest_chain_pass": True, "health_pass": True, "evidence_mode": "SCIENTIFIC", "manifest_sha256": latest.get("manifest_sha256"), "roster_sha256": health.get("roster_sha256")}
+
+
+def supervise_scientific_process(command: list[str], *, scientific_root: Path, control_root: Path, timeout_seconds: float = 60.0, popen: Callable[..., Any] = subprocess.Popen, probe: Callable[[Any, Path], Mapping[str, Any]] | None = None, manifest_path: Path | None = None, seal_path: Path | None = None, roster_sha256: str | None = None) -> Mapping[str, Any]:
     """Launch a collector child and require evidence of its first cycle."""
     process = popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     pid_path = Path(control_root) / "scientific_collector.pid"
     pid_path.parent.mkdir(parents=True, exist_ok=True)
     pid_path.write_text(str(getattr(process, "pid", "unknown")), encoding="utf-8")
-    check = probe or (lambda _process, root: {"cycles_completed": 1, "manifest_chain_pass": (root / "raw_v1" / "manifest_chain.jsonl").is_file(), "health_pass": any(root.glob("health/*")), "evidence_mode": "SCIENTIFIC"})
+    check = probe or (lambda proc, root: _probe_scientific_evidence(proc, root, manifest_path=manifest_path, seal_path=seal_path, roster_sha256=roster_sha256))
     deadline = datetime.now(UTC).timestamp() + timeout_seconds
     try:
         while datetime.now(UTC).timestamp() < deadline:
@@ -482,7 +522,7 @@ def _production_clock() -> CalibratedClock:
 def _production_collector_launcher(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     """Start the qualified persistent collector and supervise its first cycle."""
     command = [sys.executable, "scripts/run_r3_prospective_collector.py", "--mode", "SCIENTIFIC", "--persistent", "--root", str(ctx["scientific_root"]), "--roster-artifact", str(ctx["SEPTEMBER_ROSTER_FREEZE"]["roster_path"]), "--launch-manifest", str(ctx["LAUNCH_MANIFEST_BUILD"]["manifest_path"])]
-    return supervise_scientific_process(command, scientific_root=Path(ctx["scientific_root"]), control_root=Path(ctx["control_root"]), timeout_seconds=float(ctx.get("supervisor_timeout_seconds", 900)))
+    return supervise_scientific_process(command, scientific_root=Path(ctx["scientific_root"]), control_root=Path(ctx["control_root"]), timeout_seconds=float(ctx.get("supervisor_timeout_seconds", 900)), manifest_path=Path(ctx["LAUNCH_MANIFEST_BUILD"]["manifest_path"]), seal_path=Path(ctx.get("LAUNCH_SEAL", {}).get("seal_path", Path(ctx["control_root"]) / "R3_PROSPECTIVE_LAUNCH_SEAL_RECEIPT.json")), roster_sha256=str(ctx["SEPTEMBER_ROSTER_REPLAY"]["roster_sha256"]))
 
 
 def main(argv: list[str] | None = None) -> int:

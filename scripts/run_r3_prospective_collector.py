@@ -82,6 +82,8 @@ def run_scientific(root: Path, roster_artifact: Path, launch_manifest: Path) -> 
     resolved = Path(root).resolve()
     if resolved.drive.upper() != "D:" or resolved.name in {"raw_v1", "scientific_raw_v1"}:
         raise ValueError("SCIENTIFIC requires a fresh D-backed scientific root")
+    if resolved.exists() and any(resolved.iterdir()):
+        _validate_authorized_resume(resolved, launch_manifest, roster.roster_sha256)
     if manifest.get("campaign_id") != "r3_prospective_context_v1":
         raise ValueError("launch manifest campaign mismatch")
     symbols = list(roster.symbols)
@@ -91,6 +93,21 @@ def run_scientific(root: Path, roster_artifact: Path, launch_manifest: Path) -> 
         context_only.add("BTCUSDT")
     with single_instance_lock(resolved / "control" / "collector.lock"):
         return _run_cycle(resolved, symbols, roster.roster_sha256, evidence_mode="SCIENTIFIC", ws_seconds=SHADOW_WS_SECONDS, context_only_symbols=context_only)
+
+
+def _validate_authorized_resume(root: Path, launch_manifest: Path, roster_sha256: str) -> None:
+    """Allow only a root produced by this exact sealed launch identity."""
+    chain = root / "raw_v1" / "manifest_chain.jsonl"
+    health = root / "health" / "health_receipts.jsonl"
+    if not chain.is_file() or not verify_manifest_chain(chain) or not health.is_file():
+        raise ValueError("SCIENTIFIC resume root is missing a valid manifest chain or health receipt")
+    lines = [line for line in health.read_text(encoding="utf-8").splitlines() if line.strip()]
+    latest = json.loads(lines[-1])
+    if latest.get("evidence_mode") != "SCIENTIFIC" or latest.get("roster_sha256") != roster_sha256:
+        raise ValueError("SCIENTIFIC resume root has foreign evidence or roster identity")
+    seal = Path(launch_manifest).with_name("R3_PROSPECTIVE_LAUNCH_SEAL_RECEIPT.json")
+    verify_launch_seal(seal, Path(launch_manifest), roster_sha256=roster_sha256, scientific_root=root)
+    AppendOnlyEventStore(root / "raw_v1").append("collector_status", "um", "ALL", {"status": "AUTHORIZED_RESUME", "manifest_sha256": latest.get("manifest_sha256")}, source_kind="collector_control", endpoint="/fapi/v1/time", continuity_state="RESTART_GAP", evidence_mode="SCIENTIFIC")
 
 
 async def _shadow_rest_and_ws(collector: ForwardCollector, symbols: list[str], *, evidence_mode: str, ws_seconds: int = 5) -> dict[str, object]:
@@ -211,7 +228,7 @@ def run_scientific_forever(root: Path, roster_artifact: Path, launch_manifest: P
     if resolved.drive.upper() != "D:":
         raise ValueError("SCIENTIFIC requires a D-backed root")
     if resolved.exists() and any(resolved.iterdir()):
-        raise ValueError("SCIENTIFIC root must be fresh and empty")
+        _validate_authorized_resume(resolved, launch_manifest, roster.roster_sha256)
     symbols = list(roster.symbols)
     context_only = set()
     if "BTCUSDT" not in symbols:
@@ -237,6 +254,15 @@ def run_scientific_forever(root: Path, roster_artifact: Path, launch_manifest: P
             await asyncio.sleep(max(0.0, (scheduled - calibrated_now(datetime.now(UTC), calibration)).total_seconds()))
             while max_cycles is None or cycles < max_cycles:
                 if stop_event is not None and stop_event.is_set():
+                    break
+                now = calibrated_now(datetime.now(UTC), calibration)
+                if now >= datetime.fromisoformat(roster.effective_end).astimezone(UTC):
+                    collector.store.append("collector_status", "um", "ALL", {"status": "UNIVERSE_ROLLOVER_GAP", "from_month": roster.effective_month, "observed_at": now.isoformat()}, source_kind="collector_control", endpoint="/fapi/v1/time", continuity_state="UNIVERSE_ROLLOVER_GAP", evidence_mode="SCIENTIFIC")
+                    chain = resolved / "raw_v1" / "manifest_chain.jsonl"
+                    previous = json.loads(chain.read_text(encoding="utf-8").splitlines()[-1])["manifest_sha256"] if chain.exists() and chain.read_text(encoding="utf-8").strip() else None
+                    gap_manifest = build_manifest(resolved / "raw_v1", previous_manifest_sha256=previous)
+                    append_manifest(resolved / "raw_v1", gap_manifest)
+                    write_health_receipt(resolved, raw_root=resolved / "raw_v1", campaign_id="r3_prospective_context_v1", manifest_sha256=gap_manifest["manifest_sha256"], roster_sha256=roster.roster_sha256, stream_state={"status": "UNIVERSE_ROLLOVER_GAP"}, evidence_mode="SCIENTIFIC", gap_count=1)
                     break
                 await asyncio.to_thread(_run_cycle, resolved, symbols, roster.roster_sha256, evidence_mode="SCIENTIFIC", context_only_symbols=context_only, include_ws=False, boundary=boundary)
                 cycles += 1
