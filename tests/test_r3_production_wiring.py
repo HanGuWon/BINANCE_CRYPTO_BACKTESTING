@@ -161,3 +161,11 @@ def test_project_factory_uses_named_adapters_not_proof_defaults() -> None:
 def test_rollover_gap_blocks_without_next_roster() -> None:
     assert executor.rollover_state(now=datetime(2026, 10, 1, tzinfo=UTC), has_next_roster=False) == "UNIVERSE_ROLLOVER_GAP"
     assert executor.rollover_state(now=datetime(2026, 9, 30, 23, 59, tzinfo=UTC), has_next_roster=False) == "ACTIVE"
+
+
+def test_canonical_receipt_records_current_full_suite() -> None:
+    receipt = json.loads(Path("campaigns/r3_prospective_context_v1/full_pytest_receipt.json").read_text(encoding="utf-8"))
+    assert receipt["status"] == "PASS"
+    assert receipt["passed"] == 296 and receipt["failed"] == 0
+    assert receipt["scientific_source_dirty"] is False
+    assert receipt["holdout_status"] == "UNTOUCHED"
