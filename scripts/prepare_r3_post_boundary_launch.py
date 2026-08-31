@@ -246,7 +246,7 @@ def _run_september_shadow(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
 
 def _freeze_launch_identity(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     implementation = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-    return {"implementation_commit": implementation, "registry_sha256": str(ctx.get("registry_sha256", "")), "roster_sha256": ctx["SEPTEMBER_ROSTER_REPLAY"]["roster_sha256"], "shadow_receipt": ctx["SEPTEMBER_ENGINEERING_SHADOW"].get("root", "")}
+    return {"implementation_commit": implementation, "registry_sha256": str(ctx.get("registry_sha256", "")), "roster_sha256": ctx["SEPTEMBER_ROSTER_REPLAY"]["roster_sha256"], "shadow_receipt": ctx.get("SEPTEMBER_ENGINEERING_SHADOW", {}).get("root", "")}
 
 
 def _build_launch_manifest(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
