@@ -124,7 +124,11 @@ def build_forward_ranking_from_raw(raw_root: Path, census_dir: Path, output_dir:
 
 
 def build_forward_ranking_from_verified_source(receipt_path: Path, census_dir: Path, output_dir: Path, *, effective_month: str) -> Path:
-    """Rank only the exact verified August source objects, independent of transport cadence."""
+    """Rank only the exact verified August source objects, independent of transport cadence.
+
+    The receipt is the authority boundary: filesystem objects not listed there
+    are intentionally invisible to the ranking calculation.
+    """
     receipt = json.loads(Path(receipt_path).read_text(encoding="utf-8"))
     if receipt.get("status") != "PASS" or receipt.get("market") != "um" or receipt.get("interval") != "1d":
         raise RuntimeError("R3_RANKING_INPUT_NOT_VERIFIED")
