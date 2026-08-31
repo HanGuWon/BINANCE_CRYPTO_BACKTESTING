@@ -215,5 +215,5 @@ def test_verified_monthly_and_daily_transport_paths_have_equal_ranking_semantics
     left = pd.read_csv(build_forward_ranking_from_verified_source(monthly_receipt, census, tmp_path / "out-monthly", effective_month="2026-09"))
     right = pd.read_csv(build_forward_ranking_from_verified_source(daily_receipt, census, tmp_path / "out-daily", effective_month="2026-09"))
     fields = ["prior_month_quote_volume", "rank", "selected_top50"]
-    assert left[fields].to_dict("records") == right[fields].to_dict("records")
+    pd.testing.assert_frame_equal(left[fields], right[fields], check_dtype=False)
     assert ranking_semantic_sha256(left, effective_month="2026-09", selected_only=False) == ranking_semantic_sha256(right, effective_month="2026-09", selected_only=False)
