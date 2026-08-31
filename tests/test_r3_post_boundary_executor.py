@@ -8,8 +8,12 @@ import pytest
 from scripts.prepare_r3_post_boundary_launch import (
     BOUNDARY_UTC,
     CalibratedClock,
+    PRODUCTION_STAGE_NAMES,
     PostBoundaryBlocked,
+    build_production_callbacks,
+    build_project_production_callbacks,
     execute_post_boundary,
+    main as executor_main,
     prepare_post_boundary_plan,
     require_fresh_scientific_root,
     rollover_state,
@@ -130,3 +134,53 @@ def test_activation_cannot_run_without_launch_seal() -> None:
 def test_rollover_expires_without_authorized_next_roster() -> None:
     assert rollover_state(now=datetime(2026, 10, 1, tzinfo=UTC), has_next_roster=False) == "UNIVERSE_ROLLOVER_GAP"
     assert rollover_state(now=datetime(2026, 10, 1, tzinfo=UTC), has_next_roster=True) == "ACTIVE"
+
+
+def test_control_and_scientific_roots_are_separate_and_factory_is_complete() -> None:
+    control, scientific = _droot("control_fixture"), _droot("scientific_fixture")
+    callbacks = build_production_callbacks(adapters=_callbacks([]))
+    result = execute_post_boundary(clock=CalibratedClock(BOUNDARY_UTC, 1), control_root=control, scientific_root=scientific, callbacks=callbacks)
+    assert result["status"] == "R3_READY_FOR_PROSPECTIVE_LAUNCH"
+    assert any(control.iterdir())
+    assert not scientific.exists() or not any(scientific.iterdir())
+
+
+def test_factory_rejects_missing_or_noncallable_adapters() -> None:
+    with pytest.raises(ValueError, match="missing adapters"):
+        build_production_callbacks(adapters={})
+    broken = {name: (lambda _ctx: {}) for name in PRODUCTION_STAGE_NAMES}
+    broken["LAUNCH_SEAL"] = None
+    with pytest.raises(TypeError, match="callable"):
+        build_production_callbacks(adapters=broken)
+
+
+def test_interrupted_stage_replays_valid_control_receipts() -> None:
+    control, scientific = _droot("interrupt_control"), _droot("interrupt_scientific")
+    calls: list[str] = []
+    callbacks = _callbacks(calls)
+    callbacks["SEPTEMBER_ROSTER_FREEZE"] = lambda _ctx: (_ for _ in ()).throw(RuntimeError("interrupted"))
+    with pytest.raises(PostBoundaryBlocked, match="R3_BLOCKED_IMPLEMENTATION"):
+        execute_post_boundary(clock=CalibratedClock(BOUNDARY_UTC, 1), control_root=control, scientific_root=scientific, callbacks=callbacks)
+    assert (control / "august_source_acquisition.json").exists()
+    callbacks = _callbacks(calls)
+    execute_post_boundary(clock=CalibratedClock(BOUNDARY_UTC, 1), control_root=control, scientific_root=scientific, callbacks=callbacks)
+    assert calls.count("AUGUST_SOURCE_ACQUISITION") == 1
+
+
+def test_cli_without_execute_flag_is_explicitly_blocked() -> None:
+    with pytest.raises(SystemExit, match="R3_BLOCKED_SEPTEMBER_ROSTER"):
+        executor_main([])
+
+
+def test_production_cli_uses_calibrated_clock_and_blocks_preboundary(monkeypatch: pytest.MonkeyPatch) -> None:
+    import scripts.prepare_r3_post_boundary_launch as executor
+    control, scientific = _droot("cli_control"), _droot("cli_scientific")
+    monkeypatch.setattr(executor, "_production_clock", lambda: CalibratedClock(datetime(2026, 8, 31, 23, 59, tzinfo=UTC), 1))
+    assert executor.main(["--execute-production", "--control-root", str(control), "--scientific-root", str(scientific)]) == 2
+    assert not control.exists()
+    assert not scientific.exists()
+
+
+def test_project_factory_exposes_all_real_stage_names() -> None:
+    callbacks = build_project_production_callbacks()
+    assert tuple(callbacks) == PRODUCTION_STAGE_NAMES

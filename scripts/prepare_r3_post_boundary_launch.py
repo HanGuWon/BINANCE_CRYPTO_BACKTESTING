@@ -13,6 +13,8 @@ import os
 import subprocess
 import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
 BOUNDARY_UTC = datetime(2026, 9, 1, tzinfo=UTC)
 SCIENTIFIC_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\scientific_raw_v1")
 CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09")
@@ -174,7 +176,7 @@ def _acquire_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     august = listed[listed["archive_month"].astype(str).eq("2026-08")].copy()
     if august.empty:
         raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "no completed August UM 1d archive candidates")
-    acquired = acquire_1d(august, workers=2)
+    acquired = acquire_1d(august, workers=2, raw_root=raw_root)
     acquired.to_csv(out / "august_2026_acquisition.csv", index=False)
     return {"manifest_path": str((out / "august_2026_acquisition.csv").resolve()), "candidate_count": int(len(acquired)), "raw_root": str(raw_root)}
 
@@ -345,6 +347,9 @@ def main(argv: list[str] | None = None) -> int:
         result = execute_post_boundary(clock=clock, control_root=args.control_root, scientific_root=args.scientific_root, callbacks=None, initial_context={"raw_root": str(args.raw_root), "census_dir": str(args.census_dir), "roster_path": str(args.roster_path), "shadow_root": str(args.shadow_root), "registry_sha256": args.registry_sha256})
     except PostBoundaryBlocked as exc:
         print(str(exc), file=sys.stderr)
+        return 2
+    except Exception as exc:
+        print(f"R3_BLOCKED_CLOCK_CAUSALITY: Binance clock calibration failed: {type(exc).__name__}: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(result, sort_keys=True))
     return 0

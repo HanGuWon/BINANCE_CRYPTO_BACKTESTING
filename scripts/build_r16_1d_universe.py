@@ -116,8 +116,9 @@ def census_1d(census_dir: Path, output_dir: Path, *, workers: int = 2) -> tuple[
     return taxonomy, manifest
 
 
-def acquire_1d(manifest: pd.DataFrame, *, workers: int = 2) -> pd.DataFrame:
-    client = BinanceArchiveClient(Path("data/raw"), timeout=90, max_retries=3)
+def acquire_1d(manifest: pd.DataFrame, *, workers: int = 2, raw_root: Path | None = None) -> pd.DataFrame:
+    """Acquire verified native 1d archives into an explicit raw root."""
+    client = BinanceArchiveClient(Path(raw_root) if raw_root is not None else Path("data/raw"), timeout=90, max_retries=3)
     requests = []
     for row in manifest.itertuples():
         year, month = (int(part) for part in str(row.archive_month).split("-"))
