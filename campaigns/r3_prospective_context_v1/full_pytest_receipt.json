@@ -6,15 +6,15 @@
   "failed": 0,
   "warnings": 1,
   "pytest_summary": "298 passed, 1 warning in 101.04s (0:01:41)",
-  "run_timestamp": "2026-08-31T13:48:31Z",
-  "implementation_commit": "2762a5312092b62fb8b1ad13d5c36601bd04dca0",
-  "source_tree_sha256": "b7ed8e859b13f5c2588fee9a6a6fd3b44108f987425ae6af82d580fec47e5d9d",
+  "run_timestamp": "2026-08-31T13:52:59Z",
+  "implementation_commit": "6ac29243f3ef94f03a7b0d7a546909fb6a004b03",
+  "source_tree_sha256": "9afdaae6eeb61aeeead44052f33f91465b51983b61a0f0f2f930f3e4988d0366",
   "scientific_source_dirty": false,
   "holdout_status": "UNTOUCHED",
   "outcome_analysis_status": "NOT_STARTED",
   "receipt_source_identity": {
-    "cxc_commit_sha": "2762a5312092b62fb8b1ad13d5c36601bd04dca0",
-    "cxc_tree_hash": "b7ed8e859b13f5c2588fee9a6a6fd3b44108f987425ae6af82d580fec47e5d9d",
+    "cxc_commit_sha": "6ac29243f3ef94f03a7b0d7a546909fb6a004b03",
+    "cxc_tree_hash": "9afdaae6eeb61aeeead44052f33f91465b51983b61a0f0f2f930f3e4988d0366",
     "cxc_global_dirty": true,
     "scientific_scope_status": "clean"
   }

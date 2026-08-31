@@ -1,0 +1,24 @@
+{
+  "state": "R3_POST_BOUNDARY_PRODUCTION_EXECUTOR_LAUNCHABLE_WAITING_FOR_AUGUST_CLOSE",
+  "branch": "research/r2b-restricted-derivatives-v1",
+  "implementation_commit": "6ac29243f3ef94f03a7b0d7a546909fb6a004b03",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "source_tree_sha256": "9afdaae6eeb61aeeead44052f33f91465b51983b61a0f0f2f930f3e4988d0366",
+  "scientific_source_dirty": false,
+  "full_pytest": "298 passed, 1 warning in 99.25s (0:01:39)",
+  "focused_pytest": "35 passed in 0.44s",
+  "preboundary_cli": {
+    "command": "python scripts/prepare_r3_post_boundary_launch.py",
+    "exit_code": 1,
+    "stderr": "R3_BLOCKED_SEPTEMBER_ROSTER: use --execute-production after calibrated boundary"
+  },
+  "scientific_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v1",
+  "september_ranking": "ABSENT",
+  "september_roster": "ABSENT",
+  "scientific_activation": "NOT_STARTED",
+  "outcomes": "NOT_STARTED",
+  "r2b2": "NOT_STARTED",
+  "final_holdout": "UNTOUCHED",
+  "historical_roots": ["v3", "v4", "v5", "v6", "PRESERVED"],
+  "notes": "Production command is wired but intentionally not executed before the calibrated September boundary. No historical R3 outcomes, future returns, PnL, rankings, roster, or holdout were accessed."
+}
