@@ -166,6 +166,6 @@ def test_rollover_gap_blocks_without_next_roster() -> None:
 def test_canonical_receipt_records_current_full_suite() -> None:
     receipt = json.loads(Path("campaigns/r3_prospective_context_v1/full_pytest_receipt.json").read_text(encoding="utf-8"))
     assert receipt["status"] == "PASS"
-    assert receipt["passed"] == 296 and receipt["failed"] == 0
+    assert receipt["passed"] == 298 and receipt["failed"] == 0
     assert receipt["scientific_source_dirty"] is False
     assert receipt["holdout_status"] == "UNTOUCHED"
