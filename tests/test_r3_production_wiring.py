@@ -29,7 +29,14 @@ def test_real_roster_freeze_replay_and_identity_artifacts(tmp_path: Path) -> Non
     assert frozen["symbol_count"] == 50
     replayed = executor._replay_september_roster({"SEPTEMBER_ROSTER_FREEZE": frozen})
     assert replayed["roster_sha256"] == frozen["roster_sha256"]
-    identity = executor._freeze_launch_identity({"SEPTEMBER_ROSTER_REPLAY": replayed, "registry_sha256": "a" * 64})
+    identity = executor._freeze_launch_identity({
+        "SEPTEMBER_ROSTER_REPLAY": replayed,
+        "SEPTEMBER_ROSTER_FREEZE": frozen,
+        "AUGUST_SOURCE_VERIFICATION": {},
+        "SEPTEMBER_RANKING": {},
+        "SEPTEMBER_ENGINEERING_SHADOW": {},
+        "scientific_root": str(tmp_path / "scientific"),
+    })
     assert identity["roster_sha256"] == frozen["roster_sha256"]
     manifest = executor._build_launch_manifest({"control_root": str(tmp_path), "scientific_root": str(tmp_path / "scientific"), "clock": "2026-09-01T00:00:00+00:00", "LAUNCH_IDENTITY_FREEZE": identity, "SEPTEMBER_ROSTER_REPLAY": replayed})
     assert manifest["status"] == "R3_READY_FOR_PROSPECTIVE_LAUNCH"
