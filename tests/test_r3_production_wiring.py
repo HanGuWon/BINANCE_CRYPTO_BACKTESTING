@@ -179,3 +179,8 @@ def test_contract_hash_fields_map_to_distinct_canonical_files() -> None:
     identity = executor._freeze_launch_identity({"SEPTEMBER_ROSTER_REPLAY": {"roster_sha256": "a" * 64}, "SEPTEMBER_ROSTER_FREEZE": {}, "AUGUST_SOURCE_VERIFICATION": {}, "SEPTEMBER_RANKING": {}, "SEPTEMBER_ENGINEERING_SHADOW": {}, "scientific_root": "D:/scientific"})
     assert identity["data_contract_sha256"] == data_hash
     assert identity["source_dependency_matrix_sha256"] == dependency_hash
+
+
+def test_ranking_requires_verified_august_receipt(tmp_path: Path) -> None:
+    with pytest.raises(executor.PostBoundaryBlocked, match="R3_BLOCKED_SEPTEMBER_RANKING"):
+        executor._build_september_ranking({"control_root": str(tmp_path), "census_dir": str(tmp_path)})
