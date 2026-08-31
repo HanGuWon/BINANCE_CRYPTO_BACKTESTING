@@ -163,6 +163,11 @@ def test_rollover_gap_blocks_without_next_roster() -> None:
     assert executor.rollover_state(now=datetime(2026, 9, 30, 23, 59, tzinfo=UTC), has_next_roster=False) == "ACTIVE"
 
 
+def test_calibrated_clock_defaults_to_five_samples() -> None:
+    clock = executor.CalibratedClock(datetime(2026, 8, 31, tzinfo=UTC), 1.0)
+    assert clock.sample_count == 5
+
+
 def test_canonical_receipt_records_current_full_suite() -> None:
     receipt = json.loads(Path("campaigns/r3_prospective_context_v1/full_pytest_receipt.json").read_text(encoding="utf-8"))
     assert receipt["status"] == "PASS"
