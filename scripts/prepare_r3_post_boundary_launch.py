@@ -86,6 +86,15 @@ def _default_blocked(code: str, reason: str) -> StageCallback:
 
 
 def _run_stage(stage: str, callback: StageCallback, context: Mapping[str, Any], receipt_root: Path) -> dict[str, Any]:
+    path = receipt_root / f"{stage.lower()}.json"
+    if path.exists():
+        try:
+            existing = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise PostBoundaryBlocked("R3_BLOCKED_IMPLEMENTATION", f"invalid {stage} receipt: {exc}") from exc
+        if existing.get("stage") != stage or existing.get("status") != "PASS" or not isinstance(existing.get("proof"), Mapping) or existing.get("proof_sha256") != _digest(existing["proof"]):
+            raise PostBoundaryBlocked("R3_BLOCKED_LAUNCH_IDENTITY", f"conflicting {stage} receipt on replay")
+        return existing
     try:
         proof = callback(context)
     except PostBoundaryBlocked:
@@ -94,6 +103,8 @@ def _run_stage(stage: str, callback: StageCallback, context: Mapping[str, Any], 
         raise PostBoundaryBlocked("R3_BLOCKED_IMPLEMENTATION", f"{stage} callback failed: {exc}") from exc
     if not isinstance(proof, Mapping) or not proof:
         raise PostBoundaryBlocked("R3_BLOCKED_IMPLEMENTATION", f"{stage} returned no proof")
+    if stage == "SEPTEMBER_ENGINEERING_SHADOW" and proof.get("evidence_mode") == "SCIENTIFIC":
+        raise PostBoundaryBlocked("R3_BLOCKED_SEPTEMBER_SHADOW", "engineering shadow proof is contaminated with SCIENTIFIC evidence")
     return _write_stage_receipt(receipt_root, stage, proof)
 
 
@@ -114,6 +125,8 @@ def execute_post_boundary(*, clock: CalibratedClock, scientific_root: Path = SCI
         "SEPTEMBER_ROSTER_REPLAY": _default_blocked("R3_BLOCKED_SEPTEMBER_ROSTER", "September roster replay proof required"),
         "SEPTEMBER_ENGINEERING_SHADOW": _default_blocked("R3_BLOCKED_SEPTEMBER_SHADOW", "September shadow proof required"),
         "LAUNCH_IDENTITY_FREEZE": _default_blocked("R3_BLOCKED_LAUNCH_IDENTITY", "launch identity proof required"),
+        "LAUNCH_MANIFEST_BUILD": _default_blocked("R3_BLOCKED_LAUNCH_IDENTITY", "fresh launch manifest proof required"),
+        "LAUNCH_SEAL": _default_blocked("R3_BLOCKED_LAUNCH_IDENTITY", "launch seal proof required"),
         "SCIENTIFIC_ROOT_GATE": lambda _: {"root": str(root), "fresh": True},
         "SCIENTIFIC_ACTIVATION": _default_blocked("R3_BLOCKED_LAUNCH_IDENTITY", "scientific activation proof required"),
     }
@@ -136,7 +149,7 @@ def rollover_state(*, now: datetime, september_end: datetime = datetime(2026, 10
 def prepare_post_boundary_plan(*, now: datetime, scientific_root: Path = SCIENTIFIC_ROOT) -> dict[str, object]:
     require_boundary(now)
     root = require_fresh_scientific_root(scientific_root)
-    return {"status": "POST_BOUNDARY_EXECUTOR_READY", "boundary_utc": BOUNDARY_UTC.isoformat().replace("+00:00", "Z"), "scientific_root": str(root), "steps": ["TEMPORAL_GATE", "AUGUST_SOURCE_ACQUISITION", "AUGUST_SOURCE_VERIFICATION", "SEPTEMBER_RANKING", "build_september_liquidity_ranking", "SEPTEMBER_ROSTER_FREEZE", "SEPTEMBER_ROSTER_REPLAY", "SEPTEMBER_ENGINEERING_SHADOW", "LAUNCH_IDENTITY_FREEZE", "SCIENTIFIC_ROOT_GATE", "SCIENTIFIC_ACTIVATION"], "execute": False, "outcomes": "NOT_STARTED", "final_holdout": "UNTOUCHED", "r2b2": "NOT_STARTED"}
+    return {"status": "POST_BOUNDARY_EXECUTOR_READY", "boundary_utc": BOUNDARY_UTC.isoformat().replace("+00:00", "Z"), "scientific_root": str(root), "steps": ["TEMPORAL_GATE", "AUGUST_SOURCE_ACQUISITION", "AUGUST_SOURCE_VERIFICATION", "SEPTEMBER_RANKING", "build_september_liquidity_ranking", "SEPTEMBER_ROSTER_FREEZE", "SEPTEMBER_ROSTER_REPLAY", "SEPTEMBER_ENGINEERING_SHADOW", "LAUNCH_IDENTITY_FREEZE", "LAUNCH_MANIFEST_BUILD", "LAUNCH_SEAL", "SCIENTIFIC_ROOT_GATE", "SCIENTIFIC_ACTIVATION"], "execute": False, "outcomes": "NOT_STARTED", "final_holdout": "UNTOUCHED", "r2b2": "NOT_STARTED"}
 
 
 if __name__ == "__main__":
