@@ -38,7 +38,7 @@ def test_real_roster_freeze_replay_and_identity_artifacts(tmp_path: Path) -> Non
         "scientific_root": str(tmp_path / "scientific"),
     })
     assert identity["roster_sha256"] == frozen["roster_sha256"]
-    manifest = executor._build_launch_manifest({"control_root": str(tmp_path), "scientific_root": str(tmp_path / "scientific"), "clock": "2026-09-01T00:00:00+00:00", "LAUNCH_IDENTITY_FREEZE": identity, "SEPTEMBER_ROSTER_REPLAY": replayed})
+    manifest = executor._build_launch_manifest({"control_root": str(tmp_path), "scientific_root": str(tmp_path / "scientific"), "clock": "2026-09-01T00:00:00+00:00", "LAUNCH_IDENTITY_FREEZE": identity, "SEPTEMBER_ROSTER_REPLAY": replayed, "AUGUST_SOURCE_VERIFICATION": {}, "SEPTEMBER_RANKING": {}, "SEPTEMBER_ROSTER_FREEZE": frozen})
     assert manifest["status"] == "R3_READY_FOR_PROSPECTIVE_LAUNCH"
     seal = executor._build_launch_seal({"control_root": str(tmp_path), "clock": "2026-09-01T00:00:00+00:00", "LAUNCH_IDENTITY_FREEZE": identity, "SEPTEMBER_ROSTER_REPLAY": replayed, "LAUNCH_MANIFEST_BUILD": manifest})
     assert seal["status"] == "SEALED"
