@@ -184,3 +184,36 @@ def test_contract_hash_fields_map_to_distinct_canonical_files() -> None:
 def test_ranking_requires_verified_august_receipt(tmp_path: Path) -> None:
     with pytest.raises(executor.PostBoundaryBlocked, match="R3_BLOCKED_SEPTEMBER_RANKING"):
         executor._build_september_ranking({"control_root": str(tmp_path), "census_dir": str(tmp_path)})
+
+
+def test_verified_monthly_and_daily_transport_paths_have_equal_ranking_semantics(tmp_path: Path) -> None:
+    from scripts.qualify_r3_forward_ranking import build_forward_ranking_from_verified_source, ranking_semantic_sha256
+    census = tmp_path / "census"
+    census.mkdir()
+    pd.DataFrame([{"market": "um", "symbol": "FIXUSDT", "first_archive_month": "2026-08"}]).to_csv(census / "um_archive_symbol_census.csv", index=False)
+    rows = []
+    for day in range(1, 32):
+        stamp = int(pd.Timestamp(f"2026-08-{day:02d}", tz="UTC").timestamp() * 1000)
+        rows.append([stamp, 1, 2, 0.5, 1.5, 10, stamp + 86_400_000 - 1, 15, 1, 5, 7, 0])
+    def write_zip(path: Path, subset: list[list[object]]) -> str:
+        payload = "".join(",".join(map(str, row)) + "\n" for row in subset)
+        with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+            archive.writestr("FIXUSDT-1d.csv", payload)
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    monthly = tmp_path / "monthly.zip"
+    monthly_sha = write_zip(monthly, rows)
+    daily_items = []
+    for index, row in enumerate(rows, start=1):
+        path = tmp_path / f"daily-{index:02d}.zip"
+        daily_items.append({"symbol": "FIXUSDT", "path": str(path), "sha256": write_zip(path, [row]), "source_mode": "DAILY_ARCHIVE_FALLBACK"})
+    def receipt(path: Path, items: list[dict[str, object]]) -> Path:
+        payload = {"status": "PASS", "market": "um", "interval": "1d", "verified_inputs": items, "expected_symbols": ["FIXUSDT"]}
+        path.write_text(json.dumps(payload), encoding="utf-8")
+        return path
+    monthly_receipt = receipt(tmp_path / "monthly-receipt.json", [{"symbol": "FIXUSDT", "path": str(monthly), "sha256": monthly_sha, "source_mode": "MONTHLY_ARCHIVE"}])
+    daily_receipt = receipt(tmp_path / "daily-receipt.json", daily_items)
+    left = pd.read_csv(build_forward_ranking_from_verified_source(monthly_receipt, census, tmp_path / "out-monthly", effective_month="2026-09"))
+    right = pd.read_csv(build_forward_ranking_from_verified_source(daily_receipt, census, tmp_path / "out-daily", effective_month="2026-09"))
+    fields = ["prior_month_quote_volume", "rank", "selected_top50"]
+    assert left[fields].to_dict("records") == right[fields].to_dict("records")
+    assert ranking_semantic_sha256(left, effective_month="2026-09", selected_only=False) == ranking_semantic_sha256(right, effective_month="2026-09", selected_only=False)
