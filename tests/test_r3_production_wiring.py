@@ -60,13 +60,13 @@ def test_real_august_verifier_rejects_scope_and_accepts_complete_fixture(tmp_pat
     sha = hashlib.sha256(raw.read_bytes()).hexdigest()
     manifest = tmp_path / "acquisition.csv"
     pd.DataFrame([{"market": "um", "symbol": "FIXUSDT", "archive_month": "2026-08", "integrity_status": "PASS", "published_sha256": sha, "computed_sha256": sha, "raw_path": str(raw)}]).to_csv(manifest, index=False)
-    result = executor._verify_august_source({"control_root": str(tmp_path), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest)}})
+    result = executor._verify_august_source({"control_root": str(tmp_path), "census_dir": str(tmp_path / "missing-census"), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest)}})
     assert result["rows"] == 1
     bad = pd.read_csv(manifest)
     bad.loc[0, "market"] = "spot"
     bad.to_csv(manifest, index=False)
     with pytest.raises(executor.PostBoundaryBlocked, match="R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE"):
-        executor._verify_august_source({"control_root": str(tmp_path), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest)}})
+        executor._verify_august_source({"control_root": str(tmp_path), "census_dir": str(tmp_path / "missing-census"), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest)}})
 
 
 def test_production_clock_uses_binance_rest_client_five_samples(monkeypatch: pytest.MonkeyPatch) -> None:
