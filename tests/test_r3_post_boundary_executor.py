@@ -88,7 +88,7 @@ def test_stage_failures_are_explicit_and_fail_closed(stage: str, code: str) -> N
     callbacks = _callbacks([])
     callbacks[stage] = lambda _ctx: (_ for _ in ()).throw(PostBoundaryBlocked(code, "synthetic failure"))
     with pytest.raises(PostBoundaryBlocked, match=code):
-        execute_post_boundary(clock=CalibratedClock(BOUNDARY_UTC, 1), scientific_root=_droot("stage_" + stage.lower()), callbacks=callbacks)
+        execute_post_boundary(clock=CalibratedClock(BOUNDARY_UTC, 1), scientific_root=_droot("stage_" + stage.lower()), control_root=_droot("control_stage_" + stage.lower()), callbacks=callbacks)
 
 
 def test_success_is_ordered_idempotent_and_activation_follows_seal() -> None:
@@ -117,14 +117,14 @@ def test_engineering_shadow_cannot_claim_scientific_mode() -> None:
     callbacks = _callbacks([])
     callbacks["SEPTEMBER_ENGINEERING_SHADOW"] = lambda _ctx: {"evidence_mode": "SCIENTIFIC"}
     with pytest.raises(PostBoundaryBlocked, match="R3_BLOCKED_SEPTEMBER_SHADOW"):
-        execute_post_boundary(clock=CalibratedClock(BOUNDARY_UTC, 1), scientific_root=_droot("contaminated"), callbacks=callbacks)
+        execute_post_boundary(clock=CalibratedClock(BOUNDARY_UTC, 1), scientific_root=_droot("contaminated"), control_root=_droot("control_contaminated"), callbacks=callbacks)
 
 
 def test_activation_cannot_run_without_launch_seal() -> None:
     callbacks = _callbacks([])
     del callbacks["LAUNCH_SEAL"]
     with pytest.raises(PostBoundaryBlocked, match="R3_BLOCKED_LAUNCH_IDENTITY"):
-        execute_post_boundary(clock=CalibratedClock(BOUNDARY_UTC, 1), scientific_root=_droot("no_seal"), callbacks=callbacks)
+        execute_post_boundary(clock=CalibratedClock(BOUNDARY_UTC, 1), scientific_root=_droot("no_seal"), control_root=_droot("control_no_seal"), callbacks=callbacks)
 
 
 def test_rollover_expires_without_authorized_next_roster() -> None:
