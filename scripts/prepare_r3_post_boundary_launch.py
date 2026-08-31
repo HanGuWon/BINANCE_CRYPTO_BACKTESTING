@@ -361,6 +361,12 @@ def _production_clock() -> CalibratedClock:
     return CalibratedClock(current, calibration.round_trip_ms / 2.0 + 1.0)
 
 
+def _production_collector_launcher(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
+    """Start the qualified persistent collector and supervise its first cycle."""
+    command = [sys.executable, "scripts/run_r3_prospective_collector.py", "--mode", "SCIENTIFIC", "--persistent", "--root", str(ctx["scientific_root"]), "--roster-artifact", str(ctx["SEPTEMBER_ROSTER_FREEZE"]["roster_path"]), "--launch-manifest", str(ctx["LAUNCH_MANIFEST_BUILD"]["manifest_path"])]
+    return supervise_scientific_process(command, scientific_root=Path(ctx["scientific_root"]), control_root=Path(ctx["control_root"]), timeout_seconds=float(ctx.get("supervisor_timeout_seconds", 900)))
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Calibrated, fail-closed R3 post-boundary executor")
     parser.add_argument("--execute-production", action="store_true")
@@ -371,12 +377,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--roster-path", type=Path, default=Path("campaigns/r3_prospective_context_v1/rosters/2026-09.json"))
     parser.add_argument("--shadow-root", type=Path, default=Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v1"))
     parser.add_argument("--registry-sha256", default="")
+    parser.add_argument("--supervisor-timeout-seconds", type=float, default=900.0)
     args = parser.parse_args(argv)
     if not args.execute_production:
         raise SystemExit("R3_BLOCKED_SEPTEMBER_ROSTER: use --execute-production after calibrated boundary")
     try:
         clock = _production_clock()
-        result = execute_post_boundary(clock=clock, control_root=args.control_root, scientific_root=args.scientific_root, callbacks=None, initial_context={"raw_root": str(args.raw_root), "census_dir": str(args.census_dir), "roster_path": str(args.roster_path), "shadow_root": str(args.shadow_root), "registry_sha256": args.registry_sha256})
+        result = execute_post_boundary(clock=clock, control_root=args.control_root, scientific_root=args.scientific_root, callbacks=None, initial_context={"raw_root": str(args.raw_root), "census_dir": str(args.census_dir), "roster_path": str(args.roster_path), "shadow_root": str(args.shadow_root), "registry_sha256": args.registry_sha256, "supervisor_timeout_seconds": args.supervisor_timeout_seconds, "collector_launcher": _production_collector_launcher})
     except PostBoundaryBlocked as exc:
         print(str(exc), file=sys.stderr)
         return 2
