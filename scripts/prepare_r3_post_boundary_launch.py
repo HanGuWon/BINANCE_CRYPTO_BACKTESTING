@@ -536,6 +536,7 @@ def prepare_post_boundary_plan(*, now: datetime, scientific_root: Path = SCIENTI
 
 
 def _production_clock() -> CalibratedClock:
+    """Calibrate against Binance public server time before any launch-stage I/O."""
     from binance_research.data import BinanceRestClient
     from binance_research.r3_timing import calibrated_now
     calibration = BinanceRestClient().calibrate_server_clock("um", sample_count=5)
