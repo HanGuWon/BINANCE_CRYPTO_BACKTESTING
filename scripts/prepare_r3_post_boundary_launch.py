@@ -23,7 +23,10 @@ for _repo_path in (REPO_ROOT_SCRIPTS, REPO_ROOT / "src", REPO_ROOT):
 
 BOUNDARY_UTC = datetime(2026, 9, 1, tzinfo=UTC)
 SCIENTIFIC_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\scientific_raw_v1")
-CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09")
+LEGACY_CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09")
+FAILED_V1_CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v1")
+CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v2")
+SHADOW_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v2")
 MAX_CLOCK_UNCERTAINTY_MS = 2_000
 EXPECTED_REGISTRY_SHA256 = "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a"
 
@@ -76,6 +79,12 @@ def require_control_root(root: Path = CONTROL_ROOT) -> Path:
     resolved = Path(root).resolve()
     if resolved.drive.upper() != "D:":
         raise PostBoundaryBlocked("R3_BLOCKED_STORAGE", "control root must be D-backed")
+    forbidden = {LEGACY_CONTROL_ROOT.resolve(), FAILED_V1_CONTROL_ROOT.resolve()}
+    if resolved in forbidden:
+        raise PostBoundaryBlocked(
+            "R3_BLOCKED_LAUNCH_IDENTITY",
+            f"control root is reserved historical/failed evidence and cannot authorize launch-v2: {resolved}",
+        )
     resolved.mkdir(parents=True, exist_ok=True)
     return resolved
 
@@ -368,7 +377,7 @@ def _replay_september_roster(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
 def _run_september_shadow(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     from binance_research.r3_operations import verify_engineering_shadow_root
     from scripts.run_r3_prospective_collector import run_engineering_shadow_forever
-    root = Path(ctx.get("shadow_root", Path(ctx["control_root"]) / "engineering_shadow_september_launch_v1"))
+    root = Path(ctx.get("shadow_root", SHADOW_ROOT))
     roster_path = Path(ctx["SEPTEMBER_ROSTER_FREEZE"]["roster_path"])
     result = run_engineering_shadow_forever(root, roster_path, max_cycles=1, wait_for_boundary=True)
     verified = verify_engineering_shadow_root(root, expected_symbols=list(ctx["SEPTEMBER_ROSTER_FREEZE"].get("symbols", [])), roster_sha256=ctx["SEPTEMBER_ROSTER_FREEZE"]["roster_sha256"])
@@ -582,7 +591,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--raw-root", type=Path, default=REPO_ROOT / "data/raw")
     parser.add_argument("--census-dir", type=Path, default=REPO_ROOT / "data/census/r1_full_history_v1")
     parser.add_argument("--roster-path", type=Path, default=REPO_ROOT / "campaigns/r3_prospective_context_v1/rosters/2026-09.json")
-    parser.add_argument("--shadow-root", type=Path, default=Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v1"))
+    parser.add_argument("--shadow-root", type=Path, default=SHADOW_ROOT)
     parser.add_argument("--registry-sha256", default="")
     parser.add_argument("--supervisor-timeout-seconds", type=float, default=900.0)
     args = parser.parse_args(argv)

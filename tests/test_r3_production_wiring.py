@@ -199,6 +199,19 @@ def test_repository_bootstrap_paths_are_canonical() -> None:
     assert str(executor.REPO_ROOT / "src") in executor.sys.path
 
 
+def test_launch_v2_defaults_do_not_reuse_historical_control_or_shadow_roots() -> None:
+    assert str(executor.CONTROL_ROOT).endswith("2026-09-production-v2")
+    assert executor.CONTROL_ROOT != executor.LEGACY_CONTROL_ROOT
+    assert executor.CONTROL_ROOT != executor.FAILED_V1_CONTROL_ROOT
+    assert str(executor.SHADOW_ROOT).endswith("engineering_shadow_september_launch_v2")
+
+
+def test_launch_v2_rejects_legacy_and_failed_v1_control_roots() -> None:
+    for forbidden in (executor.LEGACY_CONTROL_ROOT, executor.FAILED_V1_CONTROL_ROOT):
+        with pytest.raises(executor.PostBoundaryBlocked, match="R3_BLOCKED_LAUNCH_IDENTITY"):
+            executor.require_control_root(forbidden)
+
+
 def test_collector_launcher_uses_absolute_repository_script(monkeypatch: pytest.MonkeyPatch) -> None:
     captured: dict[str, object] = {}
 
