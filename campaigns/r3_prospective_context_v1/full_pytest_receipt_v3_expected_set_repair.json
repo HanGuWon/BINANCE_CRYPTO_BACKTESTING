@@ -1,0 +1,19 @@
+{
+  "command": "python -m pytest -q",
+  "status": "PASS",
+  "exit_code": 0,
+  "passed": 320,
+  "failed": 0,
+  "warnings": 1,
+  "pytest_summary": "320 passed, 1 warning in 99.09s (0:01:39)",
+  "run_timestamp": "2026-09-01T14:31:12Z",
+  "implementation_commit": "0ea74175c2d66f9314ade6e601c1c4e553382adf",
+  "source_tree_sha256": "2ebbc126e811e2d914ba7c8994c67fd529e7d1797a222bd879c40f47ef49baa8",
+  "scientific_source_dirty": false,
+  "scientific_source_status_command": "git status --porcelain -- scripts src tests configs",
+  "scientific_source_status_output": "",
+  "holdout_status": "UNTOUCHED",
+  "outcome_analysis_status": "NOT_STARTED",
+  "r3_v3_status": "NOT_LAUNCHED",
+  "receipt_evidence_path": ".codexclaw/evidence/01a0230d-0a21-7e02-ab97-a10534161680/test-receipt.json"
+}
