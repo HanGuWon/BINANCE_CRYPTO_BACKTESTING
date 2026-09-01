@@ -1,0 +1,35 @@
+{
+  "state": "R3_PRODUCTION_LAUNCH_V2_CODE_SEALED_READY",
+  "branch": "research/r2b-restricted-derivatives-v1",
+  "implementation_commit": "116cfce4110d9beba917f9bcdd0f7c2e9fb588d6",
+  "head_commit": "116cfce4110d9beba917f9bcdd0f7c2e9fb588d6",
+  "source_tree_sha256": "8c96621e66595331e37b180bcd4704133933e5039111ee0739f85c46824543fa",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "focused_pytest": "106 passed in 4.07s",
+  "full_pytest": "308 passed, 1 warning in 93.63s (0:01:33)",
+  "full_pytest_command": "python -m pytest -q",
+  "cxc_test_receipt": ".codexclaw/evidence/01a0230d-0a21-7e02-ab97-a10534161680/test-receipt.json",
+  "scientific_source_scope": "clean",
+  "origin_sync": "0/0 required after push",
+  "production_v1": {
+    "preserved": true,
+    "control_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v1",
+    "temporal_gate_sha256": "5bb38de8c19175784e8e8a8561ca233b3951338962a245e039d9acc4199f0e6b"
+  },
+  "production_v2_prelaunch": {
+    "control_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v2",
+    "file_count": 0
+  },
+  "shadow_v2_prelaunch": {
+    "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\engineering_shadow_september_launch_v2",
+    "state": "ABSENT"
+  },
+  "scientific_root_prelaunch": {
+    "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v1",
+    "state": "ABSENT"
+  },
+  "launch": "NOT_STARTED",
+  "outcomes": "NOT_STARTED",
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED"
+}
