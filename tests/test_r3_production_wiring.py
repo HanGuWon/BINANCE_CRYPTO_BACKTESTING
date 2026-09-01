@@ -261,13 +261,19 @@ def test_month_scoped_inventory_excludes_historical_only_symbol_without_guessing
             return [], [], 1
 
     client = EmptyListingClient()
-    taxonomy = pd.DataFrame([{"market": "um", "symbol": "1000BTTCUSDT", "primary_crypto_eligible": True}])
+    taxonomy = pd.DataFrame([
+        {"market": "um", "symbol": "1000BTTCUSDT", "primary_crypto_eligible": True},
+        {"market": "um", "symbol": "DELISTEDUSDT", "primary_crypto_eligible": True},
+    ])
     listed = pd.DataFrame(columns=["market", "symbol", "archive_month"])
     inventory = executor._build_august_source_inventory(taxonomy, listed, client)
-    assert inventory["historical_taxonomy_symbol_count"] == 1
+    assert inventory["historical_taxonomy_symbol_count"] == 2
     assert inventory["august_discovered_symbol_count"] == 0
-    assert inventory["no_august_historical_symbols"] == ["1000BTTCUSDT"]
-    assert client.calls == ["data/futures/um/daily/klines/1000BTTCUSDT/1d/"]
+    assert inventory["no_august_historical_symbols"] == ["1000BTTCUSDT", "DELISTEDUSDT"]
+    assert client.calls == [
+        "data/futures/um/daily/klines/1000BTTCUSDT/1d/",
+        "data/futures/um/daily/klines/DELISTEDUSDT/1d/",
+    ]
 
 
 def test_partial_august_source_is_ineligible_not_global_blocker(tmp_path: Path) -> None:
