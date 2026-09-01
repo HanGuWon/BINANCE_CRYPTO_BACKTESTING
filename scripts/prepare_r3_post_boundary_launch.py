@@ -26,6 +26,7 @@ SCIENTIFIC_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_conte
 LEGACY_CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09")
 FAILED_V1_CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v1")
 FAILED_V2_CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v2")
+FAILED_V2_SHADOW_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v2")
 CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v3")
 SHADOW_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v3")
 MAX_CLOCK_UNCERTAINTY_MS = 2_000
@@ -90,6 +91,17 @@ def require_control_root(root: Path = CONTROL_ROOT) -> Path:
             "R3_BLOCKED_LAUNCH_IDENTITY",
             f"control root is reserved historical/failed evidence and cannot authorize launch-v3: {resolved}",
         )
+    resolved.mkdir(parents=True, exist_ok=True)
+    return resolved
+
+
+def require_shadow_root(root: Path = SHADOW_ROOT) -> Path:
+    """Allow only the reserved, fresh v3 shadow root for production wiring."""
+    resolved = Path(root).resolve()
+    if resolved.drive.upper() != "D:":
+        raise PostBoundaryBlocked("R3_BLOCKED_STORAGE", "shadow root must be D-backed")
+    if resolved != SHADOW_ROOT.resolve() or FAILED_V2_SHADOW_ROOT.resolve() in resolved.parents:
+        raise PostBoundaryBlocked("R3_BLOCKED_LAUNCH_IDENTITY", f"shadow root is not the reserved production-v3 root: {resolved}")
     resolved.mkdir(parents=True, exist_ok=True)
     return resolved
 
@@ -468,7 +480,7 @@ def _replay_september_roster(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
 def _run_september_shadow(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     from binance_research.r3_operations import verify_engineering_shadow_root
     from scripts.run_r3_prospective_collector import run_engineering_shadow_forever
-    root = Path(ctx.get("shadow_root", SHADOW_ROOT))
+    root = require_shadow_root(Path(ctx.get("shadow_root", SHADOW_ROOT)))
     roster_path = Path(ctx["SEPTEMBER_ROSTER_FREEZE"]["roster_path"])
     result = run_engineering_shadow_forever(root, roster_path, max_cycles=1, wait_for_boundary=True)
     verified = verify_engineering_shadow_root(root, expected_symbols=list(ctx["SEPTEMBER_ROSTER_FREEZE"].get("symbols", [])), roster_sha256=ctx["SEPTEMBER_ROSTER_FREEZE"]["roster_sha256"])
