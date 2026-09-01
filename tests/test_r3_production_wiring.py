@@ -281,6 +281,8 @@ def test_partial_august_source_is_ineligible_not_global_blocker(tmp_path: Path) 
     assert payload["partial_august_symbol_count"] == 1
     assert payload["complete_august_eligible_symbol_count"] == 0
     assert payload["source_integrity_blocker_count"] == 0
+    assert payload["source_coverage_by_symbol"]["MIDUSDT"]["observed_day_count"] == 12
+    assert payload["source_coverage_by_symbol"]["MIDUSDT"]["eligibility_state"] == "INELIGIBLE_INCOMPLETE_PRIOR_MONTH"
 
 
 def test_complete_august_source_is_the_only_eligible_ranking_input(tmp_path: Path) -> None:
@@ -294,6 +296,8 @@ def test_complete_august_source_is_the_only_eligible_ranking_input(tmp_path: Pat
     assert payload["expected_symbols"] == ["FULLUSDT"]
     assert payload["complete_august_eligible_symbol_count"] == 1
     assert payload["no_august_historical_symbol_count"] == 1
+    assert payload["source_coverage_by_symbol"]["FULLUSDT"]["coverage_ratio"] == 1.0
+    assert payload["source_coverage_by_symbol"]["FULLUSDT"]["ranking_state"] == "ELIGIBLE"
 
 
 def test_discovered_object_404_is_a_source_integrity_blocker(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
