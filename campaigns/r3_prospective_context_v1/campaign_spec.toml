@@ -7,6 +7,11 @@ r2b2_status = "NOT_STARTED"
 outcome_analysis_status = "NOT_STARTED"
 primary_hypothesis_count = 6
 universe_rule = "causal_monthly_um_top50_reused_when_operationally_available"
+august_source_expected_set_rule = "actual_public_binance_vision_object_discovery_separate_from_historical_um_taxonomy"
+august_source_modes = ["MONTHLY_ARCHIVE", "DAILY_ARCHIVE_FALLBACK"]
+august_partial_symbol_rule = "INELIGIBLE_INCOMPLETE_PRIOR_MONTH_per_symbol"
+august_no_source_rule = "NO_AUGUST_HISTORICAL_SOURCE_not_campaign_blocker"
+august_discovered_integrity_rule = "retrieval_checksum_malformed_or_market_failure_is_campaign_blocker"
 collection_cadence = "15m_rest_snapshots_plus_continuous_public_liquidation_stream"
 source_available_rule = "source_available_time < next_executable_open_time; source_available_time=max(native_close_time, corrected_response_receipt_time)"
 pilot_status = "ENGINEERING_PILOT_ONLY"

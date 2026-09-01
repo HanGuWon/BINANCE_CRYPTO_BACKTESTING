@@ -28,7 +28,15 @@ crowding×stress modifier, and BTC/breadth concordance. There are no parameter
 grids. The 72-row R2B registry is not reused as an R3 registry.
 
 All observations are retained raw and append-only. Derived materialization is
-separate and uses `source_available_time < decision_or_executable_boundary`.
+separate and uses `source_available_time < next_executable_open_time`, where
+native 15-minute premium-kline availability is the kline close and any derived
+1-hour/4-hour bucket availability is the maximum constituent close. Exact
+boundary equality is rejected. For the September roster, historical taxonomy,
+actually discovered August objects, complete eligible prior-month symbols, and
+the September Top50 roster are distinct sets; taxonomy membership alone never
+creates an August expected object. Monthly and listed-daily source modes are
+recorded separately, partial prior-month coverage is excluded per symbol, and
+discovered-object integrity failures block the campaign.
 Continuity gaps reset state and are never silently bridged. A minimum evidence
 window will be fixed from event counts, dependence blocks, and confidence
 precision before prospective outcome analysis; returns cannot choose its end.

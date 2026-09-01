@@ -23,6 +23,17 @@ def _ranking(path: Path) -> Path:
     return path
 
 
+def _kline_zip(path: Path, days: int) -> tuple[Path, str]:
+    rows = []
+    for day in range(1, days + 1):
+        stamp = int(pd.Timestamp(f"2026-08-{day:02d}", tz="UTC").timestamp() * 1000)
+        rows.append([stamp, 1, 2, 0.5, 1.5, 10, stamp + 86_400_000 - 1, 15, 1, 5, 7, 0])
+    payload = "".join(",".join(map(str, row)) + "\n" for row in rows)
+    with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("FIXUSDT-1d-2026-08.csv", payload)
+    return path, hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def test_real_roster_freeze_replay_and_identity_artifacts(tmp_path: Path) -> None:
     ranking = _ranking(tmp_path / "universe_monthly.csv")
     roster_path = tmp_path / "rosters" / "2026-09.json"
@@ -62,13 +73,15 @@ def test_real_august_verifier_rejects_scope_and_accepts_complete_fixture(tmp_pat
     sha = hashlib.sha256(raw.read_bytes()).hexdigest()
     manifest = tmp_path / "acquisition.csv"
     pd.DataFrame([{"market": "um", "symbol": "FIXUSDT", "archive_month": "2026-08", "integrity_status": "PASS", "published_sha256": sha, "computed_sha256": sha, "raw_path": str(raw)}]).to_csv(manifest, index=False)
-    result = executor._verify_august_source({"control_root": str(tmp_path), "census_dir": str(tmp_path / "missing-census"), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest)}})
+    inventory = manifest.with_name("august_2026_source_inventory.json")
+    inventory.write_text(json.dumps({"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "historical_taxonomy_symbols": ["FIXUSDT"], "historical_taxonomy_symbol_count": 1, "discovered_symbols": ["FIXUSDT"], "discovered_objects": []}), encoding="utf-8")
+    result = executor._verify_august_source({"control_root": str(tmp_path), "census_dir": str(tmp_path / "missing-census"), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest), "inventory_path": str(inventory)}})
     assert result["rows"] == 1
     bad = pd.read_csv(manifest)
     bad.loc[0, "market"] = "spot"
     bad.to_csv(manifest, index=False)
     with pytest.raises(executor.PostBoundaryBlocked, match="R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE"):
-        executor._verify_august_source({"control_root": str(tmp_path), "census_dir": str(tmp_path / "missing-census"), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest)}})
+        executor._verify_august_source({"control_root": str(tmp_path), "census_dir": str(tmp_path / "missing-census"), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest), "inventory_path": str(inventory)}})
 
 
 def test_production_clock_uses_binance_rest_client_five_samples(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -199,11 +212,12 @@ def test_repository_bootstrap_paths_are_canonical() -> None:
     assert str(executor.REPO_ROOT / "src") in executor.sys.path
 
 
-def test_launch_v2_defaults_do_not_reuse_historical_control_or_shadow_roots() -> None:
-    assert str(executor.CONTROL_ROOT).endswith("2026-09-production-v2")
+def test_launch_v3_defaults_do_not_reuse_historical_control_or_shadow_roots() -> None:
+    assert str(executor.CONTROL_ROOT).endswith("2026-09-production-v3")
     assert executor.CONTROL_ROOT != executor.LEGACY_CONTROL_ROOT
     assert executor.CONTROL_ROOT != executor.FAILED_V1_CONTROL_ROOT
-    assert str(executor.SHADOW_ROOT).endswith("engineering_shadow_september_launch_v2")
+    assert executor.CONTROL_ROOT != executor.FAILED_V2_CONTROL_ROOT
+    assert str(executor.SHADOW_ROOT).endswith("engineering_shadow_september_launch_v3")
 
 
 def test_launch_v2_rejects_legacy_and_failed_v1_control_roots() -> None:
@@ -212,13 +226,88 @@ def test_launch_v2_rejects_legacy_and_failed_v1_control_roots() -> None:
             executor.require_control_root(forbidden)
 
 
-def test_launch_v2_authority_paths_are_canonical() -> None:
+def test_launch_v3_authority_paths_are_canonical() -> None:
     assert executor.CONTROL_ROOT == Path(
-        r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v2"
+        r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v3"
     )
+
+
+def test_launch_v3_rejects_legacy_v1_and_v2_control_roots() -> None:
+    for forbidden in (executor.LEGACY_CONTROL_ROOT, executor.FAILED_V1_CONTROL_ROOT, executor.FAILED_V2_CONTROL_ROOT):
+        with pytest.raises(executor.PostBoundaryBlocked, match="R3_BLOCKED_LAUNCH_IDENTITY"):
+            executor.require_control_root(forbidden)
     assert executor.SHADOW_ROOT == Path(
-        r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v2"
+        r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v3"
     )
+
+
+def test_v2_expected_set_erratum_is_append_only_and_outcome_blind() -> None:
+    receipt = executor.REPO_ROOT / "campaigns" / "r3_prospective_context_v1" / "R3_PRODUCTION_LAUNCH_V2_BLOCKED_AUGUST_SOURCE_INCOMPLETE_RECEIPT.json"
+    erratum = executor.REPO_ROOT / "campaigns" / "r3_prospective_context_v1" / "R3_PRODUCTION_LAUNCH_V2_BLOCKED_EXPECTED_SET_SEMANTICS.md"
+    payload = json.loads(receipt.read_text(encoding="utf-8"))
+    assert payload["state"] == "R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE"
+    assert payload["outcomes"] == "NOT_STARTED"
+    assert payload["final_holdout"] == "UNTOUCHED"
+    assert erratum.is_file()
+
+
+def test_month_scoped_inventory_excludes_historical_only_symbol_without_guessing() -> None:
+    class EmptyListingClient:
+        def __init__(self) -> None:
+            self.calls: list[str] = []
+
+        def list_objects_v2(self, prefix: str):
+            self.calls.append(prefix)
+            return [], [], 1
+
+    client = EmptyListingClient()
+    taxonomy = pd.DataFrame([{"market": "um", "symbol": "1000BTTCUSDT", "primary_crypto_eligible": True}])
+    listed = pd.DataFrame(columns=["market", "symbol", "archive_month"])
+    inventory = executor._build_august_source_inventory(taxonomy, listed, client)
+    assert inventory["historical_taxonomy_symbol_count"] == 1
+    assert inventory["august_discovered_symbol_count"] == 0
+    assert inventory["no_august_historical_symbols"] == ["1000BTTCUSDT"]
+    assert client.calls == ["data/futures/um/daily/klines/1000BTTCUSDT/1d/"]
+
+
+def test_partial_august_source_is_ineligible_not_global_blocker(tmp_path: Path) -> None:
+    raw, sha = _kline_zip(tmp_path / "partial.zip", 12)
+    manifest = tmp_path / "acquisition.csv"
+    pd.DataFrame([{"market": "um", "symbol": "MIDUSDT", "archive_month": "2026-08", "integrity_status": "PASS", "published_sha256": sha, "computed_sha256": sha, "raw_path": str(raw), "source_mode": "DAILY_ARCHIVE_FALLBACK"}]).to_csv(manifest, index=False)
+    inventory = tmp_path / "august_2026_source_inventory.json"
+    inventory.write_text(json.dumps({"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "historical_taxonomy_symbols": ["MIDUSDT"], "historical_taxonomy_symbol_count": 1, "discovered_symbols": ["MIDUSDT"], "discovered_objects": []}), encoding="utf-8")
+    result = executor._verify_august_source({"control_root": str(tmp_path), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest), "inventory_path": str(inventory)}})
+    payload = json.loads(Path(result["receipt_path"]).read_text(encoding="utf-8"))
+    assert payload["partial_august_symbol_count"] == 1
+    assert payload["complete_august_eligible_symbol_count"] == 0
+    assert payload["source_integrity_blocker_count"] == 0
+
+
+def test_complete_august_source_is_the_only_eligible_ranking_input(tmp_path: Path) -> None:
+    raw, sha = _kline_zip(tmp_path / "complete.zip", 31)
+    manifest = tmp_path / "acquisition.csv"
+    pd.DataFrame([{"market": "um", "symbol": "FULLUSDT", "archive_month": "2026-08", "integrity_status": "PASS", "published_sha256": sha, "computed_sha256": sha, "raw_path": str(raw), "source_mode": "MONTHLY_ARCHIVE"}]).to_csv(manifest, index=False)
+    inventory = tmp_path / "august_2026_source_inventory.json"
+    inventory.write_text(json.dumps({"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "historical_taxonomy_symbols": ["FULLUSDT", "STALEUSDT"], "historical_taxonomy_symbol_count": 2, "discovered_symbols": ["FULLUSDT"], "discovered_objects": []}), encoding="utf-8")
+    result = executor._verify_august_source({"control_root": str(tmp_path), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest), "inventory_path": str(inventory)}})
+    payload = json.loads(Path(result["receipt_path"]).read_text(encoding="utf-8"))
+    assert payload["expected_symbols"] == ["FULLUSDT"]
+    assert payload["complete_august_eligible_symbol_count"] == 1
+    assert payload["no_august_historical_symbol_count"] == 1
+
+
+def test_discovered_object_404_is_a_source_integrity_blocker(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    class MissingObjectClient:
+        def __init__(self, *_args, **_kwargs) -> None:
+            pass
+
+        def download(self, _request):
+            raise RuntimeError("HTTP Error 404: Not Found")
+
+    import binance_research.data as data
+    monkeypatch.setattr(data, "BinanceArchiveClient", MissingObjectClient)
+    with pytest.raises(executor.PostBoundaryBlocked, match="discovered daily object retrieval failed"):
+        executor._download_discovered_daily({}, raw_root=tmp_path, inventory=[{"symbol": "FULLUSDT", "source_day": 1}])
 
 
 def test_collector_launcher_uses_absolute_repository_script(monkeypatch: pytest.MonkeyPatch) -> None:
