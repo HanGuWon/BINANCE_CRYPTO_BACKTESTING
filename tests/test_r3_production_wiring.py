@@ -284,6 +284,7 @@ def test_partial_august_source_is_ineligible_not_global_blocker(tmp_path: Path) 
     inventory.write_text(json.dumps({"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "historical_taxonomy_symbols": ["MIDUSDT"], "historical_taxonomy_symbol_count": 1, "discovered_symbols": ["MIDUSDT"], "discovered_objects": [{"market": "um", "symbol": "MIDUSDT", "archive_month": "2026-08", "source_mode": "DAILY_ARCHIVE_FALLBACK"}]}), encoding="utf-8")
     result = executor._verify_august_source({"control_root": str(tmp_path), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest), "inventory_path": str(inventory)}})
     payload = json.loads(Path(result["receipt_path"]).read_text(encoding="utf-8"))
+    assert payload["expected_set_basis"] == "ACTUAL_PUBLIC_BINANCE_VISION_OBJECT_DISCOVERY"
     assert payload["partial_august_symbol_count"] == 1
     assert payload["complete_august_eligible_symbol_count"] == 0
     assert payload["source_integrity_blocker_count"] == 0
@@ -305,6 +306,7 @@ def test_complete_august_source_is_the_only_eligible_ranking_input(tmp_path: Pat
     assert payload["source_coverage_by_symbol"]["FULLUSDT"]["coverage_ratio"] == 1.0
     assert payload["source_coverage_by_symbol"]["FULLUSDT"]["ranking_state"] == "ELIGIBLE"
     assert payload["source_coverage_by_symbol"]["STALEUSDT"]["eligibility_state"] == "NO_AUGUST_HISTORICAL_SOURCE"
+    assert payload["no_august_historical_source_symbols"] == ["STALEUSDT"]
 
 
 def test_empty_august_source_accepts_only_truly_empty_manifest(tmp_path: Path) -> None:
