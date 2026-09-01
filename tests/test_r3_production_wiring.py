@@ -74,7 +74,7 @@ def test_real_august_verifier_rejects_scope_and_accepts_complete_fixture(tmp_pat
     manifest = tmp_path / "acquisition.csv"
     pd.DataFrame([{"market": "um", "symbol": "FIXUSDT", "archive_month": "2026-08", "integrity_status": "PASS", "published_sha256": sha, "computed_sha256": sha, "raw_path": str(raw)}]).to_csv(manifest, index=False)
     inventory = manifest.with_name("august_2026_source_inventory.json")
-    inventory.write_text(json.dumps({"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "historical_taxonomy_symbols": ["FIXUSDT"], "historical_taxonomy_symbol_count": 1, "discovered_symbols": ["FIXUSDT"], "discovered_objects": []}), encoding="utf-8")
+    inventory.write_text(json.dumps({"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "historical_taxonomy_symbols": ["FIXUSDT"], "historical_taxonomy_symbol_count": 1, "discovered_symbols": ["FIXUSDT"], "discovered_objects": [{"market": "um", "symbol": "FIXUSDT", "archive_month": "2026-08", "source_mode": "MONTHLY_ARCHIVE"}]}), encoding="utf-8")
     result = executor._verify_august_source({"control_root": str(tmp_path), "census_dir": str(tmp_path / "missing-census"), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest), "inventory_path": str(inventory)}})
     assert result["rows"] == 1
     bad = pd.read_csv(manifest)
@@ -281,7 +281,7 @@ def test_partial_august_source_is_ineligible_not_global_blocker(tmp_path: Path) 
     manifest = tmp_path / "acquisition.csv"
     pd.DataFrame([{"market": "um", "symbol": "MIDUSDT", "archive_month": "2026-08", "integrity_status": "PASS", "published_sha256": sha, "computed_sha256": sha, "raw_path": str(raw), "source_mode": "DAILY_ARCHIVE_FALLBACK"}]).to_csv(manifest, index=False)
     inventory = tmp_path / "august_2026_source_inventory.json"
-    inventory.write_text(json.dumps({"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "historical_taxonomy_symbols": ["MIDUSDT"], "historical_taxonomy_symbol_count": 1, "discovered_symbols": ["MIDUSDT"], "discovered_objects": []}), encoding="utf-8")
+    inventory.write_text(json.dumps({"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "historical_taxonomy_symbols": ["MIDUSDT"], "historical_taxonomy_symbol_count": 1, "discovered_symbols": ["MIDUSDT"], "discovered_objects": [{"market": "um", "symbol": "MIDUSDT", "archive_month": "2026-08", "source_mode": "DAILY_ARCHIVE_FALLBACK"}]}), encoding="utf-8")
     result = executor._verify_august_source({"control_root": str(tmp_path), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest), "inventory_path": str(inventory)}})
     payload = json.loads(Path(result["receipt_path"]).read_text(encoding="utf-8"))
     assert payload["partial_august_symbol_count"] == 1
@@ -296,7 +296,7 @@ def test_complete_august_source_is_the_only_eligible_ranking_input(tmp_path: Pat
     manifest = tmp_path / "acquisition.csv"
     pd.DataFrame([{"market": "um", "symbol": "FULLUSDT", "archive_month": "2026-08", "integrity_status": "PASS", "published_sha256": sha, "computed_sha256": sha, "raw_path": str(raw), "source_mode": "MONTHLY_ARCHIVE"}]).to_csv(manifest, index=False)
     inventory = tmp_path / "august_2026_source_inventory.json"
-    inventory.write_text(json.dumps({"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "historical_taxonomy_symbols": ["FULLUSDT", "STALEUSDT"], "historical_taxonomy_symbol_count": 2, "discovered_symbols": ["FULLUSDT"], "discovered_objects": []}), encoding="utf-8")
+    inventory.write_text(json.dumps({"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "historical_taxonomy_symbols": ["FULLUSDT", "STALEUSDT"], "historical_taxonomy_symbol_count": 2, "discovered_symbols": ["FULLUSDT"], "discovered_objects": [{"market": "um", "symbol": "FULLUSDT", "archive_month": "2026-08", "source_mode": "MONTHLY_ARCHIVE"}]}), encoding="utf-8")
     result = executor._verify_august_source({"control_root": str(tmp_path), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest), "inventory_path": str(inventory)}})
     payload = json.loads(Path(result["receipt_path"]).read_text(encoding="utf-8"))
     assert payload["expected_symbols"] == ["FULLUSDT"]
@@ -304,6 +304,35 @@ def test_complete_august_source_is_the_only_eligible_ranking_input(tmp_path: Pat
     assert payload["no_august_historical_symbol_count"] == 1
     assert payload["source_coverage_by_symbol"]["FULLUSDT"]["coverage_ratio"] == 1.0
     assert payload["source_coverage_by_symbol"]["FULLUSDT"]["ranking_state"] == "ELIGIBLE"
+    assert payload["source_coverage_by_symbol"]["STALEUSDT"]["eligibility_state"] == "NO_AUGUST_HISTORICAL_SOURCE"
+
+
+def test_empty_august_source_accepts_only_truly_empty_manifest(tmp_path: Path) -> None:
+    manifest = tmp_path / "acquisition.csv"
+    pd.DataFrame(columns=["market", "symbol", "archive_month", "integrity_status", "published_sha256", "computed_sha256", "raw_path"]).to_csv(manifest, index=False)
+    inventory = tmp_path / "august_2026_source_inventory.json"
+    inventory.write_text(json.dumps({"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "historical_taxonomy_symbols": ["STALEUSDT"], "historical_taxonomy_symbol_count": 1, "discovered_symbols": [], "discovered_objects": []}), encoding="utf-8")
+    result = executor._verify_august_source({"control_root": str(tmp_path), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest), "inventory_path": str(inventory)}})
+    payload = json.loads(Path(result["receipt_path"]).read_text(encoding="utf-8"))
+    assert payload["source_coverage_by_symbol"]["STALEUSDT"]["eligibility_state"] == "NO_AUGUST_HISTORICAL_SOURCE"
+
+
+def test_no_source_does_not_bypass_nonempty_invalid_manifest(tmp_path: Path) -> None:
+    manifest = tmp_path / "acquisition.csv"
+    pd.DataFrame([{"market": "spot", "symbol": "STALEUSDT", "archive_month": "2025-07", "integrity_status": "ERROR", "published_sha256": "bad", "computed_sha256": "bad", "raw_path": str(tmp_path / "missing.zip")}]).to_csv(manifest, index=False)
+    inventory = tmp_path / "august_2026_source_inventory.json"
+    inventory.write_text(json.dumps({"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "historical_taxonomy_symbols": ["STALEUSDT"], "historical_taxonomy_symbol_count": 1, "discovered_symbols": [], "discovered_objects": []}), encoding="utf-8")
+    with pytest.raises(executor.PostBoundaryBlocked, match="August source failed"):
+        executor._verify_august_source({"control_root": str(tmp_path), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest), "inventory_path": str(inventory)}})
+
+
+def test_discovery_symbol_set_must_match_discovered_objects(tmp_path: Path) -> None:
+    manifest = tmp_path / "acquisition.csv"
+    pd.DataFrame(columns=["market", "symbol", "archive_month", "integrity_status", "published_sha256", "computed_sha256", "raw_path"]).to_csv(manifest, index=False)
+    inventory = tmp_path / "august_2026_source_inventory.json"
+    inventory.write_text(json.dumps({"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "historical_taxonomy_symbols": ["FULLUSDT"], "historical_taxonomy_symbol_count": 1, "discovered_symbols": ["FULLUSDT"], "discovered_objects": []}), encoding="utf-8")
+    with pytest.raises(executor.PostBoundaryBlocked, match="symbol set does not match"):
+        executor._verify_august_source({"control_root": str(tmp_path), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest), "inventory_path": str(inventory)}})
 
 
 def test_discovered_object_404_is_a_source_integrity_blocker(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

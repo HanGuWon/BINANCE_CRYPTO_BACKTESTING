@@ -314,11 +314,16 @@ def _verify_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
         if str(item.get("source_mode", "")) not in {"MONTHLY_ARCHIVE", "DAILY_ARCHIVE_FALLBACK"}:
             raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "August source inventory contains an unknown source mode")
     discovered_symbols = {str(symbol).upper() for symbol in inventory.get("discovered_symbols", [])}
+    discovered_object_symbols = {str(item.get("symbol", "")).upper() for item in inventory.get("discovered_objects", [])}
     historical_symbols = {str(symbol).upper() for symbol in inventory.get("historical_taxonomy_symbols", [])}
-    if not discovered_symbols:
+    if discovered_object_symbols != discovered_symbols:
+        raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "August source inventory symbol set does not match discovered objects")
+    if frame.empty:
+        if discovered_symbols:
+            raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "discovered August objects have no acquisition manifest rows")
         return _write_august_verification_receipt(ctx, frame, inventory, [], set(), historical_symbols, inventory_path)
     valid = frame["market"].astype(str).str.lower().eq("um") & frame["archive_month"].astype(str).eq("2026-08") & frame["integrity_status"].astype(str).eq("PASS") & frame["published_sha256"].astype(str).eq(frame["computed_sha256"].astype(str))
-    if not bool(valid.all()) or frame.empty:
+    if not bool(valid.all()):
         raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "August source failed UM/1d/checksum metadata verification")
     if frame["archive_month"].astype(str).str.contains("2026-09").any():
         raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "September observation entered August source")
@@ -364,6 +369,7 @@ def _write_august_verification_receipt(ctx: Mapping[str, Any], frame: Any, inven
     receipt = Path(ctx["control_root"]) / "R3_AUGUST_2026_SOURCE_VERIFICATION_RECEIPT.json"
     source_mode_by_symbol = {symbol: sorted({str(item.get("source_mode", "MONTHLY_ARCHIVE")) for item in verified_inputs if item["symbol"] == symbol}) for symbol in sorted(complete_symbols | partial_symbols)}
     source_coverage_by_symbol = {}
+    no_august_symbols = historical_symbols - discovered_symbols
     for symbol in sorted(discovered_symbols):
         observed_day_count = len(grouped_days.get(symbol, set()))
         source_coverage_by_symbol[symbol] = {
@@ -374,6 +380,16 @@ def _write_august_verification_receipt(ctx: Mapping[str, Any], frame: Any, inven
             "integrity_state": "PASS" if symbol in complete_symbols or symbol in partial_symbols else "NOT_ACQUIRED",
             "eligibility_state": "ELIGIBLE_COMPLETE_PRIOR_MONTH" if symbol in complete_symbols else "INELIGIBLE_INCOMPLETE_PRIOR_MONTH",
             "ranking_state": "ELIGIBLE" if symbol in complete_symbols else "EXCLUDED",
+        }
+    for symbol in sorted(no_august_symbols):
+        source_coverage_by_symbol[symbol] = {
+            "source_mode": [],
+            "observed_day_count": 0,
+            "expected_day_count": 31,
+            "coverage_ratio": 0.0,
+            "integrity_state": "NOT_DISCOVERED",
+            "eligibility_state": "NO_AUGUST_HISTORICAL_SOURCE",
+            "ranking_state": "EXCLUDED",
         }
     payload = {"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "rows": int(frame.shape[0]), "manifest_path": str(Path(ctx["AUGUST_SOURCE_ACQUISITION"]["manifest_path"]).resolve()), "manifest_sha256": hashlib.sha256(Path(ctx["AUGUST_SOURCE_ACQUISITION"]["manifest_path"]).read_bytes()).hexdigest(), "inventory_path": str(inventory_path.resolve()), "inventory_sha256": hashlib.sha256(inventory_path.read_bytes()).hexdigest(), "verified_source_semantic_sha256": semantic_sha, "historical_taxonomy_symbol_count": int(inventory.get("historical_taxonomy_symbol_count", len(historical_symbols))), "august_discovered_symbol_count": int(len(discovered_symbols)), "complete_august_eligible_symbol_count": int(len(complete_symbols)), "partial_august_symbol_count": int(len(partial_symbols)), "no_august_historical_symbol_count": int(len(historical_symbols - discovered_symbols)), "source_integrity_blocker_count": 0, "expected_symbols": sorted(complete_symbols), "verified_symbols": sorted(complete_symbols), "discovered_symbols": sorted(discovered_symbols), "partial_symbols": sorted(partial_symbols), "missing_symbols": [], "extra_symbols": [], "source_mode_by_symbol": source_mode_by_symbol, "source_coverage_by_symbol": source_coverage_by_symbol, "verified_inputs": verified_inputs}
     if receipt.exists():
