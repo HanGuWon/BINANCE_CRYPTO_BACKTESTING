@@ -4,9 +4,17 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import sys
 import time
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+for _repo_path in (REPO_ROOT / "src", REPO_ROOT):
+    _repo_path_text = str(_repo_path)
+    if _repo_path_text in sys.path:
+        sys.path.remove(_repo_path_text)
+    sys.path.insert(0, _repo_path_text)
 
 from binance_research.collector import AppendOnlyEventStore, ForwardCollector
 from binance_research.r3_universe import replay_roster_artifact

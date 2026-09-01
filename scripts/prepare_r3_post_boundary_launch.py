@@ -13,7 +13,13 @@ import os
 import subprocess
 import sys
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT_SCRIPTS = REPO_ROOT / "scripts"
+for _repo_path in (REPO_ROOT_SCRIPTS, REPO_ROOT / "src", REPO_ROOT):
+    _repo_path_text = str(_repo_path)
+    if _repo_path_text in sys.path:
+        sys.path.remove(_repo_path_text)
+    sys.path.insert(0, _repo_path_text)
 
 BOUNDARY_UTC = datetime(2026, 9, 1, tzinfo=UTC)
 SCIENTIFIC_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\scientific_raw_v1")
@@ -188,8 +194,8 @@ def _acquire_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     """Acquire completed August UM 1d archives through existing R1.6 code."""
     import pandas as pd
     from scripts.build_r16_1d_universe import acquire_1d, census_1d
-    census_dir = Path(ctx.get("census_dir", "data/census/r1_full_history_v1"))
-    raw_root = Path(ctx.get("raw_root", "data/raw"))
+    census_dir = Path(ctx.get("census_dir", REPO_ROOT / "data/census/r1_full_history_v1"))
+    raw_root = Path(ctx.get("raw_root", REPO_ROOT / "data/raw"))
     out = Path(ctx["control_root"]) / "august_source"
     out.mkdir(parents=True, exist_ok=True)
     _, listed = census_1d(census_dir, out / "census", workers=2)
@@ -305,7 +311,7 @@ def _build_september_ranking(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     receipt_path = Path(ctx.get("AUGUST_SOURCE_VERIFICATION", {}).get("receipt_path", ""))
     if not receipt_path.is_file():
         raise PostBoundaryBlocked("R3_BLOCKED_SEPTEMBER_RANKING", "ranking requires verified August source receipt")
-    ranked = build_forward_ranking_from_verified_source(receipt_path, Path(ctx.get("census_dir", "data/census/r1_full_history_v1")), output, effective_month="2026-09")
+    ranked = build_forward_ranking_from_verified_source(receipt_path, Path(ctx.get("census_dir", REPO_ROOT / "data/census/r1_full_history_v1")), output, effective_month="2026-09")
     frame = __import__("pandas").read_csv(ranked)
     if not frame["volume_month"].astype(str).eq("2026-08").all() or not frame["universe_month"].astype(str).eq("2026-09").all():
         raise PostBoundaryBlocked("R3_BLOCKED_SEPTEMBER_RANKING", "ranking month contract mismatch")
@@ -326,7 +332,7 @@ def _source_tree_sha256() -> str:
 
 
 def _registry_identity() -> str:
-    path = Path("campaigns/r3_prospective_context_v1/trial_registry.csv")
+    path = REPO_ROOT / "campaigns/r3_prospective_context_v1/trial_registry.csv"
     if not path.is_file():
         raise PostBoundaryBlocked("R3_BLOCKED_LAUNCH_IDENTITY", "frozen trial registry is missing")
     digest = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -338,7 +344,7 @@ def _registry_identity() -> str:
 def _freeze_september_roster(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     from binance_research.r3_universe import build_causal_monthly_roster, write_roster_artifact
     ranking = Path(ctx["SEPTEMBER_RANKING"]["artifact_path"])
-    destination = Path(ctx.get("roster_path", "campaigns/r3_prospective_context_v1/rosters/2026-09.json"))
+    destination = Path(ctx.get("roster_path", REPO_ROOT / "campaigns/r3_prospective_context_v1/rosters/2026-09.json"))
     roster = build_causal_monthly_roster(ranking, effective_month="2026-09")
     if destination.exists():
         try:
@@ -375,7 +381,7 @@ def _freeze_launch_identity(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
         raise PostBoundaryBlocked("R3_BLOCKED_LAUNCH_IDENTITY", "scientific source scope is dirty")
     implementation = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
     registry = _registry_identity()
-    contract_dir = Path("campaigns/r3_prospective_context_v1")
+    contract_dir = REPO_ROOT / "campaigns/r3_prospective_context_v1"
     contracts = {name: hashlib.sha256((contract_dir / filename).read_bytes()).hexdigest() for name, filename in {"data_contract_sha256": "data_contract.md", "source_dependency_matrix_sha256": "R3_SOURCE_DEPENDENCY_MATRIX.json", "collection_contract_sha256": "collection_contract.md", "feature_semantics_sha256": "feature_semantics.md", "clock_contract_sha256": "R3_CLOCK_CONTRACT.md", "universe_contract_sha256": "universe_contract.md", "metrics_contract_sha256": "metrics_contract.md", "multiple_testing_plan_sha256": "multiple_testing_plan.md", "promotion_policy_sha256": "promotion_policy.md"}.items()}
     verification = ctx["AUGUST_SOURCE_VERIFICATION"]
     ranking = ctx["SEPTEMBER_RANKING"]
@@ -544,24 +550,46 @@ def _production_clock() -> CalibratedClock:
     return CalibratedClock(current, calibration.round_trip_ms / 2.0 + 1.0, sample_count=5)
 
 
+def _import_closure_self_check() -> str:
+    """Resolve lazy production imports without network or launch-stage writes."""
+    import importlib
+
+    modules = (
+        "scripts.build_r16_1d_universe",
+        "scripts.qualify_r3_forward_ranking",
+        "scripts.run_r3_prospective_collector",
+        "binance_research.r3_universe",
+        "binance_research.r3_operations",
+    )
+    for module in modules:
+        importlib.import_module(module)
+    build_project_production_callbacks()
+    return str(REPO_ROOT)
+
+
 def _production_collector_launcher(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     """Start the qualified persistent collector and supervise its first cycle."""
-    command = [sys.executable, "scripts/run_r3_prospective_collector.py", "--mode", "SCIENTIFIC", "--persistent", "--root", str(ctx["scientific_root"]), "--roster-artifact", str(ctx["SEPTEMBER_ROSTER_FREEZE"]["roster_path"]), "--launch-manifest", str(ctx["LAUNCH_MANIFEST_BUILD"]["manifest_path"])]
+    command = [sys.executable, str(REPO_ROOT_SCRIPTS / "run_r3_prospective_collector.py"), "--mode", "SCIENTIFIC", "--persistent", "--root", str(ctx["scientific_root"]), "--roster-artifact", str(ctx["SEPTEMBER_ROSTER_FREEZE"]["roster_path"]), "--launch-manifest", str(ctx["LAUNCH_MANIFEST_BUILD"]["manifest_path"])]
     return supervise_scientific_process(command, scientific_root=Path(ctx["scientific_root"]), control_root=Path(ctx["control_root"]), timeout_seconds=float(ctx.get("supervisor_timeout_seconds", 900)), manifest_path=Path(ctx["LAUNCH_MANIFEST_BUILD"]["manifest_path"]), seal_path=Path(ctx.get("LAUNCH_SEAL", {}).get("seal_path", Path(ctx["control_root"]) / "R3_PROSPECTIVE_LAUNCH_SEAL_RECEIPT.json")), roster_sha256=str(ctx["SEPTEMBER_ROSTER_REPLAY"]["roster_sha256"]))
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Calibrated, fail-closed R3 post-boundary executor")
     parser.add_argument("--execute-production", action="store_true")
+    parser.add_argument("--self-check-imports", action="store_true")
     parser.add_argument("--control-root", type=Path, default=CONTROL_ROOT)
     parser.add_argument("--scientific-root", type=Path, default=SCIENTIFIC_ROOT)
-    parser.add_argument("--raw-root", type=Path, default=Path("data/raw"))
-    parser.add_argument("--census-dir", type=Path, default=Path("data/census/r1_full_history_v1"))
-    parser.add_argument("--roster-path", type=Path, default=Path("campaigns/r3_prospective_context_v1/rosters/2026-09.json"))
+    parser.add_argument("--raw-root", type=Path, default=REPO_ROOT / "data/raw")
+    parser.add_argument("--census-dir", type=Path, default=REPO_ROOT / "data/census/r1_full_history_v1")
+    parser.add_argument("--roster-path", type=Path, default=REPO_ROOT / "campaigns/r3_prospective_context_v1/rosters/2026-09.json")
     parser.add_argument("--shadow-root", type=Path, default=Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v1"))
     parser.add_argument("--registry-sha256", default="")
     parser.add_argument("--supervisor-timeout-seconds", type=float, default=900.0)
     args = parser.parse_args(argv)
+    if args.self_check_imports:
+        repo_root = _import_closure_self_check()
+        print(json.dumps({"repo_root": repo_root, "imports": "PASS"}, sort_keys=True))
+        return 0
     if not args.execute_production:
         raise SystemExit("R3_BLOCKED_SEPTEMBER_ROSTER: use --execute-production after calibrated boundary")
     try:

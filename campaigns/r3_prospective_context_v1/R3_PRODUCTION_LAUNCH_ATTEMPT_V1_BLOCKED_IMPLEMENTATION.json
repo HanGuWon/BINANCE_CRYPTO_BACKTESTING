@@ -1,0 +1,18 @@
+{
+  "state": "R3_PRODUCTION_LAUNCH_ATTEMPT_V1_BLOCKED_IMPLEMENTATION",
+  "recorded_at_utc": "2026-09-01T01:25:57.839201Z",
+  "implementation_commit": "12c2b91cc1fe26bf1bf798b09eff533b394d6c83",
+  "source_tree_sha256": "997d522313aaab38f92ad3e9f183d7e1df813ce3e2dac459e0bf2736b9ca10f1",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "control_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v1",
+  "temporal_gate_receipt": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v1\\temporal_gate.json",
+  "temporal_gate_receipt_sha256": "5bb38de8c19175784e8e8a8561ca233b3951338962a245e039d9acc4199f0e6b",
+  "last_completed_stage": "TEMPORAL_GATE",
+  "blocker": "AUGUST_SOURCE_ACQUISITION callback failed: No module named 'scripts.build_r16_1d_universe'",
+  "acquisition_started": false,
+  "scientific_root_created": false,
+  "outcomes": "NOT_STARTED",
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED",
+  "superseded_by": "A new implementation/source identity and launch_control/2026-09-production-v2 are required; this v1 evidence is immutable."
+}

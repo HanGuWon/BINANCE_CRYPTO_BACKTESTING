@@ -3,6 +3,8 @@ from __future__ import annotations
 import hashlib
 import json
 import io
+import os
+import subprocess
 import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
@@ -156,6 +158,67 @@ def test_project_factory_uses_named_adapters_not_proof_defaults() -> None:
     assert callbacks["AUGUST_SOURCE_ACQUISITION"] is executor._acquire_august_source
     assert callbacks["SEPTEMBER_RANKING"] is executor._build_september_ranking
     assert callbacks["LAUNCH_SEAL"] is executor._build_launch_seal
+
+
+def test_direct_entrypoint_bootstraps_import_closure_from_arbitrary_cwd(tmp_path: Path) -> None:
+    script = executor.REPO_ROOT / "scripts" / "prepare_r3_post_boundary_launch.py"
+    environment = os.environ.copy()
+    environment.pop("PYTHONPATH", None)
+    result = subprocess.run(
+        [str(__import__("sys").executable), str(script), "--self-check-imports"],
+        cwd=tmp_path,
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    payload = json.loads(result.stdout)
+    assert payload == {"imports": "PASS", "repo_root": str(executor.REPO_ROOT)}
+
+
+def test_collector_direct_entrypoint_bootstraps_from_arbitrary_cwd(tmp_path: Path) -> None:
+    script = executor.REPO_ROOT / "scripts" / "run_r3_prospective_collector.py"
+    environment = os.environ.copy()
+    environment.pop("PYTHONPATH", None)
+    result = subprocess.run(
+        [str(__import__("sys").executable), str(script), "--help"],
+        cwd=tmp_path,
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "usage:" in result.stdout
+
+
+def test_repository_bootstrap_paths_are_canonical() -> None:
+    assert executor.REPO_ROOT_SCRIPTS == executor.REPO_ROOT / "scripts"
+    assert str(executor.REPO_ROOT) in executor.sys.path
+    assert str(executor.REPO_ROOT / "src") in executor.sys.path
+
+
+def test_collector_launcher_uses_absolute_repository_script(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: dict[str, object] = {}
+
+    def fake_supervisor(command: list[str], **kwargs: object) -> dict[str, object]:
+        captured["command"] = command
+        return {"cycles_completed": 1, "manifest_chain_pass": True, "health_pass": True}
+
+    monkeypatch.setattr(executor, "supervise_scientific_process", fake_supervisor)
+    executor._production_collector_launcher({
+        "scientific_root": "D:/scientific",
+        "control_root": "D:/control",
+        "SEPTEMBER_ROSTER_FREEZE": {"roster_path": "D:/roster.json"},
+        "LAUNCH_MANIFEST_BUILD": {"manifest_path": "D:/manifest.json"},
+        "LAUNCH_SEAL": {"seal_path": "D:/seal.json"},
+        "SEPTEMBER_ROSTER_REPLAY": {"roster_sha256": "a" * 64},
+    })
+    command = captured["command"]
+    assert isinstance(command, list)
+    assert command[1] == str(executor.REPO_ROOT / "scripts" / "run_r3_prospective_collector.py")
+    assert Path(command[1]).is_absolute()
 
 
 def test_rollover_gap_blocks_without_next_roster() -> None:
