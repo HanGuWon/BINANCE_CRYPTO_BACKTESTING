@@ -1,0 +1,32 @@
+{
+  "state": "R3_PRODUCTION_ENTRYPOINT_REPAIRED_READY_FOR_LAUNCH_V2",
+  "implementation_commit": "62653b13ea041a9b15ea6822957e9b5f9f0e3c00",
+  "source_tree_sha256": "a3744375436d47bf9f57c035307d800f6229675075b7b005f18d0e41f21db1fd",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "bootstrap": {
+    "repo_root": "Path(__file__).resolve().parents[1]",
+    "available_paths": ["REPO_ROOT/scripts", "REPO_ROOT/src", "REPO_ROOT"],
+    "collector_script": "REPO_ROOT/scripts/run_r3_prospective_collector.py"
+  },
+  "entrypoint_preflight": {
+    "command": "python <absolute-repo>/scripts/prepare_r3_post_boundary_launch.py --self-check-imports",
+    "cwd": "neutral temporary directory",
+    "result": "PASS",
+    "collector_help_result": "PASS"
+  },
+  "failed_v1": {
+    "control_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v1",
+    "temporal_gate_sha256": "5bb38de8c19175784e8e8a8561ca233b3951338962a245e039d9acc4199f0e6b",
+    "last_completed_stage": "TEMPORAL_GATE",
+    "blocker": "AUGUST_SOURCE_ACQUISITION callback failed: No module named 'scripts.build_r16_1d_universe'",
+    "preserved": true
+  },
+  "production_v2_control_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v2",
+  "production_v2_files": 0,
+  "scientific_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v1",
+  "scientific_root_exists": false,
+  "scientific_collection": "NOT_STARTED",
+  "outcomes": "NOT_STARTED",
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED"
+}
