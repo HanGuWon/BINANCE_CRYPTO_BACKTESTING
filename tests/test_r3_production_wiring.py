@@ -212,6 +212,15 @@ def test_launch_v2_rejects_legacy_and_failed_v1_control_roots() -> None:
             executor.require_control_root(forbidden)
 
 
+def test_launch_v2_authority_paths_are_canonical() -> None:
+    assert executor.CONTROL_ROOT == Path(
+        r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v2"
+    )
+    assert executor.SHADOW_ROOT == Path(
+        r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v2"
+    )
+
+
 def test_collector_launcher_uses_absolute_repository_script(monkeypatch: pytest.MonkeyPatch) -> None:
     captured: dict[str, object] = {}
 
