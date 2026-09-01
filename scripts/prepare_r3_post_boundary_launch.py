@@ -102,6 +102,8 @@ def require_shadow_root(root: Path = SHADOW_ROOT) -> Path:
         raise PostBoundaryBlocked("R3_BLOCKED_STORAGE", "shadow root must be D-backed")
     if resolved != SHADOW_ROOT.resolve() or FAILED_V2_SHADOW_ROOT.resolve() in resolved.parents:
         raise PostBoundaryBlocked("R3_BLOCKED_LAUNCH_IDENTITY", f"shadow root is not the reserved production-v3 root: {resolved}")
+    if resolved.exists() and any(resolved.iterdir()):
+        raise PostBoundaryBlocked("R3_BLOCKED_LAUNCH_IDENTITY", f"production-v3 shadow root is not fresh: {resolved}")
     resolved.mkdir(parents=True, exist_ok=True)
     return resolved
 
