@@ -335,6 +335,16 @@ def test_discovery_symbol_set_must_match_discovered_objects(tmp_path: Path) -> N
         executor._verify_august_source({"control_root": str(tmp_path), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest), "inventory_path": str(inventory)}})
 
 
+def test_discovered_symbol_missing_from_manifest_is_a_blocker(tmp_path: Path) -> None:
+    raw, sha = _kline_zip(tmp_path / "complete.zip", 31)
+    manifest = tmp_path / "acquisition.csv"
+    pd.DataFrame([{"market": "um", "symbol": "FULLUSDT", "archive_month": "2026-08", "integrity_status": "PASS", "published_sha256": sha, "computed_sha256": sha, "raw_path": str(raw), "source_mode": "MONTHLY_ARCHIVE"}]).to_csv(manifest, index=False)
+    inventory = tmp_path / "august_2026_source_inventory.json"
+    inventory.write_text(json.dumps({"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "historical_taxonomy_symbols": ["FULLUSDT", "MISSINGUSDT"], "historical_taxonomy_symbol_count": 2, "discovered_symbols": ["FULLUSDT", "MISSINGUSDT"], "discovered_objects": [{"market": "um", "symbol": "FULLUSDT", "archive_month": "2026-08", "source_mode": "MONTHLY_ARCHIVE"}, {"market": "um", "symbol": "MISSINGUSDT", "archive_month": "2026-08", "source_mode": "DAILY_ARCHIVE_FALLBACK"}]}), encoding="utf-8")
+    with pytest.raises(executor.PostBoundaryBlocked, match="missing from acquisition manifest"):
+        executor._verify_august_source({"control_root": str(tmp_path), "AUGUST_SOURCE_ACQUISITION": {"manifest_path": str(manifest), "inventory_path": str(inventory)}})
+
+
 def test_discovered_object_404_is_a_source_integrity_blocker(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     class MissingObjectClient:
         def __init__(self, *_args, **_kwargs) -> None:

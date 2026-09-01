@@ -322,6 +322,10 @@ def _verify_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
         if discovered_symbols:
             raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "discovered August objects have no acquisition manifest rows")
         return _write_august_verification_receipt(ctx, frame, inventory, [], set(), historical_symbols, inventory_path)
+    manifest_symbols = {str(symbol).upper() for symbol in frame["symbol"].dropna()}
+    missing_discovered = discovered_symbols - manifest_symbols
+    if missing_discovered:
+        raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"discovered August symbols missing from acquisition manifest: {sorted(missing_discovered)}")
     valid = frame["market"].astype(str).str.lower().eq("um") & frame["archive_month"].astype(str).eq("2026-08") & frame["integrity_status"].astype(str).eq("PASS") & frame["published_sha256"].astype(str).eq(frame["computed_sha256"].astype(str))
     if not bool(valid.all()):
         raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "August source failed UM/1d/checksum metadata verification")
