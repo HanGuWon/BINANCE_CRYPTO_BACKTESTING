@@ -58,6 +58,14 @@ def test_real_roster_freeze_replay_and_identity_artifacts(tmp_path: Path) -> Non
     assert json.loads(Path(seal["seal_path"]).read_text())["manifest_sha256"] == manifest["manifest_sha256"]
 
 
+def test_stage_artifact_reference_uses_file_hash_when_logical_hash_also_exists(tmp_path: Path) -> None:
+    artifact = tmp_path / "roster.json"
+    artifact.write_text('{"symbols": []}\n', encoding="utf-8")
+    file_sha = hashlib.sha256(artifact.read_bytes()).hexdigest()
+    proof = {"roster_path": str(artifact), "roster_sha256": "logical-roster-identity", "roster_file_sha256": file_sha}
+    executor._validate_artifact_references(proof)
+
+
 def test_real_august_verifier_rejects_scope_and_accepts_complete_fixture(tmp_path: Path) -> None:
     raw = tmp_path / "archive.zip"
     rows = []

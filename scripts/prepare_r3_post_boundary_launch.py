@@ -12,6 +12,7 @@ import argparse
 import os
 import subprocess
 import sys
+import urllib.parse
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT_SCRIPTS = REPO_ROOT / "scripts"
@@ -29,8 +30,15 @@ FAILED_V2_CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospectiv
 FAILED_V2_SHADOW_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v2")
 CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v3")
 SHADOW_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v3")
+PRODUCTION_V4_CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v4")
+PRODUCTION_V4_SHADOW_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v4")
+PRODUCTION_V4_SCIENTIFIC_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\scientific_raw_v4")
 MAX_CLOCK_UNCERTAINTY_MS = 2_000
 EXPECTED_REGISTRY_SHA256 = "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a"
+PRODUCTION_PROFILES = {
+    "v3": {"control_root": CONTROL_ROOT, "shadow_root": SHADOW_ROOT, "scientific_root": SCIENTIFIC_ROOT},
+    "v4": {"control_root": PRODUCTION_V4_CONTROL_ROOT, "shadow_root": PRODUCTION_V4_SHADOW_ROOT, "scientific_root": PRODUCTION_V4_SCIENTIFIC_ROOT},
+}
 
 
 class PostBoundaryBlocked(RuntimeError):
@@ -77,14 +85,14 @@ def require_fresh_scientific_root(root: Path = SCIENTIFIC_ROOT) -> Path:
     return resolved
 
 
-def require_control_root(root: Path = CONTROL_ROOT, *, allow_fixture: bool = False) -> Path:
+def require_control_root(root: Path = CONTROL_ROOT, *, allow_fixture: bool = False, expected_root: Path = CONTROL_ROOT) -> Path:
     resolved = Path(root).resolve()
     if resolved.drive.upper() != "D:":
         raise PostBoundaryBlocked("R3_BLOCKED_STORAGE", "control root must be D-backed")
     # Production-v3 is a single pre-registered identity.  Reject the failed
     # v1/v2 roots *and* arbitrary descendants/overrides so a caller cannot
     # accidentally authorize a new launch lineage by changing one path flag.
-    if resolved != CONTROL_ROOT.resolve() and not allow_fixture:
+    if resolved != Path(expected_root).resolve() and not allow_fixture:
         raise PostBoundaryBlocked(
             "R3_BLOCKED_LAUNCH_IDENTITY",
             f"control root is not the reserved production-v3 root: {resolved}",
@@ -93,12 +101,12 @@ def require_control_root(root: Path = CONTROL_ROOT, *, allow_fixture: bool = Fal
     return resolved
 
 
-def require_shadow_root(root: Path = SHADOW_ROOT) -> Path:
+def require_shadow_root(root: Path = SHADOW_ROOT, *, expected_root: Path = SHADOW_ROOT) -> Path:
     """Allow only the reserved, fresh v3 shadow root for production wiring."""
     resolved = Path(root).resolve()
     if resolved.drive.upper() != "D:":
         raise PostBoundaryBlocked("R3_BLOCKED_STORAGE", "shadow root must be D-backed")
-    if resolved != SHADOW_ROOT.resolve() or FAILED_V2_SHADOW_ROOT.resolve() in resolved.parents:
+    if resolved != Path(expected_root).resolve() or FAILED_V2_SHADOW_ROOT.resolve() in resolved.parents:
         raise PostBoundaryBlocked("R3_BLOCKED_LAUNCH_IDENTITY", f"shadow root is not the reserved production-v3 root: {resolved}")
     if resolved.exists() and any(resolved.iterdir()):
         raise PostBoundaryBlocked("R3_BLOCKED_LAUNCH_IDENTITY", f"production-v3 shadow root is not fresh: {resolved}")
@@ -119,7 +127,13 @@ def _validate_artifact_references(proof: Mapping[str, Any]) -> None:
         path = Path(value)
         if not path.is_file():
             raise PostBoundaryBlocked("R3_BLOCKED_LAUNCH_IDENTITY", f"referenced artifact missing: {path}")
-        hash_key = key[:-5] + "_sha256"
+        # Some proofs carry both a logical identity hash (for example
+        # ``roster_sha256``) and a byte-level file hash.  A path must be
+        # checked against the latter; comparing file bytes to a logical hash
+        # creates a false tamper failure at the roster freeze boundary.
+        hash_key = key[:-5] + "_file_sha256"
+        if proof.get(hash_key) is None:
+            hash_key = key[:-5] + "_sha256"
         expected = proof.get(hash_key)
         if expected is not None and hashlib.sha256(path.read_bytes()).hexdigest() != str(expected):
             raise PostBoundaryBlocked("R3_BLOCKED_LAUNCH_IDENTITY", f"referenced artifact hash changed: {path}")
@@ -279,13 +293,30 @@ def _build_august_source_inventory(taxonomy: Any, listed: Any, client: Any) -> d
 
 
 def _download_discovered_daily(ctx: Mapping[str, Any], *, raw_root: Path, inventory: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    from binance_research.data import ArchiveRequest, BinanceArchiveClient
+    from binance_research.data import ArchiveRequest, BinanceArchiveClient, load_kline_archive, validate_klines
     client = BinanceArchiveClient(raw_root, timeout=90, max_retries=3)
     rows: list[dict[str, Any]] = []
     for item in inventory:
         source_month = str(item.get("archive_month", "2026-08"))
         year, month = (int(part) for part in source_month.split("-"))
         request = ArchiveRequest("um", "klines", str(item["symbol"]), year, month, interval="1d", cadence="daily", day=int(item["source_day"]))
+        # Reuse an already verified immutable object from an earlier aborted
+        # launch.  This is deliberately fail-closed: a missing/invalid
+        # sidecar falls through to a fresh network fetch, while a checksum
+        # mismatch raises instead of silently replacing local bytes.
+        relative = Path(request.market) / request.dataset / request.symbol / (request.interval or "")
+        destination = raw_root / relative / Path(urllib.parse.urlparse(request.url()).path).name
+        sidecar = destination.with_suffix(destination.suffix + ".manifest.json")
+        if destination.is_file() and sidecar.is_file():
+            metadata = json.loads(sidecar.read_text(encoding="utf-8"))
+            computed = hashlib.sha256(destination.read_bytes()).hexdigest()
+            if computed != str(metadata.get("computed_sha256", "")) or computed != str(metadata.get("published_sha256", "")):
+                raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"immutable cached archive checksum changed: {destination}")
+            issues = validate_klines(load_kline_archive(destination), "1d")
+            if any(getattr(issue, "severity", "ERROR") == "ERROR" for issue in issues):
+                raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"immutable cached archive failed validation: {destination}")
+            rows.append({**item, "raw_path": str(destination), "published_sha256": computed, "computed_sha256": computed, "integrity_status": "PASS", "retrieved_at_utc": metadata.get("downloaded_at")})
+            continue
         try:
             path, manifest = client.download(request)
         except Exception as exc:
@@ -519,7 +550,7 @@ def _replay_september_roster(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
 def _run_september_shadow(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     from binance_research.r3_operations import verify_engineering_shadow_root
     from scripts.run_r3_prospective_collector import run_engineering_shadow_forever
-    root = require_shadow_root(Path(ctx.get("shadow_root", SHADOW_ROOT)))
+    root = require_shadow_root(Path(ctx.get("shadow_root", SHADOW_ROOT)), expected_root=Path(ctx.get("expected_shadow_root", SHADOW_ROOT)))
     roster_path = Path(ctx["SEPTEMBER_ROSTER_FREEZE"]["roster_path"])
     result = run_engineering_shadow_forever(root, roster_path, max_cycles=1, wait_for_boundary=True)
     verified = verify_engineering_shadow_root(root, expected_symbols=list(ctx["SEPTEMBER_ROSTER_FREEZE"].get("symbols", [])), roster_sha256=ctx["SEPTEMBER_ROSTER_FREEZE"]["roster_sha256"])
@@ -645,20 +676,25 @@ def supervise_scientific_process(command: list[str], *, scientific_root: Path, c
     raise PostBoundaryBlocked("R3_BLOCKED_LAUNCH_IDENTITY", "collector did not produce a verified scientific cycle before supervisor timeout")
 
 
-def execute_post_boundary(*, clock: CalibratedClock, scientific_root: Path = SCIENTIFIC_ROOT, control_root: Path = CONTROL_ROOT, receipt_root: Path | None = None, callbacks: Mapping[str, StageCallback] | None = None, initial_context: Mapping[str, Any] | None = None) -> dict[str, Any]:
+def execute_post_boundary(*, clock: CalibratedClock, scientific_root: Path = SCIENTIFIC_ROOT, control_root: Path = CONTROL_ROOT, receipt_root: Path | None = None, callbacks: Mapping[str, StageCallback] | None = None, initial_context: Mapping[str, Any] | None = None, launch_profile: str = "v3") -> dict[str, Any]:
     """Run all launch stages after the calibrated boundary.
 
     The temporal gate is first, so pre-boundary calls create no files and invoke
     no callback. All external work is represented by proof-producing callbacks.
     """
     require_calibrated_boundary(clock)
+    if launch_profile not in PRODUCTION_PROFILES:
+        raise ValueError(f"unknown production profile: {launch_profile}")
+    profile = PRODUCTION_PROFILES[launch_profile]
     root = Path(scientific_root)
+    if callbacks is None and root.resolve() != Path(profile["scientific_root"]).resolve():
+        raise PostBoundaryBlocked("R3_BLOCKED_LAUNCH_IDENTITY", f"scientific root is not the reserved {launch_profile} root: {root}")
     # Receipt-root injection is reserved for deterministic unit fixtures.  A
     # real production invocation (callbacks omitted, no receipt override)
-    # remains pinned to the exact pre-registered v3 control root.
-    control = Path(receipt_root) if receipt_root is not None else require_control_root(control_root, allow_fixture=callbacks is not None)
+    # remains pinned to the exact pre-registered profile roots.
+    control = Path(receipt_root) if receipt_root is not None else require_control_root(control_root, allow_fixture=callbacks is not None, expected_root=profile["control_root"])
     if receipt_root is not None:
-        control = require_control_root(control, allow_fixture=True)
+        control = require_control_root(control, allow_fixture=True, expected_root=profile["control_root"])
     defaults: dict[str, StageCallback] = {
         "AUGUST_SOURCE_ACQUISITION": _default_blocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "August source acquisition proof required"),
         "AUGUST_SOURCE_VERIFICATION": _default_blocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "August source verification proof required"),
@@ -673,7 +709,7 @@ def execute_post_boundary(*, clock: CalibratedClock, scientific_root: Path = SCI
         "SCIENTIFIC_ACTIVATION": _default_blocked("R3_BLOCKED_LAUNCH_IDENTITY", "scientific activation proof required"),
     }
     defaults.update(build_project_production_callbacks() if callbacks is None else dict(callbacks))
-    context: dict[str, Any] = {"clock": clock.server_time.isoformat(), "scientific_root": str(root), "control_root": str(control)}
+    context: dict[str, Any] = {"clock": clock.server_time.isoformat(), "scientific_root": str(root), "control_root": str(control), "expected_shadow_root": str(profile["shadow_root"]), "launch_profile": launch_profile}
     context.update(dict(initial_context or {}))
     out = [_write_stage_receipt(control, "TEMPORAL_GATE", {"server_time": clock.server_time.isoformat(), "uncertainty_ms": clock.uncertainty_ms})]
     for stage, callback in defaults.items():
@@ -731,12 +767,13 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Calibrated, fail-closed R3 post-boundary executor")
     parser.add_argument("--execute-production", action="store_true")
     parser.add_argument("--self-check-imports", action="store_true")
-    parser.add_argument("--control-root", type=Path, default=CONTROL_ROOT)
-    parser.add_argument("--scientific-root", type=Path, default=SCIENTIFIC_ROOT)
+    parser.add_argument("--production-version", choices=tuple(PRODUCTION_PROFILES), default="v3")
+    parser.add_argument("--control-root", type=Path)
+    parser.add_argument("--scientific-root", type=Path)
     parser.add_argument("--raw-root", type=Path, default=REPO_ROOT / "data/raw")
     parser.add_argument("--census-dir", type=Path, default=REPO_ROOT / "data/census/r1_full_history_v1")
     parser.add_argument("--roster-path", type=Path, default=REPO_ROOT / "campaigns/r3_prospective_context_v1/rosters/2026-09.json")
-    parser.add_argument("--shadow-root", type=Path, default=SHADOW_ROOT)
+    parser.add_argument("--shadow-root", type=Path)
     parser.add_argument("--registry-sha256", default="")
     parser.add_argument("--supervisor-timeout-seconds", type=float, default=900.0)
     args = parser.parse_args(argv)
@@ -747,8 +784,12 @@ def main(argv: list[str] | None = None) -> int:
     if not args.execute_production:
         raise SystemExit("R3_BLOCKED_SEPTEMBER_ROSTER: use --execute-production after calibrated boundary")
     try:
+        profile = PRODUCTION_PROFILES[args.production_version]
+        control_root = args.control_root or profile["control_root"]
+        scientific_root = args.scientific_root or profile["scientific_root"]
+        shadow_root = args.shadow_root or profile["shadow_root"]
         clock = _production_clock()
-        result = execute_post_boundary(clock=clock, control_root=args.control_root, scientific_root=args.scientific_root, callbacks=None, initial_context={"raw_root": str(args.raw_root), "census_dir": str(args.census_dir), "roster_path": str(args.roster_path), "shadow_root": str(args.shadow_root), "registry_sha256": args.registry_sha256, "supervisor_timeout_seconds": args.supervisor_timeout_seconds, "collector_launcher": _production_collector_launcher})
+        result = execute_post_boundary(clock=clock, control_root=control_root, scientific_root=scientific_root, callbacks=None, launch_profile=args.production_version, initial_context={"raw_root": str(args.raw_root), "census_dir": str(args.census_dir), "roster_path": str(args.roster_path), "shadow_root": str(shadow_root), "registry_sha256": args.registry_sha256, "supervisor_timeout_seconds": args.supervisor_timeout_seconds, "collector_launcher": _production_collector_launcher})
     except PostBoundaryBlocked as exc:
         print(str(exc), file=sys.stderr)
         return 2
