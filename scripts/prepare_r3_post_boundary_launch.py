@@ -218,14 +218,25 @@ def build_project_production_callbacks() -> dict[str, StageCallback]:
     })
 
 
-def _august_daily_inventory(client: Any, symbol: str) -> list[dict[str, Any]]:
-    """List actual August daily Vision objects; never infer missing days by URL."""
+def _month_expected_days(source_month: str) -> set[Any]:
+    import pandas as pd
+
+    period = pd.Period(source_month, freq="M")
+    return set(pd.date_range(f"{source_month}-01", periods=period.days_in_month, freq="D", tz="UTC"))
+
+
+def _source_label(source_month: str) -> str:
+    return "August" if source_month == "2026-08" else source_month
+
+
+def _daily_inventory(client: Any, symbol: str, source_month: str) -> list[dict[str, Any]]:
+    """List actual monthly-scope daily Vision objects; never infer missing URLs."""
     prefix = f"data/futures/um/daily/klines/{symbol}/1d/"
     try:
         _, objects, pages = client.list_objects_v2(prefix)
     except Exception as exc:
         raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"August source inventory failed for {symbol}: {exc}") from exc
-    stem = f"{symbol}-1d-2026-08-"
+    stem = f"{symbol}-1d-{source_month}-"
     rows: list[dict[str, Any]] = []
     for obj in objects:
         name = Path(obj.key).name
@@ -234,12 +245,16 @@ def _august_daily_inventory(client: Any, symbol: str) -> list[dict[str, Any]]:
         day_text = name[len(stem):-4]
         if not day_text.isdigit() or not 1 <= int(day_text) <= 31:
             continue
-        rows.append({"market": "um", "symbol": symbol, "archive_month": "2026-08", "interval": "1d", "cadence": "daily", "source_day": int(day_text), "object_key": obj.key, "object_size": obj.size, "object_etag": obj.etag, "listing_pages": pages, "source_mode": "DAILY_ARCHIVE_FALLBACK", "discovery_status": "DISCOVERED"})
+        rows.append({"market": "um", "symbol": symbol, "archive_month": source_month, "interval": "1d", "cadence": "daily", "source_day": int(day_text), "object_key": obj.key, "object_size": obj.size, "object_etag": obj.etag, "listing_pages": pages, "source_mode": "DAILY_ARCHIVE_FALLBACK", "discovery_status": "DISCOVERED"})
     return sorted(rows, key=lambda row: int(row["source_day"]))
 
 
-def _build_august_source_inventory(taxonomy: Any, listed: Any, client: Any) -> dict[str, Any]:
-    """Separate historical taxonomy from actual August-discovered objects."""
+def _august_daily_inventory(client: Any, symbol: str) -> list[dict[str, Any]]:
+    return _daily_inventory(client, symbol, "2026-08")
+
+
+def _build_month_source_inventory(taxonomy: Any, listed: Any, client: Any, source_month: str) -> dict[str, Any]:
+    """Separate historical taxonomy from actual month-discovered objects."""
     import pandas as pd
     um_taxonomy = taxonomy[taxonomy["market"].astype(str).str.lower().eq("um")].copy() if "market" in taxonomy.columns else pd.DataFrame()
     if um_taxonomy.empty or "symbol" not in um_taxonomy:
@@ -249,15 +264,20 @@ def _build_august_source_inventory(taxonomy: Any, listed: Any, client: Any) -> d
         historical = set(um_taxonomy.loc[primary, "symbol"].astype(str).str.upper())
     else:
         historical = set(um_taxonomy["symbol"].astype(str).str.upper())
-    monthly = listed[(listed["market"].astype(str).str.lower() == "um") & listed["archive_month"].astype(str).eq("2026-08")].copy() if {"market", "archive_month", "symbol"}.issubset(listed.columns) else pd.DataFrame()
+    monthly = listed[(listed["market"].astype(str).str.lower() == "um") & listed["archive_month"].astype(str).eq(source_month)].copy() if {"market", "archive_month", "symbol"}.issubset(listed.columns) else pd.DataFrame()
     monthly = monthly.drop_duplicates(subset=["symbol", "archive_month"])
     monthly_symbols = set(monthly["symbol"].astype(str).str.upper())
     objects: list[dict[str, Any]] = []
     objects.extend({**row, "source_mode": "MONTHLY_ARCHIVE", "discovery_status": "DISCOVERED", "cadence": "monthly", "object_key": row.get("key", ""), "object_size": row.get("size", ""), "object_etag": row.get("etag", "")} for row in monthly.to_dict(orient="records"))
     for symbol in sorted(historical - monthly_symbols):
-        objects.extend(_august_daily_inventory(client, symbol))
+        objects.extend(_daily_inventory(client, symbol, source_month))
     discovered = {str(row["symbol"]).upper() for row in objects}
-    return {"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "historical_taxonomy_symbols": sorted(historical), "historical_taxonomy_symbol_count": len(historical), "discovered_symbols": sorted(discovered), "august_discovered_symbol_count": len(discovered), "no_august_historical_symbols": sorted(historical - discovered), "no_august_historical_symbol_count": len(historical - discovered), "discovered_objects": objects}
+    no_source = sorted(historical - discovered)
+    return {"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": source_month, "historical_taxonomy_symbols": sorted(historical), "historical_taxonomy_symbol_count": len(historical), "discovered_symbols": sorted(discovered), "discovered_symbol_count": len(discovered), "august_discovered_symbol_count": len(discovered), "no_historical_source_symbols": no_source, "no_historical_source_symbol_count": len(no_source), "no_august_historical_symbols": no_source, "no_august_historical_symbol_count": len(no_source), "discovered_objects": objects}
+
+
+def _build_august_source_inventory(taxonomy: Any, listed: Any, client: Any) -> dict[str, Any]:
+    return _build_month_source_inventory(taxonomy, listed, client, "2026-08")
 
 
 def _download_discovered_daily(ctx: Mapping[str, Any], *, raw_root: Path, inventory: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -265,7 +285,9 @@ def _download_discovered_daily(ctx: Mapping[str, Any], *, raw_root: Path, invent
     client = BinanceArchiveClient(raw_root, timeout=90, max_retries=3)
     rows: list[dict[str, Any]] = []
     for item in inventory:
-        request = ArchiveRequest("um", "klines", str(item["symbol"]), 2026, 8, interval="1d", cadence="daily", day=int(item["source_day"]))
+        source_month = str(item.get("archive_month", "2026-08"))
+        year, month = (int(part) for part in source_month.split("-"))
+        request = ArchiveRequest("um", "klines", str(item["symbol"]), year, month, interval="1d", cadence="daily", day=int(item["source_day"]))
         try:
             path, manifest = client.download(request)
         except Exception as exc:
@@ -274,18 +296,19 @@ def _download_discovered_daily(ctx: Mapping[str, Any], *, raw_root: Path, invent
     return rows
 
 
-def _acquire_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
-    """Discover and acquire only actual August UM 1d objects."""
+def _acquire_month_source(ctx: Mapping[str, Any], source_month: str) -> Mapping[str, Any]:
+    """Discover and acquire only actual UM 1d objects for one source month."""
     import pandas as pd
     from scripts.build_r16_1d_universe import acquire_1d, census_1d
     from binance_research.data import BinanceArchiveClient
     census_dir = Path(ctx.get("census_dir", REPO_ROOT / "data/census/r1_full_history_v1"))
     raw_root = Path(ctx.get("raw_root", REPO_ROOT / "data/raw"))
-    out = Path(ctx["control_root"]) / "august_source"
+    out = Path(ctx.get("source_output_dir", Path(ctx["control_root"]) / ("august_source" if source_month == "2026-08" else f"source_{source_month}")))
     out.mkdir(parents=True, exist_ok=True)
     taxonomy, listed = census_1d(census_dir, out / "census", workers=2)
-    inventory = _build_august_source_inventory(taxonomy, listed, BinanceArchiveClient(raw_root, timeout=90, max_retries=3))
-    inventory_path = out / "august_2026_source_inventory.json"
+    inventory = _build_month_source_inventory(taxonomy, listed, BinanceArchiveClient(raw_root, timeout=90, max_retries=3), source_month)
+    inventory_name = "august_2026_source_inventory.json" if source_month == "2026-08" else f"{source_month}_source_inventory.json"
+    inventory_path = out / inventory_name
     inventory_path.write_text(json.dumps(inventory, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     monthly = pd.DataFrame([row for row in inventory["discovered_objects"] if row["source_mode"] == "MONTHLY_ARCHIVE"])
     daily = [row for row in inventory["discovered_objects"] if row["source_mode"] == "DAILY_ARCHIVE_FALLBACK"]
@@ -303,11 +326,16 @@ def _acquire_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     for column in columns:
         if column not in acquired:
             acquired[column] = None
-    acquired.to_csv(out / "august_2026_acquisition.csv", index=False)
-    return {"manifest_path": str((out / "august_2026_acquisition.csv").resolve()), "manifest_sha256": hashlib.sha256((out / "august_2026_acquisition.csv").read_bytes()).hexdigest(), "inventory_path": str(inventory_path.resolve()), "inventory_sha256": hashlib.sha256(inventory_path.read_bytes()).hexdigest(), "historical_taxonomy_symbol_count": inventory["historical_taxonomy_symbol_count"], "august_discovered_symbol_count": inventory["august_discovered_symbol_count"], "no_august_historical_symbol_count": inventory["no_august_historical_symbol_count"], "source_integrity_blocker_count": 0, "source_mode": "MONTHLY_ARCHIVE" if not daily else "MONTHLY_ARCHIVE_AND_DAILY_ARCHIVE_FALLBACK"}
+    manifest_name = "august_2026_acquisition.csv" if source_month == "2026-08" else f"{source_month}_acquisition.csv"
+    acquired.to_csv(out / manifest_name, index=False)
+    return {"manifest_path": str((out / manifest_name).resolve()), "manifest_sha256": hashlib.sha256((out / manifest_name).read_bytes()).hexdigest(), "inventory_path": str(inventory_path.resolve()), "inventory_sha256": hashlib.sha256(inventory_path.read_bytes()).hexdigest(), "source_month": source_month, "historical_taxonomy_symbol_count": inventory["historical_taxonomy_symbol_count"], "discovered_symbol_count": inventory["discovered_symbol_count"], "no_historical_source_symbol_count": inventory["no_historical_source_symbol_count"], "august_discovered_symbol_count": inventory["discovered_symbol_count"], "no_august_historical_symbol_count": inventory["no_historical_source_symbol_count"], "source_integrity_blocker_count": 0, "source_mode": "MONTHLY_ARCHIVE" if not daily else "MONTHLY_ARCHIVE_AND_DAILY_ARCHIVE_FALLBACK"}
 
 
-def _verify_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
+def _acquire_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
+    return _acquire_month_source(ctx, "2026-08")
+
+
+def _verify_month_source(ctx: Mapping[str, Any], source_month: str) -> Mapping[str, Any]:
     import pandas as pd
     from binance_research.data import load_kline_archive, validate_klines
     acquisition = ctx["AUGUST_SOURCE_ACQUISITION"]
@@ -316,17 +344,18 @@ def _verify_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     required = {"market", "symbol", "archive_month", "integrity_status", "published_sha256", "computed_sha256", "raw_path"}
     if not required.issubset(frame.columns):
         raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "acquisition manifest lacks integrity columns")
-    inventory_path = Path(str(acquisition.get("inventory_path", manifest_path.with_name("august_2026_source_inventory.json"))))
+    default_inventory_name = "august_2026_source_inventory.json" if source_month == "2026-08" else f"{source_month}_source_inventory.json"
+    inventory_path = Path(str(acquisition.get("inventory_path", manifest_path.with_name(default_inventory_name))))
     if not inventory_path.is_file():
         raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "August source inventory is missing")
     inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
-    if inventory.get("status") != "PASS" or inventory.get("market") != "um" or inventory.get("month") != "2026-08":
-        raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "August source inventory is not authoritative")
+    if inventory.get("status") != "PASS" or inventory.get("market") != "um" or inventory.get("month") != source_month:
+        raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"{_source_label(source_month)} source inventory is not authoritative")
     for item in inventory.get("discovered_objects", []):
-        if str(item.get("market", "")).lower() != "um" or str(item.get("archive_month", "")) != "2026-08":
-            raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "August source inventory contains an unexpected market or month")
+        if str(item.get("market", "")).lower() != "um" or str(item.get("archive_month", "")) != source_month:
+            raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"{_source_label(source_month)} source inventory contains an unexpected market or month")
         if str(item.get("source_mode", "")) not in {"MONTHLY_ARCHIVE", "DAILY_ARCHIVE_FALLBACK"}:
-            raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "August source inventory contains an unknown source mode")
+            raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"{_source_label(source_month)} source inventory contains an unknown source mode")
     discovered_symbols = {str(symbol).upper() for symbol in inventory.get("discovered_symbols", [])}
     discovered_object_symbols = {str(item.get("symbol", "")).upper() for item in inventory.get("discovered_objects", [])}
     historical_symbols = {str(symbol).upper() for symbol in inventory.get("historical_taxonomy_symbols", [])}
@@ -334,18 +363,18 @@ def _verify_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
         raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "August source inventory symbol set does not match discovered objects")
     if frame.empty:
         if discovered_symbols:
-            raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "discovered August objects have no acquisition manifest rows")
-        return _write_august_verification_receipt(ctx, frame, inventory, [], set(), historical_symbols, inventory_path)
+            raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"discovered {_source_label(source_month)} objects have no acquisition manifest rows")
+        return _write_month_verification_receipt(ctx, frame, inventory, [], set(), historical_symbols, inventory_path, source_month=source_month)
     manifest_symbols = {str(symbol).upper() for symbol in frame["symbol"].dropna()}
     missing_discovered = discovered_symbols - manifest_symbols
     if missing_discovered:
         raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"discovered August symbols missing from acquisition manifest: {sorted(missing_discovered)}")
-    valid = frame["market"].astype(str).str.lower().eq("um") & frame["archive_month"].astype(str).eq("2026-08") & frame["integrity_status"].astype(str).eq("PASS") & frame["published_sha256"].astype(str).eq(frame["computed_sha256"].astype(str))
+    valid = frame["market"].astype(str).str.lower().eq("um") & frame["archive_month"].astype(str).eq(source_month) & frame["integrity_status"].astype(str).eq("PASS") & frame["published_sha256"].astype(str).eq(frame["computed_sha256"].astype(str))
     if not bool(valid.all()):
         raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "August source failed UM/1d/checksum metadata verification")
-    if frame["archive_month"].astype(str).str.contains("2026-09").any():
-        raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "September observation entered August source")
-    expected_days = set(pd.date_range("2026-08-01", "2026-08-31", freq="D", tz="UTC"))
+    if frame["archive_month"].astype(str).ne(source_month).any():
+        raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"observation outside {source_month} entered source")
+    expected_days = _month_expected_days(source_month)
     verified_inputs: list[dict[str, Any]] = []
     grouped_days: dict[str, set[pd.Timestamp]] = {}
     for record in frame.to_dict(orient="records"):
@@ -366,7 +395,7 @@ def _verify_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
             raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"invalid OHLCV/grid in {path}")
         days = set(pd.to_datetime(candles["open_time"], utc=True).dt.floor("D"))
         if any(day not in expected_days for day in days) or len(days) != len(candles):
-            raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"duplicate or non-August candle in {path}")
+            raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"duplicate or non-{_source_label(source_month)} candle in {path}")
         symbol = str(record["symbol"]).upper()
         if symbol not in discovered_symbols:
             raise PostBoundaryBlocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", f"acquired symbol was not in discovered August inventory: {symbol}")
@@ -375,19 +404,20 @@ def _verify_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
     complete_symbols = {symbol for symbol, days in grouped_days.items() if days == expected_days}
     partial_symbols = set(grouped_days) - complete_symbols
     complete_inputs = [item for item in verified_inputs if item["symbol"] in complete_symbols]
-    return _write_august_verification_receipt(ctx, frame, inventory, complete_inputs, partial_symbols, historical_symbols, inventory_path, discovered_symbols=discovered_symbols, grouped_days=grouped_days)
+    return _write_month_verification_receipt(ctx, frame, inventory, complete_inputs, partial_symbols, historical_symbols, inventory_path, source_month=source_month, discovered_symbols=discovered_symbols, grouped_days=grouped_days)
 
 
-def _write_august_verification_receipt(ctx: Mapping[str, Any], frame: Any, inventory: Mapping[str, Any], verified_inputs: list[dict[str, Any]], partial_symbols: set[str], historical_symbols: set[str], inventory_path: Path, *, discovered_symbols: set[str] | None = None, grouped_days: Mapping[str, set[Any]] | None = None) -> Mapping[str, Any]:
+def _write_month_verification_receipt(ctx: Mapping[str, Any], frame: Any, inventory: Mapping[str, Any], verified_inputs: list[dict[str, Any]], partial_symbols: set[str], historical_symbols: set[str], inventory_path: Path, *, source_month: str, discovered_symbols: set[str] | None = None, grouped_days: Mapping[str, set[Any]] | None = None) -> Mapping[str, Any]:
     discovered_symbols = discovered_symbols if discovered_symbols is not None else {str(symbol).upper() for symbol in inventory.get("discovered_symbols", [])}
     grouped_days = grouped_days or {}
     complete_symbols = {str(item["symbol"]).upper() for item in verified_inputs}
     partial_symbols = {str(symbol).upper() for symbol in partial_symbols}
-    semantic_sha = _digest({"month": "2026-08", "inputs": verified_inputs, "discovered_symbols": sorted(discovered_symbols), "partial_symbols": sorted(partial_symbols)})
-    receipt = Path(ctx["control_root"]) / "R3_AUGUST_2026_SOURCE_VERIFICATION_RECEIPT.json"
+    semantic_sha = _digest({"month": source_month, "inputs": verified_inputs, "discovered_symbols": sorted(discovered_symbols), "partial_symbols": sorted(partial_symbols)})
+    receipt_name = "R3_AUGUST_2026_SOURCE_VERIFICATION_RECEIPT.json" if source_month == "2026-08" else f"R3_{source_month}_SOURCE_VERIFICATION_RECEIPT.json"
+    receipt = Path(ctx["control_root"]) / receipt_name
     source_mode_by_symbol = {symbol: sorted({str(item.get("source_mode", "MONTHLY_ARCHIVE")) for item in verified_inputs if item["symbol"] == symbol}) for symbol in sorted(complete_symbols | partial_symbols)}
     source_coverage_by_symbol = {}
-    no_august_symbols = historical_symbols - discovered_symbols
+    no_source_symbols = historical_symbols - discovered_symbols
     for symbol in sorted(discovered_symbols):
         observed_day_count = len(grouped_days.get(symbol, set()))
         source_coverage_by_symbol[symbol] = {
@@ -399,7 +429,7 @@ def _write_august_verification_receipt(ctx: Mapping[str, Any], frame: Any, inven
             "eligibility_state": "ELIGIBLE_COMPLETE_PRIOR_MONTH" if symbol in complete_symbols else "INELIGIBLE_INCOMPLETE_PRIOR_MONTH",
             "ranking_state": "ELIGIBLE" if symbol in complete_symbols else "EXCLUDED",
         }
-    for symbol in sorted(no_august_symbols):
+    for symbol in sorted(no_source_symbols):
         source_coverage_by_symbol[symbol] = {
             "source_mode": [],
             "observed_day_count": 0,
@@ -409,7 +439,7 @@ def _write_august_verification_receipt(ctx: Mapping[str, Any], frame: Any, inven
             "eligibility_state": "NO_AUGUST_HISTORICAL_SOURCE",
             "ranking_state": "EXCLUDED",
         }
-    payload = {"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": "2026-08", "expected_set_basis": "ACTUAL_PUBLIC_BINANCE_VISION_OBJECT_DISCOVERY", "rows": int(frame.shape[0]), "manifest_path": str(Path(ctx["AUGUST_SOURCE_ACQUISITION"]["manifest_path"]).resolve()), "manifest_sha256": hashlib.sha256(Path(ctx["AUGUST_SOURCE_ACQUISITION"]["manifest_path"]).read_bytes()).hexdigest(), "inventory_path": str(inventory_path.resolve()), "inventory_sha256": hashlib.sha256(inventory_path.read_bytes()).hexdigest(), "verified_source_semantic_sha256": semantic_sha, "historical_taxonomy_symbol_count": int(inventory.get("historical_taxonomy_symbol_count", len(historical_symbols))), "august_discovered_symbol_count": int(len(discovered_symbols)), "complete_august_eligible_symbol_count": int(len(complete_symbols)), "partial_august_symbol_count": int(len(partial_symbols)), "no_august_historical_symbol_count": int(len(historical_symbols - discovered_symbols)), "no_august_historical_source_symbols": sorted(no_august_symbols), "source_integrity_blocker_count": 0, "expected_symbols": sorted(complete_symbols), "verified_symbols": sorted(complete_symbols), "discovered_symbols": sorted(discovered_symbols), "partial_symbols": sorted(partial_symbols), "missing_symbols": [], "extra_symbols": [], "source_mode_by_symbol": source_mode_by_symbol, "source_coverage_by_symbol": source_coverage_by_symbol, "verified_inputs": verified_inputs}
+    payload = {"status": "PASS", "market": "um", "dataset": "klines", "interval": "1d", "month": source_month, "expected_set_basis": "ACTUAL_PUBLIC_BINANCE_VISION_OBJECT_DISCOVERY", "rows": int(frame.shape[0]), "manifest_path": str(Path(ctx["AUGUST_SOURCE_ACQUISITION"]["manifest_path"]).resolve()), "manifest_sha256": hashlib.sha256(Path(ctx["AUGUST_SOURCE_ACQUISITION"]["manifest_path"]).read_bytes()).hexdigest(), "inventory_path": str(inventory_path.resolve()), "inventory_sha256": hashlib.sha256(inventory_path.read_bytes()).hexdigest(), "verified_source_semantic_sha256": semantic_sha, "historical_taxonomy_symbol_count": int(inventory.get("historical_taxonomy_symbol_count", len(historical_symbols))), "discovered_symbol_count": int(len(discovered_symbols)), "august_discovered_symbol_count": int(len(discovered_symbols)), "complete_source_eligible_symbol_count": int(len(complete_symbols)), "complete_august_eligible_symbol_count": int(len(complete_symbols)), "partial_source_symbol_count": int(len(partial_symbols)), "partial_august_symbol_count": int(len(partial_symbols)), "no_historical_source_symbol_count": int(len(no_source_symbols)), "no_august_historical_symbol_count": int(len(no_source_symbols)), "no_historical_source_symbols": sorted(no_source_symbols), "no_august_historical_source_symbols": sorted(no_source_symbols), "source_integrity_blocker_count": 0, "expected_symbols": sorted(complete_symbols), "verified_symbols": sorted(complete_symbols), "discovered_symbols": sorted(discovered_symbols), "partial_symbols": sorted(partial_symbols), "missing_symbols": [], "extra_symbols": [], "source_mode_by_symbol": source_mode_by_symbol, "source_coverage_by_symbol": source_coverage_by_symbol, "verified_inputs": verified_inputs}
     if receipt.exists():
         prior = json.loads(receipt.read_text(encoding="utf-8"))
         if prior != payload:
@@ -417,6 +447,14 @@ def _write_august_verification_receipt(ctx: Mapping[str, Any], frame: Any, inven
         return {"receipt_path": str(receipt.resolve()), "receipt_sha256": hashlib.sha256(receipt.read_bytes()).hexdigest(), "verified_source_semantic_sha256": semantic_sha, "rows": int(frame.shape[0]), "manifest_path": str(Path(ctx["AUGUST_SOURCE_ACQUISITION"]["manifest_path"]).resolve())}
     receipt.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return {"receipt_path": str(receipt.resolve()), "receipt_sha256": hashlib.sha256(receipt.read_bytes()).hexdigest(), "verified_source_semantic_sha256": semantic_sha, "rows": int(frame.shape[0]), "manifest_path": str(Path(ctx["AUGUST_SOURCE_ACQUISITION"]["manifest_path"]).resolve())}
+
+
+def _write_august_verification_receipt(ctx: Mapping[str, Any], frame: Any, inventory: Mapping[str, Any], verified_inputs: list[dict[str, Any]], partial_symbols: set[str], historical_symbols: set[str], inventory_path: Path, *, discovered_symbols: set[str] | None = None, grouped_days: Mapping[str, set[Any]] | None = None) -> Mapping[str, Any]:
+    return _write_month_verification_receipt(ctx, frame, inventory, verified_inputs, partial_symbols, historical_symbols, inventory_path, source_month="2026-08", discovered_symbols=discovered_symbols, grouped_days=grouped_days)
+
+
+def _verify_august_source(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
+    return _verify_month_source(ctx, "2026-08")
 
 
 def _build_september_ranking(ctx: Mapping[str, Any]) -> Mapping[str, Any]:

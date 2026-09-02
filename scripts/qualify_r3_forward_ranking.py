@@ -150,11 +150,19 @@ def build_forward_ranking_from_verified_source(receipt_path: Path, census_dir: P
     if expected and verified != expected:
         raise RuntimeError(f"R3_RANKING_INPUT_SYMBOL_SET_MISMATCH:expected={sorted(expected)}:verified={sorted(verified)}")
     prior_month = str(pd.Period(effective_month, freq="M") - 1)
+    expected_days = set(
+        pd.date_range(
+            f"{prior_month}-01",
+            periods=pd.Period(prior_month, freq="M").days_in_month,
+            freq="D",
+            tz="UTC",
+        )
+    )
     rows: list[dict[str, object]] = []
     for symbol in sorted(verified):
         candles = pd.concat([load_kline_archive(Path(str(item["path"]))) for item in by_symbol[symbol]], ignore_index=True)
         days = pd.to_datetime(candles["open_time"], utc=True).dt.floor("D")
-        if candles.empty or days.nunique() != pd.Period(prior_month, freq="M").days_in_month or days.duplicated().any():
+        if candles.empty or set(days) != expected_days or days.duplicated().any():
             raise RuntimeError(f"R3_RANKING_INPUT_INCOMPLETE:{symbol}")
         quote_volume = float(pd.to_numeric(candles["quote_volume"], errors="coerce").fillna(0).sum())
         rows.append({"market": "um", "symbol": symbol, "archive_month": prior_month, "raw_path": str(by_symbol[symbol][0]["path"]), "published_sha256": str(by_symbol[symbol][0]["sha256"]), "computed_sha256": str(by_symbol[symbol][0]["sha256"]), "integrity_status": "PASS", "row_count": int(len(candles)), "verified_quote_volume": quote_volume})
