@@ -1,18 +1,19 @@
 {
   "status": "PASS",
   "purpose": "R3_V3_IDENTITY_RECONCILIATION",
-  "recorded_at_utc": "2026-09-02T02:00:00Z",
+  "recorded_at_utc": "2026-09-02T02:22:38Z",
   "branch": "research/r2b-restricted-derivatives-v1",
-  "head": "f716784661a902126f6bc84198459c817204cd97",
-  "origin_head": "f716784661a902126f6bc84198459c817204cd97",
+  "head": "510caa220501c29bbf8962d70f19f7e28df498bc",
+  "origin_head": "510caa220501c29bbf8962d70f19f7e28df498bc",
   "origin_ahead_behind": "0 0",
   "pytest_receipt_implementation_commit": "f716784661a902126f6bc84198459c817204cd97",
   "pytest_receipt_source_tree_sha256": "2bf4deb475ff103335c66254364f9aae651a707ac421ffbbb0b7cff21fa9b40e",
   "pytest_receipt_commit_is_ancestor": true,
   "head_delta_from_pytest_receipt": {
-    "commit": "f716784661a902126f6bc84198459c817204cd97",
+    "commit": "510caa220501c29bbf8962d70f19f7e28df498bc",
     "changed_paths": [
-      "campaigns/r3_prospective_context_v1/R3_AUGUST_DISCOVERY_PATH_HISTORICAL_PARITY_RECEIPT.json"
+      "campaigns/r3_prospective_context_v1/R3_AUGUST_DISCOVERY_PATH_HISTORICAL_PARITY_RECEIPT.json",
+      "campaigns/r3_prospective_context_v1/R3_V3_IDENTITY_RECONCILIATION_RECEIPT.json"
     ],
     "scientific_scope_changed": false,
     "source_tree_sha_unchanged": true
