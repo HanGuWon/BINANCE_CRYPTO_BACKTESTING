@@ -408,6 +408,7 @@ def _verify_month_source(ctx: Mapping[str, Any], source_month: str) -> Mapping[s
 
 
 def _write_month_verification_receipt(ctx: Mapping[str, Any], frame: Any, inventory: Mapping[str, Any], verified_inputs: list[dict[str, Any]], partial_symbols: set[str], historical_symbols: set[str], inventory_path: Path, *, source_month: str, discovered_symbols: set[str] | None = None, grouped_days: Mapping[str, set[Any]] | None = None) -> Mapping[str, Any]:
+    expected_day_count = len(_month_expected_days(source_month))
     discovered_symbols = discovered_symbols if discovered_symbols is not None else {str(symbol).upper() for symbol in inventory.get("discovered_symbols", [])}
     grouped_days = grouped_days or {}
     complete_symbols = {str(item["symbol"]).upper() for item in verified_inputs}
@@ -423,8 +424,8 @@ def _write_month_verification_receipt(ctx: Mapping[str, Any], frame: Any, invent
         source_coverage_by_symbol[symbol] = {
             "source_mode": source_mode_by_symbol.get(symbol, []),
             "observed_day_count": observed_day_count,
-            "expected_day_count": 31,
-            "coverage_ratio": observed_day_count / 31,
+            "expected_day_count": expected_day_count,
+            "coverage_ratio": observed_day_count / expected_day_count,
             "integrity_state": "PASS" if symbol in complete_symbols or symbol in partial_symbols else "NOT_ACQUIRED",
             "eligibility_state": "ELIGIBLE_COMPLETE_PRIOR_MONTH" if symbol in complete_symbols else "INELIGIBLE_INCOMPLETE_PRIOR_MONTH",
             "ranking_state": "ELIGIBLE" if symbol in complete_symbols else "EXCLUDED",
@@ -433,7 +434,7 @@ def _write_month_verification_receipt(ctx: Mapping[str, Any], frame: Any, invent
         source_coverage_by_symbol[symbol] = {
             "source_mode": [],
             "observed_day_count": 0,
-            "expected_day_count": 31,
+            "expected_day_count": expected_day_count,
             "coverage_ratio": 0.0,
             "integrity_state": "NOT_DISCOVERED",
             "eligibility_state": "NO_AUGUST_HISTORICAL_SOURCE",
