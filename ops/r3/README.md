@@ -17,3 +17,7 @@ rejected and each record contains `outcomes_accessed: false`.
 The Task Scheduler XML is a sanitized template. It intentionally contains no
 user SID, password, credential, or security descriptor. Registration belongs
 to the phase-3 script and must use `MultipleInstancesPolicy=IgnoreNew`.
+
+If the local token cannot register a scheduled task, the phase-3 installer can
+use the native per-user Startup shortcut as a credential-free logon fallback;
+it still invokes the same fail-closed launcher and existing collector lock.

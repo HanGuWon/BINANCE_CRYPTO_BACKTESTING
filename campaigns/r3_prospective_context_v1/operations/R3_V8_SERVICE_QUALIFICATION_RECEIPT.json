@@ -31,7 +31,7 @@
   "outcomes_accessed": false,
   "r2b2": "NOT_STARTED",
   "record_type": "R3_V8_SERVICE_QUALIFICATION_RECEIPT",
-  "recorded_at_utc": "2026-09-02T12:50:32.786644+00:00",
+  "recorded_at_utc": "2026-09-02T12:52:24.946615+00:00",
   "registration": {
     "command": "powershell.exe -NoProfile -Command & { $t=Get-ScheduledTask -TaskName 'R3-Prospective-Scientific-v8' -ErrorAction Stop; $i=Get-ScheduledTaskInfo -TaskName 'R3-Prospective-Scientific-v8'; [pscustomobject]@{State=$t.State;LastTaskResult=$i.LastTaskResult;MultipleInstancesPolicy=($t.Settings.MultipleInstancesPolicy.ToString())} | ConvertTo-Json -Compress }",
     "exit_code": 1,
@@ -70,13 +70,13 @@
       1027188
     ],
     "disk_state": "GREEN",
-    "free_disk_bytes": 136287395840,
+    "free_disk_bytes": 136287350784,
     "manifest_observation_count": 16,
     "observed_bytes_per_hour": 4311686.0,
     "projected_bytes_30d": 3104413920.0,
     "projected_bytes_7d": 724363248.0,
     "projected_bytes_per_day": 103480464.0,
-    "projected_days_to_zero": 1317.035028370186
+    "projected_days_to_zero": 1317.03459296433
   },
   "task_name": "R3-Prospective-Scientific-v8",
   "watchdog_state": "YELLOW",

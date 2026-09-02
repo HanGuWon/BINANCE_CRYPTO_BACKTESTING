@@ -13,7 +13,7 @@
   <Principals>
     <Principal id="Author">
       <LogonType>InteractiveToken</LogonType>
-      <RunLevel>LeastPrivilege</RunLevel>
+      <RunLevel>Limited</RunLevel>
     </Principal>
   </Principals>
   <Settings>
