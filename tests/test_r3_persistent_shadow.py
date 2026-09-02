@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import scripts.run_r3_prospective_collector as runner
+from binance_research.r3_operations import append_manifest, build_manifest, verify_engineering_shadow_root
 from binance_research.r3_timing import calibrate_server_clock
 
 
@@ -89,3 +90,28 @@ def test_engineering_shadow_waits_for_real_boundary_without_injection(tmp_path: 
     assert len(calls) == 2
     assert all((calls[index + 1] - calls[index]).total_seconds() == 900 for index in range(len(calls) - 1))
     assert sleeps and all(delay >= 0 for delay in sleeps)
+
+
+def test_shadow_reconciles_files_appended_by_stream_before_verification(tmp_path: Path) -> None:
+    raw = tmp_path / "raw_v1" / "um" / "AAAUSDT"
+    raw.mkdir(parents=True)
+    for stream in ("premium", "book_ticker", "open_interest"):
+        (raw / f"{stream}.jsonl").write_text(
+            '{"symbol":"AAAUSDT","stream":"' + stream + '","evidence_mode":"ENGINEERING_SHADOW"}\n',
+            encoding="utf-8",
+        )
+    for stream in ("klines_15m", "premium_klines_15m"):
+        (raw / f"{stream}.jsonl").write_text(
+            '{"symbol":"AAAUSDT","stream":"' + stream + '","evidence_mode":"ENGINEERING_SHADOW","payload":{"source_open_time":"2026-08-30T00:00:00+00:00","source_available_time":"2026-08-30T00:15:00+00:00"}}\n',
+            encoding="utf-8",
+        )
+    stale = build_manifest(tmp_path / "raw_v1", manifest_id="before-stream")
+    append_manifest(tmp_path / "raw_v1", stale)
+    (raw / "liquidation.jsonl").write_text(
+        '{"symbol":"AAAUSDT","stream":"liquidation","evidence_mode":"ENGINEERING_SHADOW"}\n',
+        encoding="utf-8",
+    )
+    runner._reconcile_manifest_after_stream_stop(tmp_path, roster_sha256="a" * 64, evidence_mode="ENGINEERING_SHADOW", cycles=1)
+    verified = verify_engineering_shadow_root(tmp_path, expected_symbols=["AAAUSDT"], roster_sha256="a" * 64)
+    assert verified["files"] == 6
+    assert verified["rows"] == 6

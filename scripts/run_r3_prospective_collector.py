@@ -224,6 +224,44 @@ def _run_cycle(root: Path, symbols: list[str], roster_sha256: str, *, evidence_m
     return manifest
 
 
+def _reconcile_manifest_after_stream_stop(root: Path, *, roster_sha256: str, evidence_mode: str, cycles: int) -> dict[str, object]:
+    """Finalize a stable manifest after all concurrent stream writers are stopped."""
+    raw_root = Path(root) / "raw_v1"
+    chain = raw_root / "manifest_chain.jsonl"
+    previous = None
+    if chain.exists() and chain.read_text(encoding="utf-8").strip():
+        if not verify_manifest_chain(chain):
+            raise RuntimeError(f"manifest chain failed verification before reconciliation: {chain}")
+        previous = json.loads(chain.read_text(encoding="utf-8").splitlines()[-1])["manifest_sha256"]
+    manifest = build_manifest(raw_root, previous_manifest_sha256=previous)
+    append_manifest(raw_root, manifest)
+    gap_states = {"POLL_GAP", "RATE_LIMIT_GAP", "SEQUENCE_GAP", "RESTART_GAP"}
+    gap_count = 0
+    restart_count = 0
+    for path in raw_root.rglob("*.jsonl"):
+        if path.name == "manifest_chain.jsonl":
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                state = json.loads(line).get("continuity_state")
+            except json.JSONDecodeError:
+                continue
+            gap_count += int(state in gap_states)
+            restart_count += int(state == "RESTART_GAP")
+    write_health_receipt(
+        root,
+        raw_root=raw_root,
+        campaign_id="r3_prospective_context_v1",
+        manifest_sha256=manifest["manifest_sha256"],
+        roster_sha256=roster_sha256,
+        stream_state={"status": "MANIFEST_RECONCILED_AFTER_STREAM_STOP", "cycles": cycles},
+        restart_count=restart_count,
+        gap_count=gap_count,
+        evidence_mode=evidence_mode,
+    )
+    return manifest
+
+
 def run_scientific_forever(root: Path, roster_artifact: Path, launch_manifest: Path, *, max_cycles: int | None = None, interval_seconds: int = 900, stop_event: asyncio.Event | None = None) -> None:
     """Persistent scientific architecture with one WS worker and grid REST cycles.
 
@@ -330,6 +368,8 @@ def run_engineering_shadow_forever(root: Path, roster_artifact: Path, *, max_cyc
                     break
         finally:
             ws_stop.set(); ws_task.cancel(); await asyncio.gather(ws_task, return_exceptions=True)
+            if manifests:
+                _reconcile_manifest_after_stream_stop(resolved, roster_sha256=roster_sha256, evidence_mode="ENGINEERING_SHADOW", cycles=len(manifests))
             (resolved / "health" / "shutdown_receipt.json").parent.mkdir(parents=True, exist_ok=True)
             (resolved / "health" / "shutdown_receipt.json").write_text(json.dumps({"evidence_mode": "ENGINEERING_SHADOW", "cycles": len(manifests), "status": "SHUTDOWN_FINALIZED", "roster_sha256": roster_sha256}, sort_keys=True) + "\n", encoding="utf-8")
         return {"cycles": len(manifests), "manifests": manifests, "roster_sha256": roster_sha256, "evidence_mode": "ENGINEERING_SHADOW"}

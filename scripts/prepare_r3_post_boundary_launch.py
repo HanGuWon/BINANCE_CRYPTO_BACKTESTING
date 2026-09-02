@@ -39,6 +39,9 @@ PRODUCTION_V5_SCIENTIFIC_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_pro
 PRODUCTION_V6_CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v6")
 PRODUCTION_V6_SHADOW_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v6")
 PRODUCTION_V6_SCIENTIFIC_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\scientific_raw_v6")
+PRODUCTION_V7_CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v7")
+PRODUCTION_V7_SHADOW_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v7")
+PRODUCTION_V7_SCIENTIFIC_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\scientific_raw_v7")
 MAX_CLOCK_UNCERTAINTY_MS = 2_000
 EXPECTED_REGISTRY_SHA256 = "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a"
 PRODUCTION_PROFILES = {
@@ -46,6 +49,7 @@ PRODUCTION_PROFILES = {
     "v4": {"control_root": PRODUCTION_V4_CONTROL_ROOT, "shadow_root": PRODUCTION_V4_SHADOW_ROOT, "scientific_root": PRODUCTION_V4_SCIENTIFIC_ROOT},
     "v5": {"control_root": PRODUCTION_V5_CONTROL_ROOT, "shadow_root": PRODUCTION_V5_SHADOW_ROOT, "scientific_root": PRODUCTION_V5_SCIENTIFIC_ROOT},
     "v6": {"control_root": PRODUCTION_V6_CONTROL_ROOT, "shadow_root": PRODUCTION_V6_SHADOW_ROOT, "scientific_root": PRODUCTION_V6_SCIENTIFIC_ROOT},
+    "v7": {"control_root": PRODUCTION_V7_CONTROL_ROOT, "shadow_root": PRODUCTION_V7_SHADOW_ROOT, "scientific_root": PRODUCTION_V7_SCIENTIFIC_ROOT},
 }
 
 
