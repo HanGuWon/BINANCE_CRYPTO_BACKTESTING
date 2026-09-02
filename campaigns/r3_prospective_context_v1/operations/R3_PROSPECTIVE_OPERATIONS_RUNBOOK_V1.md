@@ -50,6 +50,23 @@ The launcher is synchronous so that lock lifetime covers the collector. A
 second invocation returns `COLLECTOR_LOCK_COLLISION` (exit code 73) and does not
 start a second writer. It never creates a new root or bypasses a seal.
 
+The preferred Task Scheduler registration is provided by
+`ops/r3/register_r3_v8_task.ps1` and the sanitized XML template. On this host,
+both `Register-ScheduledTask` and `schtasks /Create` were attempted with the
+current user token and returned `Access is denied`; no task was created. As a
+native, credential-free fallback, `ops/r3/install_r3_v8_startup.ps1` installs
+the user Startup shortcut
+`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\R3-Prospective-Scientific-v8.lnk`.
+It targets the same launcher, runs at logon, and is validated without stopping
+the live collector. If Task Scheduler permission is later granted, register
+the named task and remove the fallback only after `Get-ScheduledTask` and
+`Get-ScheduledTaskInfo` show the expected identity and `IgnoreNew` policy.
+
+The phase-3 qualification receipt is written by
+`ops/r3/qualify_r3_v8_service.py`; it records the Task Scheduler denial,
+Startup fallback validation, collision result, safe-skip restart decision, and
+the outcome-blind storage/watchdog evidence.
+
 ## Watchdog and staleness
 
 ```powershell
