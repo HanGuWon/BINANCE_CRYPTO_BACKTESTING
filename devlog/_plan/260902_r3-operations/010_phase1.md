@@ -65,7 +65,12 @@ $tree | Select-Object ProcessId,ParentProcessId,CreationDate,ExecutablePath,Comm
 $ownerRow=$byPid[$owner]; $cmd=($ownerRow.CommandLine -replace '\s+',' ').Trim().ToLowerInvariant()
 $required=@('run_r3_prospective_collector.py','--mode scientific','--persistent','scientific_raw_v8','2026-09.json','r3_prospective_launch_manifest_2026-09.json')
 if (($required | Where-Object { $cmd -notlike "*$_*" }).Count -gt 0) { exit 2 }
-$authorized=@($all | Where-Object { $line=(($_.CommandLine -replace '\s+',' ').Trim().ToLowerInvariant()); ($required | Where-Object { $line -notlike "*$_*" }).Count -eq 0 })
+$authorized=@($all | Where-Object {
+    if ($_.Name -notmatch '^(python|python\d+(\.\d+)?)\.exe$') { return $false }
+    $line=(($_.CommandLine -replace '\s+',' ').Trim().ToLowerInvariant())
+    foreach ($token in $required) { if ($line -notlike "*$token*") { return $false } }
+    return $true
+})
 $outside=@($authorized | Where-Object { -not $seen.Contains([int]$_.ProcessId) })
 if ($outside.Count -gt 0) { Write-Error 'independent authorized writer detected'; exit 3 }
 Write-Output 'authorized_writer_count=1'
