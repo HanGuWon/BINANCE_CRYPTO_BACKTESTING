@@ -1,0 +1,53 @@
+{
+  "status": "PASS",
+  "purpose": "R3_V3_IDENTITY_RECONCILIATION",
+  "recorded_at_utc": "2026-09-02T01:11:35.4258343Z",
+  "branch": "research/r2b-restricted-derivatives-v1",
+  "head": "3d7d0d338e2bbd45e0d0e2f055d3dd41acb689dc",
+  "origin_head": "3d7d0d338e2bbd45e0d0e2f055d3dd41acb689dc",
+  "origin_ahead_behind": "0 0",
+  "pytest_receipt_implementation_commit": "778ba211e216f55bb3b8ec70d13fe1965b372e47",
+  "pytest_receipt_source_tree_sha256": "2ebbc126e811e2d914ba7c8994c67fd529e7d1797a222bd879c40f47ef49baa8",
+  "pytest_receipt_commit_is_ancestor": true,
+  "head_delta_from_pytest_receipt": {
+    "commit": "3d7d0d338e2bbd45e0d0e2f055d3dd41acb689dc",
+    "changed_paths": [
+      "campaigns/r3_prospective_context_v1/full_pytest_receipt_v3_expected_set_repair.json"
+    ],
+    "scientific_scope_changed": false,
+    "source_tree_sha_unchanged": true
+  },
+  "current_source_tree_sha256": "2ebbc126e811e2d914ba7c8994c67fd529e7d1797a222bd879c40f47ef49baa8",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "scientific_source_status_command": "git status --porcelain -- scripts src tests configs",
+  "scientific_source_status_output": "",
+  "production_v1_temporal_gate_sha256": "5bb38de8c19175784e8e8a8561ca233b3951338962a245e039d9acc4199f0e6b",
+  "production_v2_preservation": {
+    "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v2",
+    "file_count": 4,
+    "files": {
+      "temporal_gate.json": "778e0a4c797d399638316f349dc2a8cae6d7ad0e6108ebaf9901b1b10b32ee71",
+      "august_source/census/asset_taxonomy.csv": "76ee7e9973b66c3842f26cbb2147bd527c2ecf9fdb18798d73025f1c1b7c4d33",
+      "august_source/census/volume_archive_manifest.csv": "40ab5342ff42676cc1ec15ee7e292afd6d529679b194f609cf176edf618eb10a",
+      "august_source/census/volume_size_estimate.json": "494f969e10ceaf9cd695740309b80f3b82e4cf8387766b6bbd7b48640fdc7f01"
+    }
+  },
+  "production_v3_control_root": {
+    "path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v3",
+    "file_count": 0,
+    "fresh": true
+  },
+  "engineering_shadow_v3_root": {
+    "path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\engineering_shadow_september_launch_v3",
+    "file_count": 0,
+    "fresh": true
+  },
+  "scientific_root": {
+    "path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v1",
+    "exists": false,
+    "fresh": true
+  },
+  "outcomes_accessed": false,
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED"
+}
