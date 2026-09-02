@@ -1,0 +1,15 @@
+{
+  "status": "INVALID/SUPERSEDED",
+  "campaign_id": "r3_prospective_context_v1",
+  "launch_version": "production-v5",
+  "recorded_at_utc": "2026-09-02T06:31:00Z",
+  "control_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v5-INVALID_SUPERVISOR_TIMEOUT_20260902",
+  "scientific_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v5-INVALID_SUPERVISOR_TIMEOUT_20260902",
+  "failure_code": "R3_BLOCKED_LAUNCH_IDENTITY",
+  "failure_stage": "SCIENTIFIC_ACTIVATION",
+  "failure_reason": "The supervisor's 900-second deadline coincided with the first scheduled 15-minute boundary. A valid first cycle was written immediately after the deadline, but activation returned nonzero and no canonical activation receipt was produced.",
+  "historical_outcomes_accessed": false,
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED",
+  "superseded_by": "production-v6-with-extended-supervisor-window"
+}
