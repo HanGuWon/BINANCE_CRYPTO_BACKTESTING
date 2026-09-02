@@ -3,26 +3,26 @@
   "purpose": "R3_V3_IDENTITY_RECONCILIATION",
   "recorded_at_utc": "2026-09-02T02:00:00Z",
   "branch": "research/r2b-restricted-derivatives-v1",
-  "head": "99f41979c0451a6a2ac995ef5541c67c0e5c4da4",
-  "origin_head": "99f41979c0451a6a2ac995ef5541c67c0e5c4da4",
+  "head": "f716784661a902126f6bc84198459c817204cd97",
+  "origin_head": "f716784661a902126f6bc84198459c817204cd97",
   "origin_ahead_behind": "0 0",
-  "pytest_receipt_implementation_commit": "0a03082e285c6eb5cc3a009bac8a26d75533d75a",
-  "pytest_receipt_source_tree_sha256": "79f1a6e4fee83ba4ba91e33905762155d58f5884a405aaf107e6d0696effe593",
+  "pytest_receipt_implementation_commit": "f716784661a902126f6bc84198459c817204cd97",
+  "pytest_receipt_source_tree_sha256": "2bf4deb475ff103335c66254364f9aae651a707ac421ffbbb0b7cff21fa9b40e",
   "pytest_receipt_commit_is_ancestor": true,
   "head_delta_from_pytest_receipt": {
-    "commit": "0a03082e285c6eb5cc3a009bac8a26d75533d75a",
+    "commit": "f716784661a902126f6bc84198459c817204cd97",
     "changed_paths": [
-      "campaigns/r3_prospective_context_v1/R3_AUGUST_DISCOVERY_PATH_HISTORICAL_PARITY_RECEIPT_bc7b760.json"
+      "campaigns/r3_prospective_context_v1/R3_AUGUST_DISCOVERY_PATH_HISTORICAL_PARITY_RECEIPT.json"
     ],
     "scientific_scope_changed": false,
     "source_tree_sha_unchanged": true
   },
-  "current_source_tree_sha256": "79f1a6e4fee83ba4ba91e33905762155d58f5884a405aaf107e6d0696effe593",
+  "current_source_tree_sha256": "2bf4deb475ff103335c66254364f9aae651a707ac421ffbbb0b7cff21fa9b40e",
   "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
   "scientific_source_status_command": "git status --porcelain -- scripts src tests configs",
   "scientific_source_status_output": "",
   "discovery_parity_receipt": "campaigns/r3_prospective_context_v1/R3_AUGUST_DISCOVERY_PATH_HISTORICAL_PARITY_RECEIPT.json",
-  "discovery_parity_receipt_sha256": "41b9fbe53572a498934e48745f32d3e711cb52062efe392dc65c76963a9faad7",
+  "discovery_parity_receipt_sha256": "4f0216ee2429fa1fdbcc8ba2d54c091a25a7476a0394425a306dc3e02e82f73a",
   "production_v1_temporal_gate_sha256": "5bb38de8c19175784e8e8a8561ca233b3951338962a245e039d9acc4199f0e6b",
   "production_v2_preservation": {
     "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v2",
