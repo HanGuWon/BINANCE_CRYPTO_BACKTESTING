@@ -11,10 +11,18 @@ import argparse
 import hashlib
 import json
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
+
+# Support both ``python -m scripts.qualify_r3_discovery_path`` and the
+# repository's documented ``python scripts/qualify_r3_discovery_path.py``
+# invocation.  The latter puts ``scripts/`` (rather than the repository root)
+# on ``sys.path``.
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts import prepare_r3_post_boundary_launch as executor
 from scripts.qualify_r3_forward_ranking import build_forward_ranking_from_verified_source, ranking_semantic_sha256
@@ -138,7 +146,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--raw-root", type=Path, default=DEFAULT_RAW_ROOT)
     parser.add_argument("--census-dir", type=Path, default=DEFAULT_CENSUS_DIR)
     parser.add_argument("--committed-roster", type=Path, default=DEFAULT_ROSTER)
-    parser.add_argument("--receipt", type=Path, default=DEFAULT_RECEIP)
+    parser.add_argument("--receipt", type=Path, default=DEFAULT_RECEIPT)
     args = parser.parse_args(argv)
     result = run_preflight(source_month=args.source_month, effective_month=args.effective_month, work_root=args.work_root, raw_root=args.raw_root, census_dir=args.census_dir, committed_roster=args.committed_roster, receipt_path=args.receipt)
     print(json.dumps(result, sort_keys=True))
