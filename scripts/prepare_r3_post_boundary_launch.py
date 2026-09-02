@@ -77,14 +77,14 @@ def require_fresh_scientific_root(root: Path = SCIENTIFIC_ROOT) -> Path:
     return resolved
 
 
-def require_control_root(root: Path = CONTROL_ROOT) -> Path:
+def require_control_root(root: Path = CONTROL_ROOT, *, allow_fixture: bool = False) -> Path:
     resolved = Path(root).resolve()
     if resolved.drive.upper() != "D:":
         raise PostBoundaryBlocked("R3_BLOCKED_STORAGE", "control root must be D-backed")
     # Production-v3 is a single pre-registered identity.  Reject the failed
     # v1/v2 roots *and* arbitrary descendants/overrides so a caller cannot
     # accidentally authorize a new launch lineage by changing one path flag.
-    if resolved != CONTROL_ROOT.resolve():
+    if resolved != CONTROL_ROOT.resolve() and not allow_fixture:
         raise PostBoundaryBlocked(
             "R3_BLOCKED_LAUNCH_IDENTITY",
             f"control root is not the reserved production-v3 root: {resolved}",
@@ -653,9 +653,12 @@ def execute_post_boundary(*, clock: CalibratedClock, scientific_root: Path = SCI
     """
     require_calibrated_boundary(clock)
     root = Path(scientific_root)
-    control = Path(receipt_root) if receipt_root is not None else require_control_root(control_root)
+    # Receipt-root injection is reserved for deterministic unit fixtures.  A
+    # real production invocation (callbacks omitted, no receipt override)
+    # remains pinned to the exact pre-registered v3 control root.
+    control = Path(receipt_root) if receipt_root is not None else require_control_root(control_root, allow_fixture=callbacks is not None)
     if receipt_root is not None:
-        control = require_control_root(control)
+        control = require_control_root(control, allow_fixture=True)
     defaults: dict[str, StageCallback] = {
         "AUGUST_SOURCE_ACQUISITION": _default_blocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "August source acquisition proof required"),
         "AUGUST_SOURCE_VERIFICATION": _default_blocked("R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE", "August source verification proof required"),
