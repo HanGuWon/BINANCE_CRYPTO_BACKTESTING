@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import zipfile
+from types import SimpleNamespace
 from pathlib import Path
 
 import pandas as pd
@@ -29,6 +30,23 @@ def test_archive_request_percent_encodes_non_ascii_symbol() -> None:
     request = ArchiveRequest("um", "klines", "龙虾USDT", 2026, 7, interval="1d")
     assert "%E9%BE%99%E8%99%BEUSDT" in request.url()
     assert "龙虾" not in request.url()
+
+
+def test_roster_parity_ignores_transport_fields_and_numeric_dtypes() -> None:
+    committed = SimpleNamespace(
+        effective_month="2026-08",
+        market="um",
+        symbols=("FIXUSDT",),
+        prior_ranking=({"market": "um", "symbol": "FIXUSDT", "rank": 1.0, "selected_top50": True},),
+    )
+    replay = SimpleNamespace(
+        effective_month="2026-08",
+        market="um",
+        symbols=("FIXUSDT",),
+        prior_ranking=({"market": "um", "symbol": "FIXUSDT", "rank": 1, "selected_top50": True, "raw_path": "D:/temporary.zip"},),
+    )
+    keys = set(committed.prior_ranking[0])
+    assert preflight._canonical_roster_evidence(replay, keys=keys) == preflight._canonical_roster_evidence(committed, keys=keys)
 
 
 def test_month_inventory_uses_actual_source_month_and_no_guessed_objects() -> None:

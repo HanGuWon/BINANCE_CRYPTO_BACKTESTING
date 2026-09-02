@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import subprocess
 import sys
 from pathlib import Path
@@ -79,6 +80,40 @@ def _inventory_counts(inventory: dict[str, Any]) -> dict[str, int]:
     }
 
 
+def _canonical_roster_evidence(roster: Any, *, keys: set[str] | None = None) -> dict[str, Any]:
+    """Return membership evidence independent of transport paths and dtypes.
+
+    A discovery replay necessarily has different raw paths and source-artifact
+    SHA256 values from the committed control roster.  Those are provenance
+    fields, not universe membership.  Compare the canonical selected-ranking
+    fields while normalising pandas/JSON integer-vs-float representations.
+    """
+    rows = list(roster.prior_ranking)
+    selected_keys = set(keys or {str(key) for row in rows for key in row})
+
+    def normalise(value: Any) -> Any:
+        if value is None:
+            return None
+        if isinstance(value, float):
+            if math.isnan(value):
+                return None
+            if value.is_integer():
+                return int(value)
+        return value
+
+    evidence = [
+        {key: normalise(row.get(key)) for key in sorted(selected_keys)}
+        for row in rows
+    ]
+    evidence.sort(key=lambda row: str(row.get("symbol", "")))
+    return {
+        "effective_month": roster.effective_month,
+        "market": roster.market,
+        "symbols": list(roster.symbols),
+        "prior_ranking": evidence,
+    }
+
+
 def run_preflight(*, source_month: str, effective_month: str, work_root: Path, raw_root: Path, census_dir: Path, committed_roster: Path, receipt_path: Path) -> dict[str, Any]:
     work_root = _fresh_d_root(work_root)
     receipt = _base_receipt(source_month=source_month, effective_month=effective_month, work_root=work_root)
@@ -113,13 +148,18 @@ def run_preflight(*, source_month: str, effective_month: str, work_root: Path, r
         ranking_frame = pd.read_csv(ranking_path)
         generated = build_causal_monthly_roster(ranking_path, effective_month=effective_month)
         committed = replay_roster_artifact(committed_roster, effective_month=effective_month)
-        parity = generated.symbols == committed.symbols and generated.roster_sha256 == committed.roster_sha256
+        committed_keys = {str(key) for row in committed.prior_ranking for key in row}
+        generated_evidence = _canonical_roster_evidence(generated, keys=committed_keys)
+        committed_evidence = _canonical_roster_evidence(committed, keys=committed_keys)
+        parity = generated_evidence == committed_evidence
         receipt.update({
             "ranking_artifact_path": str(ranking_path.resolve()),
             "ranking_artifact_sha256": _sha256(ranking_path),
             "ranking_semantic_sha256": ranking_semantic_sha256(ranking_frame, effective_month=effective_month, selected_only=False),
             "resulting_roster_logical_sha256": generated.roster_sha256,
             "committed_roster_logical_sha256": committed.roster_sha256,
+            "roster_semantic_parity": "PASS" if parity else "FAIL",
+            "roster_source_sha256_equal": generated.source_sha256 == committed.source_sha256,
             "resulting_roster_symbol_count": len(generated.symbols),
             "committed_roster_symbol_count": len(committed.symbols),
             "parity": "PASS" if parity else "FAIL",
