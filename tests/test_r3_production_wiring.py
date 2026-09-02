@@ -174,6 +174,39 @@ def test_supervisor_default_probe_rejects_file_only_evidence(tmp_path: Path) -> 
     assert process.terminated
 
 
+def test_default_probe_accepts_a_sealed_first_scientific_cycle(tmp_path: Path, monkeypatch) -> None:
+    import binance_research.r3_operations as operations
+    from binance_research.r3_operations import append_manifest, build_manifest, write_health_receipt
+
+    raw = tmp_path / "raw_v1" / "um" / "ALL"
+    raw.mkdir(parents=True)
+    (raw / "cycle_metadata.jsonl").write_text(
+        '{"stream":"cycle_metadata","evidence_mode":"SCIENTIFIC","continuity_state":"SOURCE_TIME_UNAVAILABLE"}\n',
+        encoding="utf-8",
+    )
+    manifest = build_manifest(tmp_path / "raw_v1", manifest_id="cycle")
+    append_manifest(tmp_path / "raw_v1", manifest)
+    write_health_receipt(
+        tmp_path,
+        campaign_id="r3_prospective_context_v1",
+        manifest_sha256=manifest["manifest_sha256"],
+        roster_sha256="a" * 64,
+        stream_state={"status": "CYCLE_COMPLETE"},
+        evidence_mode="SCIENTIFIC",
+    )
+    monkeypatch.setattr(operations, "verify_launch_seal", lambda *args, **kwargs: None)
+    process = type("RunningProcess", (), {"poll": lambda self: None})()
+    result = executor._probe_scientific_evidence(
+        process,
+        tmp_path,
+        manifest_path=tmp_path / "launch.json",
+        seal_path=tmp_path / "seal.json",
+        roster_sha256="a" * 64,
+    )
+    assert result["cycles_completed"] == 1
+    assert result["health_pass"] is True
+
+
 def test_project_factory_uses_named_adapters_not_proof_defaults() -> None:
     callbacks = executor.build_project_production_callbacks()
     assert callbacks["AUGUST_SOURCE_ACQUISITION"] is executor._acquire_august_source

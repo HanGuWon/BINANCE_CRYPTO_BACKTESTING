@@ -1,0 +1,18 @@
+{
+  "campaign_id": "r3_prospective_context_v1",
+  "production_profile": "v7",
+  "status": "INVALID/SUPERSEDED",
+  "recorded_at_utc": "2026-09-02T17:02:00+09:00",
+  "implementation_commit": "48507a42b6b3ef2becc4eabcdd03f2a9c0bdb185",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "control_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1/launch_control/2026-09-production-v7",
+  "shadow_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1/engineering_shadow_september_launch_v7",
+  "scientific_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1/scientific_raw_v7",
+  "failure_stage": "SCIENTIFIC_ACTIVATION",
+  "failure_code": "R3_BLOCKED_LAUNCH_IDENTITY",
+  "failure_reason": "_probe_scientific_evidence referenced verify_launch_seal without importing it, so the valid first scientific cycle was reported as health_pass=false. The cycle was captured but activation was not authorized.",
+  "first_cycle_captured": true,
+  "outcomes": "NOT_STARTED",
+  "final_holdout": "UNTOUCHED",
+  "action": "Preserve v7 roots unchanged as immutable evidence; do not resume them. The next production profile must include the explicit launch-seal import."
+}

@@ -42,6 +42,9 @@ PRODUCTION_V6_SCIENTIFIC_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_pro
 PRODUCTION_V7_CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v7")
 PRODUCTION_V7_SHADOW_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v7")
 PRODUCTION_V7_SCIENTIFIC_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\scientific_raw_v7")
+PRODUCTION_V8_CONTROL_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v8")
+PRODUCTION_V8_SHADOW_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\engineering_shadow_september_launch_v8")
+PRODUCTION_V8_SCIENTIFIC_ROOT = Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\scientific_raw_v8")
 MAX_CLOCK_UNCERTAINTY_MS = 2_000
 EXPECTED_REGISTRY_SHA256 = "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a"
 PRODUCTION_PROFILES = {
@@ -50,6 +53,7 @@ PRODUCTION_PROFILES = {
     "v5": {"control_root": PRODUCTION_V5_CONTROL_ROOT, "shadow_root": PRODUCTION_V5_SHADOW_ROOT, "scientific_root": PRODUCTION_V5_SCIENTIFIC_ROOT},
     "v6": {"control_root": PRODUCTION_V6_CONTROL_ROOT, "shadow_root": PRODUCTION_V6_SHADOW_ROOT, "scientific_root": PRODUCTION_V6_SCIENTIFIC_ROOT},
     "v7": {"control_root": PRODUCTION_V7_CONTROL_ROOT, "shadow_root": PRODUCTION_V7_SHADOW_ROOT, "scientific_root": PRODUCTION_V7_SCIENTIFIC_ROOT},
+    "v8": {"control_root": PRODUCTION_V8_CONTROL_ROOT, "shadow_root": PRODUCTION_V8_SHADOW_ROOT, "scientific_root": PRODUCTION_V8_SCIENTIFIC_ROOT},
 }
 
 
@@ -626,7 +630,7 @@ def _activate_scientific(ctx: Mapping[str, Any]) -> Mapping[str, Any]:
 
 def _probe_scientific_evidence(process: Any, root: Path, *, manifest_path: Path | None = None, seal_path: Path | None = None, roster_sha256: str | None = None) -> Mapping[str, Any]:
     """Verify actual scientific cycle, health, chain, and launch authorization."""
-    from binance_research.r3_operations import verify_manifest_chain
+    from binance_research.r3_operations import verify_launch_seal, verify_manifest_chain
     if getattr(process, "poll", lambda: None)() is not None:
         return {"cycles_completed": 0, "manifest_chain_pass": False, "health_pass": False}
     chain = root / "raw_v1" / "manifest_chain.jsonl"
