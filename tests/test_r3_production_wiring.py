@@ -241,6 +241,16 @@ def test_launch_v3_rejects_legacy_v1_and_v2_control_roots() -> None:
     )
 
 
+def test_launch_v3_rejects_control_root_descendants_and_overrides() -> None:
+    for candidate in (
+        executor.FAILED_V2_CONTROL_ROOT / "nested",
+        executor.CONTROL_ROOT / "nested",
+        Path(r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\other"),
+    ):
+        with pytest.raises(executor.PostBoundaryBlocked, match="R3_BLOCKED_LAUNCH_IDENTITY"):
+            executor.require_control_root(candidate)
+
+
 def test_launch_v3_shadow_root_rejects_prior_root_and_descendants() -> None:
     assert executor.require_shadow_root(executor.SHADOW_ROOT) == executor.SHADOW_ROOT.resolve()
     for forbidden in (executor.FAILED_V2_SHADOW_ROOT, executor.FAILED_V2_SHADOW_ROOT / "nested"):

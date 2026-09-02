@@ -81,15 +81,13 @@ def require_control_root(root: Path = CONTROL_ROOT) -> Path:
     resolved = Path(root).resolve()
     if resolved.drive.upper() != "D:":
         raise PostBoundaryBlocked("R3_BLOCKED_STORAGE", "control root must be D-backed")
-    forbidden = {
-        LEGACY_CONTROL_ROOT.resolve(),
-        FAILED_V1_CONTROL_ROOT.resolve(),
-        FAILED_V2_CONTROL_ROOT.resolve(),
-    }
-    if resolved in forbidden:
+    # Production-v3 is a single pre-registered identity.  Reject the failed
+    # v1/v2 roots *and* arbitrary descendants/overrides so a caller cannot
+    # accidentally authorize a new launch lineage by changing one path flag.
+    if resolved != CONTROL_ROOT.resolve():
         raise PostBoundaryBlocked(
             "R3_BLOCKED_LAUNCH_IDENTITY",
-            f"control root is reserved historical/failed evidence and cannot authorize launch-v3: {resolved}",
+            f"control root is not the reserved production-v3 root: {resolved}",
         )
     resolved.mkdir(parents=True, exist_ok=True)
     return resolved

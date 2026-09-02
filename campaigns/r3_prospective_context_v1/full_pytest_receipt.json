@@ -2,20 +2,25 @@
   "command": "python -m pytest -q",
   "status": "PASS",
   "exit_code": 0,
-  "passed": 302,
+  "passed": 327,
   "failed": 0,
   "warnings": 1,
-  "pytest_summary": "302 passed, 1 warning in 89.64s (0:01:29)",
-  "run_timestamp": "2026-08-31T14:57:09Z",
-  "implementation_commit": "12c2b91cc1fe26bf1bf798b09eff533b394d6c83",
-  "source_tree_sha256": "997d522313aaab38f92ad3e9f183d7e1df813ce3e2dac459e0bf2736b9ca10f1",
+  "pytest_summary": "327 passed, 1 warning in 117.69s (0:01:57)",
+  "run_timestamp": "2026-09-02T01:52:25.489Z",
+  "implementation_commit": "0a03082e285c6eb5cc3a009bac8a26d75533d75a",
+  "source_tree_sha256": "79f1a6e4fee83ba4ba91e33905762155d58f5884a405aaf107e6d0696effe593",
   "scientific_source_dirty": false,
+  "scientific_source_status_command": "git status --porcelain -- scripts src tests configs",
+  "scientific_source_status_output": "",
   "holdout_status": "UNTOUCHED",
   "outcome_analysis_status": "NOT_STARTED",
+  "r3_v3_status": "NOT_LAUNCHED",
+  "receipt_evidence_path": ".codexclaw/evidence/01a0230d-0a21-7e02-ab97-a10534161680/test-receipt.json",
   "receipt_source_identity": {
-    "cxc_commit_sha": "12c2b91cc1fe26bf1bf798b09eff533b394d6c83",
-    "cxc_tree_hash": "997d522313aaab38f92ad3e9f183d7e1df813ce3e2dac459e0bf2736b9ca10f1",
+    "cxc_commit_sha": "0a03082e285c6eb5cc3a009bac8a26d75533d75a",
+    "cxc_tree_hash": "f6f7f3861272c97112e141252f9dcd093b7909622a857e5696548179cc33faef",
     "cxc_global_dirty": true,
     "scientific_scope_status": "clean"
-  }
+  },
+  "supersedes": "302 passed receipt recorded 2026-08-31"
 }
