@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<!-- Sanitized template: fill no user name, SID, password, or security descriptor. -->
+<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Description>R3 v8 outcome-blind prospective scientific collector. Absolute paths are fixed in the launcher script.</Description>
+    <URI>\R3-Prospective-Scientific-v8</URI>
+  </RegistrationInfo>
+  <Triggers>
+    <LogonTrigger>
+      <Enabled>true</Enabled>
+    </LogonTrigger>
+  </Triggers>
+  <Principals>
+    <Principal id="Author">
+      <LogonType>InteractiveToken</LogonType>
+      <RunLevel>LeastPrivilege</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <RestartOnFailure>
+      <Interval>PT1M</Interval>
+      <Count>3</Count>
+    </RestartOnFailure>
+    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>
+    <AllowStartIfOnBatteries>true</AllowStartIfOnBatteries>
+    <DontStopIfGoingOnBatteries>true</DontStopIfGoingOnBatteries>
+  </Settings>
+  <Actions Context="Author">
+    <Exec>
+      <Command>powershell.exe</Command>
+      <Arguments>-NoProfile -ExecutionPolicy Bypass -File "C:\Users\user\Documents\ChatGPT\BINANCE 지표용 테스트\ops\r3\launch_r3_v8_resume.ps1"</Arguments>
+      <WorkingDirectory>C:\Users\user\Documents\ChatGPT\BINANCE 지표용 테스트</WorkingDirectory>
+    </Exec>
+  </Actions>
+</Task>
