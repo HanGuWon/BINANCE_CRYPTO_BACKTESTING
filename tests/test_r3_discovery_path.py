@@ -10,6 +10,7 @@ import pandas as pd
 import scripts.prepare_r3_post_boundary_launch as executor
 import scripts.qualify_r3_discovery_path as preflight
 from binance_research.r3_universe import build_causal_monthly_roster, write_roster_artifact
+from binance_research.data import ArchiveRequest
 from scripts.qualify_r3_forward_ranking import build_forward_ranking_from_verified_source
 
 
@@ -22,6 +23,12 @@ def _zip(path: Path, month: str, days: list[int]) -> str:
     with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr(f"FIXUSDT-1d-{month}.csv", payload)
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def test_archive_request_percent_encodes_non_ascii_symbol() -> None:
+    request = ArchiveRequest("um", "klines", "龙虾USDT", 2026, 7, interval="1d")
+    assert "%E9%BE%99%E8%99%BEUSDT" in request.url()
+    assert "龙虾" not in request.url()
 
 
 def test_month_inventory_uses_actual_source_month_and_no_guessed_objects() -> None:

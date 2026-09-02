@@ -199,10 +199,15 @@ class ArchiveRequest:
     def url(self) -> str:
         market_path = {"spot": "spot", "um": "futures/um", "cm": "futures/cm"}[self.market]
         suffix = f"{self.year:04d}-{self.month:02d}-{self.day:02d}" if self.cadence == "daily" else f"{self.year:04d}-{self.month:02d}"
-        base = f"https://data.binance.vision/data/{market_path}/{self.cadence}/{self.dataset}/{self.symbol}"
+        # Vision occasionally lists symbols containing non-ASCII characters.
+        # Encode each path component before handing the URL to urllib; passing
+        # raw Unicode to ``urllib.request`` raises ``UnicodeEncodeError`` and
+        # makes an otherwise authoritative object look unavailable.
+        encoded_symbol = urllib.parse.quote(self.symbol, safe="")
+        base = f"https://data.binance.vision/data/{market_path}/{self.cadence}/{self.dataset}/{encoded_symbol}"
         if self.interval:
-            base += f"/{self.interval}"; filename = f"{self.symbol}-{self.interval}-{suffix}.zip"
-        else: filename = f"{self.symbol}-{self.dataset}-{suffix}.zip"
+            base += f"/{self.interval}"; filename = f"{encoded_symbol}-{self.interval}-{suffix}.zip"
+        else: filename = f"{encoded_symbol}-{self.dataset}-{suffix}.zip"
         return f"{base}/{filename}"
 
 class BinanceArchiveClient:
