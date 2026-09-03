@@ -4,6 +4,8 @@ This report is a human-readable view of
 `campaigns/r3_prospective_context_v1/R3_CANONICAL_STATE_INDEX.json`. It records
 state and provenance only; it is not an outcome report.
 
+Authoritative current state: `R3_PROSPECTIVE_COLLECTION_OPERATIONALLY_STABILIZED_VERIFIED`.
+
 ## R1
 
 R1 is the historical Binance indicator/backtesting foundation. Its manifests,

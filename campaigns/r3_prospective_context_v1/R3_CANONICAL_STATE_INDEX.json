@@ -1,7 +1,7 @@
 {
   "record_type": "R3_CANONICAL_STATE_INDEX",
   "recorded_at_utc": "2026-09-03T02:48:17.535818Z",
-  "current_state": "R3_PROSPECTIVE_COLLECTION_OPERATIONALLY_STABILIZED",
+  "current_state": "R3_PROSPECTIVE_COLLECTION_OPERATIONALLY_STABILIZED_VERIFIED",
   "canonical_repository": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트",
   "canonical_branch": "research/r2b-restricted-derivatives-v1",
   "canonical_head": "0a8c5f21d882af521511e29643d26ac85f2056b7",
@@ -209,7 +209,8 @@
     "R3_WAITING_FOR_COMPLETED_AUGUST_RANKING": "HISTORICAL_EVIDENCE / SUPERSEDED by sealed v8 launch",
     "R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE": "HISTORICAL_EVIDENCE / SUPERSEDED by later source repair",
     "R3_PROSPECTIVE_SCIENTIFIC_COLLECTION_ACTIVE_VERIFIED": "HISTORICAL_EVIDENCE / superseded by current operations state",
-    "R3_PROSPECTIVE_COLLECTION_OPERATIONALLY_STABILIZED": "CURRENT"
+    "R3_PROSPECTIVE_COLLECTION_OPERATIONALLY_STABILIZED": "HISTORICAL_EVIDENCE / superseded by final outcome-blind verification",
+    "R3_PROSPECTIVE_COLLECTION_OPERATIONALLY_STABILIZED_VERIFIED": "CURRENT"
   },
   "codexclaw_classification_path": "campaigns/r3_prospective_context_v1/operations/R3_CODEXCLAW_CLASSIFICATION_20260903.json",
   "outcome_boundary": {

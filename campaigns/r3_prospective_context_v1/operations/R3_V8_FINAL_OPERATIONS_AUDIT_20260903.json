@@ -2,6 +2,7 @@
   "record_type": "R3_V8_FINAL_OPERATIONS_AUDIT",
   "recorded_at_utc": "2026-09-03T02:59:39.585777Z",
   "purpose": "Final outcome-blind reconciliation of the running sealed v8 collector",
+  "terminal_state": "R3_PROSPECTIVE_COLLECTION_OPERATIONALLY_STABILIZED_VERIFIED",
   "current_head": "4187f12702e51bf278320be0d7d9261c0686c18e",
   "origin_head": "0a8c5f21d882af521511e29643d26ac85f2056b7",
   "ahead_behind_current_head_vs_origin": "3 0",
