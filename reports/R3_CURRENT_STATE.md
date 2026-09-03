@@ -60,7 +60,7 @@ Latest recorded cycle: `cycle-20260903T014503283533Z`, completed at
 | item | value |
 | --- | --- |
 | branch | `research/r2b-restricted-derivatives-v1` |
-| canonical HEAD/origin | `0a8c5f21d882af521511e29643d26ac85f2056b7` / same |
+| sealed v8 HEAD/origin anchor | `0a8c5f21d882af521511e29643d26ac85f2056b7` / same; current checkout may be a documentation-only descendant |
 | frozen implementation | `ecebc49dff41eeec33af62c2c85a75c5a0bd2922` |
 | source-tree SHA256 | `b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688` |
 | registry SHA256 | `c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a` |

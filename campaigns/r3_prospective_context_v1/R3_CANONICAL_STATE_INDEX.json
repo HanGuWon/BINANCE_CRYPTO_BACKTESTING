@@ -7,6 +7,7 @@
   "canonical_head": "0a8c5f21d882af521511e29643d26ac85f2056b7",
   "origin_head": "0a8c5f21d882af521511e29643d26ac85f2056b7",
   "ahead_behind": "0 0",
+  "head_interpretation": "sealed v8 evidence anchor; any later local descendant in this reconciliation is documentation-only and must retain the frozen scientific source identity",
   "frozen_identity": {
     "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
     "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",

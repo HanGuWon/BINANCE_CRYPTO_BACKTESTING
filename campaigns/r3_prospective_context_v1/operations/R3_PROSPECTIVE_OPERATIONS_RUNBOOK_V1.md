@@ -26,8 +26,10 @@ the existing Python environment. A source-scope change in `scripts`, `src`,
 
 The canonical source is the checkout at
 `C:\Users\user\Documents\ChatGPT\BINANCE 지표용 테스트`, on branch
-`research/r2b-restricted-derivatives-v1`, at HEAD
-`0a8c5f21d882af521511e29643d26ac85f2056b7` (also `origin`, `0 0`). The detached
+`research/r2b-restricted-derivatives-v1`. The sealed v8 evidence anchor is
+`0a8c5f21d882af521511e29643d26ac85f2056b7` (the current `origin` tip); this
+reconciliation may add documentation-only descendants without changing the
+scientific source identity. The detached
 Codex worktree at
 `C:\Users\user\.codex\worktrees\ef86\BINANCE 지표용 테스트` is an abandoned
 read-only worktree at `9a70508eafe973405cfad165a0c8598288bc7aa0`, `0 ahead / 27
