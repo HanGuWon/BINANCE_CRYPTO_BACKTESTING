@@ -48,12 +48,12 @@ this reconciliation.
 The authorized collector uses the canonical repository
 `C:\Users\user\Documents\ChatGPT\BINANCE 지표용 테스트`, the sealed v8
 identity, the September 2026 roster, and the D-backed scientific root. The
-2026-09-03 operational snapshot records 69 completed SCIENTIFIC cycles, 69
-health receipts, 69 manifest entries, zero missing-cycle records, one authorized
+2026-09-03 operational snapshot records 73 completed SCIENTIFIC cycles, 73
+health receipts, 73 manifest entries, zero missing-cycle records, one authorized
 writer, manifest-chain `PASS`, and launch seal `SEALED`.
 
-Latest recorded cycle: `cycle-20260903T014503283533Z`, completed at
-`2026-09-03T01:45:24.643322Z`, for the `01:30–01:45Z` bar.
+Latest recorded cycle: `cycle-20260903T024503281858Z`, completed at
+`2026-09-03T02:45:26.930548Z`, for the `02:30–02:45Z` bar.
 
 ## Scientific identity
 
@@ -80,10 +80,10 @@ directory exist. The detached Codex worktree is not a collection source.
 ## Operational health
 
 The latest outcome-blind watchdog state is `YELLOW` solely because the health
-stream reports 10 source/restart gaps; disk state is `GREEN`. The measured
-bytes-per-cycle median is 1,053,551.5, inclusive p95 is 1,457,034.7, and max is
-1,735,185 bytes. D: free capacity was 136,226,295,808 bytes at the snapshot,
-with projected seven-/30-day growth of 707,986,608 / 3,034,228,320 bytes.
+stream reports 12 source/restart gaps; disk state is `GREEN`. The measured
+bytes-per-cycle median is 1,066,029.0, inclusive p95 is 1,452,663.1, and max is
+1,735,185 bytes. D: free capacity was 136,144,461,824 bytes at the snapshot,
+with projected seven-/30-day growth of 716,371,488 / 3,070,163,520 bytes.
 No synthetic observations are fabricated and raw evidence remains append-only.
 
 The native per-user Startup shortcut is validated as the credential-free
@@ -97,6 +97,7 @@ The stale-worktree evidence and `.codexclaw` path-level classification are in:
 - `campaigns/r3_prospective_context_v1/operations/R3_WORKTREE_DISCOVERY_20260903.json`
 - `campaigns/r3_prospective_context_v1/operations/R3_STALE_WORKTREE_DISPOSITION_20260903.md`
 - `campaigns/r3_prospective_context_v1/operations/R3_CODEXCLAW_CLASSIFICATION_20260903.json`
+- `campaigns/r3_prospective_context_v1/operations/R3_V8_RECONCILIATION_AUDIT_20260903.json`
 
 ## Outcome boundary
 

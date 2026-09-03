@@ -1,6 +1,6 @@
 {
   "record_type": "R3_CANONICAL_STATE_INDEX",
-  "recorded_at_utc": "2026-09-03T02:10:00Z",
+  "recorded_at_utc": "2026-09-03T02:48:17.535818Z",
   "current_state": "R3_PROSPECTIVE_COLLECTION_OPERATIONALLY_STABILIZED",
   "canonical_repository": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트",
   "canonical_branch": "research/r2b-restricted-derivatives-v1",
@@ -30,27 +30,27 @@
     "wrapper_executable": "C:\\Users\\user\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts\\python.exe",
     "authorized_writer_count": 1,
     "duplicate_writers": [],
-    "cycle_count": 69,
-    "health_count": 69,
-    "manifest_entry_count": 69,
+    "cycle_count": 73,
+    "health_count": 73,
+    "manifest_entry_count": 73,
     "missing_cycle_count": 0,
-    "latest_cycle_id": "cycle-20260903T014503283533Z",
-    "latest_cycle_completed_at": "2026-09-03T01:45:24.643322Z",
-    "latest_target_bar_open": "2026-09-03T01:30:00Z",
-    "latest_target_bar_close": "2026-09-03T01:45:00Z",
+    "latest_cycle_id": "cycle-20260903T024503281858Z",
+    "latest_cycle_completed_at": "2026-09-03T02:45:26.930548Z",
+    "latest_target_bar_open": "2026-09-03T02:30:00Z",
+    "latest_target_bar_close": "2026-09-03T02:45:00Z",
     "manifest_chain_verification": true,
     "launch_seal_verification": true,
-    "gap_count": 10,
-    "restart_count": 10,
+    "gap_count": 12,
+    "restart_count": 12,
     "gap_reason": "reported_source_or_restart_gap",
     "watchdog_state": "YELLOW",
     "disk_state": "GREEN",
-    "free_disk_bytes": 136226295808,
-    "bytes_cycle_median": 1053551.5,
-    "bytes_cycle_p95_inclusive": 1457034.7,
+    "free_disk_bytes": 136144461824,
+    "bytes_cycle_median": 1066029.0,
+    "bytes_cycle_p95_inclusive": 1452663.1,
     "bytes_cycle_max": 1735185,
-    "projected_bytes_7d": 707986608.0,
-    "projected_bytes_30d": 3034228320.0
+    "projected_bytes_7d": 716371488.0,
+    "projected_bytes_30d": 3070163520.0
   },
   "service": {
     "launcher": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\ops\\r3\\launch_r3_v8_resume.ps1",
@@ -69,6 +69,7 @@
     "daily_operations": "campaigns/r3_prospective_context_v1/operations/R3_V8_DAILY_OPERATIONS_RECEIPTS.jsonl",
     "full_pytest": "campaigns/r3_prospective_context_v1/operations/R3_V8_FULL_PYTEST_RECEIPT_20260902.json",
     "final_operations_audit": "campaigns/r3_prospective_context_v1/operations/R3_V8_FINAL_OPERATIONS_AUDIT_20260902.json",
+    "reconciliation_audit": "campaigns/r3_prospective_context_v1/operations/R3_V8_RECONCILIATION_AUDIT_20260903.json",
     "pytest_summary": "331 passed, 1 warning in 100.79s (0:01:40)",
     "pytest_exit_code": 0,
     "pytest_receipt_execution_head": "7c828d5085ea787c32c713649aa7fbcd8a74e452",
@@ -77,11 +78,12 @@
   "worktrees": [
     {
       "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트",
-      "head": "0a8c5f21d882af521511e29643d26ac85f2056b7",
+      "head": "d58a96e3020a277a96c62f80a5a971dd59c0b0ea",
       "branch": "research/r2b-restricted-derivatives-v1",
       "status": "CURRENT",
       "collector_source": true,
-      "scientific_scope_status": "clean"
+      "scientific_scope_status": "clean",
+      "relative_to_sealed_v8_anchor": "2 documentation-only commits ahead"
     },
     {
       "path": "C:\\Users\\user\\.codex\\worktrees\\ef86\\BINANCE 지표용 테스트",
@@ -184,6 +186,11 @@
       "artifact": "R3_CANONICAL_STATE_INDEX.json and reports/R3_CURRENT_STATE.md",
       "classification": "CURRENT",
       "reason": "authoritative current-state surfaces"
+    },
+    {
+      "artifact": "R3_V8_RECONCILIATION_AUDIT_20260903.json",
+      "classification": "CURRENT",
+      "reason": "new immutable timestamped operational snapshot; prior final audit remains unchanged"
     }
   ],
   "historical_state_taxonomy": {
