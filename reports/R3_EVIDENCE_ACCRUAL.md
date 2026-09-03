@@ -63,9 +63,17 @@ It records:
 - explicit human authorization is absent;
 - `auto_start=false`, final holdout `UNTOUCHED`, and R2B2 `NOT_STARTED`.
 
+The synthetic qualification suite is
+`python -m pytest -q ops/r3/tests/test_evaluation_readiness.py`: 27 tests
+passed. It includes the broad forbidden-token/path firewall as well as the
+minimum, gap, duplicate, roster, horizon, and no-auto-start fixtures.
+
 The resulting state is intentionally
 `R3_EVALUATION_PREREGISTRATION_BLOCKED`. The prior first-pass receipt was moved
-to `R3_EVALUATION_READINESS_RECEIPT_20260903_PRECHECK_SUPERSEDED.json`, and the
+to `R3_EVALUATION_READINESS_RECEIPT_20260903_PRECHECK_SUPERSEDED.json`, the
+pre-firewall final receipt is preserved at
+`R3_EVALUATION_READINESS_RECEIPT_20260903_FINAL_PRE_FIREWALL_SUPERSEDED.json`,
+and the
 earlier 92-cycle inventory remains at
 `R3_OUTCOME_BLIND_EVIDENCE_INVENTORY_20260903.json`; both are preserved for
 provenance. A later horizon amendment must supersede this

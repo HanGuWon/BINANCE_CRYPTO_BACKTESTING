@@ -19,9 +19,8 @@ The 92-cycle canonical snapshot remains
 fresh snapshot is
 `R3_OUTCOME_BLIND_EVIDENCE_INVENTORY_20260903_FINAL.json`; it supersedes the
 earlier snapshot only by timestamped path and does not alter its bytes. Both
-exclude control-only
-source-time absence from stream-gap counts, uses the first grid boundary after
-recorded availability, includes the authoritative health gap/restart counters,
-and contains only timestamps, symbols, schema presence, continuity,
+exclude control-only source-time absence from stream-gap counts, use the first
+grid boundary after recorded availability, include the authoritative health
+gap/restart counters, and contain only timestamps, symbols, schema presence, continuity,
 availability, event/input counts, and dependence summaries. No payload values,
 forward labels, returns, PnL, rankings, or confirmatory material are retained.

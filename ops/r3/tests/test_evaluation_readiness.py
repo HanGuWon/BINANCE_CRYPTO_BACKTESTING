@@ -129,6 +129,22 @@ def test_forbidden_result_field_fails_closed() -> None:
         evaluate_readiness(_contract(), inventory, _spec(), roster_months=["2026-08", "2026-09"], human_authorized=True)
 
 
+@pytest.mark.parametrize("token", ["outcome", "return", "pnl", "sharpe", "hit_rate", "future", "holdout", "r2b2"])
+def test_broad_forbidden_tokens_fail_closed(token: str) -> None:
+    inventory = _inventory()
+    inventory[token + "_field"] = 1
+    with pytest.raises(ReadinessInputError):
+        evaluate_readiness(_contract(), inventory, _spec(), roster_months=["2026-08", "2026-09"], human_authorized=True)
+
+
+@pytest.mark.parametrize("token", ["outcome", "return", "pnl", "sharpe", "hit_rate", "future", "holdout", "r2b2"])
+def test_broad_forbidden_path_tokens_fail_closed(token: str) -> None:
+    inventory = _inventory()
+    inventory["path"] = "D:/metadata/" + token + "/snapshot.json"
+    with pytest.raises(ReadinessInputError):
+        evaluate_readiness(_contract(), inventory, _spec(), roster_months=["2026-08", "2026-09"], human_authorized=True)
+
+
 def test_forbidden_holdout_path_fails_closed() -> None:
     inventory = _inventory()
     inventory["path"] = "D:/research/final_holdout/metadata.json"

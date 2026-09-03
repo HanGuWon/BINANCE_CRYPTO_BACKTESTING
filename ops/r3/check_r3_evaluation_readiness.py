@@ -54,6 +54,7 @@ FORBIDDEN_KEY_TOKENS = frozenset(
         "r2b2",
     }
 )
+BROAD_FORBIDDEN_TOKENS = frozenset({"outcome", "return", "pnl", "sharpe", "hit_rate", "future", "holdout", "r2b2"})
 ALLOWED_SAFETY_KEYS = frozenset(
     {
         "outcomes_accessed",
@@ -63,6 +64,7 @@ ALLOWED_SAFETY_KEYS = frozenset(
         "secondary_campaign_accessed",
         "final_holdout_status",
         "final_holdout",
+        "r2b2_status",
     }
 )
 PATH_KEYS = frozenset({"path", "root", "file", "artifact", "uri", "source"})
@@ -97,7 +99,10 @@ def _reject_forbidden(value: Any, *, path: str = "$", parent_key: str = "") -> N
     if isinstance(value, Mapping):
         for key, child in value.items():
             normalized = _normal_key(key)
-            if normalized in FORBIDDEN_KEY_TOKENS and normalized not in ALLOWED_SAFETY_KEYS:
+            if normalized not in ALLOWED_SAFETY_KEYS and (
+                normalized in FORBIDDEN_KEY_TOKENS
+                or any(token in normalized for token in BROAD_FORBIDDEN_TOKENS)
+            ):
                 raise ReadinessInputError(f"forbidden metadata key at {path}.{key}")
             _reject_forbidden(child, path=f"{path}.{key}", parent_key=normalized)
         return
@@ -107,7 +112,7 @@ def _reject_forbidden(value: Any, *, path: str = "$", parent_key: str = "") -> N
         return
     if isinstance(value, str) and _normal_key(parent_key) in PATH_KEYS:
         lowered = value.replace("\\", "/").lower()
-        if any(token in lowered for token in FORBIDDEN_PATH_TOKENS):
+        if any(token in lowered for token in FORBIDDEN_PATH_TOKENS) or any(token in lowered for token in BROAD_FORBIDDEN_TOKENS):
             raise ReadinessInputError(f"forbidden metadata path at {path}")
 
 
