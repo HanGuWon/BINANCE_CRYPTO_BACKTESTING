@@ -40,3 +40,13 @@ discovered-object integrity failures block the campaign.
 Continuity gaps reset state and are never silently bridged. A minimum evidence
 window will be fixed from event counts, dependence blocks, and confidence
 precision before prospective outcome analysis; returns cannot choose its end.
+
+The outcome-blind unlock contract is frozen in
+`R3_EVALUATION_AMENDMENT_V1.md`. Evaluation is eligible only after one exact
+pre-existing horizon key is supplied and hashed. The current six-row
+`trial_registry.csv` has no horizon field and the R2B registry is not reused;
+therefore the current state is `R3_EVALUATION_PREREGISTRATION_BLOCKED` and no
+horizon, threshold, or subgroup may be invented or searched. The amendment
+also fixes UTC six-hour dependence blocks, Holm correction across exactly six
+hypotheses, explicit missing/gap/censor rules, evidence minima, and a human
+authorization gate. Satisfying metadata minima never launches evaluation.

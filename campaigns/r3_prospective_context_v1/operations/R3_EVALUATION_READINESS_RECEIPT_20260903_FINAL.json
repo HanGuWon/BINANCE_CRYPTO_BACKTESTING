@@ -1,0 +1,115 @@
+{
+  "auto_start": false,
+  "contract_version": "r3-evaluation-readiness-v1",
+  "family": {
+    "correction": "HOLM_STEP_DOWN_ALPHA_0.05",
+    "count": 6,
+    "hypotheses": [
+      "R3_H01",
+      "R3_H02",
+      "R3_H03",
+      "R3_H04",
+      "R3_H05",
+      "R3_H06"
+    ]
+  },
+  "firewall": {
+    "final_holdout": "UNTOUCHED",
+    "metadata_only": true,
+    "outcomes_accessed": false,
+    "r2b2": "NOT_STARTED"
+  },
+  "gap_attrition": {
+    "effective_hypothesis_counts": {
+      "R3_H01": 4682,
+      "R3_H02": 3086,
+      "R3_H03": 24117,
+      "R3_H04": 24117,
+      "R3_H05": 3182,
+      "R3_H06": 3506
+    },
+    "effective_utc_6h_blocks": 4,
+    "raw_hypothesis_counts": {
+      "R3_H01": 4700,
+      "R3_H02": 3104,
+      "R3_H03": 24135,
+      "R3_H04": 24135,
+      "R3_H05": 3200,
+      "R3_H06": 3524
+    },
+    "raw_utc_6h_blocks": 5,
+    "reported_gap_or_restart_count": 18,
+    "rule": "remove one UTC block if any gap/restart is reported and one count per reported gap/restart; never impute"
+  },
+  "gates": {
+    "calendar_days": {
+      "observed": 2,
+      "pass": false,
+      "required": 30
+    },
+    "completeness": {
+      "duplicate_cycle_ids": 0,
+      "gap_records": 0,
+      "missing_cycle_count": 0,
+      "no_imputation": true,
+      "pass": true,
+      "strict_boundary_rejected": 0
+    },
+    "hypotheses": {
+      "R3_H01": {
+        "observed": 4682,
+        "pass": false,
+        "required": 5000
+      },
+      "R3_H02": {
+        "observed": 3086,
+        "pass": false,
+        "required": 5000
+      },
+      "R3_H03": {
+        "observed": 24117,
+        "pass": true,
+        "required": 1000
+      },
+      "R3_H04": {
+        "observed": 24117,
+        "pass": true,
+        "required": 1000
+      },
+      "R3_H05": {
+        "observed": 3182,
+        "pass": false,
+        "required": 5000
+      },
+      "R3_H06": {
+        "observed": 3506,
+        "pass": false,
+        "required": 5000
+      }
+    },
+    "roster_months": {
+      "observed": 0,
+      "pass": false,
+      "required": 2
+    },
+    "utc_6h_blocks": {
+      "observed": 4,
+      "pass": false,
+      "required": 120
+    }
+  },
+  "horizon": {
+    "frozen": false,
+    "key_count": 0,
+    "sha256_present": false
+  },
+  "human_authorized": false,
+  "reasons": [
+    "HORIZON_NOT_FROZEN",
+    "GLOBAL_METADATA_MINIMA_NOT_MET",
+    "HYPOTHESIS_MINIMA_NOT_MET",
+    "HUMAN_AUTHORIZATION_MISSING"
+  ],
+  "record_type": "R3_EVALUATION_READINESS_RECEIPT",
+  "state": "R3_EVALUATION_PREREGISTRATION_BLOCKED"
+}
