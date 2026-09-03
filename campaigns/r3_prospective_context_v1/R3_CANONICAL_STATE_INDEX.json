@@ -1,11 +1,11 @@
 {
   "record_type": "R3_CANONICAL_STATE_INDEX",
-  "recorded_at_utc": "2026-09-03T08:03:13.046376Z",
+  "recorded_at_utc": "2026-09-03T08:13:32.2232555Z",
   "current_state": "R3_EVALUATION_PREREGISTRATION_BLOCKED",
   "canonical_repository": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트",
   "canonical_branch": "research/r2b-restricted-derivatives-v1",
-  "canonical_head": "d8d36c908d054a06333fa0d751b58d427f94bf6a",
-  "origin_head": "d8d36c908d054a06333fa0d751b58d427f94bf6a",
+  "canonical_head": "f90b199b8f2c4cfd49893b72763f4ac524a05d7a",
+  "origin_head": "f90b199b8f2c4cfd49893b72763f4ac524a05d7a",
   "ahead_behind": "0 0",
   "head_interpretation": "origin-synchronized documentation/operations descendant; sealed v8 scientific source identity remains frozen and unchanged",
   "frozen_identity": {
@@ -74,6 +74,7 @@
     "outcome_blind_inventory": "campaigns/r3_prospective_context_v1/operations/R3_OUTCOME_BLIND_EVIDENCE_INVENTORY_20260903_FINAL.json",
     "evaluation_amendment": "campaigns/r3_prospective_context_v1/R3_EVALUATION_AMENDMENT_V1.md",
     "evaluation_readiness": "campaigns/r3_prospective_context_v1/operations/R3_EVALUATION_READINESS_RECEIPT_20260903_FINAL.json",
+    "final_integrity": "campaigns/r3_prospective_context_v1/operations/R3_EVALUATION_FINAL_INTEGRITY_RECEIPT_20260903.json",
     "evidence_accrual_report": "reports/R3_EVIDENCE_ACCRUAL.md",
     "pytest_summary": "331 passed, 1 warning in 100.79s (0:01:40)",
     "pytest_exit_code": 0,
