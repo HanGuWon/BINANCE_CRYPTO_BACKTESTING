@@ -50,19 +50,19 @@ this reconciliation.
 The authorized collector uses the canonical repository
 `C:\Users\user\Documents\ChatGPT\BINANCE 지표용 테스트`, the sealed v8
 identity, the September 2026 roster, and the D-backed scientific root. The
-2026-09-03 operational snapshot records 94 completed SCIENTIFIC cycles, 94
-health receipts, 94 manifest entries, zero missing-cycle records, one authorized
-writer, manifest-chain `PASS`, and launch seal `SEALED`.
+2026-09-03 post-resume operational snapshot records 116 completed SCIENTIFIC
+cycles, 116 health receipts, 116 manifest entries, one preserved missing-cycle
+gap, one authorized writer, manifest-chain `PASS`, and launch seal `SEALED`.
 
-Latest recorded cycle: `cycle-20260903T080003294928Z`, completed at
-`2026-09-03T08:00:26.311222Z`, for the `07:45–08:00Z` bar.
+Latest recorded cycle: `cycle-20260903T134504766572Z`, completed at
+`2026-09-03T13:45:28.732047Z`, for the `13:30–13:45Z` bar.
 
 ## Scientific identity
 
 | item | value |
 | --- | --- |
 | branch | `research/r2b-restricted-derivatives-v1` |
-| current HEAD/origin snapshot | `f90b199b8f2c4cfd49893b72763f4ac524a05d7a` / same; final integrity receipt records the subsequent documentation commit |
+| current HEAD/origin snapshot | `2c39febfd7350d0bbcb12ed7185fcb52933b5324` / same; authorized-resume receipts are documentation/operations-only descendants |
 | sealed v8 implementation anchor | `ecebc49dff41eeec33af62c2c85a75c5a0bd2922` |
 | source-tree SHA256 | `b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688` |
 | registry SHA256 | `c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a` |
@@ -82,17 +82,21 @@ directory exist. The detached Codex worktree is not a collection source.
 ## Operational health
 
 The latest outcome-blind watchdog state is `YELLOW` solely because the health
-stream reports 18 source/restart gaps; disk state is `GREEN`. The measured
+stream reports 23 source/restart gaps; disk state is `GREEN`. The measured
 bytes-per-cycle median is 1,066,029.0, inclusive p95 is 1,452,663.1, and max is
-1,735,185 bytes. D: free capacity was 135,259,381,760 bytes at the snapshot,
+1,735,185 bytes. D: free capacity was 135,235,428,352 bytes at the post-resume
+snapshot,
 with projected seven-/30-day growth of 716,371,488 / 3,070,163,520 bytes.
 No synthetic observations are fabricated and raw evidence remains append-only.
 
 The native per-user Startup shortcut is validated as the credential-free
-fallback. Task Scheduler registration was denied by the current token, so a
-live restart was safely skipped (`SAFE_SKIP_LIVE_RESTART`) to protect immutable
-evidence. Launcher collision protection returns exit 73 and the lock reports one
-writer.
+fallback. The collector had stopped with a stale PID lock; the PID was
+confirmed terminated, the lock was removed as stale control metadata, and the
+already-qualified launcher resumed the same sealed root. The
+`R3_V8_AUTHORIZED_RESUME_RECEIPT_20260903.json` and
+`R3_V8_RESUME_STABILITY_RECEIPT_20260903.json` record this append-only
+disposition. Launcher collision protection returns exit 73 and the active lock
+reports one writer.
 
 The stale-worktree evidence and `.codexclaw` path-level classification are in:
 
