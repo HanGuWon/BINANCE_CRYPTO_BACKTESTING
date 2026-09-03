@@ -1,0 +1,111 @@
+{
+  "record_type": "R3_WORKTREE_DISCOVERY",
+  "recorded_at_utc": "2026-09-03T01:55:00Z",
+  "discovery_scope": [
+    "C:\\Users\\user\\Documents\\ChatGPT",
+    "C:\\Users\\user\\.codex\\worktrees"
+  ],
+  "canonical": {
+    "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트",
+    "head": "0a8c5f21d882af521511e29643d26ac85f2056b7",
+    "branch": "research/r2b-restricted-derivatives-v1",
+    "origin_head": "0a8c5f21d882af521511e29643d26ac85f2056b7",
+    "ahead_behind": "0 0",
+    "remote_url": "https://github.com/HanGuWon/BINANCE_CRYPTO_BACKTESTING.git",
+    "scientific_scope_status": "clean",
+    "scientific_scope": ["scripts", "src", "tests", "configs"],
+    "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+    "implementation_is_ancestor": true,
+    "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+    "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a"
+  },
+  "worktrees": [
+    {
+      "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트",
+      "head": "0a8c5f21d882af521511e29643d26ac85f2056b7",
+      "branch": "research/r2b-restricted-derivatives-v1",
+      "detached": false,
+      "collector_uses_path": true,
+      "scientific_scope_status": "clean"
+    },
+    {
+      "path": "C:\\Users\\user\\.codex\\worktrees\\ef86\\BINANCE 지표용 테스트",
+      "head": "9a70508eafe973405cfad165a0c8598288bc7aa0",
+      "orig_head": "9a70508eafe973405cfad165a0c8598288bc7aa0",
+      "branch": null,
+      "detached": true,
+      "collector_uses_path": false,
+      "git_common_dir": "C:/Users/user/Documents/ChatGPT/BINANCE 지표용 테스트/.git",
+      "remote_url": "https://github.com/HanGuWon/BINANCE_CRYPTO_BACKTESTING.git",
+      "owner_thread_id": "01a05faf-8450-7471-b6be-2710911c393e",
+      "worktree_metadata_created": "2026-09-02T10:14:15+09:00",
+      "codex_synced_branch": "refs/heads/research/r2b-restricted-derivatives-v1",
+      "last_synced_tree_ref": "45864d6f5b1ae6d7a72e0669868e0d717741999e",
+      "scientific_scope_status": "clean",
+      "tracked_modified_paths": [
+        ".codexclaw/goalplans/repair-the-r3-prospective-context-v1-launch-cont/goalplan.json",
+        "devlog/_plan/260827_r2b-preoutcome-freeze-20260827/030_phase3.md"
+      ],
+      "tracked_modified_path_sha256_equal_to_canonical": true,
+      "scientific_untracked_paths": []
+    }
+  ],
+  "ref_chronology": [
+    {
+      "commit": "9a70508eafe973405cfad165a0c8598288bc7aa0",
+      "time": "2026-09-02T10:12:23+09:00",
+      "subject": "record R3 v3 launch identity reconciliation",
+      "role": "stale worktree HEAD"
+    },
+    {
+      "commit": "f716784661a902126f6bc84198459c817204cd97",
+      "time": "2026-09-02T11:08:50+09:00",
+      "origin_reflog_time": "2026-09-02T11:08:52+09:00",
+      "subject": "allow isolated fixture roots without weakening launch pin",
+      "role": "historical remote tip observed after stale worktree creation"
+    },
+    {
+      "commit": "457106aea0d79e0cd7c25137bb0d0485864a4739",
+      "time": "2026-09-02T19:56:15+09:00",
+      "subject": "docs: record v8 scientific activation evidence",
+      "role": "later canonical evidence commit"
+    },
+    {
+      "commit": "0a8c5f21d882af521511e29643d26ac85f2056b7",
+      "time": "2026-09-02T21:59:31+09:00",
+      "subject": "ops: record final v8 verification",
+      "role": "current canonical branch and origin tip"
+    }
+  ],
+  "active_collector": {
+    "writer_pid": 153760,
+    "wrapper_pid": 158632,
+    "wrapper_parent_pid": 148584,
+    "writer_executable": "C:\\Users\\user\\AppData\\Roaming\\uv\\python\\cpython-3.11-windows-x86_64-none\\python.exe",
+    "wrapper_executable": "C:\\Users\\user\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts\\python.exe",
+    "writer_cwd": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트",
+    "writer_start_time": "2026-09-02T08:30:42.148899Z",
+    "command": "run_r3_prospective_collector.py --mode SCIENTIFIC --persistent --root D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8 --roster-artifact C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\rosters\\2026-09.json --launch-manifest D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_MANIFEST_2026-09.json",
+    "scientific_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8",
+    "roster": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\rosters\\2026-09.json",
+    "launch_manifest": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_MANIFEST_2026-09.json",
+    "launch_seal": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_SEAL_RECEIPT.json",
+    "authorized_writer_count": 1,
+    "duplicate_writers": []
+  },
+  "data_root": {
+    "actual_path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA",
+    "scientific_raw_v8_exists": true,
+    "launch_control_v8_exists": true
+  },
+  "negative_access": {
+    "outcomes_accessed": false,
+    "returns_inspected": false,
+    "final_holdout_accessed": false,
+    "r2b2_started": false,
+    "v9_created": false,
+    "destructive_actions": false,
+    "collector_stopped": false
+  },
+  "disposition": "The detached 9a70508 worktree is an abandoned Codex worktree sharing the canonical repository and origin. It has no scientific-scope changes and is left untouched/read-only by procedure; no merge, reset, checkout, deletion, or force-push is performed. The canonical active-v8 worktree remains authoritative."
+}

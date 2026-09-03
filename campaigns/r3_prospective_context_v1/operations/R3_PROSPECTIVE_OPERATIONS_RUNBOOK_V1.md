@@ -22,6 +22,21 @@ The current live command must continue to name this root, roster, manifest, and
 the existing Python environment. A source-scope change in `scripts`, `src`,
 `tests`, or `configs` blocks launch until a new identity is explicitly sealed.
 
+## Canonical/stale worktree
+
+The canonical source is the checkout at
+`C:\Users\user\Documents\ChatGPT\BINANCE 지표용 테스트`, on branch
+`research/r2b-restricted-derivatives-v1`, at HEAD
+`0a8c5f21d882af521511e29643d26ac85f2056b7` (also `origin`, `0 0`). The detached
+Codex worktree at
+`C:\Users\user\.codex\worktrees\ef86\BINANCE 지표용 테스트` is an abandoned
+read-only worktree at `9a70508eafe973405cfad165a0c8598288bc7aa0`, `0 ahead / 27
+behind`; it is not a collector launch source and remains untouched. The
+chronology, shared Git metadata, and byte-equality checks are recorded in
+`operations/R3_STALE_WORKTREE_DISPOSITION_20260903.md`; the append-only current
+state is indexed in `../R3_CANONICAL_STATE_INDEX.json`. No reset, checkout,
+merge, deletion, or force-push is part of this disposition.
+
 ## Service start and authorized resume
 
 Run from an elevated or ordinary user PowerShell as appropriate for the local
