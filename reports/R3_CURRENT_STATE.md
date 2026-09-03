@@ -98,6 +98,7 @@ The stale-worktree evidence and `.codexclaw` path-level classification are in:
 - `campaigns/r3_prospective_context_v1/operations/R3_STALE_WORKTREE_DISPOSITION_20260903.md`
 - `campaigns/r3_prospective_context_v1/operations/R3_CODEXCLAW_CLASSIFICATION_20260903.json`
 - `campaigns/r3_prospective_context_v1/operations/R3_V8_RECONCILIATION_AUDIT_20260903.json`
+- `campaigns/r3_prospective_context_v1/operations/R3_V8_FINAL_OPERATIONS_AUDIT_20260903.json`
 
 ## Outcome boundary
 
