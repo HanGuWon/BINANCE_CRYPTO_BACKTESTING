@@ -4,7 +4,7 @@ This report is a human-readable view of
 `campaigns/r3_prospective_context_v1/R3_CANONICAL_STATE_INDEX.json`. It records
 state and provenance only; it is not an outcome report.
 
-Authoritative current state: `R3_PROSPECTIVE_COLLECTION_OPERATIONALLY_STABILIZED_VERIFIED`.
+Authoritative current state: `R3_EVALUATION_PREREGISTRATION_BLOCKED`.
 
 ## R1
 
@@ -50,20 +50,20 @@ this reconciliation.
 The authorized collector uses the canonical repository
 `C:\Users\user\Documents\ChatGPT\BINANCE 지표용 테스트`, the sealed v8
 identity, the September 2026 roster, and the D-backed scientific root. The
-2026-09-03 operational snapshot records 73 completed SCIENTIFIC cycles, 73
-health receipts, 73 manifest entries, zero missing-cycle records, one authorized
+2026-09-03 operational snapshot records 94 completed SCIENTIFIC cycles, 94
+health receipts, 94 manifest entries, zero missing-cycle records, one authorized
 writer, manifest-chain `PASS`, and launch seal `SEALED`.
 
-Latest recorded cycle: `cycle-20260903T024503281858Z`, completed at
-`2026-09-03T02:45:26.930548Z`, for the `02:30–02:45Z` bar.
+Latest recorded cycle: `cycle-20260903T080003294928Z`, completed at
+`2026-09-03T08:00:26.311222Z`, for the `07:45–08:00Z` bar.
 
 ## Scientific identity
 
 | item | value |
 | --- | --- |
 | branch | `research/r2b-restricted-derivatives-v1` |
-| sealed v8 HEAD/origin anchor | `0a8c5f21d882af521511e29643d26ac85f2056b7` / same; current checkout may be a documentation-only descendant |
-| frozen implementation | `ecebc49dff41eeec33af62c2c85a75c5a0bd2922` |
+| current HEAD/origin | `d8d36c908d054a06333fa0d751b58d427f94bf6a` / same; documentation and operations are synchronized |
+| sealed v8 implementation anchor | `ecebc49dff41eeec33af62c2c85a75c5a0bd2922` |
 | source-tree SHA256 | `b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688` |
 | registry SHA256 | `c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a` |
 | scientific root | `D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\scientific_raw_v8` |
@@ -82,9 +82,9 @@ directory exist. The detached Codex worktree is not a collection source.
 ## Operational health
 
 The latest outcome-blind watchdog state is `YELLOW` solely because the health
-stream reports 12 source/restart gaps; disk state is `GREEN`. The measured
+stream reports 18 source/restart gaps; disk state is `GREEN`. The measured
 bytes-per-cycle median is 1,066,029.0, inclusive p95 is 1,452,663.1, and max is
-1,735,185 bytes. D: free capacity was 136,144,461,824 bytes at the snapshot,
+1,735,185 bytes. D: free capacity was 135,259,381,760 bytes at the snapshot,
 with projected seven-/30-day growth of 716,371,488 / 3,070,163,520 bytes.
 No synthetic observations are fabricated and raw evidence remains append-only.
 
@@ -104,14 +104,15 @@ The stale-worktree evidence and `.codexclaw` path-level classification are in:
 
 ## Outcome boundary
 
-Evaluation is `NOT_YET_AUTHORIZED`. Outcomes are `NOT_STARTED`; no return,
+Evaluation is `FROZEN_BUT_HORIZON_BLOCKED` under
+`R3_EVALUATION_AMENDMENT_V1.md`. Outcomes are `NOT_STARTED`; no return,
 performance, ranking, or holdout material is accessed by this report. The final
 holdout is `UNTOUCHED`, and R2B2 is `NOT_STARTED`.
 
 ## Next milestone
 
-Continue outcome-blind v8 collection and daily operational receipts. Before the
-October boundary, follow the runbook's September-close → complete prior-month
-eligibility → frozen October roster → rollover authorization sequence. Do not
-create an October roster from incomplete data and do not start outcome analysis
-until a separately approved evaluation amendment exists.
+Continue outcome-blind v8 collection and daily operational receipts. The
+metadata-only readiness checker remains fail-closed until one exact,
+pre-existing horizon key is explicitly hashed and the calendar/block,
+per-hypothesis, completeness, and roster-month minima are met. Do not start an
+evaluation automatically or access the final holdout.
