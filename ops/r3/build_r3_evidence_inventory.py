@@ -18,7 +18,22 @@ import sys
 from collections import Counter, defaultdict
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping, Sequence
+
+try:
+    from ops.r3.r3_forceorder_identity import (
+        ForceOrderIdentityError,
+        ValidatedForceOrder,
+        deduplicate_forceorders,
+        validate_forceorder_envelope,
+    )
+except ModuleNotFoundError:  # pragma: no cover - direct script invocation
+    from r3_forceorder_identity import (  # type: ignore[no-redef]
+        ForceOrderIdentityError,
+        ValidatedForceOrder,
+        deduplicate_forceorders,
+        validate_forceorder_envelope,
+    )
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -50,6 +65,20 @@ STREAMS = (
     "book_ticker",
     "liquidation",
 )
+PRIMARY_HYPOTHESES = ("R3_H01", "R3_H02", "R3_H03", "R3_H04", "R3_H05", "R3_H06")
+HYPOTHESIS_SCOPES: dict[str, tuple[str, ...]] = {
+    "book_ticker": ("R3_H01",),
+    "klines_15m": ("R3_H02", "R3_H06"),
+    "open_interest": ("R3_H02",),
+    "premium": ("R3_H05",),
+    "premium_klines_15m": ("R3_H05",),
+    "liquidation": ("R3_H03", "R3_H04"),
+}
+VALID_GAP_CATEGORIES = frozenset({"MISSING_CYCLE", "RESTART_GAP", "SOURCE_UNAVAILABLE", "ROLLOVER_GAP", "INCOMPLETE_BUCKET"})
+PER_H_TEMPORAL_MINIMA = {
+    hypothesis: {"usable_blocks": 30, "usable_days": 30, "per_roster_minimum": 1}
+    for hypothesis in PRIMARY_HYPOTHESES
+}
 
 
 class InventoryError(RuntimeError):
@@ -139,6 +168,149 @@ def _bucket_15m(timestamp: datetime) -> datetime:
 
 def _bucket_6h(timestamp: datetime) -> datetime:
     return timestamp.replace(hour=(timestamp.hour // 6) * 6, minute=0, second=0, microsecond=0)
+
+
+def _inclusive_6h_blocks(start: datetime, end: datetime | None = None) -> tuple[str, ...]:
+    """Expand a closed interval to every UTC six-hour block it touches."""
+    if end is None:
+        end = start
+    if end < start:
+        raise InventoryError("gap end precedes gap start")
+    cursor = _bucket_6h(start)
+    last = _bucket_6h(end)
+    blocks: list[str] = []
+    while cursor <= last:
+        blocks.append(cursor.isoformat())
+        cursor += timedelta(hours=6)
+    return tuple(blocks)
+
+
+def _gap_scopes(stream: str, state: str) -> tuple[str, ...]:
+    """Return affected hypothesis scopes for one continuity incident."""
+    normalized_stream = str(stream or "").strip().lower()
+    normalized_state = str(state or "").strip().upper()
+    if normalized_state == "UNIVERSE_ROLLOVER_GAP":
+        raise InventoryError("legacy gap category UNIVERSE_ROLLOVER_GAP is not accepted; use ROLLOVER_GAP")
+    scopes = list(HYPOTHESIS_SCOPES.get(normalized_stream, ()))
+    if normalized_stream == "collector_status" or normalized_state in {"RESTART_GAP", "ROLLOVER_GAP"}:
+        scopes.append("GLOBAL")
+    unknown = sorted(set(scopes) - set(PRIMARY_HYPOTHESES) - {"GLOBAL"})
+    if unknown:
+        raise InventoryError(f"unknown gap scopes: {unknown}")
+    return tuple(dict.fromkeys(scopes))
+
+
+def _scoped_gap_blocks(records: Iterable[dict[str, Any]]) -> dict[str, set[str]]:
+    """Validate and union explicit gap blocks by hypothesis scope."""
+    result: dict[str, set[str]] = defaultdict(set)
+    for index, record in enumerate(records):
+        if not isinstance(record, Mapping):
+            raise InventoryError(f"gap record {index} is not an object")
+        category = str(record.get("category", "")).strip().upper()
+        if category == "UNIVERSE_ROLLOVER_GAP" or category not in VALID_GAP_CATEGORIES:
+            raise InventoryError(f"gap record {index} has unknown/legacy category")
+        start = _parse_dt(record.get("start_time"))
+        end = _parse_dt(record.get("end_time")) if record.get("end_time") not in (None, "") else None
+        if start is None:
+            raise InventoryError(f"gap record {index} has invalid start_time")
+        expected = _inclusive_6h_blocks(start, end)
+        supplied = record.get("utc_6h_block_ids")
+        if not isinstance(supplied, list):
+            raise InventoryError(f"gap record {index} must supply utc_6h_block_ids")
+        if len(supplied) != len(set(map(str, supplied))):
+            raise InventoryError(f"gap record {index} contains duplicate block ids")
+        supplied_ids = tuple(map(str, supplied))
+        if set(supplied_ids) != set(expected):
+            raise InventoryError(f"gap record {index} block ids do not match its closed interval")
+        scopes = record.get("scopes")
+        if not isinstance(scopes, list) or len(scopes) != len(set(map(str, scopes))):
+            raise InventoryError(f"gap record {index} must supply unique scopes")
+        normalized_scopes = {str(scope) for scope in scopes}
+        if not normalized_scopes or not normalized_scopes.issubset(set(PRIMARY_HYPOTHESES) | {"GLOBAL"}):
+            raise InventoryError(f"gap record {index} has unknown/empty scopes")
+        for scope in normalized_scopes:
+            result[scope].update(expected)
+    return {scope: set(blocks) for scope, blocks in sorted(result.items())}
+
+
+def _membership_sha(symbols: Sequence[str]) -> str:
+    canonical = json.dumps(sorted(set(map(str, symbols))), ensure_ascii=False, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _used_roster_identities(
+    cycles: Sequence[dict[str, Any]],
+    verified_rosters: Sequence[dict[str, Any]],
+    complete_rows: Mapping[str, Sequence[Mapping[str, Any]]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Resolve used verified rosters and enforce symbol-qualified membership."""
+    normalized: list[dict[str, Any]] = []
+    for index, roster in enumerate(verified_rosters):
+        sha = str(roster.get("roster_sha256") or "")
+        month = str(roster.get("effective_month") or "")
+        symbols = sorted(set(map(str, roster.get("symbols", []))))
+        start = _parse_dt(roster.get("effective_start"))
+        end = _parse_dt(roster.get("effective_end"))
+        if not sha or not month or not symbols or start is None or end is None or end <= start:
+            raise InventoryError(f"verified roster {index} lacks an exact interval/membership")
+        normalized.append({**roster, "effective_month": month, "roster_sha256": sha, "symbols": symbols, "effective_start": start.isoformat(), "effective_end": end.isoformat(), "_start": start, "_end": end})
+    # Different identities may not overlap. Same-month/same-SHA duplicate
+    # artifacts are intentionally collapsed later.
+    for left_index, left in enumerate(normalized):
+        for right in normalized[left_index + 1 :]:
+            if left["roster_sha256"] == right["roster_sha256"]:
+                continue
+            if left["_start"] < right["_end"] and right["_start"] < left["_end"]:
+                raise InventoryError("verified roster intervals overlap with different SHAs")
+    diagnostics: list[dict[str, Any]] = []
+    matched_cycles: defaultdict[str, list[str]] = defaultdict(list)
+    for cycle in cycles:
+        cycle_id = str(cycle.get("cycle_id") or "")
+        cycle_time = _parse_dt(cycle.get("timestamp") or cycle.get("cycle_time"))
+        if not cycle_id or cycle_time is None:
+            diagnostics.append({"cycle_id": cycle_id, "reason": "CYCLE_ID_OR_TIME_INVALID"})
+            continue
+        candidates_by_sha = {
+            roster["roster_sha256"]: roster
+            for roster in normalized
+            if roster["_start"] <= cycle_time < roster["_end"]
+        }
+        declared_sha = str(cycle.get("roster_sha256") or "")
+        if declared_sha:
+            candidates_by_sha = {sha: roster for sha, roster in candidates_by_sha.items() if sha == declared_sha}
+        candidates = list(candidates_by_sha.values())
+        if len(candidates) != 1:
+            diagnostics.append({"cycle_id": cycle_id, "reason": "ROSTER_INTERVAL_UNMATCHED" if not candidates else "ROSTER_INTERVAL_AMBIGUOUS"})
+            continue
+        matched_cycles[candidates[0]["roster_sha256"]].append(cycle_id)
+    used: list[dict[str, Any]] = []
+    for sha, cycle_ids in sorted(matched_cycles.items()):
+        roster = next(roster for roster in normalized if roster["roster_sha256"] == sha)
+        rows = complete_rows.get(sha, ())
+        counts: Counter[str] = Counter()
+        for row in rows:
+            if not isinstance(row, Mapping):
+                raise InventoryError("complete_rows must contain symbol-qualified objects")
+            symbol = str(row.get("symbol") or "")
+            timestamp = _parse_dt(row.get("timestamp"))
+            if not symbol or timestamp is None:
+                raise InventoryError("complete source row lacks symbol/timestamp")
+            if not (roster["_start"] <= timestamp < roster["_end"]):
+                continue
+            if symbol not in set(roster["symbols"]):
+                raise InventoryError(f"complete source row symbol is outside verified roster membership: {symbol}")
+            counts[symbol] += 1
+        if not counts:
+            diagnostics.append({"roster_sha256": sha, "reason": "NO_COMPLETE_MEMBERSHIP_ROW", "cycle_ids": sorted(cycle_ids)})
+            continue
+        used.append({
+            "effective_month": roster["effective_month"],
+            "roster_sha256": sha,
+            "membership": {"symbols": roster["symbols"], "symbol_count": len(roster["symbols"]), "membership_sha256": _membership_sha(roster["symbols"])},
+            "cycle_ids": sorted(set(cycle_ids)),
+            "complete_rows": dict(sorted(counts.items())),
+        })
+    return used, diagnostics
 
 
 def _is_gap(state: Any) -> bool:
@@ -235,6 +407,8 @@ def build_inventory(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
     cycle_ids: set[str] = set()
     cycle_metadata_records: list[dict[str, str]] = []
     stream_records: defaultdict[str, list[tuple[str, datetime, bool, bool, set[str], bool | None]]] = defaultdict(list)
+    liquidation_envelopes: list[dict[str, Any]] = []
+    complete_bar_opens: set[datetime] = set()
     daily_counts: defaultdict[date, int] = defaultdict(int)
     six_hour_counts: defaultdict[datetime, int] = defaultdict(int)
     explicit_gap_records: list[dict[str, Any]] = []
@@ -252,7 +426,7 @@ def build_inventory(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
                 raise InventoryError(f"collector continuity incident has no timestamp: {path}")
             if stream == "collector_status" and status_time is not None and _is_gap(status):
                 category = "RESTART_GAP" if "RESTART" in status else "SOURCE_UNAVAILABLE"
-                explicit_gap_records.append({"category": category, "stream": stream, "symbol": None, "cycle_id": None, "start_time": status_time.isoformat(), "end_time": None, "utc_6h_block_ids": [_bucket_6h(status_time).isoformat()], "continuity_state": status, "source_time_available": False})
+                explicit_gap_records.append({"category": category, "stream": stream, "symbol": None, "cycle_id": None, "start_time": status_time.isoformat(), "end_time": None, "utc_6h_block_ids": [_bucket_6h(status_time).isoformat()], "scopes": list(_gap_scopes(stream, category)), "continuity_state": status, "source_time_available": False})
             continue
         row = summary[stream]
         row["records"] += 1
@@ -260,6 +434,19 @@ def build_inventory(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
         if symbol:
             row["symbols"].add(symbol)
         payload = envelope.get("payload")
+        if stream == "liquidation":
+            # Keep the strict envelope fields only long enough to hand them to
+            # the replay-safe identity helper; no payload field is emitted.
+            liquidation_envelopes.append({
+                "market_type": envelope.get("market_type"),
+                "symbol": envelope.get("symbol"),
+                "stream": envelope.get("stream") or stream,
+                "endpoint": envelope.get("endpoint"),
+                "payload": payload,
+                "collector_receipt_time": envelope.get("collector_receipt_time"),
+                "corrected_response_receipt_time": envelope.get("corrected_response_receipt_time"),
+                "continuity_state": envelope.get("continuity_state"),
+            })
         keys = _payload_keys(payload)
         timestamp = _first_timestamp(envelope)
         available = _source_available(envelope, payload)
@@ -287,6 +474,10 @@ def build_inventory(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
             # timestamp. For every actual stream, preserve missing source and
             # restart evidence as compact timestamped records. No payload is
             # retained and no gap is imputed or backfilled.
+            if stream in {"klines_15m", "premium_klines_15m"} and not gap and available and boundary_ok is True and isinstance(payload, dict):
+                source_open = _parse_dt(payload.get("source_open_time"))
+                if source_open is not None:
+                    complete_bar_opens.add(source_open)
             if stream != "cycle_metadata":
                 state = str(envelope.get("continuity_state") or "").upper()
                 category = None
@@ -317,6 +508,7 @@ def build_inventory(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
                         "start_time": timestamp.isoformat(),
                         "end_time": end_time,
                         "utc_6h_block_ids": block_ids,
+                        "scopes": list(_gap_scopes(stream, category)),
                         "continuity_state": state or None,
                         "source_time_available": bool(available),
                     })
@@ -328,7 +520,7 @@ def build_inventory(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
                 cycle_ids.add(cycle_id)
                 if timestamp is None:
                     raise InventoryError(f"cycle metadata timestamp is missing for {cycle_id}")
-                cycle_metadata_records.append({"cycle_id": cycle_id, "timestamp": timestamp.isoformat()})
+                cycle_metadata_records.append({"cycle_id": cycle_id, "timestamp": timestamp.isoformat(), "roster_sha256": str((payload or {}).get("roster_sha256") or "") if isinstance(payload, dict) else ""})
         if timestamp is not None:
             stream_records[stream].append((symbol, timestamp, available, gap, keys, boundary_ok))
     if not cycle_ids:
@@ -417,7 +609,15 @@ def build_inventory(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
         replay_ok = replay.get("status") == "PASS" and replay_proof.get("replayed") is True and replay_proof.get("roster_sha256") == roster_sha
         if not replay_ok:
             raise InventoryError(f"roster replay proof mismatch: {replay_path}")
-        verified_rosters.append({"effective_month": roster.get("effective_month"), "roster_sha256": roster_sha, "symbol_count": len(roster.get("symbols", [])), "artifact": str(roster_path)})
+        verified_rosters.append({
+            "effective_month": roster.get("effective_month"),
+            "roster_sha256": roster_sha,
+            "symbol_count": len(roster.get("symbols", [])),
+            "symbols": sorted(set(map(str, roster.get("symbols", [])))),
+            "effective_start": roster.get("effective_start"),
+            "effective_end": roster.get("effective_end"),
+            "artifact": str(roster_path),
+        })
     if not verified_rosters:
         raise InventoryError("no verified roster artifacts found")
 
@@ -447,6 +647,50 @@ def build_inventory(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
     raw_oi_rows = raw("open_interest", {"openInterest"})
     raw_book_rows = raw("book_ticker", {"bidPrice", "askPrice", "bidQty", "askQty"})
     raw_liquidation_rows = [row for row in raw("liquidation") if {"E", "e", "o"}.issubset(row[4])]
+
+    # The forceOrder helper is the sole source of H03/H04 identity counts.
+    # Validate once here for metadata-only block maps, then use the helper's
+    # deterministic receipt for all global and endpoint accounting.
+    forceorder_valid: list[ValidatedForceOrder] = []
+    forceorder_invalid_reasons: list[str] = []
+    for envelope in liquidation_envelopes:
+        try:
+            forceorder_valid.append(validate_forceorder_envelope(envelope, complete_bar_opens=complete_bar_opens))
+        except ForceOrderIdentityError as exc:
+            forceorder_invalid_reasons.append(exc.reason)
+    forceorder_receipt = deduplicate_forceorders(liquidation_envelopes, complete_bar_opens=complete_bar_opens)
+    if forceorder_invalid_reasons and sorted(forceorder_invalid_reasons) != list(forceorder_receipt.invalid_reasons):
+        raise InventoryError("forceOrder validation receipt mismatch")
+
+    def forceorder_event_time(record: ValidatedForceOrder) -> datetime:
+        return datetime.fromtimestamp(int(record.identity_tuple[2]) / 1000.0, tz=UTC)
+
+    forceorder_h03_rows = [(str(record.identity_tuple[1]), forceorder_event_time(record)) for record in forceorder_receipt.representatives if record.h03_status == "endpoint_eligible"]
+    forceorder_h04_rows = [(str(record.identity_tuple[1]), forceorder_event_time(record)) for record in forceorder_receipt.representatives if record.h04_status == "endpoint_eligible"]
+
+    # Prove roster membership using symbol-qualified complete primary rows.
+    # Keep one deterministic witness per symbol in the compact inventory; the
+    # source stream itself remains immutable and is never copied to output.
+    complete_rows_by_roster: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
+    roster_intervals: dict[str, tuple[datetime, datetime, set[str]]] = {}
+    for roster in verified_rosters:
+        start = _parse_dt(roster.get("effective_start"))
+        end = _parse_dt(roster.get("effective_end"))
+        if start is None or end is None:
+            raise InventoryError("verified roster interval is invalid")
+        roster_intervals[str(roster["roster_sha256"])] = (start, end, set(map(str, roster.get("symbols", []))))
+    witness_by_roster_symbol: dict[tuple[str, str], datetime] = {}
+    for symbol, timestamp, available, gap, _keys, boundary_ok in kline_rows:
+        if not available or gap or boundary_ok is not True:
+            continue
+        for sha, (start, end, members) in roster_intervals.items():
+            if start <= timestamp < end:
+                if symbol not in members:
+                    raise InventoryError(f"complete source row symbol is outside verified roster membership: {symbol}")
+                witness_by_roster_symbol.setdefault((sha, symbol), timestamp)
+    for (sha, symbol), timestamp in sorted(witness_by_roster_symbol.items()):
+        complete_rows_by_roster[sha].append({"symbol": symbol, "timestamp": timestamp.isoformat()})
+    used_roster_identities, roster_diagnostics = _used_roster_identities(cycle_metadata_records, verified_rosters, complete_rows_by_roster)
     def pair_count(left: list[tuple[str, datetime, bool, bool, set[str], bool | None]], right: list[tuple[str, datetime, bool, bool, set[str], bool | None]]) -> int:
         left_keys = {(symbol, _bucket_15m(timestamp)) for symbol, timestamp, *_ in left}
         right_keys = {(symbol, _bucket_15m(timestamp)) for symbol, timestamp, *_ in right}
@@ -495,32 +739,44 @@ def build_inventory(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
             counts = Counter(_bucket_6h(timestamp) for _, timestamp, *_ in rows)
         return {bucket.isoformat(): int(count) for bucket, count in sorted(counts.items())}
 
+    def block_count_pairs(rows: Iterable[tuple[str, datetime]], *, unique_symbol_bucket: bool = False) -> dict[str, int]:
+        pairs = list(rows)
+        if unique_symbol_bucket:
+            keys = {(symbol, _bucket_6h(timestamp)) for symbol, timestamp in pairs}
+            counts = Counter(bucket for _, bucket in keys)
+        else:
+            counts = Counter(_bucket_6h(timestamp) for _, timestamp in pairs)
+        return {bucket.isoformat(): int(count) for bucket, count in sorted(counts.items())}
+
     h02_pairs = {(symbol, _bucket_6h(timestamp)) for symbol, timestamp, *_ in kline_rows} & {(symbol, _bucket_6h(timestamp)) for symbol, timestamp, *_ in oi_rows}
     h05_pairs = {(symbol, _bucket_6h(timestamp)) for symbol, timestamp, *_ in premium_rows} & {(symbol, _bucket_6h(timestamp)) for symbol, timestamp, *_ in premium_kline_rows}
     h06_keys = {(symbol, _bucket_6h(timestamp)) for symbol, timestamp, *_ in kline_rows}
     raw_h02_pairs = {(symbol, _bucket_6h(timestamp)) for symbol, timestamp, *_ in raw_kline_rows} & {(symbol, _bucket_6h(timestamp)) for symbol, timestamp, *_ in raw_oi_rows}
     raw_h05_pairs = {(symbol, _bucket_6h(timestamp)) for symbol, timestamp, *_ in raw_premium_rows} & {(symbol, _bucket_6h(timestamp)) for symbol, timestamp, *_ in raw_premium_kline_rows}
     raw_h06_keys = {(symbol, _bucket_6h(timestamp)) for symbol, timestamp, *_ in raw_kline_rows}
+    forceorder_raw_h03_rows = [(str(record.identity_tuple[1]), forceorder_event_time(record)) for record in forceorder_valid if record.h03_status == "endpoint_eligible"]
+    forceorder_raw_h04_rows = [(str(record.identity_tuple[1]), forceorder_event_time(record)) for record in forceorder_valid if record.h04_status == "endpoint_eligible"]
     eligible_by_hypothesis = {
         "R3_H01": block_count(book_rows, unique_symbol_bucket=True),
         "R3_H02": {bucket.isoformat(): sum(1 for _, b in h02_pairs if b == bucket) for bucket in sorted({b for _, b in h02_pairs})},
-        "R3_H03": block_count(liquidation_rows),
-        "R3_H04": block_count(liquidation_rows),
+        "R3_H03": block_count_pairs(forceorder_h03_rows),
+        "R3_H04": block_count_pairs(forceorder_h04_rows),
         "R3_H05": {bucket.isoformat(): sum(1 for _, b in h05_pairs if b == bucket) for bucket in sorted({b for _, b in h05_pairs})},
         "R3_H06": {bucket.isoformat(): sum(1 for _, b in h06_keys if b == bucket) for bucket in sorted({b for _, b in h06_keys})},
     }
     raw_by_hypothesis = {
         "R3_H01": block_count(raw_book_rows, unique_symbol_bucket=True),
         "R3_H02": {bucket.isoformat(): sum(1 for _, b in raw_h02_pairs if b == bucket) for bucket in sorted({b for _, b in raw_h02_pairs})},
-        "R3_H03": block_count(raw_liquidation_rows),
-        "R3_H04": block_count(raw_liquidation_rows),
+        "R3_H03": block_count_pairs(forceorder_raw_h03_rows),
+        "R3_H04": block_count_pairs(forceorder_raw_h04_rows),
         "R3_H05": {bucket.isoformat(): sum(1 for _, b in raw_h05_pairs if b == bucket) for bucket in sorted({b for _, b in raw_h05_pairs})},
         "R3_H06": {bucket.isoformat(): sum(1 for _, b in raw_h06_keys if b == bucket) for bucket in sorted({b for _, b in raw_h06_keys})},
     }
-    gap_blocks: dict[str, set[str]] = defaultdict(set)
-    for record in explicit_gap_records:
-        for block in record["utc_6h_block_ids"]:
-            gap_blocks[block].add(record["category"])
+    gap_blocks_by_scope = _scoped_gap_blocks(explicit_gap_records)
+    excluded_by_hypothesis = {
+        hypothesis: set(gap_blocks_by_scope.get(hypothesis, set())) | set(gap_blocks_by_scope.get("GLOBAL", set()))
+        for hypothesis in PRIMARY_HYPOTHESES
+    }
     explicit_by_category = Counter(record["category"] for record in explicit_gap_records)
     actual_incident_keys = {(record["category"], record.get("cycle_id") or record["start_time"]) for record in explicit_gap_records}
     health_gap_count = int(latest_health.get("gap_count", 0))
@@ -530,10 +786,35 @@ def build_inventory(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
     if health_restart_count != actual_restart_count or health_gap_count != actual_gap_count:
         raise InventoryError(f"health counters do not reconcile to observed continuity incidents: health=({health_gap_count},{health_restart_count}) observed=({actual_gap_count},{actual_restart_count})")
     for hypothesis, mapping in eligible_by_hypothesis.items():
-        eligible_by_hypothesis[hypothesis] = {block: count for block, count in mapping.items() if block not in gap_blocks}
+        eligible_by_hypothesis[hypothesis] = {block: count for block, count in mapping.items() if block not in excluded_by_hypothesis[hypothesis]}
     eligible_counts = {hypothesis: sum(mapping.values()) for hypothesis, mapping in eligible_by_hypothesis.items()}
     raw_counts = {hypothesis: sum(mapping.values()) for hypothesis, mapping in raw_by_hypothesis.items()}
-    eligible_calendar_by_block = {bucket.isoformat(): count for bucket, count in sorted(six_hour_counts.items()) if bucket.isoformat() not in gap_blocks}
+    eligible_calendar_by_block = {bucket.isoformat(): count for bucket, count in sorted(six_hour_counts.items())}
+    usable_calendar_by_block = {bucket: count for bucket, count in eligible_calendar_by_block.items() if bucket not in set(gap_blocks_by_scope.get("GLOBAL", set()))}
+
+    h_rows: dict[str, list[tuple[str, datetime]]] = {
+        "R3_H01": [(symbol, timestamp) for symbol, timestamp, *_ in book_rows],
+        "R3_H02": [(symbol, bucket) for symbol, bucket in sorted(h02_pairs)],
+        "R3_H03": forceorder_h03_rows,
+        "R3_H04": forceorder_h04_rows,
+        "R3_H05": [(symbol, bucket) for symbol, bucket in sorted(h05_pairs)],
+        "R3_H06": [(symbol, bucket) for symbol, bucket in sorted(h06_keys)],
+    }
+    usable_days_by_hypothesis: dict[str, list[str]] = {}
+    for hypothesis, rows in h_rows.items():
+        excluded = excluded_by_hypothesis[hypothesis]
+        usable_days_by_hypothesis[hypothesis] = sorted({timestamp.date().isoformat() for _symbol, timestamp in rows if _bucket_6h(timestamp).isoformat() not in excluded})
+    roster_contribution_by_hypothesis: dict[str, dict[str, dict[str, Any]]] = {hypothesis: {} for hypothesis in PRIMARY_HYPOTHESES}
+    for identity in used_roster_identities:
+        sha = str(identity["roster_sha256"])
+        roster = next(roster for roster in verified_rosters if str(roster["roster_sha256"]) == sha)
+        start = _parse_dt(roster["effective_start"])
+        end = _parse_dt(roster["effective_end"])
+        members = set(identity["membership"]["symbols"])
+        for hypothesis in PRIMARY_HYPOTHESES:
+            excluded = excluded_by_hypothesis[hypothesis]
+            complete_count = sum(1 for symbol, timestamp in h_rows[hypothesis] if symbol in members and start is not None and end is not None and start <= timestamp < end and _bucket_6h(timestamp).isoformat() not in excluded)
+            roster_contribution_by_hypothesis[hypothesis][sha] = {"effective_month": identity["effective_month"], "complete_count": int(complete_count)}
 
     inventory = {
         "record_type": "R3_OUTCOME_BLIND_EVIDENCE_INVENTORY_V2",
@@ -541,7 +822,9 @@ def build_inventory(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
         "root": str(resolved),
         "market": "um",
         "interval": "15m",
-        "verified_roster_months": sorted({entry["effective_month"] for entry in verified_rosters}),
+        "verified_roster_months": sorted({entry["effective_month"] for entry in used_roster_identities}),
+        "used_roster_identities": used_roster_identities,
+        "roster_use_diagnostics": roster_diagnostics,
         "verified_roster_artifacts": verified_rosters,
         "unverified_roster_artifacts": unverified_rosters,
         "calendar": {
@@ -552,6 +835,8 @@ def build_inventory(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
             "independent_utc_6h_blocks": len(six_hour_counts),
             "raw_by_utc_6h_block": {bucket.isoformat(): count for bucket, count in sorted(six_hour_counts.items())},
             "eligible_by_utc_6h_block": eligible_calendar_by_block,
+            "usable_by_utc_6h_block": usable_calendar_by_block,
+            "global_gate_targets": {"independent_utc_days": 30, "independent_utc_6h_blocks": 120},
         },
         "cycles": {
             "cycle_count": len(cycle_ids),
@@ -569,6 +854,21 @@ def build_inventory(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
             "H05_crowding_stress_modifier": {"input_streams": ["premium", "premium_klines_15m"], "raw_symbol_buckets": raw_counts["R3_H05"], "primary_eligible_symbol_buckets": eligible_counts["R3_H05"], "usable_symbol_buckets": eligible_counts["R3_H05"], "funding_rate_observations": len(premium_rows), "raw_by_utc_6h_block": raw_by_hypothesis["R3_H05"], "eligible_by_utc_6h_block": eligible_by_hypothesis["R3_H05"]},
             "H06_btc_breadth_concordance": {"input_stream": "klines_15m", "btc_symbol": btc_symbol, "usable_breadth_decision_buckets": breadth_decisions, "raw_symbol_buckets": raw_counts["R3_H06"], "primary_eligible_symbol_buckets": eligible_counts["R3_H06"], "usable_kline_symbol_buckets": eligible_counts["R3_H06"], "raw_by_utc_6h_block": raw_by_hypothesis["R3_H06"], "eligible_by_utc_6h_block": eligible_by_hypothesis["R3_H06"]},
         },
+        "gap_blocks_by_scope": {scope: sorted(blocks) for scope, blocks in sorted(gap_blocks_by_scope.items())},
+        "excluded_block_ids_by_hypothesis": {hypothesis: sorted(blocks) for hypothesis, blocks in sorted(excluded_by_hypothesis.items())},
+        "usable_blocks_by_hypothesis": {hypothesis: sorted(eligible_by_hypothesis[hypothesis]) for hypothesis in PRIMARY_HYPOTHESES},
+        "usable_days_by_hypothesis": usable_days_by_hypothesis,
+        "roster_contribution_by_hypothesis": roster_contribution_by_hypothesis,
+        "per_hypothesis_temporal_minima": PER_H_TEMPORAL_MINIMA,
+        "forceorder_accounting": {
+            **forceorder_receipt.as_dict(),
+            "identity_key_version": "forceorder:v2",
+            "per_block_unique_representatives": {
+                "R3_H03": block_count_pairs(forceorder_h03_rows),
+                "R3_H04": block_count_pairs(forceorder_h04_rows),
+            },
+            "representative_block_basis": "normalized exchange event time E",
+        },
         "availability_and_gaps": {
             "source_unavailable_records": sum(1 for record in explicit_gap_records if record["category"] == "SOURCE_UNAVAILABLE"),
             "gap_records": explicit_gap_records,
@@ -584,7 +884,7 @@ def build_inventory(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
                 "rejected": sum(1 for stream in ("klines_15m", "premium_klines_15m") for row in stream_records[stream] if row[5] is False),
                 "missing_boundary_fields": sum(1 for stream in ("klines_15m", "premium_klines_15m") for row in stream_records[stream] if row[5] is None),
             },
-            "gap_block_accounting": {"excluded_block_ids": sorted(gap_blocks), "block_reasons": {block: sorted(reasons) for block, reasons in sorted(gap_blocks.items())}, "raw_gap_count": len(explicit_gap_records), "explicit_records_by_category": dict(sorted(explicit_by_category.items())), "health_counters_reconciled": True},
+            "gap_block_accounting": {"excluded_block_ids": sorted(set(gap_blocks_by_scope.get("GLOBAL", set()))), "gap_blocks_by_scope": {scope: sorted(blocks) for scope, blocks in sorted(gap_blocks_by_scope.items())}, "raw_gap_count": len(explicit_gap_records), "explicit_records_by_category": dict(sorted(explicit_by_category.items())), "health_counters_reconciled": True},
         },
         "dependence": {
             "observations_by_utc_day": dict(sorted((day.isoformat(), count) for day, count in daily_counts.items())),

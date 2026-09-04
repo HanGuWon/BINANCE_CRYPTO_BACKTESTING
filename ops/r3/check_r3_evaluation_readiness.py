@@ -36,7 +36,12 @@ MINIMA = {
     "R3_H05": 5_000,
     "R3_H06": 5_000,
 }
+PER_H_TEMPORAL_MINIMA = {
+    hypothesis: {"usable_blocks": 30, "usable_days": 30, "per_roster_minimum": 1}
+    for hypothesis in PRIMARY_HYPOTHESES
+}
 VALID_GAP_CATEGORIES = frozenset({"MISSING_CYCLE", "RESTART_GAP", "SOURCE_UNAVAILABLE", "ROLLOVER_GAP", "INCOMPLETE_BUCKET"})
+VALID_GAP_SCOPES = frozenset({"GLOBAL", *PRIMARY_HYPOTHESES})
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_ROSTER_PATH = REPO_ROOT / "campaigns" / "r3_prospective_context_v1" / "rosters" / "2026-09.json"
 
@@ -131,20 +136,26 @@ def utc_6h_block_ids_for_gap(start: Any, end: Any = None) -> tuple[str, ...]:
 
 
 def derive_gap_accounting(inventory: Mapping[str, Any]) -> dict[str, Any]:
-    """Validate explicit gap records and derive unique excluded blocks."""
+    """Validate explicit scoped gap records and derive unique exclusions."""
     availability = inventory.get("availability_and_gaps", {})
     if not isinstance(availability, Mapping):
         raise ReadinessInputError("availability_and_gaps must be an object")
     records = availability.get("gap_records", [])
     if not isinstance(records, list):
         raise ReadinessInputError("gap_records must be an explicit list of records")
-    excluded: set[str] = set()
+    strict_schema = inventory.get("gap_blocks_by_scope") is not None or any(
+        isinstance(record, Mapping) and ("scopes" in record or "utc_6h_block_ids" in record)
+        for record in records
+    )
+    scoped: dict[str, set[str]] = {scope: set() for scope in VALID_GAP_SCOPES}
     block_reasons: dict[str, set[str]] = {}
     normalized_records: list[dict[str, Any]] = []
     for index, record in enumerate(records):
         if not isinstance(record, Mapping):
             raise ReadinessInputError(f"gap_records[{index}] must be an object")
         category = str(record.get("category", "")).strip().upper()
+        if category == "UNIVERSE_ROLLOVER_GAP":
+            raise ReadinessInputError("legacy gap category UNIVERSE_ROLLOVER_GAP is rejected")
         if category not in VALID_GAP_CATEGORIES:
             raise ReadinessInputError(f"gap_records[{index}] has unknown category")
         start = record.get("start_time", record.get("start"))
@@ -152,15 +163,34 @@ def derive_gap_accounting(inventory: Mapping[str, Any]) -> dict[str, Any]:
             raise ReadinessInputError(f"gap_records[{index}] has no start_time")
         end = record.get("end_time", record.get("end"))
         block_ids = utc_6h_block_ids_for_gap(start, end)
+        supplied = record.get("utc_6h_block_ids")
+        scopes = record.get("scopes")
+        if strict_schema:
+            if not isinstance(supplied, list):
+                raise ReadinessInputError(f"gap_records[{index}] must include utc_6h_block_ids")
+            supplied_ids = [str(value) for value in supplied]
+            if len(supplied_ids) != len(set(supplied_ids)):
+                raise ReadinessInputError(f"gap_records[{index}] contains duplicate block ids")
+            if set(supplied_ids) != set(block_ids):
+                raise ReadinessInputError(f"gap_records[{index}] block ids do not match its interval")
+            if not isinstance(scopes, list):
+                raise ReadinessInputError(f"gap_records[{index}] must include scopes")
+            scope_ids = [str(value) for value in scopes]
+            if len(scope_ids) != len(set(scope_ids)) or not scope_ids or not set(scope_ids).issubset(VALID_GAP_SCOPES):
+                raise ReadinessInputError(f"gap_records[{index}] has duplicate/unknown scopes")
+        else:
+            scope_ids = ["GLOBAL"]
         normalized_records.append({
             "category": category,
             "start_time": _parse_utc(start, f"gap_records[{index}].start_time").isoformat(),
             "end_time": None if end in (None, "") else _parse_utc(end, f"gap_records[{index}].end_time").isoformat(),
             "utc_6h_block_ids": list(block_ids),
+            "scopes": sorted(scope_ids),
         })
         for block_id in block_ids:
-            excluded.add(block_id)
             block_reasons.setdefault(block_id, set()).add(category)
+            for scope in scope_ids:
+                scoped[scope].add(block_id)
 
     # Aggregate counters are descriptive only when their explicit records are
     # present. A positive counter without records is an unaccounted gap.
@@ -183,15 +213,107 @@ def derive_gap_accounting(inventory: Mapping[str, Any]) -> dict[str, Any]:
         raise ReadinessInputError("gap accounting is marked incomplete")
     if aggregate > 0 and not normalized_records:
         raise ReadinessInputError("aggregate gaps are not represented by explicit records")
+    excluded_by_hypothesis = {
+        hypothesis: sorted(scoped[hypothesis] | scoped["GLOBAL"])
+        for hypothesis in PRIMARY_HYPOTHESES
+    }
     return {
         "complete": True,
         "raw_gap_count": len(normalized_records),
         "aggregate_gap_count": aggregate,
-        "excluded_block_ids": sorted(excluded),
-        "excluded_block_count": len(excluded),
+        "excluded_block_ids": sorted(scoped["GLOBAL"]),
+        "excluded_block_count": len(scoped["GLOBAL"]),
+        "gap_blocks_by_scope": {scope: sorted(blocks) for scope, blocks in sorted(scoped.items()) if blocks},
+        "excluded_block_ids_by_hypothesis": excluded_by_hypothesis,
         "block_reasons": {block: sorted(block_reasons[block]) for block in sorted(block_reasons)},
         "records": normalized_records,
         "rule": "explicit timestamped gaps mapped to each touched UTC_6H block; overlapping gaps count once; no imputation/backfill",
+    }
+
+
+def validate_scoped_gap_blocks(inventory: Mapping[str, Any]) -> dict[str, Any]:
+    """Validate the builder's explicit gap schema and return scope unions."""
+    accounting = derive_gap_accounting(inventory)
+    availability = inventory.get("availability_and_gaps", {})
+    supplied = inventory.get("gap_blocks_by_scope")
+    if supplied is None and isinstance(availability, Mapping):
+        supplied = availability.get("gap_blocks_by_scope")
+    if not isinstance(supplied, Mapping):
+        raise ReadinessInputError("gap_blocks_by_scope must be an object")
+    normalized: dict[str, list[str]] = {}
+    for scope, values in supplied.items():
+        scope_id = str(scope)
+        if scope_id not in VALID_GAP_SCOPES:
+            raise ReadinessInputError(f"unknown gap scope: {scope_id}")
+        if not isinstance(values, list):
+            raise ReadinessInputError(f"gap scope {scope_id} must be a list")
+        ids = [str(value) for value in values]
+        if len(ids) != len(set(ids)):
+            raise ReadinessInputError(f"gap scope {scope_id} contains duplicate block ids")
+        normalized[scope_id] = sorted(ids)
+    expected = {scope: sorted(values) for scope, values in accounting["gap_blocks_by_scope"].items() if values}
+    if normalized != expected:
+        raise ReadinessInputError("gap_blocks_by_scope does not match explicit intervals")
+    return {
+        "gap_blocks_by_scope": normalized,
+        "excluded_block_ids_by_hypothesis": accounting["excluded_block_ids_by_hypothesis"],
+        "records": accounting["records"],
+    }
+
+
+def validate_per_hypothesis_gates(
+    inventory: Mapping[str, Any],
+    used_roster_identities: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Validate exact per-H usable maps and roster contributions."""
+    calendar = inventory.get("calendar", {})
+    if not isinstance(calendar, Mapping):
+        raise ReadinessInputError("calendar must be an object")
+    if _number(calendar, "independent_utc_days") < 30 or _number(calendar, "independent_utc_6h_blocks") < 120:
+        raise ReadinessInputError("global complete calendar minima are not met")
+    blocks = inventory.get("usable_blocks_by_hypothesis")
+    days = inventory.get("usable_days_by_hypothesis")
+    contributions = inventory.get("roster_contribution_by_hypothesis")
+    if not isinstance(blocks, Mapping) or not isinstance(days, Mapping) or not isinstance(contributions, Mapping):
+        raise ReadinessInputError("usable per-hypothesis maps are required")
+    expected_hypotheses = set(PRIMARY_HYPOTHESES)
+    if set(map(str, blocks)) != expected_hypotheses or set(map(str, days)) != expected_hypotheses or set(map(str, contributions)) != expected_hypotheses:
+        raise ReadinessInputError("usable per-hypothesis maps must use the exact H01-H06 key set")
+    used_shas = {str(identity.get("roster_sha256") or "") for identity in used_roster_identities}
+    if "" in used_shas:
+        raise ReadinessInputError("used roster identity lacks roster_sha256")
+    result: dict[str, Any] = {}
+    for hypothesis in PRIMARY_HYPOTHESES:
+        block_values = blocks.get(hypothesis)
+        day_values = days.get(hypothesis)
+        roster_values = contributions.get(hypothesis)
+        if not isinstance(block_values, list) or not isinstance(day_values, list) or not isinstance(roster_values, Mapping):
+            raise ReadinessInputError(f"{hypothesis} usable maps are missing or malformed")
+        block_ids = [str(value) for value in block_values]
+        day_ids = [str(value) for value in day_values]
+        if len(block_ids) != len(set(block_ids)) or len(day_ids) != len(set(day_ids)):
+            raise ReadinessInputError(f"{hypothesis} usable maps contain duplicates")
+        if any(not isinstance(value, str) for value in block_values + day_values):
+            raise ReadinessInputError(f"{hypothesis} usable maps require string keys")
+        roster_keys = {str(key) for key in roster_values}
+        if not used_shas.issubset(roster_keys):
+            raise ReadinessInputError(f"{hypothesis} lacks contribution for every used roster SHA")
+        contribution_counts: dict[str, int] = {}
+        for sha in used_shas:
+            entry = roster_values.get(sha)
+            if not isinstance(entry, Mapping):
+                raise ReadinessInputError(f"{hypothesis} roster contribution for {sha} is malformed")
+            count = entry.get("complete_count")
+            if isinstance(count, bool) or not isinstance(count, int) or count < 1:
+                raise ReadinessInputError(f"{hypothesis} roster contribution for {sha} is not positive")
+            contribution_counts[sha] = count
+        minima = PER_H_TEMPORAL_MINIMA[hypothesis]
+        if len(block_ids) < minima["usable_blocks"] or len(day_ids) < minima["usable_days"]:
+            raise ReadinessInputError(f"{hypothesis} temporal minima are not met")
+        result[hypothesis] = {"usable_blocks": block_ids, "usable_days": day_ids, "roster_contribution": contribution_counts, "minima": minima}
+    return {
+        "global": {"independent_utc_days": _number(calendar, "independent_utc_days"), "independent_utc_6h_blocks": _number(calendar, "independent_utc_6h_blocks")},
+        "hypotheses": result,
     }
 
 
@@ -216,11 +338,18 @@ def _effective_counts(inventory: Mapping[str, Any], gap_accounting: Mapping[str,
             raise ReadinessInputError(f"{field} must be an object")
         raw[hypothesis] = _number(entry, raw_key, _number(entry, fallback_key))
     raw_blocks = _number(calendar, "independent_utc_6h_blocks")
-    excluded = set((gap_accounting or {}).get("excluded_block_ids", []))
+    strict_schema = inventory.get("gap_blocks_by_scope") is not None or inventory.get("usable_blocks_by_hypothesis") is not None
+    excluded = set((gap_accounting or {}).get("excluded_block_ids", [])) if not strict_schema else set()
     block_counts = calendar.get("eligible_by_utc_6h_block")
     if block_counts is not None and not isinstance(block_counts, Mapping):
         raise ReadinessInputError("eligible_by_utc_6h_block must be an object")
-    if block_counts is None and excluded:
+    if strict_schema:
+        usable_calendar = calendar.get("usable_by_utc_6h_block")
+        if isinstance(usable_calendar, Mapping):
+            effective_blocks = len(usable_calendar)
+        else:
+            effective_blocks = raw_blocks
+    elif block_counts is None and excluded:
         supplied = calendar.get("eligible_utc_6h_blocks")
         if not isinstance(supplied, list):
             raise ReadinessInputError("excluded blocks require explicit eligible_utc_6h_blocks or eligible_by_utc_6h_block")
@@ -348,6 +477,24 @@ def evaluate_readiness(amendment: Mapping[str, Any], inventory: Mapping[str, Any
     alternatives = amendment.get("evaluation_horizon_alternatives", spec.get("evaluation_horizon_alternatives", []))
     exact_horizon = horizon_keys == [HORIZON_KEY] and isinstance(horizon_sha, str) and re.fullmatch(r"[0-9a-f]{64}", horizon_sha) is not None and interval == HORIZON_INTERVAL and bars == HORIZON_BARS and alternatives == []
     gap_accounting = derive_gap_accounting(inventory)
+    strict_schema = inventory.get("gap_blocks_by_scope") is not None or inventory.get("usable_blocks_by_hypothesis") is not None or inventory.get("used_roster_identities") is not None
+    scoped_gap_receipt: dict[str, Any] | None = None
+    temporal_gate_receipt: dict[str, Any] | None = None
+    if strict_schema:
+        scoped_gap_receipt = validate_scoped_gap_blocks(inventory)
+        used_identities = inventory.get("used_roster_identities")
+        if not isinstance(used_identities, list):
+            raise ReadinessInputError("used_roster_identities must be an explicit list")
+        derived_months = sorted({str(identity.get("effective_month") or "") for identity in used_identities})
+        if "" in derived_months:
+            raise ReadinessInputError("used roster identity has no effective_month")
+        declared_months = inventory.get("verified_roster_months", [])
+        if not isinstance(declared_months, list) or sorted(set(map(str, declared_months))) != derived_months:
+            raise ReadinessInputError("verified_roster_months is not the used verified-roster set")
+        if roster_months and sorted(set(map(str, roster_months))) != derived_months:
+            raise ReadinessInputError("caller-supplied roster months do not match used verified identities")
+        roster_months = derived_months
+        temporal_gate_receipt = validate_per_hypothesis_gates(inventory, used_identities)
     raw_counts, effective_counts = _effective_counts(inventory, gap_accounting)
     cycles = inventory.get("cycles", {})
     availability = inventory.get("availability_and_gaps", {})
@@ -360,17 +507,24 @@ def evaluate_readiness(amendment: Mapping[str, Any], inventory: Mapping[str, Any
     completeness_pass = duplicate_cycles == 0 and boundary_rejected == 0 and no_imputation and gap_accounting["complete"]
     gates: dict[str, Any] = {
         "calendar_days": _gate(MINIMA["calendar_days"], _number(calendar, "observed_utc_days")),
-        "utc_6h_blocks": _gate(MINIMA["utc_6h_blocks"], effective_counts["_utc_6h_blocks"]),
+        "utc_6h_blocks": _gate(MINIMA["utc_6h_blocks"], _number(calendar, "independent_utc_6h_blocks") if strict_schema else effective_counts["_utc_6h_blocks"]),
         "roster_months": _gate(MINIMA["roster_months"], len(set(roster_months))),
         "completeness": {"pass": completeness_pass, "duplicate_cycle_ids": duplicate_cycles, "missing_cycle_count": missing_cycles, "strict_boundary_rejected": boundary_rejected, "no_imputation": no_imputation, "gap_accounting_complete": gap_accounting["complete"], "raw_gap_count": gap_accounting["raw_gap_count"]},
         "hypotheses": {},
     }
+    if strict_schema:
+        gates["global_complete_calendar"] = {
+            "independent_utc_days": _gate(30, _number(calendar, "independent_utc_days")),
+            "independent_utc_6h_blocks": _gate(120, _number(calendar, "independent_utc_6h_blocks")),
+            "pass": temporal_gate_receipt is not None,
+        }
+        gates["per_hypothesis_temporal"] = temporal_gate_receipt["hypotheses"] if temporal_gate_receipt else {}
     for hypothesis in PRIMARY_HYPOTHESES:
         gates["hypotheses"][hypothesis] = _gate(MINIMA[hypothesis], effective_counts[hypothesis])
     reasons: list[str] = []
     if not exact_horizon:
         reasons.append("HORIZON_NOT_FROZEN")
-    if not all(gate["pass"] for name, gate in gates.items() if name != "hypotheses"):
+    if not all(gate.get("pass", True) for name, gate in gates.items() if name not in {"hypotheses", "per_hypothesis_temporal"}):
         reasons.append("GLOBAL_METADATA_MINIMA_NOT_MET")
     if not all(gate["pass"] for gate in gates["hypotheses"].values()):
         reasons.append("HYPOTHESIS_MINIMA_NOT_MET")
@@ -384,6 +538,7 @@ def evaluate_readiness(amendment: Mapping[str, Any], inventory: Mapping[str, Any
         "auto_start": False, "human_authorized": human_authorized,
         "horizon": {"frozen": exact_horizon, "key": HORIZON_KEY if horizon_keys == [HORIZON_KEY] else None, "key_count": len(horizon_keys), "sha256_present": bool(horizon_sha), "interval": HORIZON_INTERVAL, "bars": HORIZON_BARS, "alternatives": []},
         "gates": gates, "gap_accounting": gap_accounting,
+        "scoped_gap_accounting": scoped_gap_receipt,
         "gap_attrition": {"raw_utc_6h_blocks": raw_counts["_utc_6h_blocks"], "effective_utc_6h_blocks": effective_counts["_utc_6h_blocks"], "raw_hypothesis_counts": {h: raw_counts[h] for h in PRIMARY_HYPOTHESES}, "effective_hypothesis_counts": {h: effective_counts[h] for h in PRIMARY_HYPOTHESES}, "rule": gap_accounting["rule"]},
         "family": {"hypotheses": list(PRIMARY_HYPOTHESES), "count": len(PRIMARY_HYPOTHESES), "correction": "HOLM_STEP_DOWN_ALPHA_0.05"},
         "firewall": {"metadata_only": True, "final_holdout": "UNTOUCHED", "r2b2": "NOT_STARTED", "outcomes_accessed": False, "outcome_values_accessed": False},
