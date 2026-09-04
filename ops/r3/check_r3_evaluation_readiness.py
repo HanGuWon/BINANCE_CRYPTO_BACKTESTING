@@ -317,6 +317,85 @@ def validate_per_hypothesis_gates(
     }
 
 
+PRIMARY_FAMILY_KEYS = ("H01", "H02", "H03", "H04", "H05", "H06")
+FROZEN_IMPLEMENTATION_COMMIT = "ecebc49dff41eeec33af62c2c85a75c5a0bd2922"
+FROZEN_SOURCE_TREE_SHA256 = "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688"
+FROZEN_REGISTRY_SHA256 = "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a"
+FROZEN_SCIENTIFIC_ROOT = r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\scientific_raw_v8"
+FROZEN_LAUNCH_MANIFEST_SHA256 = "cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659"
+
+
+def validate_primary_family_metadata(
+    amendment: Mapping[str, Any],
+    horizon_map: Mapping[str, Any],
+    manifest: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Fail closed unless the exact six-slot primary family is pinned."""
+    if not isinstance(amendment, Mapping) or not isinstance(horizon_map, Mapping) or not isinstance(manifest, Mapping):
+        raise ReadinessInputError("amendment, horizon_map, and manifest must be objects")
+    horizons = horizon_map.get("horizons")
+    if not isinstance(horizons, Mapping) or list(horizons) != list(PRIMARY_FAMILY_KEYS):
+        raise ReadinessInputError("horizon map keys must be exactly H01-H06 in order")
+    if any(not isinstance(horizons[key], Mapping) or horizons[key].get("primary") is not True for key in PRIMARY_FAMILY_KEYS):
+        raise ReadinessInputError("every H01-H06 horizon must be primary")
+    manifest_keys = manifest.get("horizon_keys")
+    if manifest_keys != list(PRIMARY_FAMILY_KEYS):
+        raise ReadinessInputError("manifest horizon_keys are not exactly H01-H06")
+    p_keys = manifest.get("primary_p_value_keys")
+    if p_keys != list(PRIMARY_FAMILY_KEYS) or manifest.get("primary_p_value_count") != len(PRIMARY_FAMILY_KEYS):
+        raise ReadinessInputError("manifest must pin exactly six primary p-value slots")
+    for key, value in manifest.items():
+        normalized = _normal_key(key)
+        if "p_value" in normalized and normalized not in {"primary_p_value_keys", "primary_p_value_count", "bootstrap_p_value"}:
+            if normalized in {"primary_p_values", "p_values"}:
+                if not isinstance(value, Mapping) or list(value) != list(PRIMARY_FAMILY_KEYS):
+                    raise ReadinessInputError("primary p-values must have exactly H01-H06 keys")
+            else:
+                raise ReadinessInputError(f"hidden p-value field is not allowed: {key}")
+        if "component" in normalized and "p" in normalized:
+            raise ReadinessInputError("component-level p-values are not allowed")
+    amendment_alternatives = amendment.get("evaluation_horizon_alternatives", [])
+    manifest_alternatives = manifest.get("evaluation_horizon_alternatives", [])
+    if amendment_alternatives != [] or manifest_alternatives != []:
+        raise ReadinessInputError("alternate horizons are not allowed")
+    required_rule = "source_available_time < next_executable_open_time"
+    rule_values = [horizon_map.get("source_available_rule"), manifest.get("source_available_rule"), amendment.get("source_available_rule"), amendment.get("text")]
+    if not any(isinstance(value, str) and required_rule in value for value in rule_values):
+        raise ReadinessInputError("strict source availability rule is not present")
+    if any(isinstance(value, str) and "source_open_time" in value and "source_available_time" not in value for value in rule_values):
+        raise ReadinessInputError("source_open_time substitution is not admissible")
+    identity_fields = {
+        "frozen_implementation_commit": FROZEN_IMPLEMENTATION_COMMIT,
+        "frozen_source_tree_sha256": FROZEN_SOURCE_TREE_SHA256,
+        "frozen_registry_sha256": FROZEN_REGISTRY_SHA256,
+        "scientific_root": FROZEN_SCIENTIFIC_ROOT,
+        "launch_manifest_sha256": FROZEN_LAUNCH_MANIFEST_SHA256,
+    }
+    for field, expected in identity_fields.items():
+        actual = manifest.get(field)
+        if field == "launch_manifest_sha256" and actual is None:
+            actual = manifest.get("launch_manifest_sha")
+        if actual is None or (str(actual).casefold() != expected.casefold() if field == "scientific_root" else actual != expected):
+            raise ReadinessInputError(f"manifest identity mismatch: {field}")
+    seal = str(manifest.get("launch_seal_status") or manifest.get("launch_seal") or "").upper()
+    if seal != "SEALED":
+        raise ReadinessInputError("launch seal is not SEALED")
+    horizon_sha = manifest.get("horizon_sha256")
+    map_sha = horizon_map.get("artifact_sha256") or horizon_map.get("horizon_sha256") or horizon_map.get("_sha256")
+    if map_sha is not None and horizon_sha != map_sha:
+        raise ReadinessInputError("horizon-map SHA mismatch")
+    amendment_sha = manifest.get("amendment_sha256")
+    amendment_identity_sha = amendment.get("artifact_sha256") or amendment.get("amendment_sha256") or amendment.get("_sha256")
+    if amendment_identity_sha is not None and amendment_sha != amendment_identity_sha:
+        raise ReadinessInputError("amendment SHA mismatch")
+    return {
+        "primary_family_keys": list(PRIMARY_FAMILY_KEYS),
+        "primary_p_value_count": len(PRIMARY_FAMILY_KEYS),
+        "source_available_rule": required_rule,
+        "identity": {field: manifest.get(field) for field in identity_fields} | {"launch_seal_status": seal},
+    }
+
+
 def _effective_counts(inventory: Mapping[str, Any], gap_accounting: Mapping[str, Any] | None = None) -> tuple[dict[str, int], dict[str, int]]:
     availability = inventory.get("availability_and_gaps", {})
     calendar = inventory.get("calendar", {})

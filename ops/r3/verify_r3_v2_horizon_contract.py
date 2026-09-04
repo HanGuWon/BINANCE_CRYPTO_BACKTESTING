@@ -21,6 +21,11 @@ SUPERSEDED_MAP = CAMPAIGN / "R3_EVALUATION_HORIZON_MAP_V1_SUPERSEDED_20260905.js
 EXPECTED_V1 = "27276b4d3b66d25c987fadbac531df3cfd741dbd43625406fdc342e89c2f1c39"
 EXPECTED_PRIOR_V2 = "8f12263c107e8b1fb2596c72f5c3e0c741a17339a42f95aab67df86b87738c38"
 EXPECTED_PRIOR_MANIFEST = "ee840ad17dfaf246991f758d6420fd790f8bfcfaa0279ef4d2626ed5d93543a7"
+EXPECTED_IMPLEMENTATION = "ecebc49dff41eeec33af62c2c85a75c5a0bd2922"
+EXPECTED_SOURCE_TREE = "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688"
+EXPECTED_REGISTRY = "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a"
+EXPECTED_ROOT = r"D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\scientific_raw_v8"
+EXPECTED_LAUNCH_MANIFEST = "cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659"
 
 
 def sha256(path: Path) -> str:
@@ -54,6 +59,16 @@ def verify() -> dict[str, object]:
         raise ValueError("old manifest supersession hash is missing")
     if manifest.get("superseded_horizon_sha256") != sha256(SUPERSEDED_MAP):
         raise ValueError("superseded map hash is missing")
+    if manifest.get("frozen_implementation_commit") != EXPECTED_IMPLEMENTATION:
+        raise ValueError("frozen implementation identity mismatch")
+    if manifest.get("frozen_source_tree_sha256") != EXPECTED_SOURCE_TREE:
+        raise ValueError("frozen source-tree identity mismatch")
+    if manifest.get("frozen_registry_sha256") != EXPECTED_REGISTRY:
+        raise ValueError("frozen registry identity mismatch")
+    if str(manifest.get("scientific_root", "")).casefold() != EXPECTED_ROOT.casefold():
+        raise ValueError("scientific root identity mismatch")
+    if manifest.get("launch_manifest_sha256") != EXPECTED_LAUNCH_MANIFEST or manifest.get("launch_seal_status") != "SEALED":
+        raise ValueError("launch manifest/seal identity mismatch")
     if horizon.get("source_available_rule") != "source_available_time < next_executable_open_time":
         raise ValueError("strict source availability rule is not frozen")
     v2_lower = " ".join(v2_text.lower().split())
