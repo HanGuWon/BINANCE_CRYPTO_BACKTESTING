@@ -8,12 +8,12 @@ It never opens D-backed payload values and never edits V1.
 ## Exact changes
 
 1. Add `campaigns/r3_prospective_context_v1/R3_EVALUATION_HORIZON_V1.json` with
-   exactly the human-authorized fields: `horizon_key` equal to
+   exactly the eight human-authorized fields: `horizon_key` equal to
    `R3_HORIZON_15M_NEXT_NATIVE_BAR_V1`, `interval` `15m`, `bars` `1`, `primary`
    `true`, `alternative_horizons` `[]`, selection basis
    `EX_ANTE_NATIVE_COLLECTION_CADENCE_AND_MECHANISM_ALIGNMENT`,
-   `outcome_values_accessed` `false`, and `human_authorized` `true`. Add exact
-   temporal fields defining one complete native interval after `T_exec`, with
+   `outcome_values_accessed` `false`, and `human_authorized` `true`. Keep the
+   keep temporal definitions in the V2 amendment and reproducibility manifest;
    `source_available_time < next_executable_open_time` and equality rejected.
 2. Add `R3_EVALUATION_AMENDMENT_V2.md` as a new immutable amendment. State the
    V1 SHA and classification `SUPERSEDED_PREREGISTRATION_BLOCKED`; preserve V1

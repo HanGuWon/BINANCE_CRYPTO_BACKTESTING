@@ -1,0 +1,10 @@
+{
+  "horizon_key": "R3_HORIZON_15M_NEXT_NATIVE_BAR_V1",
+  "interval": "15m",
+  "bars": 1,
+  "primary": true,
+  "alternative_horizons": [],
+  "selection_basis": "EX_ANTE_NATIVE_COLLECTION_CADENCE_AND_MECHANISM_ALIGNMENT",
+  "outcome_values_accessed": false,
+  "human_authorized": true
+}

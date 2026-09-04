@@ -1,12 +1,19 @@
-# R3 multiple-testing plan
+# R3 multiple-testing plan — V2 freeze
 
-The primary family is exactly six mechanism hypotheses, one row per structural
-context mechanism in `trial_registry.csv`. There are no threshold or horizon
-grids in the collection campaign. Any later confirmatory analysis must account
-for all six hypotheses jointly and may not add variants after observing returns.
+The primary family is exactly six structural hypotheses (`R3_H01` through
+`R3_H06`), one row per mechanism in `trial_registry.csv`. There are no
+threshold, horizon, polarity, subgroup, or diagnostic grids. The sole horizon
+is `R3_HORIZON_15M_NEXT_NATIVE_BAR_V1`, a native 15-minute one-bar response;
+its selection basis is `EX_ANTE_NATIVE_COLLECTION_CADENCE_AND_MECHANISM_ALIGNMENT`.
 
-`R3_EVALUATION_AMENDMENT_V1.md` is the frozen evaluation contract for these
-same six rows. It uses Holm step-down at alpha 0.05 across exactly six primary
-tests, with no post-hoc polarity, threshold, horizon, subgroup, or diagnostic
-variant. The absence of a pre-existing horizon key is an explicit hard block;
-it is not a license to search horizons.
+`R3_EVALUATION_AMENDMENT_V2.md` is the immutable contract for these six rows.
+Holm step-down controls two-sided alpha 0.05 across exactly six primary tests.
+The primary dependence units are complete UTC six-hour blocks with a fixed
+10,000-draw wild Rademacher bootstrap (seed 1729); the symbol-and-block
+clustered sandwich is secondary and NW lag is fixed at 0. No post-hoc horizon,
+threshold, polarity, subgroup, or diagnostic variant may be added after any
+outcome is observed.
+
+The V1 amendment remains preserved byte-for-byte and is superseded only because
+it had no frozen horizon and an incompatible lifetime missing-cycle condition;
+it is not invalid outcome evidence.
