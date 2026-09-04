@@ -1,11 +1,14 @@
 # R3 evaluation amendment V2 — six-horizon, outcome-blind contract
 
-**Status:** `R3_EVALUATION_PREREGISTERED_COLLECTION_CONTINUES`  
-**Recorded:** 2026-09-04 KST  
-**Campaign:** `r3_prospective_context_v1`  
+**Status:** `R3_EVALUATION_PREREGISTERED_COLLECTION_CONTINUES`
+
+**Recorded:** 2026-09-04 KST
+
+**Campaign:** `r3_prospective_context_v1`
 **Primary family:** exactly six rows (`R3_H01`–`R3_H06`) from
-`trial_registry.csv`  
-**Horizon map:** `R3_EVALUATION_HORIZON_MAP_V1.json`  
+`trial_registry.csv`
+
+**Horizon map:** `R3_EVALUATION_HORIZON_MAP_V1.json`
 **Horizon-map SHA256:** `7cd935a33ac7ed47d1b9c7e037d5033b3add694934730eca5ebadda48fbb98e5`
 
 This amendment is a new, pre-outcome contract. It preserves the bytes of V1

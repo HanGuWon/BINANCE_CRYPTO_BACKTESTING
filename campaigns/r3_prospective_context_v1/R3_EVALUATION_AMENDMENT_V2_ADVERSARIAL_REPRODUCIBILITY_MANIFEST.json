@@ -2,7 +2,7 @@
   "manifest_version": "r3-evaluation-amendment-v2-adversarial",
   "campaign_id": "r3_prospective_context_v1",
   "amendment": "R3_EVALUATION_AMENDMENT_V2_ADVERSARIAL.md",
-  "amendment_sha256": "f9eeecf10a3f09eefc1492b154b32059d6ade41b48f6f1955948f07792178eb4",
+  "amendment_sha256": "ac788de08e77a5eb87b7b5a6619ada104668df3dc00f6908491ee2e1afa79672",
   "horizon_artifact": "R3_EVALUATION_HORIZON_MAP_V1.json",
   "horizon_sha256": "7cd935a33ac7ed47d1b9c7e037d5033b3add694934730eca5ebadda48fbb98e5",
   "superseded_horizon_artifact": "R3_EVALUATION_HORIZON_MAP_V1_SUPERSEDED_20260905.json",
