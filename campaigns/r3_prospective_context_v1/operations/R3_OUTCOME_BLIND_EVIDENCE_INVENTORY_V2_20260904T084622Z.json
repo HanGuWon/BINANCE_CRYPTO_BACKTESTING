@@ -1,0 +1,1272 @@
+{
+  "availability_and_gaps": {
+    "gap_accounting_complete": true,
+    "gap_block_accounting": {
+      "block_reasons": {
+        "2026-09-02T06:00:00+00:00": [
+          "RESTART_GAP"
+        ],
+        "2026-09-02T18:00:00+00:00": [
+          "RESTART_GAP"
+        ],
+        "2026-09-03T00:00:00+00:00": [
+          "RESTART_GAP"
+        ],
+        "2026-09-03T06:00:00+00:00": [
+          "RESTART_GAP"
+        ],
+        "2026-09-03T12:00:00+00:00": [
+          "RESTART_GAP"
+        ],
+        "2026-09-04T00:00:00+00:00": [
+          "RESTART_GAP"
+        ],
+        "2026-09-04T06:00:00+00:00": [
+          "RESTART_GAP"
+        ]
+      },
+      "excluded_block_ids": [
+        "2026-09-02T06:00:00+00:00",
+        "2026-09-02T18:00:00+00:00",
+        "2026-09-03T00:00:00+00:00",
+        "2026-09-03T06:00:00+00:00",
+        "2026-09-03T12:00:00+00:00",
+        "2026-09-04T00:00:00+00:00",
+        "2026-09-04T06:00:00+00:00"
+      ],
+      "explicit_records_by_category": {
+        "RESTART_GAP": 25
+      },
+      "health_counters_reconciled": true,
+      "raw_gap_count": 25
+    },
+    "gap_records": [
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-02T09:03:01.767019+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-02T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-02T09:03:02.773182+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-02T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-02T09:03:04.786752+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-02T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-02T09:03:08.791542+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-02T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-02T10:48:38.723969+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-02T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-02T20:13:46.811863+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-02T18:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T00:38:46.016141+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T00:38:47.017797+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T00:42:07.666276+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T00:59:33.297172+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T02:03:17.592973+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T02:37:41.197843+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T02:46:04.242703+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T03:38:48.381573+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T03:41:51.240822+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T06:45:18.732720+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T07:15:42.399108+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T07:18:45.322490+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T11:43:05.127698+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T11:43:06.190089+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T11:43:08.198930+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T13:34:53.240994+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T12:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-03T13:37:42.806563+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-03T12:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-04T00:13:46.244739+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-04T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "continuity_state": "RESTART_GAP",
+        "cycle_id": null,
+        "end_time": null,
+        "source_time_available": false,
+        "start_time": "2026-09-04T08:38:43.898548+00:00",
+        "stream": "collector_status",
+        "symbol": null,
+        "utc_6h_block_ids": [
+          "2026-09-04T06:00:00+00:00"
+        ]
+      }
+    ],
+    "gap_reset_required": true,
+    "gap_state_counts": {
+      "book_ticker": {
+        "COMPLETE": 6200
+      },
+      "cycle_metadata": {
+        "SOURCE_TIME_UNAVAILABLE": 124
+      },
+      "klines_15m": {
+        "COMPLETE": 12524
+      },
+      "liquidation": {
+        "COMPLETE": 34538
+      },
+      "open_interest": {
+        "COMPLETE": 6200
+      },
+      "premium": {
+        "COMPLETE": 6200
+      },
+      "premium_klines_15m": {
+        "COMPLETE": 14056
+      }
+    },
+    "health_gap_count": 25,
+    "health_restart_count": 25,
+    "no_imputation": true,
+    "source_unavailable_records": 0,
+    "strict_15m_boundary": {
+      "accepted": 26580,
+      "missing_boundary_fields": 0,
+      "normalized_records_checked": 26580,
+      "rejected": 0
+    }
+  },
+  "calendar": {
+    "eligible_by_utc_6h_block": {
+      "2026-09-02T12:00:00+00:00": 18124,
+      "2026-09-03T18:00:00+00:00": 143
+    },
+    "first_observation_time": "2026-09-02T08:14:59.999000+00:00",
+    "independent_utc_6h_blocks": 9,
+    "independent_utc_days": 3,
+    "last_observation_time": "2026-09-04T08:46:21.715000+00:00",
+    "observed_utc_days": 3,
+    "raw_by_utc_6h_block": {
+      "2026-09-02T06:00:00+00:00": 8925,
+      "2026-09-02T12:00:00+00:00": 18124,
+      "2026-09-02T18:00:00+00:00": 2904,
+      "2026-09-03T00:00:00+00:00": 22784,
+      "2026-09-03T06:00:00+00:00": 13263,
+      "2026-09-03T12:00:00+00:00": 12032,
+      "2026-09-03T18:00:00+00:00": 143,
+      "2026-09-04T00:00:00+00:00": 1036,
+      "2026-09-04T06:00:00+00:00": 507
+    }
+  },
+  "causal_input_presence": {
+    "H01_execution_quality_context": {
+      "eligible_by_utc_6h_block": {
+        "2026-09-02T12:00:00+00:00": 50
+      },
+      "input_stream": "book_ticker",
+      "primary_eligible_observations": 50,
+      "raw_by_utc_6h_block": {
+        "2026-09-02T06:00:00+00:00": 50,
+        "2026-09-02T12:00:00+00:00": 50,
+        "2026-09-02T18:00:00+00:00": 50,
+        "2026-09-03T00:00:00+00:00": 50,
+        "2026-09-03T06:00:00+00:00": 50,
+        "2026-09-03T12:00:00+00:00": 50,
+        "2026-09-04T00:00:00+00:00": 50,
+        "2026-09-04T06:00:00+00:00": 50
+      },
+      "raw_observations": 400,
+      "usable_observations": 50
+    },
+    "H02_price_oi_quadrant": {
+      "eligible_by_utc_6h_block": {
+        "2026-09-02T12:00:00+00:00": 50
+      },
+      "input_streams": [
+        "klines_15m",
+        "open_interest"
+      ],
+      "primary_eligible_symbol_buckets": 50,
+      "raw_by_utc_6h_block": {
+        "2026-09-02T06:00:00+00:00": 50,
+        "2026-09-02T12:00:00+00:00": 50,
+        "2026-09-02T18:00:00+00:00": 50,
+        "2026-09-03T00:00:00+00:00": 50,
+        "2026-09-03T06:00:00+00:00": 50,
+        "2026-09-03T12:00:00+00:00": 50,
+        "2026-09-04T00:00:00+00:00": 50,
+        "2026-09-04T06:00:00+00:00": 50
+      },
+      "raw_symbol_buckets": 400,
+      "usable_symbol_buckets": 50
+    },
+    "H03_liquidation_continuation": {
+      "eligible_by_utc_6h_block": {
+        "2026-09-02T12:00:00+00:00": 9194
+      },
+      "input_stream": "liquidation",
+      "observed_events": 9194,
+      "primary_eligible_events": 9194,
+      "raw_by_utc_6h_block": {
+        "2026-09-02T06:00:00+00:00": 3868,
+        "2026-09-02T12:00:00+00:00": 9194,
+        "2026-09-02T18:00:00+00:00": 1697,
+        "2026-09-03T00:00:00+00:00": 6660,
+        "2026-09-03T06:00:00+00:00": 4564,
+        "2026-09-03T12:00:00+00:00": 7976,
+        "2026-09-04T00:00:00+00:00": 436,
+        "2026-09-04T06:00:00+00:00": 143
+      },
+      "raw_events": 34538
+    },
+    "H04_liquidation_reversion": {
+      "eligible_by_utc_6h_block": {
+        "2026-09-02T12:00:00+00:00": 9194
+      },
+      "input_stream": "liquidation",
+      "observed_events": 9194,
+      "primary_eligible_events": 9194,
+      "raw_by_utc_6h_block": {
+        "2026-09-02T06:00:00+00:00": 3868,
+        "2026-09-02T12:00:00+00:00": 9194,
+        "2026-09-02T18:00:00+00:00": 1697,
+        "2026-09-03T00:00:00+00:00": 6660,
+        "2026-09-03T06:00:00+00:00": 4564,
+        "2026-09-03T12:00:00+00:00": 7976,
+        "2026-09-04T00:00:00+00:00": 436,
+        "2026-09-04T06:00:00+00:00": 143
+      },
+      "raw_events": 34538
+    },
+    "H05_crowding_stress_modifier": {
+      "eligible_by_utc_6h_block": {
+        "2026-09-02T12:00:00+00:00": 50
+      },
+      "funding_rate_observations": 6200,
+      "input_streams": [
+        "premium",
+        "premium_klines_15m"
+      ],
+      "primary_eligible_symbol_buckets": 50,
+      "raw_by_utc_6h_block": {
+        "2026-09-02T06:00:00+00:00": 50,
+        "2026-09-02T12:00:00+00:00": 50,
+        "2026-09-02T18:00:00+00:00": 50,
+        "2026-09-03T00:00:00+00:00": 50,
+        "2026-09-03T06:00:00+00:00": 50,
+        "2026-09-03T12:00:00+00:00": 50,
+        "2026-09-04T00:00:00+00:00": 50,
+        "2026-09-04T06:00:00+00:00": 50
+      },
+      "raw_symbol_buckets": 400,
+      "usable_symbol_buckets": 50
+    },
+    "H06_btc_breadth_concordance": {
+      "btc_symbol": "BTCUSDT",
+      "eligible_by_utc_6h_block": {
+        "2026-09-02T12:00:00+00:00": 50,
+        "2026-09-03T18:00:00+00:00": 50
+      },
+      "input_stream": "klines_15m",
+      "primary_eligible_symbol_buckets": 100,
+      "raw_by_utc_6h_block": {
+        "2026-09-02T06:00:00+00:00": 50,
+        "2026-09-02T12:00:00+00:00": 50,
+        "2026-09-02T18:00:00+00:00": 50,
+        "2026-09-03T00:00:00+00:00": 50,
+        "2026-09-03T06:00:00+00:00": 50,
+        "2026-09-03T12:00:00+00:00": 50,
+        "2026-09-03T18:00:00+00:00": 50,
+        "2026-09-04T00:00:00+00:00": 50,
+        "2026-09-04T06:00:00+00:00": 50
+      },
+      "raw_symbol_buckets": 450,
+      "usable_breadth_decision_buckets": 98,
+      "usable_kline_symbol_buckets": 100
+    },
+    "definition": "source_time_available=true, continuity not a gap, required schema keys present; no derived label is constructed"
+  },
+  "cycles": {
+    "cycle_count": 124,
+    "cycle_id_timestamps": [
+      {
+        "cycle_id": "cycle-20260902T084503275383Z",
+        "timestamp": "2026-09-02T08:45:44.999278+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T090003280983Z",
+        "timestamp": "2026-09-02T09:00:31.616473+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T091503286504Z",
+        "timestamp": "2026-09-02T09:15:25.300009+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T104838723969Z",
+        "timestamp": "2026-09-02T10:49:22.541494+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T104926436253Z",
+        "timestamp": "2026-09-02T10:49:56.736122+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T105000578192Z",
+        "timestamp": "2026-09-02T10:50:28.562323+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T105033826894Z",
+        "timestamp": "2026-09-02T10:50:57.766138+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T105100678123Z",
+        "timestamp": "2026-09-02T10:51:24.614634+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T105127430878Z",
+        "timestamp": "2026-09-02T10:51:54.384023+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T110003287273Z",
+        "timestamp": "2026-09-02T11:00:35.329891+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T111503281730Z",
+        "timestamp": "2026-09-02T11:15:24.648993+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T113003280964Z",
+        "timestamp": "2026-09-02T11:30:25.186386+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T114504450519Z",
+        "timestamp": "2026-09-02T11:45:28.778903+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T120003290162Z",
+        "timestamp": "2026-09-02T12:00:27.807144+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T121503273476Z",
+        "timestamp": "2026-09-02T12:15:29.293847+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T123003268266Z",
+        "timestamp": "2026-09-02T12:30:29.969540+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T124503291915Z",
+        "timestamp": "2026-09-02T12:45:26.195609+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T130003282038Z",
+        "timestamp": "2026-09-02T13:00:28.930696+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T131503284751Z",
+        "timestamp": "2026-09-02T13:15:27.535916+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T133003291295Z",
+        "timestamp": "2026-09-02T13:30:27.991130+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T134503277917Z",
+        "timestamp": "2026-09-02T13:45:26.166180+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T140003280974Z",
+        "timestamp": "2026-09-02T14:00:31.301540+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T141503278288Z",
+        "timestamp": "2026-09-02T14:15:27.666920+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T143003285573Z",
+        "timestamp": "2026-09-02T14:30:26.790641+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T144503281310Z",
+        "timestamp": "2026-09-02T14:45:26.425019+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T150003283658Z",
+        "timestamp": "2026-09-02T15:00:28.126414+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T151503276725Z",
+        "timestamp": "2026-09-02T15:15:27.223097+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T153003289604Z",
+        "timestamp": "2026-09-02T15:30:27.353391+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T154503288131Z",
+        "timestamp": "2026-09-02T15:45:25.550855+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T160003278587Z",
+        "timestamp": "2026-09-02T16:00:26.284934+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T161503297533Z",
+        "timestamp": "2026-09-02T16:15:25.438496+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T163003293898Z",
+        "timestamp": "2026-09-02T16:30:26.841979+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T164503283846Z",
+        "timestamp": "2026-09-02T16:45:22.591647+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T170003289924Z",
+        "timestamp": "2026-09-02T17:00:24.092791+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T171503294106Z",
+        "timestamp": "2026-09-02T17:15:23.177554+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T173003270892Z",
+        "timestamp": "2026-09-02T17:30:23.489257+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T174503290102Z",
+        "timestamp": "2026-09-02T17:45:24.656809+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T180003274322Z",
+        "timestamp": "2026-09-02T18:00:26.624995+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T181503293199Z",
+        "timestamp": "2026-09-02T18:15:25.020278+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T183003294585Z",
+        "timestamp": "2026-09-02T18:30:26.481633+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T184503289851Z",
+        "timestamp": "2026-09-02T18:45:23.707508+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260902T201346746264Z",
+        "timestamp": "2026-09-03T00:39:03.089163+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T003907350399Z",
+        "timestamp": "2026-09-03T00:39:27.181165+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T003929933389Z",
+        "timestamp": "2026-09-03T00:39:56.148229+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T003959745734Z",
+        "timestamp": "2026-09-03T00:40:26.455657+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004029384583Z",
+        "timestamp": "2026-09-03T00:40:56.211479+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004059758943Z",
+        "timestamp": "2026-09-03T00:41:26.098325+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004130756424Z",
+        "timestamp": "2026-09-03T00:41:57.527142+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004200750601Z",
+        "timestamp": "2026-09-03T00:42:28.979248+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004234638683Z",
+        "timestamp": "2026-09-03T00:43:02.143545+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004305209678Z",
+        "timestamp": "2026-09-03T00:43:31.596070+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004335209230Z",
+        "timestamp": "2026-09-03T00:44:01.775013+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004404641708Z",
+        "timestamp": "2026-09-03T00:44:30.814108+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004433625585Z",
+        "timestamp": "2026-09-03T00:44:58.828106+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004501710687Z",
+        "timestamp": "2026-09-03T00:45:28.592459+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004531621082Z",
+        "timestamp": "2026-09-03T00:45:57.700510+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004601509007Z",
+        "timestamp": "2026-09-03T00:46:29.815916+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004632916023Z",
+        "timestamp": "2026-09-03T00:46:59.993745+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004702981663Z",
+        "timestamp": "2026-09-03T00:47:28.793264+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004731750973Z",
+        "timestamp": "2026-09-03T00:47:57.166676+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004800209991Z",
+        "timestamp": "2026-09-03T00:48:26.329555+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004830320037Z",
+        "timestamp": "2026-09-03T00:48:58.296594+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004901226746Z",
+        "timestamp": "2026-09-03T00:49:27.925158+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T004931624270Z",
+        "timestamp": "2026-09-03T00:49:59.103845+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T005002935036Z",
+        "timestamp": "2026-09-03T00:50:30.531198+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T010003293049Z",
+        "timestamp": "2026-09-03T01:00:25.665473+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T011503275318Z",
+        "timestamp": "2026-09-03T01:15:24.267723+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T013003282095Z",
+        "timestamp": "2026-09-03T01:30:25.259714+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T014503283533Z",
+        "timestamp": "2026-09-03T01:45:24.643322+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T020003290833Z",
+        "timestamp": "2026-09-03T02:00:26.082444+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T021503279845Z",
+        "timestamp": "2026-09-03T02:15:24.721114+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T023003300606Z",
+        "timestamp": "2026-09-03T02:30:24.327104+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T024503281858Z",
+        "timestamp": "2026-09-03T02:45:26.930548+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T030003279297Z",
+        "timestamp": "2026-09-03T03:00:23.490718+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T031503290735Z",
+        "timestamp": "2026-09-03T03:15:22.738118+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T033003292421Z",
+        "timestamp": "2026-09-03T03:30:23.653932+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T034503290735Z",
+        "timestamp": "2026-09-03T03:45:26.240220+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T040003289949Z",
+        "timestamp": "2026-09-03T04:00:26.158396+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T041503287576Z",
+        "timestamp": "2026-09-03T04:15:25.966731+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T043003283314Z",
+        "timestamp": "2026-09-03T04:30:41.298838+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T044503285444Z",
+        "timestamp": "2026-09-03T04:45:25.869809+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T050003291241Z",
+        "timestamp": "2026-09-03T05:00:24.110278+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T051503271212Z",
+        "timestamp": "2026-09-03T05:15:23.432080+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T053003278346Z",
+        "timestamp": "2026-09-03T05:30:27.044095+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T054503265653Z",
+        "timestamp": "2026-09-03T05:45:26.248675+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T060003293538Z",
+        "timestamp": "2026-09-03T06:00:27.889282+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T061503271394Z",
+        "timestamp": "2026-09-03T06:15:27.700546+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T063003292035Z",
+        "timestamp": "2026-09-03T06:30:26.727772+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T064503277068Z",
+        "timestamp": "2026-09-03T06:45:27.630824+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T070003279487Z",
+        "timestamp": "2026-09-03T07:00:31.060310+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T071503268580Z",
+        "timestamp": "2026-09-03T07:15:43.730308+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T073003272864Z",
+        "timestamp": "2026-09-03T07:30:25.239587+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T074503294289Z",
+        "timestamp": "2026-09-03T07:45:25.917293+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T080003294928Z",
+        "timestamp": "2026-09-03T08:00:26.311222+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T081503286777Z",
+        "timestamp": "2026-09-03T08:15:24.507027+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T083003276186Z",
+        "timestamp": "2026-09-03T08:30:22.493196+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T084503282371Z",
+        "timestamp": "2026-09-03T08:45:21.820185+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T090003281684Z",
+        "timestamp": "2026-09-03T09:00:25.724349+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T091503288468Z",
+        "timestamp": "2026-09-03T09:15:23.824515+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T114305127698Z",
+        "timestamp": "2026-09-03T11:43:41.131669+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T114345240169Z",
+        "timestamp": "2026-09-03T11:44:13.628502+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T114416775584Z",
+        "timestamp": "2026-09-03T11:44:43.769452+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T114446669798Z",
+        "timestamp": "2026-09-03T11:45:14.153517+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T114517388059Z",
+        "timestamp": "2026-09-03T11:45:41.627621+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T114545049245Z",
+        "timestamp": "2026-09-03T11:46:11.563154+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T114614780615Z",
+        "timestamp": "2026-09-03T11:46:38.823708+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T114641977002Z",
+        "timestamp": "2026-09-03T11:47:08.135710+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T114711203297Z",
+        "timestamp": "2026-09-03T11:47:35.477725+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T114738569205Z",
+        "timestamp": "2026-09-03T11:48:03.045225+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T120003276741Z",
+        "timestamp": "2026-09-03T12:00:30.932151+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T121503272217Z",
+        "timestamp": "2026-09-03T12:15:28.636983+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T123003277517Z",
+        "timestamp": "2026-09-03T12:30:26.350395+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T124503281806Z",
+        "timestamp": "2026-09-03T12:45:34.791227+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T130003280504Z",
+        "timestamp": "2026-09-03T13:00:30.459697+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T131503274425Z",
+        "timestamp": "2026-09-03T13:15:28.967036+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T134504766572Z",
+        "timestamp": "2026-09-03T13:45:28.732047+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T140004763831Z",
+        "timestamp": "2026-09-03T14:00:30.312599+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T141504770520Z",
+        "timestamp": "2026-09-03T14:15:28.765722+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T143004772974Z",
+        "timestamp": "2026-09-03T14:30:30.638855+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T144504774005Z",
+        "timestamp": "2026-09-03T14:45:28.927762+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260903T150004751823Z",
+        "timestamp": "2026-09-03T15:00:28.124217+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260904T001504180971Z",
+        "timestamp": "2026-09-04T00:15:28.506397+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260904T003004189384Z",
+        "timestamp": "2026-09-04T00:30:25.198383+00:00"
+      },
+      {
+        "cycle_id": "cycle-20260904T084503187377Z",
+        "timestamp": "2026-09-04T08:45:28.416993+00:00"
+      }
+    ],
+    "duplicate_cycle_ids": 0,
+    "metadata_stream": {
+      "complete_records": 124,
+      "continuity_state_counts": {
+        "SOURCE_TIME_UNAVAILABLE": 124
+      },
+      "files": 1,
+      "first_timestamp": "2026-09-02T08:45:44.999278+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-04T08:45:28.416993+00:00",
+      "records": 124,
+      "source_available_records": 0,
+      "source_unavailable_records": 124,
+      "symbols": 1
+    }
+  },
+  "dependence": {
+    "btc_synchronization": {
+      "breadth_decision_buckets": 98,
+      "btc_symbol": "BTCUSDT"
+    },
+    "event_spacing_seconds": {
+      "liquidation_event_count": 34538,
+      "median": 0.704,
+      "minimum": 0.0
+    },
+    "liquidation_clustering": {
+      "active_15m_buckets": 94,
+      "event_count": 34538,
+      "max_events_per_bucket": 1700
+    },
+    "observations_by_utc_6h_block": {
+      "2026-09-02T06:00:00+00:00": 8925,
+      "2026-09-02T12:00:00+00:00": 18124,
+      "2026-09-02T18:00:00+00:00": 2904,
+      "2026-09-03T00:00:00+00:00": 22784,
+      "2026-09-03T06:00:00+00:00": 13263,
+      "2026-09-03T12:00:00+00:00": 12032,
+      "2026-09-03T18:00:00+00:00": 143,
+      "2026-09-04T00:00:00+00:00": 1036,
+      "2026-09-04T06:00:00+00:00": 507
+    },
+    "observations_by_utc_day": {
+      "2026-09-02": 29953,
+      "2026-09-03": 48222,
+      "2026-09-04": 1543
+    },
+    "predeclared_block_scheme": "UTC_6H_PRIMARY; UTC_DAY_AND_DAY_X_MARKET_STATE_SENSITIVITY",
+    "simultaneous_cross_symbol_buckets": {
+      "book_ticker": {
+        "buckets_with_multiple_symbols": 90,
+        "max_symbols_in_bucket": 50
+      },
+      "cycle_metadata": {
+        "buckets_with_multiple_symbols": 0,
+        "max_symbols_in_bucket": 1
+      },
+      "klines_15m": {
+        "buckets_with_multiple_symbols": 98,
+        "max_symbols_in_bucket": 50
+      },
+      "liquidation": {
+        "buckets_with_multiple_symbols": 93,
+        "max_symbols_in_bucket": 343
+      },
+      "open_interest": {
+        "buckets_with_multiple_symbols": 92,
+        "max_symbols_in_bucket": 50
+      },
+      "premium": {
+        "buckets_with_multiple_symbols": 90,
+        "max_symbols_in_bucket": 50
+      },
+      "premium_klines_15m": {
+        "buckets_with_multiple_symbols": 101,
+        "max_symbols_in_bucket": 50
+      }
+    }
+  },
+  "integrity": {
+    "confirmatory_root_accessed": false,
+    "payload_values_retained": false,
+    "performance_fields_seen": false,
+    "raw_streams_read": [
+      "book_ticker",
+      "cycle_metadata",
+      "klines_15m",
+      "liquidation",
+      "open_interest",
+      "premium",
+      "premium_klines_15m"
+    ],
+    "secondary_campaign_accessed": false
+  },
+  "interval": "15m",
+  "market": "um",
+  "observed_at_utc": "2026-09-04T08:46:34.455475+00:00",
+  "record_type": "R3_OUTCOME_BLIND_EVIDENCE_INVENTORY_V2",
+  "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8",
+  "streams": {
+    "book_ticker": {
+      "complete_records": 6200,
+      "continuity_state_counts": {
+        "COMPLETE": 6200
+      },
+      "files": 50,
+      "first_timestamp": "2026-09-02T08:45:04.062000+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-04T08:45:29.806000+00:00",
+      "records": 6200,
+      "source_available_records": 6200,
+      "source_unavailable_records": 0,
+      "symbols": 50
+    },
+    "cycle_metadata": {
+      "complete_records": 124,
+      "continuity_state_counts": {
+        "SOURCE_TIME_UNAVAILABLE": 124
+      },
+      "files": 1,
+      "first_timestamp": "2026-09-02T08:45:44.999278+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-04T08:45:28.416993+00:00",
+      "records": 124,
+      "source_available_records": 0,
+      "source_unavailable_records": 124,
+      "symbols": 1
+    },
+    "klines_15m": {
+      "complete_records": 12524,
+      "continuity_state_counts": {
+        "COMPLETE": 12524
+      },
+      "files": 50,
+      "first_timestamp": "2026-09-02T08:29:59.999000+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-04T08:44:59.999000+00:00",
+      "records": 12524,
+      "source_available_records": 12524,
+      "source_unavailable_records": 0,
+      "symbols": 50
+    },
+    "liquidation": {
+      "complete_records": 34538,
+      "continuity_state_counts": {
+        "COMPLETE": 34538
+      },
+      "files": 707,
+      "first_timestamp": "2026-09-02T08:30:45.449000+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-04T08:46:21.715000+00:00",
+      "records": 34538,
+      "source_available_records": 34538,
+      "source_unavailable_records": 0,
+      "symbols": 707
+    },
+    "open_interest": {
+      "complete_records": 6200,
+      "continuity_state_counts": {
+        "COMPLETE": 6200
+      },
+      "files": 50,
+      "first_timestamp": "2026-09-02T08:44:59.700000+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-04T08:45:25.248000+00:00",
+      "records": 6200,
+      "source_available_records": 6200,
+      "source_unavailable_records": 0,
+      "symbols": 50
+    },
+    "premium": {
+      "complete_records": 6200,
+      "continuity_state_counts": {
+        "COMPLETE": 6200
+      },
+      "files": 50,
+      "first_timestamp": "2026-09-02T08:45:05+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-04T08:45:30+00:00",
+      "records": 6200,
+      "source_available_records": 6200,
+      "source_unavailable_records": 0,
+      "symbols": 50
+    },
+    "premium_klines_15m": {
+      "complete_records": 14056,
+      "continuity_state_counts": {
+        "COMPLETE": 14056
+      },
+      "files": 50,
+      "first_timestamp": "2026-09-02T08:14:59.999000+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-04T08:44:59.999000+00:00",
+      "records": 14056,
+      "source_available_records": 14056,
+      "source_unavailable_records": 0,
+      "symbols": 50
+    }
+  },
+  "unverified_roster_artifacts": [
+    {
+      "artifact": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\rosters\\2026-08.json",
+      "effective_month": "2026-08",
+      "reason": "REPLAY_PROOF_MISSING"
+    }
+  ],
+  "verified_roster_artifacts": [
+    {
+      "artifact": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\rosters\\2026-09.json",
+      "effective_month": "2026-09",
+      "roster_sha256": "bb05514dfc78cfca3b736488b1454f4cb022da0110e2cbf69f53c505f543ea79",
+      "symbol_count": 50
+    }
+  ],
+  "verified_roster_months": [
+    "2026-09"
+  ]
+}
