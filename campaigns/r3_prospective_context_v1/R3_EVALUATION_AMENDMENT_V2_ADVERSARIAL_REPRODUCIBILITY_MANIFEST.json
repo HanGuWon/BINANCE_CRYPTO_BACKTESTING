@@ -6,7 +6,7 @@
   "horizon_artifact": "R3_EVALUATION_HORIZON_MAP_V1.json",
   "horizon_sha256": "7cd935a33ac7ed47d1b9c7e037d5033b3add694934730eca5ebadda48fbb98e5",
   "superseded_horizon_artifact": "R3_EVALUATION_HORIZON_MAP_V1_SUPERSEDED_20260905.json",
-  "superseded_horizon_sha256": "bf13812328b076eeafc15e20db585cdfa0605e213d8b9c6b36faada477d9353e",
+  "superseded_horizon_sha256": "86dafd9c69ec43eb37cd3fb37d505d7e534de53607c8a601a8c321500eda7798",
   "v1_amendment_sha256": "27276b4d3b66d25c987fadbac531df3cfd741dbd43625406fdc342e89c2f1c39",
   "superseded_single_15m_v2_manifest": "R3_EVALUATION_AMENDMENT_V2_REPRODUCIBILITY_MANIFEST.json",
   "superseded_single_15m_v2_manifest_sha256": "ee840ad17dfaf246991f758d6420fd790f8bfcfaa0279ef4d2626ed5d93543a7",
