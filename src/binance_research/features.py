@@ -324,21 +324,36 @@ def build_cohort_aware_breadth(
     if missing := required_cohort - set(cohorts.columns):
         raise ValueError(f"missing breadth cohort columns: {', '.join(sorted(missing))}")
     frame = panel.copy()
+    original_index = frame.index.copy()
     frame[timestamp_column] = pd.to_datetime(frame[timestamp_column], utc=True)
     frame["universe_month"] = frame[timestamp_column].dt.to_period("M").astype(str)
     frame["_close"] = pd.to_numeric(frame["close"], errors="coerce")
     expected = pd.Timedelta(milliseconds=INTERVAL_MS[timeframe])
     frame["_ema"] = np.nan
-    for (market, symbol), indexes in frame.groupby([market_column, symbol_column], sort=False).groups.items():
-        group = frame.loc[indexes].sort_values(timestamp_column)
-        ts = group[timestamp_column]
-        segments = ts.diff().fillna(expected).ne(expected).cumsum()
-        for _, segment_indexes in group.groupby(segments, sort=False).groups.items():
-            values = frame.loc[segment_indexes, "_close"]
-            frame.loc[segment_indexes, "_ema"] = values.ewm(span=ema_period, adjust=False, min_periods=ema_period).mean().to_numpy()
+    # Group codes and integer row positions are deliberately separate from
+    # DataFrame labels: duplicate/non-default indexes must never be passed to
+    # .loc as if they were row positions.
+    row_positions = np.arange(len(frame), dtype=int)
+    group_codes = frame.groupby([market_column, symbol_column], sort=False, dropna=False).ngroup().to_numpy(dtype=int)
+    ema_column = frame.columns.get_loc("_ema")
+    for group_code in pd.unique(group_codes):
+        positions = row_positions[group_codes == group_code]
+        timestamps = frame.iloc[positions][timestamp_column].to_numpy()
+        order = np.argsort(timestamps, kind="stable")
+        ordered_positions = positions[order]
+        ts = frame.iloc[ordered_positions][timestamp_column]
+        segments = ts.diff().fillna(expected).ne(expected).cumsum().to_numpy(dtype=int)
+        for segment_id in pd.unique(segments):
+            segment_positions = ordered_positions[segments == segment_id]
+            values = frame.iloc[segment_positions]["_close"]
+            ema = values.ewm(span=ema_period, adjust=False, min_periods=ema_period).mean().to_numpy()
+            frame.iloc[segment_positions, ema_column] = ema
     selected = cohorts[cohorts[selected_column].astype(bool)][[market_column, "universe_month", symbol_column]].drop_duplicates()
-    frame = frame.merge(selected.assign(_selected=True), on=[market_column, "universe_month", symbol_column], how="left")
-    frame["_selected"] = frame["_selected"].fillna(False)
+    selected_keys = set(selected.itertuples(index=False, name=None))
+    frame["_selected"] = [
+        (market, universe_month, symbol) in selected_keys
+        for market, universe_month, symbol in frame[[market_column, "universe_month", symbol_column]].itertuples(index=False, name=None)
+    ]
     frame["_valid"] = frame["_selected"] & frame["_ema"].notna() & frame["_close"].notna()
     frame["_above"] = np.where(frame["_valid"], frame["_close"] > frame["_ema"], np.nan)
     group_keys = [market_column, timestamp_column]
@@ -356,6 +371,10 @@ def build_cohort_aware_breadth(
     )
     diagnostics.loc[diagnostics["coverage_status"] != "AVAILABLE", "breadth_pct_above_ema50"] = np.nan
     diagnostics = diagnostics.drop(columns=["above_count"])
+    # Diagnostics are an aggregate table, but retain a deterministic copy of
+    # the input labels while computing so duplicate labels cannot affect the
+    # result through an implicit merge/reset-index operation.
+    frame.index = original_index
     return diagnostics
 
 

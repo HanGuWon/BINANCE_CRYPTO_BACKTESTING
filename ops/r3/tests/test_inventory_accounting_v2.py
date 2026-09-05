@@ -49,7 +49,15 @@ def _strict_inventory() -> dict:
     usable_blocks = {hypothesis: list(block_ids) for hypothesis in PRIMARY_HYPOTHESES}
     usable_days = {hypothesis: [f"2026-01-{index:02d}" for index in range(1, 31)] for hypothesis in PRIMARY_HYPOTHESES}
     contributions = {
-        hypothesis: {used_sha: {"effective_month": "2026-09", "complete_count": 1}}
+        hypothesis: {
+            used_sha: {
+                "effective_month": "2026-09",
+                "complete_count": 1,
+                "block_ids": [block_ids[0]],
+                "day_ids": ["2026-01-01"],
+                "roster_sha256": used_sha,
+            }
+        }
         for hypothesis in PRIMARY_HYPOTHESES
     }
     return {
@@ -65,10 +73,12 @@ def _strict_inventory() -> dict:
             "health_gap_count": 3,
             "health_restart_count": 1,
             "source_unavailable_records": 1,
+            "rollover_gap_count": 0,
+            "incomplete_bucket_count": 0,
             "no_imputation": True,
         },
         "streams": {},
-        "cycles": {},
+        "cycles": {"missing_cycle_count": 0},
         "verified_roster_months": ["2026-09"],
         "used_roster_identities": [{"effective_month": "2026-09", "roster_sha256": used_sha}],
         "usable_blocks_by_hypothesis": usable_blocks,

@@ -32,17 +32,24 @@ def _inventory() -> dict:
     blocks = _blocks()
     return {
         "record_type": "R3_OUTCOME_BLIND_EVIDENCE_INVENTORY_V2",
-        "calendar": {"observed_utc_days": MINIMA["calendar_days"], "independent_utc_6h_blocks": len(blocks), "eligible_by_utc_6h_block": {block: 1 for block in blocks}},
-        "cycles": {"cycle_count": 200, "duplicate_cycle_ids": 0, "missing_cycle_count": 0},
-        "availability_and_gaps": {"gap_records": [], "gap_accounting_complete": True, "health_gap_count": 0, "health_restart_count": 0, "source_unavailable_records": 0, "no_imputation": True, "strict_15m_boundary": {"rejected": 0}},
+        "observed_at_utc": "2026-01-03T00:00:00+00:00",
+        "calendar": {"observed_utc_days": MINIMA["calendar_days"], "independent_utc_days": MINIMA["calendar_days"], "independent_utc_6h_blocks": len(blocks), "eligible_by_utc_6h_block": {block: 1 for block in blocks}},
+        "cycles": {
+            "cycle_count": 200,
+            "cycle_id_timestamps": [{"cycle_id": f"c{index}", "timestamp": f"2026-01-{(index % 3) + 1:02d}T00:00:00+00:00"} for index in range(200)],
+            "duplicate_cycle_ids": 0,
+            "missing_cycle_count": 0,
+            "metadata_stream": {"complete_records": 200, "files": 1, "records": 200, "source_available_records": 200, "source_unavailable_records": 0, "gap_records": 0, "symbols": 1, "continuity_state_counts": {"COMPLETE": 200}, "first_timestamp": "2026-01-01T00:00:00+00:00", "last_timestamp": "2026-01-03T00:00:00+00:00"},
+        },
+        "availability_and_gaps": {"gap_records": [], "gap_accounting_complete": True, "health_gap_count": 0, "health_restart_count": 0, "source_unavailable_records": 0, "rollover_gap_count": 0, "incomplete_bucket_count": 0, "no_imputation": True, "strict_15m_boundary": {"rejected": 0}},
         "streams": {},
         "causal_input_presence": {
-            "H01_execution_quality_context": {"usable_observations": MINIMA["R3_H01"]},
-            "H02_price_oi_quadrant": {"usable_symbol_buckets": MINIMA["R3_H02"]},
-            "H03_liquidation_continuation": {"observed_events": MINIMA["R3_H03"]},
-            "H04_liquidation_reversion": {"observed_events": MINIMA["R3_H04"]},
-            "H05_crowding_stress_modifier": {"usable_symbol_buckets": MINIMA["R3_H05"]},
-            "H06_btc_breadth_concordance": {"usable_kline_symbol_buckets": MINIMA["R3_H06"]},
+            "H01_execution_quality_context": {"usable_observations": MINIMA["R3_H01"], "raw_observations": MINIMA["R3_H01"]},
+            "H02_price_oi_quadrant": {"usable_symbol_buckets": MINIMA["R3_H02"], "raw_symbol_buckets": MINIMA["R3_H02"]},
+            "H03_liquidation_continuation": {"observed_events": MINIMA["R3_H03"], "raw_events": MINIMA["R3_H03"]},
+            "H04_liquidation_reversion": {"observed_events": MINIMA["R3_H04"], "raw_events": MINIMA["R3_H04"]},
+            "H05_crowding_stress_modifier": {"usable_symbol_buckets": MINIMA["R3_H05"], "raw_symbol_buckets": MINIMA["R3_H05"]},
+            "H06_btc_breadth_concordance": {"usable_kline_symbol_buckets": MINIMA["R3_H06"], "raw_symbol_buckets": MINIMA["R3_H06"]},
         },
         "integrity": {"payload_values_retained": False, "performance_fields_seen": False, "confirmatory_root_accessed": False, "secondary_campaign_accessed": False},
     }
@@ -57,7 +64,7 @@ def _contract(horizon: bool = True) -> dict:
 
 
 def _evaluate(inventory=None, contract=None, *, months=("2026-08", "2026-09"), human=True):
-    return evaluate_readiness(contract or _contract(), inventory or _inventory(), _spec(), roster_months=list(months), human_authorized=human)
+    return evaluate_readiness(contract or _contract(), inventory or _inventory(), _spec(), roster_months=list(months), human_authorized=human, reference_time=datetime(2026, 1, 3, tzinfo=timezone.utc))
 
 
 def test_synthetic_all_minima_is_eligible_but_never_starts() -> None:
@@ -134,6 +141,7 @@ def test_missing_cycle_is_accounted_not_silently_discarded() -> None:
 def test_duplicate_cycles_and_strict_boundary_fail_completeness() -> None:
     inventory = _inventory()
     inventory["cycles"]["duplicate_cycle_ids"] = 1
+    inventory["cycles"]["cycle_id_timestamps"][1]["cycle_id"] = inventory["cycles"]["cycle_id_timestamps"][0]["cycle_id"]
     inventory["availability_and_gaps"]["strict_15m_boundary"]["rejected"] = 1
     result = _evaluate(inventory=inventory)
     assert result["gates"]["completeness"]["pass"] is False
@@ -209,5 +217,5 @@ def test_roster_source_or_replay_tampering_fails_closed(tmp_path: Path) -> None:
 def test_current_v1_inventory_is_not_accepted_as_v2_gap_input() -> None:
     inventory_path = ROOT / "campaigns" / "r3_prospective_context_v1" / "operations" / "R3_OUTCOME_BLIND_EVIDENCE_INVENTORY_20260903.json"
     inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
-    with pytest.raises(ReadinessInputError, match="gap_records"):
+    with pytest.raises(ReadinessInputError, match="gap_records|gap_accounting|clock-skew|observed_at"):
         _evaluate(inventory=inventory)

@@ -19,7 +19,7 @@ from .features import CORE_FEATURE_SPECS, CoreFeatureEngine, compute_gap_safe_fe
 from .registry import ExperimentRecord, ExperimentRegistry, code_hash
 from .regimes import classify_regimes, fit_regime_thresholds
 from .reporting import ArtifactWriter
-from .splits import expanding_walk_forward
+from .splits import chronological_split, expanding_walk_forward
 from .statistics import correlation_matrix, deflated_sharpe_probability, hierarchical_feature_clusters, trade_overlap_matrix
 from .synthetic import generate_synthetic_bars
 
@@ -65,13 +65,41 @@ def _backtest_summaries(frame: pd.DataFrame, signals: pd.DataFrame, cost: CostMo
     return pd.DataFrame.from_records(records), trades, returns
 
 
-def _regime_table(trades: list[pd.DataFrame], regimes: pd.DataFrame) -> pd.DataFrame:
+def _regime_table(
+    trades: list[pd.DataFrame],
+    regimes: pd.DataFrame,
+    *,
+    regime_times: pd.Series | None = None,
+) -> pd.DataFrame:
+    """Attribute each trade to the latest regime known at decision time."""
+    if regime_times is None:
+        if "regime_time" in regimes:
+            regime_times = regimes["regime_time"]
+        elif "open_time" in regimes:
+            regime_times = regimes["open_time"]
+        elif isinstance(regimes.index, pd.DatetimeIndex):
+            regime_times = pd.Series(regimes.index, index=regimes.index)
+        else:
+            raise ValueError("regime_times must be supplied when regime index is not datetime-like")
+    parsed_regime_times = pd.to_datetime(regime_times, utc=True, errors="coerce")
+    if parsed_regime_times.isna().any() or not parsed_regime_times.is_monotonic_increasing:
+        raise ValueError("regime_times must be finite and sorted")
     records: list[dict[str, object]] = []
     for table in trades:
         for _, trade in table.iterrows():
-            if int(trade["entry_bar"]) >= len(regimes): continue
+            if "decision_time" not in trade or pd.isna(trade["decision_time"]):
+                raise ValueError("trade is missing decision_time")
+            decision_time = pd.to_datetime(trade["decision_time"], utc=True, errors="coerce")
+            if pd.isna(decision_time):
+                raise ValueError("trade decision_time is invalid")
+            eligible = np.flatnonzero(parsed_regime_times.to_numpy() <= decision_time)
+            if not len(eligible):
+                continue
+            regime_position = int(eligible[-1])
             for column in regimes:
-                records.append({"feature_id": trade["feature_id"], "regime_type": column, "regime": regimes.iloc[int(trade["entry_bar"])][column], "net_return": trade["net_return"]})
+                if column in {"regime_time", "open_time"}:
+                    continue
+                records.append({"feature_id": trade["feature_id"], "regime_type": column, "regime": regimes.iloc[regime_position][column], "net_return": trade["net_return"]})
     if not records: return pd.DataFrame([{"status": "INSUFFICIENT EVIDENCE"}])
     return pd.DataFrame(records).groupby(["feature_id", "regime_type", "regime"], dropna=False)["net_return"].agg(trade_count="count", mean_trade="mean", net_return="sum").reset_index()
 
@@ -86,8 +114,18 @@ def _family_stability(summary: pd.DataFrame) -> pd.DataFrame:
 
 
 def _outer_positions(n: int, config: dict[str, Any]) -> tuple[int, int, int, int]:
-    split = config["split"]; train_end = int(n * float(split["train_fraction"])); validation_end = int(n * (float(split["train_fraction"]) + float(split["validation_fraction"])))
-    validation_start = min(train_end + int(split.get("embargo_bars", 0)), validation_end); test_start = min(validation_end + int(split.get("embargo_bars", 0)), n)
+    split = config["split"]
+    positions = pd.DataFrame({"_position": np.arange(n, dtype=int)})
+    partitions = chronological_split(
+        positions,
+        train_fraction=float(split["train_fraction"]),
+        validation_fraction=float(split["validation_fraction"]),
+        embargo_bars=int(split.get("embargo_bars", 0)),
+    )
+    train_end = len(partitions.train)
+    validation_start = int(partitions.validation.index[0]) if len(partitions.validation) else train_end
+    validation_end = validation_start + len(partitions.validation)
+    test_start = int(partitions.test.index[0]) if len(partitions.test) else n
     return train_end, validation_start, validation_end, test_start
 
 
@@ -135,11 +173,24 @@ def run_research(args: argparse.Namespace) -> int:
     symbol = str(bars["symbol"].iloc[0]) if "symbol" in bars and len(bars) else args.symbol; by_symbol = summary.assign(symbol=symbol)
     by_year = pd.concat([table.assign(year=pd.to_datetime(table["entry_time"], utc=True).dt.year).groupby(["feature_id", "year"])["net_return"].agg(trade_count="count", mean_trade="mean", net_return="sum").reset_index() for table in trade_tables], ignore_index=True) if trade_tables else pd.DataFrame([{"status": "INSUFFICIENT EVIDENCE"}])
     by_month = pd.concat([table.assign(month=pd.to_datetime(table["entry_time"], utc=True).dt.strftime("%Y-%m")).groupby(["feature_id", "month"])["net_return"].agg(trade_count="count", mean_trade="mean", net_return="sum").reset_index() for table in trade_tables], ignore_index=True) if trade_tables else pd.DataFrame([{"status": "INSUFFICIENT EVIDENCE"}])
-    try: by_regime = _regime_table(trade_tables, classify_regimes(validation, fit_regime_thresholds(train)))
+    try:
+        regime_times = validation.get("open_time", validation.get("timestamp"))
+        by_regime = _regime_table(trade_tables, classify_regimes(validation, fit_regime_thresholds(train)), regime_times=regime_times)
     except ValueError: by_regime = pd.DataFrame([{"status": "INSUFFICIENT EVIDENCE"}])
     variants = preregistered_rule_variants(development); parameter_summary, _, _ = _backtest_summaries(validation, variants.iloc[len(train):], cost, rule, timeframe, args.market); parameter_summary = _family_stability(parameter_summary)
-    if not parameter_summary.empty and "sharpe" in parameter_summary:
-        trial_sharpes = parameter_summary["sharpe"]; parameter_summary["deflated_sharpe_probability"] = parameter_summary.apply(lambda row: deflated_sharpe_probability(float(row["sharpe"]), trial_sharpes, len(validation)) if pd.notna(row.get("sharpe")) else np.nan, axis=1)
+    if not parameter_summary.empty and "sharpe_periodic" in parameter_summary:
+        trial_sharpes = parameter_summary["sharpe_periodic"].dropna()
+        parameter_summary["deflated_sharpe_probability"] = parameter_summary.apply(
+            lambda row: deflated_sharpe_probability(
+                float(row["sharpe_periodic"]),
+                trial_sharpes,
+                int(row["timeline_observations"]),
+                skewness=0.0,
+                excess_kurtosis=0.0,
+                moment_policy="gaussian_zero",
+            ) if pd.notna(row.get("sharpe_periodic")) else np.nan,
+            axis=1,
+        )
     primary = validation["sig_ema20_50"]; cost_records = []
     for slippage in (0.0, 1.0, 2.0, 5.0):
         model = CostModel(cost.maker_fee_bps, cost.taker_fee_bps, cost.fallback_spread_bps, slippage, cost.latency_bars); result = run_backtest(validation, primary, model, int(rule["holding_bars"]), str(rule["fee_mode"]), timeframe, args.market); cost_records.append({"feature_id": "sig_ema20_50", "slippage_bps": slippage, **result.summary})

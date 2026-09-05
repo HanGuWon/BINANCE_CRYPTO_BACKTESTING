@@ -77,6 +77,23 @@ def test_cohort_breadth_denominator_excludes_unselected_and_warmup() -> None:
     assert "coverage_status" in result
 
 
+def test_cohort_breadth_handles_duplicate_non_default_index_and_gap_reset() -> None:
+    first = pd.date_range("2024-01-01", periods=55, freq="h", tz="UTC")
+    second = pd.date_range("2024-01-01", periods=55, freq="h", tz="UTC")
+    second = second.where(second < second[30], second + pd.Timedelta(hours=2))
+    panel = pd.concat([
+        pd.DataFrame({"timestamp": stamps, "market": "spot", "symbol": symbol, "close": np.arange(55, dtype=float) + offset}, index=[10, 20, 10, *range(30, 82)])
+        for symbol, stamps, offset in [("A", first, 0), ("B", second, 1)]
+    ])
+    cohorts = pd.DataFrame({"market": ["spot", "spot"], "universe_month": ["2024-01", "2024-01"], "symbol": ["A", "B"], "selected_top50": [True, True]})
+    result = build_cohort_aware_breadth(panel, cohorts, timeframe="1h", minimum_valid_fraction=0.5)
+    # Both symbols share the same timestamps, so diagnostics are one row per
+    # market/timestamp rather than one row per source row; no merge explosion
+    # occurs despite duplicate input labels.
+    assert len(result) == 57
+    assert result["selected_count"].max() == 2
+
+
 def test_global_calendar_split_and_24h_purge() -> None:
     frame = pd.DataFrame({"timestamp": pd.date_range("2023-12-31", periods=300, freq="15min", tz="UTC")})
     split = global_calendar_split(frame, train_end="2024-01-02", validation_end="2024-01-03", timeframe="15m")

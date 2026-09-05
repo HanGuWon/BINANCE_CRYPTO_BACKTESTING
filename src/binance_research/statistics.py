@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Literal, Sequence
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -64,14 +65,30 @@ def hierarchical_feature_clusters(correlation: pd.DataFrame, threshold: float = 
 
 
 def deflated_sharpe_probability(
-    observed_sharpe: float,
-    trial_sharpes: pd.Series,
+    observed_sharpe_periodic: float,
+    trial_sharpes_periodic: Sequence[float] | pd.Series,
     observations: int,
-    skewness: float = 0.0,
-    excess_kurtosis: float = 0.0,
+    *,
+    skewness: float,
+    excess_kurtosis: float,
+    moment_policy: Literal["observed", "gaussian_zero"] = "observed",
 ) -> float:
-    """Approximate Bailey/Lopez de Prado trial-aware probability, not a profit claim."""
-    trials = pd.to_numeric(trial_sharpes, errors="coerce").dropna()
+    """Approximate Bailey/Lopez de Prado DSR on periodic Sharpe inputs.
+
+    This function performs no annualization.  Gaussian-zero moments are
+    accepted only when explicitly requested by ``moment_policy``.
+    """
+    if moment_policy not in {"observed", "gaussian_zero"}:
+        raise ValueError("moment_policy must be observed or gaussian_zero")
+    if not np.isfinite(observed_sharpe_periodic):
+        raise ValueError("observed_sharpe_periodic must be finite")
+    if not np.isfinite(skewness) or not np.isfinite(excess_kurtosis):
+        raise ValueError("skewness and excess_kurtosis must be finite")
+    if moment_policy == "gaussian_zero" and (skewness != 0.0 or excess_kurtosis != 0.0):
+        raise ValueError("gaussian_zero moment policy requires zero moments")
+    trials = pd.to_numeric(pd.Series(trial_sharpes_periodic), errors="coerce")
+    if trials.isna().any() or not np.isfinite(trials.to_numpy(dtype=float)).all():
+        raise ValueError("trial_sharpes_periodic must contain only finite values")
     if observations < 3 or len(trials) < 2:
         return np.nan
     std_trials = float(trials.std(ddof=1))
@@ -82,8 +99,15 @@ def deflated_sharpe_probability(
         (1 - EULER_GAMMA) * stats.norm.ppf(1 - 1 / n_trials)
         + EULER_GAMMA * stats.norm.ppf(1 - 1 / (n_trials * np.e))
     )
-    denominator = np.sqrt(max(1e-15, (1 - skewness * observed_sharpe + (excess_kurtosis / 4) * observed_sharpe**2) / (observations - 1)))
-    return float(stats.norm.cdf((observed_sharpe - expected_max) / denominator))
+    denominator = np.sqrt(max(1e-15, (1 - skewness * observed_sharpe_periodic + (excess_kurtosis / 4) * observed_sharpe_periodic**2) / (observations - 1)))
+    return float(stats.norm.cdf((observed_sharpe_periodic - expected_max) / denominator))
+
+
+def annualize_sharpe(sharpe_periodic: float, periods_per_year: float) -> float:
+    """Presentation-only conversion from periodic to annualized Sharpe."""
+    if not np.isfinite(sharpe_periodic) or not np.isfinite(periods_per_year) or periods_per_year <= 0:
+        raise ValueError("sharpe_periodic must be finite and periods_per_year must be positive")
+    return float(sharpe_periodic * np.sqrt(periods_per_year))
 
 
 @dataclass(frozen=True)

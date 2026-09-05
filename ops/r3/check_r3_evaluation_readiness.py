@@ -93,13 +93,22 @@ def _as_bool(value: Any, field: str) -> bool:
     return value
 
 
-def _number(mapping: Mapping[str, Any], key: str, default: int = 0) -> int:
-    value = mapping.get(key, default)
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise ReadinessInputError(f"{key} must be numeric")
+_MISSING = object()
+
+
+def _number(mapping: Mapping[str, Any], key: str, default: object = _MISSING) -> int:
+    """Read a non-negative integer without silently defaulting metadata."""
+    if key not in mapping:
+        if default is _MISSING:
+            raise ReadinessInputError(f"{key} is required")
+        value = default
+    else:
+        value = mapping[key]
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ReadinessInputError(f"{key} must be an integer")
     if value < 0:
         raise ReadinessInputError(f"{key} must be non-negative")
-    return int(value)
+    return value
 
 
 def _parse_utc(value: Any, field: str) -> datetime:
@@ -113,6 +122,123 @@ def _parse_utc(value: Any, field: str) -> datetime:
     if parsed.tzinfo is None or parsed.utcoffset() != timedelta(0):
         raise ReadinessInputError(f"{field} must be UTC with an explicit offset")
     return parsed.astimezone(timezone.utc)
+
+
+_STREAM_REQUIRED_COUNTERS = (
+    "complete_records", "files", "records", "source_available_records",
+    "source_unavailable_records", "gap_records", "symbols",
+)
+_PRESENCE_FIELDS = {
+    "H01_execution_quality_context": ("usable_observations", "raw_observations"),
+    "H02_price_oi_quadrant": ("usable_symbol_buckets", "raw_symbol_buckets"),
+    "H03_liquidation_continuation": ("observed_events", "raw_events"),
+    "H04_liquidation_reversion": ("observed_events", "raw_events"),
+    "H05_crowding_stress_modifier": ("usable_symbol_buckets", "raw_symbol_buckets"),
+    "H06_btc_breadth_concordance": ("usable_kline_symbol_buckets", "raw_symbol_buckets"),
+}
+
+
+def _validate_stream_metadata(stream: Any, field: str) -> None:
+    if not isinstance(stream, Mapping):
+        raise ReadinessInputError(f"{field} must be an object")
+    for key in _STREAM_REQUIRED_COUNTERS:
+        _number(stream, key)
+    _parse_utc(stream.get("first_timestamp"), f"{field}.first_timestamp")
+    _parse_utc(stream.get("last_timestamp"), f"{field}.last_timestamp")
+    if _parse_utc(stream["last_timestamp"], f"{field}.last_timestamp") < _parse_utc(stream["first_timestamp"], f"{field}.first_timestamp"):
+        raise ReadinessInputError(f"{field} timestamp range is reversed")
+    states = stream.get("continuity_state_counts")
+    if not isinstance(states, Mapping):
+        raise ReadinessInputError(f"{field}.continuity_state_counts must be an object")
+    for state, count in states.items():
+        if not isinstance(state, str):
+            raise ReadinessInputError(f"{field}.continuity_state_counts keys must be strings")
+        _number({"value": count}, "value")
+
+
+def _validate_metadata_envelope(inventory: Mapping[str, Any], reference_time: datetime | None = None) -> None:
+    """Validate the typed, freshness-bound metadata envelope before gating."""
+    if not isinstance(inventory, Mapping):
+        raise ReadinessInputError("inventory must be an object")
+    observed = _parse_utc(inventory.get("observed_at_utc"), "observed_at_utc")
+    clock = reference_time or datetime.now(timezone.utc)
+    if clock.tzinfo is None:
+        raise ReadinessInputError("reference_time must include an explicit timezone")
+    clock = clock.astimezone(timezone.utc)
+    if clock - observed > timedelta(days=7):
+        raise ReadinessInputError("observed_at_utc is stale (>7 days)")
+    if observed - clock > timedelta(minutes=5):
+        raise ReadinessInputError("observed_at_utc is beyond the +5 minute clock-skew window")
+
+    availability = inventory.get("availability_and_gaps")
+    if not isinstance(availability, Mapping):
+        raise ReadinessInputError("availability_and_gaps must be an object")
+    if not isinstance(availability.get("gap_accounting_complete"), bool):
+        raise ReadinessInputError("gap_accounting_complete must be boolean")
+    if not isinstance(availability.get("gap_records"), list):
+        raise ReadinessInputError("gap_records must be an explicit list of records")
+    for key in ("health_gap_count", "health_restart_count", "source_unavailable_records", "rollover_gap_count", "incomplete_bucket_count"):
+        _number(availability, key)
+    if not isinstance(availability.get("no_imputation"), bool):
+        raise ReadinessInputError("no_imputation must be boolean")
+    boundary = availability.get("strict_15m_boundary")
+    if not isinstance(boundary, Mapping):
+        raise ReadinessInputError("strict_15m_boundary must be an object")
+    _number(boundary, "rejected")
+
+    cycles = inventory.get("cycles")
+    if not isinstance(cycles, Mapping):
+        raise ReadinessInputError("cycles must be an object")
+    cycle_records = cycles.get("cycle_id_timestamps")
+    if not isinstance(cycle_records, list):
+        raise ReadinessInputError("cycles.cycle_id_timestamps must be a list")
+    cycle_count = _number(cycles, "cycle_count")
+    missing_count = _number(cycles, "missing_cycle_count")
+    duplicate_count = _number(cycles, "duplicate_cycle_ids")
+    if cycle_count != len(cycle_records):
+        raise ReadinessInputError("cycles.cycle_count does not match cycle_id_timestamps")
+    identifiers: list[str] = []
+    for index, record in enumerate(cycle_records):
+        if not isinstance(record, Mapping) or not isinstance(record.get("cycle_id"), str):
+            raise ReadinessInputError(f"cycles.cycle_id_timestamps[{index}] requires string cycle_id")
+        _parse_utc(record.get("timestamp"), f"cycles.cycle_id_timestamps[{index}].timestamp")
+        identifiers.append(record["cycle_id"])
+    actual_duplicates = len(identifiers) - len(set(identifiers))
+    if duplicate_count != actual_duplicates:
+        raise ReadinessInputError("cycles.duplicate_cycle_ids does not reconcile to cycle IDs")
+    if missing_count < 0:
+        raise ReadinessInputError("cycles.missing_cycle_count must be non-negative")
+    metadata_stream = cycles.get("metadata_stream")
+    _validate_stream_metadata(metadata_stream, "cycles.metadata_stream")
+
+    streams = inventory.get("streams")
+    if not isinstance(streams, Mapping):
+        raise ReadinessInputError("streams must be an object")
+    for name, stream in streams.items():
+        _validate_stream_metadata(stream, f"streams.{name}")
+    cycle_stream = streams.get("cycle_metadata")
+    if cycle_stream is not None:
+        for key in _STREAM_REQUIRED_COUNTERS + ("first_timestamp", "last_timestamp"):
+            if cycle_stream.get(key) != metadata_stream.get(key):
+                raise ReadinessInputError(f"streams.cycle_metadata disagrees with cycles.metadata_stream: {key}")
+
+    calendar = inventory.get("calendar")
+    if not isinstance(calendar, Mapping):
+        raise ReadinessInputError("calendar must be an object")
+    _number(calendar, "observed_utc_days")
+    _number(calendar, "independent_utc_days")
+    _number(calendar, "independent_utc_6h_blocks")
+    presence = inventory.get("causal_input_presence")
+    if not isinstance(presence, Mapping) or set(presence) != set(_PRESENCE_FIELDS):
+        raise ReadinessInputError("causal_input_presence must contain exactly H01-H06 entries")
+    for name, (usable_key, raw_key) in _PRESENCE_FIELDS.items():
+        entry = presence.get(name)
+        if not isinstance(entry, Mapping):
+            raise ReadinessInputError(f"{name} must be an object")
+        usable = _number(entry, usable_key)
+        raw = _number(entry, raw_key)
+        if usable > raw:
+            raise ReadinessInputError(f"{name}.{usable_key} cannot exceed {raw_key}")
 
 
 def _utc_6h_block_id(value: datetime) -> str:
@@ -306,6 +432,20 @@ def validate_per_hypothesis_gates(
             count = entry.get("complete_count")
             if isinstance(count, bool) or not isinstance(count, int) or count < 1:
                 raise ReadinessInputError(f"{hypothesis} roster contribution for {sha} is not positive")
+            if entry.get("roster_sha256") != sha:
+                raise ReadinessInputError(f"{hypothesis} roster contribution for {sha} has mismatched roster_sha256")
+            contribution_blocks = entry.get("block_ids")
+            contribution_days = entry.get("day_ids")
+            if (
+                not isinstance(contribution_blocks, list)
+                or not isinstance(contribution_days, list)
+                or any(not isinstance(value, str) for value in contribution_blocks + contribution_days)
+                or len(contribution_blocks) != len(set(contribution_blocks))
+                or len(contribution_days) != len(set(contribution_days))
+                or not set(contribution_blocks).issubset(set(block_ids))
+                or not set(contribution_days).issubset(set(day_ids))
+            ):
+                raise ReadinessInputError(f"{hypothesis} roster contribution for {sha} has invalid block/day IDs")
             contribution_counts[sha] = count
         minima = PER_H_TEMPORAL_MINIMA[hypothesis]
         if len(block_ids) < minima["usable_blocks"] or len(day_ids) < minima["usable_days"]:
@@ -411,11 +551,17 @@ def _effective_counts(inventory: Mapping[str, Any], gap_accounting: Mapping[str,
         "R3_H06": ("H06_btc_breadth_concordance", "usable_kline_symbol_buckets", "raw_symbol_buckets"),
     }
     raw: dict[str, int] = {}
-    for hypothesis, (field, fallback_key, raw_key) in definitions.items():
-        entry = presence.get(field, {})
+    effective: dict[str, int] = {}
+    for hypothesis, (field, usable_key, raw_key) in definitions.items():
+        entry = presence.get(field)
         if not isinstance(entry, Mapping):
             raise ReadinessInputError(f"{field} must be an object")
-        raw[hypothesis] = _number(entry, raw_key, _number(entry, fallback_key))
+        usable = _number(entry, usable_key)
+        raw_count = _number(entry, raw_key)
+        if usable > raw_count:
+            raise ReadinessInputError(f"{field}.{usable_key} cannot exceed {raw_key}")
+        raw[hypothesis] = raw_count
+        effective[hypothesis] = usable
     raw_blocks = _number(calendar, "independent_utc_6h_blocks")
     strict_schema = inventory.get("gap_blocks_by_scope") is not None or inventory.get("usable_blocks_by_hypothesis") is not None
     excluded = set((gap_accounting or {}).get("excluded_block_ids", [])) if not strict_schema else set()
@@ -437,7 +583,6 @@ def _effective_counts(inventory: Mapping[str, Any], gap_accounting: Mapping[str,
         effective_blocks = sum(1 for block in block_counts if str(block) not in excluded)
     else:
         effective_blocks = raw_blocks
-    effective = dict(raw)
     # An inventory may provide exact per-hypothesis eligible block maps. Never
     # infer an observation count by subtracting aggregate gap counters.
     for hypothesis in PRIMARY_HYPOTHESES:
@@ -448,10 +593,8 @@ def _effective_counts(inventory: Mapping[str, Any], gap_accounting: Mapping[str,
             mapped = nested.get("eligible_by_utc_6h_block")
         if isinstance(mapped, Mapping):
             effective[hypothesis] = sum(_number({"value": value}, "value") for block, value in mapped.items() if str(block) not in excluded)
-        elif isinstance(nested, Mapping):
-            primary_count = nested.get("primary_eligible_observations")
-            if primary_count is not None and not excluded:
-                effective[hypothesis] = _number({"value": primary_count}, "value")
+        elif isinstance(nested, Mapping) and nested.get(definitions[hypothesis][1]) is not None and not excluded:
+            effective[hypothesis] = _number(nested, definitions[hypothesis][1])
     raw["_utc_6h_blocks"] = raw_blocks
     effective["_utc_6h_blocks"] = effective_blocks
     return raw, effective
@@ -523,7 +666,15 @@ def _load_roster_months(paths: Path | Sequence[Path] | None) -> list[str]:
     return sorted(set(_verify_roster_artifact(Path(path)) for path in paths))
 
 
-def evaluate_readiness(amendment: Mapping[str, Any], inventory: Mapping[str, Any], spec: Mapping[str, Any], *, roster_months: Sequence[str] = (), human_authorized: bool = False) -> dict[str, Any]:
+def evaluate_readiness(
+    amendment: Mapping[str, Any],
+    inventory: Mapping[str, Any],
+    spec: Mapping[str, Any],
+    *,
+    roster_months: Sequence[str] = (),
+    human_authorized: bool = False,
+    reference_time: datetime | None = None,
+) -> dict[str, Any]:
     _reject_forbidden(amendment, path="amendment")
     _reject_forbidden(inventory, path="inventory")
     _reject_forbidden(spec, path="spec")
@@ -532,6 +683,7 @@ def evaluate_readiness(amendment: Mapping[str, Any], inventory: Mapping[str, Any
             raise ReadinessInputError(f"{label}.outcome_values_accessed must be false")
     if not isinstance(human_authorized, bool):
         raise ReadinessInputError("human_authorized must be boolean")
+    _validate_metadata_envelope(inventory, reference_time)
     if inventory.get("record_type") not in {INVENTORY_RECORD_TYPE, "R3_OUTCOME_BLIND_EVIDENCE_INVENTORY"}:
         raise ReadinessInputError("unexpected inventory record_type")
     integrity = inventory.get("integrity", {})

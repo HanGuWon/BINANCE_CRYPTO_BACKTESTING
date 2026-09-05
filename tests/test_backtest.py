@@ -32,6 +32,8 @@ def test_next_bar_execution_and_exact_costs() -> None:
     assert trade["spread_cost"] == pytest.approx(0.0002)
     assert trade["slippage_cost"] == pytest.approx(0.0002)
     assert trade["funding_cost"] == pytest.approx(0.002)
+    assert trade["funding_cashflow"] == pytest.approx(-0.002)
+    assert trade["net_return"] == pytest.approx(trade["gross_return"] + trade["funding_cashflow"] - trade["fee_cost"] - trade["spread_cost"] - trade["slippage_cost"])
 
 
 def test_futures_never_silently_assumes_zero_funding() -> None:
@@ -52,10 +54,28 @@ def test_mfe_mae_and_long_short_symmetry() -> None:
     assert long["gross_return"] == pytest.approx(-short["gross_return"])
 
 
+def test_short_timeline_compounds_and_funding_sign_is_explicit() -> None:
+    bars = pd.DataFrame({
+        "open_time": pd.date_range("2024-01-01", periods=4, freq="h", tz="UTC"),
+        "open": [100.0, 90.0, 80.0, 70.0],
+        "high": [101.0, 91.0, 81.0, 71.0],
+        "low": [99.0, 89.0, 79.0, 69.0],
+        "close": [100.0, 90.0, 80.0, 70.0],
+        "funding_rate": [0.0, -0.01, -0.02, 0.0],
+    })
+    result = run_backtest(bars, pd.Series([-1.0, 0.0, 0.0, 0.0]), CostModel(0, 0, 0, 0), holding_bars=2, market_type="um")
+    trade = result.trades.iloc[0]
+    assert trade["funding_cashflow"] == pytest.approx(-0.03)
+    assert trade["funding_cost"] == pytest.approx(0.03)
+    factors = [1 + (-(bars.open.iloc[i + 1] / bars.open.iloc[i] - 1)) - (-1) * bars.funding_rate.iloc[i] for i in (1, 2)]
+    assert result.timeline.iloc[1] == pytest.approx(factors[0] - 1)
+    assert result.timeline.iloc[2] == pytest.approx(factors[1] - 1)
+    assert (1 + result.timeline.iloc[1]) * (1 + result.timeline.iloc[2]) == pytest.approx(np.prod(factors))
+
+
 def test_deterministic_replay(bars: pd.DataFrame) -> None:
     signal = pd.Series(np.where(np.arange(len(bars)) % 10 == 0, 1, 0), index=bars.index)
     first = run_backtest(bars, signal, CostModel(), holding_bars=4)
     second = run_backtest(bars, signal, CostModel(), holding_bars=4)
     assert_frame_equal(first.trades, second.trades)
     assert first.summary == second.summary
-

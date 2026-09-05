@@ -57,7 +57,7 @@ def _max_drawdown(returns: pd.Series) -> float:
 
 def _risk_metrics(timeline: pd.Series, periods_per_year: float) -> dict[str, float]:
     if timeline.empty:
-        return {"sharpe": np.nan, "sortino": np.nan, "maximum_drawdown": np.nan, "calmar": np.nan}
+        return {"sharpe": np.nan, "sharpe_periodic": np.nan, "sortino": np.nan, "maximum_drawdown": np.nan, "calmar": np.nan}
     values = pd.to_numeric(timeline, errors="coerce").fillna(0.0)
     mean_return = float(values.mean())
     std = float(values.std(ddof=0))
@@ -66,6 +66,7 @@ def _risk_metrics(timeline: pd.Series, periods_per_year: float) -> dict[str, flo
     annual_return = mean_return * periods_per_year
     return {
         "sharpe": float(np.sqrt(periods_per_year) * mean_return / std) if std > 0 else np.nan,
+        "sharpe_periodic": float(mean_return / std) if std > 0 else np.nan,
         "sortino": float(np.sqrt(periods_per_year) * mean_return / downside_deviation) if downside_deviation > 0 else np.nan,
         "maximum_drawdown": maximum_drawdown,
         "calmar": float(annual_return / abs(maximum_drawdown)) if maximum_drawdown < 0 else np.nan,
@@ -135,10 +136,17 @@ def _build_timeline(
     spread: np.ndarray,
     funding: np.ndarray,
 ) -> pd.Series:
-    """Build one open-to-open return for every bar, including inactive bars."""
-    timeline = pd.Series(0.0, index=bars.index, dtype=float)
+    """Build compounded open-to-open factors for every bar.
+
+    Each active bar contributes ``1 + d * price_return - d * funding`` and
+    entry/exit costs are applied exactly once as multiplicative cash factors.
+    Multiplying factors (rather than adding signed returns) keeps short equity
+    path-consistent.  Inactive bars remain a neutral factor of one (return
+    zero).
+    """
+    timeline_factor = np.ones(len(bars), dtype=float)
     if trades.empty:
-        return timeline
+        return pd.Series(0.0, index=bars.index, dtype=float)
     opens = pd.to_numeric(bars["open"], errors="coerce").to_numpy(dtype=float)
     for trade in trades.itertuples(index=False):
         entry = int(trade.entry_bar)
@@ -147,25 +155,23 @@ def _build_timeline(
         for bar in range(entry, exit_bar):
             if bar + 1 >= len(opens):
                 continue
-            period_return = direction * (opens[bar + 1] / opens[bar] - 1)
-            period_return -= direction * float(funding[bar])
+            bar_factor = 1.0 + direction * (opens[bar + 1] / opens[bar] - 1.0)
+            bar_factor -= direction * float(funding[bar])
             if bar == entry:
-                period_return -= fee_bps / 10_000
-                period_return -= float(spread[entry]) / 2 / 10_000
-                period_return -= slippage_bps / 10_000
+                entry_cost = fee_bps / 10_000 + float(spread[entry]) / 2 / 10_000 + slippage_bps / 10_000
+                bar_factor *= 1.0 - entry_cost
             if bar == exit_bar - 1:
-                period_return -= fee_bps / 10_000
-                period_return -= float(spread[exit_bar]) / 2 / 10_000
-                period_return -= slippage_bps / 10_000
-            timeline.iloc[bar] += period_return
-    return timeline
+                exit_cost = fee_bps / 10_000 + float(spread[exit_bar]) / 2 / 10_000 + slippage_bps / 10_000
+                bar_factor *= 1.0 - exit_cost
+            timeline_factor[bar] *= bar_factor
+    return pd.Series(timeline_factor - 1.0, index=bars.index, dtype=float)
 
 
 def _empty_trades() -> pd.DataFrame:
     return pd.DataFrame(columns=[
         "decision_bar", "entry_bar", "exit_bar", "decision_time", "entry_time", "exit_time",
         "direction", "entry_price", "exit_price", "gross_return", "fee_cost", "spread_cost",
-        "slippage_cost", "funding_cost", "net_return", "mfe", "mae", "time_to_mfe",
+        "slippage_cost", "funding_cashflow", "funding_cost", "net_return", "mfe", "mae", "time_to_mfe",
         "time_to_mae", "holding_bars",
     ])
 
@@ -222,15 +228,17 @@ def run_backtest(
         fee_cost = 2 * fee_bps / 10_000
         spread_cost = (spread[entry] + spread[exit_bar]) / 2 / 10_000
         slippage_cost = 2 * cost_model.slippage_bps / 10_000
-        funding_cost = direction * float(np.sum(funding[entry:exit_bar]))
+        funding_cashflow = -direction * float(np.sum(funding[entry:exit_bar]))
+        funding_cost = -funding_cashflow
         mfe, mae, time_mfe, time_mae = _trade_excursions(highs[entry:exit_bar], lows[entry:exit_bar], entry_price, direction)
         records.append({
             "decision_bar": decision, "entry_bar": entry, "exit_bar": exit_bar,
             "decision_time": timestamps.iloc[decision], "entry_time": timestamps.iloc[entry], "exit_time": timestamps.iloc[exit_bar],
             "direction": direction, "entry_price": entry_price, "exit_price": exit_price,
             "gross_return": gross, "fee_cost": fee_cost, "spread_cost": spread_cost,
-            "slippage_cost": slippage_cost, "funding_cost": funding_cost,
-            "net_return": gross - fee_cost - spread_cost - slippage_cost - funding_cost,
+            "slippage_cost": slippage_cost, "funding_cashflow": funding_cashflow,
+            "funding_cost": funding_cost,
+            "net_return": gross + funding_cashflow - fee_cost - spread_cost - slippage_cost,
             "mfe": mfe, "mae": mae, "time_to_mfe": time_mfe, "time_to_mae": time_mae,
             "holding_bars": holding_bars,
         })

@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 
 import binance_research.cli as cli
-from binance_research.cli import main
+from binance_research.cli import _regime_table, main
 from binance_research.reporting import REQUIRED_ARTIFACTS
 
 
@@ -53,3 +53,11 @@ def test_cli_explicit_final_holdout_branch_is_gap_safe_without_accessing_data() 
     source = inspect.getsource(cli.run_research)
     assert source.count("compute_gap_safe_features") >= 2
     assert "if args.final_holdout" in source
+
+
+def test_regime_attribution_uses_decision_time_not_future_entry_bar() -> None:
+    times = pd.Series(pd.date_range("2024-01-01", periods=3, freq="h", tz="UTC"))
+    regimes = pd.DataFrame({"volatility_regime": ["low", "high", "panic"]})
+    trades = [pd.DataFrame({"feature_id": ["sig"], "decision_time": [times.iloc[0] + pd.Timedelta(minutes=30)], "entry_bar": [2], "net_return": [0.1]})]
+    result = _regime_table(trades, regimes, regime_times=times)
+    assert result.loc[result["regime_type"] == "volatility_regime", "regime"].item() == "low"

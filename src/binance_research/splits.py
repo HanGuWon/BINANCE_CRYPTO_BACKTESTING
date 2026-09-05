@@ -23,6 +23,41 @@ class GlobalCalendarPartitions:
 
 
 HORIZON_PURGE_BARS_24H = {"15m": 96, "1h": 24, "4h": 6}
+TIMEFRAME_STEPS = {
+    "15m": pd.Timedelta(minutes=15),
+    "1h": pd.Timedelta(hours=1),
+    "4h": pd.Timedelta(hours=4),
+}
+
+
+def _utc_timestamp(value: object, field: str, *, require_timezone: bool = False) -> pd.Timestamp:
+    """Normalize an explicit timezone-aware timestamp to UTC."""
+    try:
+        parsed = pd.Timestamp(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{field} must be a timezone-aware timestamp") from exc
+    if parsed.tzinfo is None:
+        if require_timezone:
+            raise ValueError(f"{field} must include an explicit timezone")
+        parsed = parsed.tz_localize("UTC")
+    return parsed.tz_convert("UTC")
+
+
+def next_executable_open(source_available_time: object, timeframe: str) -> pd.Timestamp:
+    """Return the first canonical bar open strictly after source availability.
+
+    Source availability and decision time are deliberately separate fields in
+    provenance records.  This helper only resolves the executable open; callers
+    must retain their decision timestamp and assert the strict inequality
+    ``source_available_time < entry_time``.
+    """
+    try:
+        step = TIMEFRAME_STEPS[timeframe]
+    except KeyError as exc:
+        raise ValueError(f"unsupported timeframe: {timeframe}") from exc
+    available = _utc_timestamp(source_available_time, "source_available_time", require_timezone=True)
+    # floor + one step is strict even when availability is exactly on-grid.
+    return (available.floor(step) + step).tz_convert("UTC")
 
 
 def global_calendar_split(
@@ -43,15 +78,15 @@ def global_calendar_split(
         raise ValueError(f"missing split timestamp column: {timestamp_column}")
     ordered = frame.copy()
     ordered[timestamp_column] = pd.to_datetime(ordered[timestamp_column], utc=True)
-    train_boundary = pd.Timestamp(train_end, tz="UTC")
-    validation_boundary = pd.Timestamp(validation_end, tz="UTC")
+    train_boundary = _utc_timestamp(train_end, "train_end")
+    validation_boundary = _utc_timestamp(validation_end, "validation_end")
     if validation_boundary <= train_boundary:
         raise ValueError("validation_end must be after train_end")
     purge = HORIZON_PURGE_BARS_24H[timeframe]
     # Calendar boundaries are authoritative; purge is represented as a UTC
     # timestamp mask when the source rows are regular, without percentage-based
     # per-symbol partitions.
-    step = pd.Timedelta({"15m": "15min", "1h": "1h", "4h": "4h"}[timeframe])
+    step = TIMEFRAME_STEPS[timeframe]
     train_cut = train_boundary - purge * step
     validation_cut = validation_boundary - purge * step
     embargo_delta = operational_embargo_bars * step
