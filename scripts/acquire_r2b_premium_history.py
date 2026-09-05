@@ -81,6 +81,7 @@ def acquire_rows(client: BinanceArchiveClient, rows: list[dict[str, object]], ra
             "dataset": "premiumIndexKlines",
             "market": "um",
             "interval": "15m",
+            "acquisition_root": str(raw_root.resolve()),
             "local_path": str(path),
             "row_count": manifest.row_count,
             "first_timestamp": manifest.first_timestamp,
@@ -128,6 +129,7 @@ def main() -> int:
         previous["dataset"] = "premiumIndexKlines"
         previous["market"] = "um"
         previous["interval"] = "15m"
+        previous["acquisition_root"] = str(args.raw_root.resolve())
         previous.to_csv(existing, index=False)
         rows = previous.to_dict("records")
     elif not args.dry_run:

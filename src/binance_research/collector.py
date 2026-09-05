@@ -11,6 +11,11 @@ from typing import Any, AsyncIterator
 from .data import BinanceRestClient, IPBanFatalError, RateLimitGapError, RestResponseMetadata
 from .r3_streams import normalize_stream_payload
 
+try:
+    from ops.r3.r3_forceorder_identity_v3 import normalize_forceorder_payload_v3
+except ModuleNotFoundError:  # pragma: no cover - direct package invocation
+    normalize_forceorder_payload_v3 = None  # type: ignore[assignment]
+
 
 class AppendOnlyEventStore:
     def __init__(self, root: Path) -> None:
@@ -146,6 +151,55 @@ def observed_forceorder_pressure(payload: dict[str, Any], *, endpoint: str | Non
         "average_fill_price": order.get("ap"),
         "position_side": order.get("ps"),
         "subtype": order.get("st") or payload.get("st"),
+        "signed_observed_notional": signed,
+        "raw_payload_sha256": hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
+    }
+
+
+def route_liquidation_event_v3(payload: dict[str, Any], requested_symbol: str = "ALL", *, endpoint: str | None = None) -> tuple[str, str]:
+    """Route a current all-market ForceOrder payload through the V3 parser.
+
+    The historical :func:`route_liquidation_event` remains V2-compatible and
+    is intentionally not used here: in V3 ``ps`` is the pair symbol and
+    ``st`` is the UM/CM discriminator.
+    """
+    if normalize_forceorder_payload_v3 is None:  # pragma: no cover
+        raise RuntimeError("V3 forceOrder parser is unavailable")
+    _identity_tuple, normalized = normalize_forceorder_payload_v3(payload)
+    event_symbol = str(normalized["o"]["s"])
+    requested = str(requested_symbol).strip().upper()
+    if requested != "ALL" and requested != event_symbol:
+        raise ValueError("requested liquidation symbol does not match forceOrder event symbol")
+    return ("um" if int(normalized["st"]) == 1 else "cm", event_symbol)
+
+
+def observed_forceorder_pressure_v3(payload: dict[str, Any], *, endpoint: str | None = None) -> dict[str, Any]:
+    """Create the V3 metadata observable using canonical parser fields."""
+    if normalize_forceorder_payload_v3 is None:  # pragma: no cover
+        raise RuntimeError("V3 forceOrder parser is unavailable")
+    _identity_tuple, normalized = normalize_forceorder_payload_v3(payload)
+    order = normalized["o"]
+    market, symbol = route_liquidation_event_v3(payload, endpoint=endpoint)
+    side = order["S"]
+    quantity = float(order["l"])
+    average_price = float(order["ap"] or order["p"])
+    signed = quantity * average_price if side == "SELL" else -quantity * average_price
+    return {
+        "observable": "observed_forceorder_pressure_v3",
+        "status": "OBSERVED_FORCEORDER_EVENT",
+        "market": market,
+        "symbol": symbol,
+        "pair_symbol": normalized["ps"],
+        "subtype": int(normalized["st"]),
+        "exchange_event_time": int(normalized["E"]),
+        "trade_order_time": int(order["T"]),
+        "side": side,
+        "original_quantity": order["q"],
+        "last_filled_quantity": order["l"],
+        "accumulated_filled_quantity": order["z"],
+        "order_price": order["p"],
+        "average_fill_price": order["ap"],
+        "position_side": None,
         "signed_observed_notional": signed,
         "raw_payload_sha256": hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
     }

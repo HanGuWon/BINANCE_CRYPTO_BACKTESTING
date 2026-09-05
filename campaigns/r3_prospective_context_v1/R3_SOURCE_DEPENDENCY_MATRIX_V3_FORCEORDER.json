@@ -1,0 +1,49 @@
+{
+  "schema": "r3-source-dependency-matrix-v3-forceorder-identity",
+  "status": "R3_NEW_SCIENTIFIC_IDENTITY_REQUIRED",
+  "supersedes": "R3_SOURCE_DEPENDENCY_MATRIX_V2_FORCEORDER.json",
+  "superseded_sha256": "31802e1e09c6b1558cbb0a6938609fe36b15722bb4870ab0656e24ff09de77f6",
+  "scope": "versioned ForceOrder parser, routing, inventory metadata, and replay accounting only; no live-root rewrite or outcome access",
+  "forceorder_contract": {
+    "stream": "liquidation",
+    "event_type": "forceOrder",
+    "accepted_subtype_tokens": [1, 2, "1", "2"],
+    "subtype_mapping": {"1": "um", "2": "cm"},
+    "pair_symbol_semantics": "ps is the contract pair symbol, never a position-side enum",
+    "official_shape": ["e", "E", "ps", "st", "o"],
+    "legacy_nested_shape": "o.ps and o.st may supply missing top-level pair/subtype only; both locations must agree when present",
+    "unknown_keys": "reject",
+    "exact_boundary": "source availability and identity fields are never inferred from another field",
+    "endpoint_allowlist": "wss://fstream.binance.com or wss://dstream.binance.com/market/ws/{!forceOrder@arr|[a-z0-9_]+@forceOrder}, without port/userinfo/query/fragment",
+    "optional_null_policy": "optional order fields t,b,a,m,wt,ot are canonicalized to null when absent; trade id is not inferred",
+    "identity_tuple": ["market_type", "event_type", "event_symbol", "pair_symbol", "E_ms", "T_ms", "t_trade_id", "S", "o", "f", "q", "p", "ap", "X", "l", "z", "st"],
+    "dedup_key": "forceorder:v3:<lowercase SHA256(UTF-8 compact sorted canonical identity tuple JSON)>",
+    "raw_count_invariant": "raw = unique + duplicate + collision + invalid",
+    "endpoint_count_invariant": "raw_endpoint_H = unique_endpoint_H + duplicate_endpoint_H + collision_endpoint_H + invalid_endpoint_H"
+  },
+  "field_chain": {
+    "event_type": {"source": "e", "required": true, "type": "string", "rule": "exactly forceOrder"},
+    "event_time_ms": {"source": "E", "required": true, "type": "non-negative integer milliseconds", "rule": "identity event time"},
+    "pair_symbol": {"source": ["ps", "o.ps"], "required": true, "type": "non-empty symbol string", "rule": "top-level wins only when equal to nested; never BOTH/LONG/SHORT"},
+    "subtype": {"source": ["st", "o.st"], "required": true, "type": "integer enum 1 or 2", "rule": "top-level wins only when equal to nested; no default"},
+    "event_symbol": {"source": "o.s", "required": true, "type": "non-empty symbol string", "rule": "equals envelope symbol and equals pair or pair + _contract suffix"},
+    "side": {"source": "o.S", "required": true, "type": "enum", "allowed": ["BUY", "SELL"]},
+    "order_type": {"source": "o.o", "required": true, "type": "documented order-type enum"},
+    "time_in_force": {"source": "o.f", "required": true, "type": "documented time-in-force enum"},
+    "quantity": {"source": "o.q", "required": true, "type": "finite positive decimal string"},
+    "price": {"source": "o.p", "required": true, "type": "finite non-negative decimal string"},
+    "average_price": {"source": "o.ap", "required": true, "type": "finite non-negative decimal string"},
+    "order_status": {"source": "o.X", "required": true, "type": "documented order-status enum"},
+    "last_filled_quantity": {"source": "o.l", "required": true, "type": "finite non-negative decimal string"},
+    "cumulative_filled_qty": {"source": "o.z", "required": true, "type": "finite non-negative decimal string"},
+    "order_trade_time_ms": {"source": "o.T", "required": true, "type": "non-negative integer milliseconds"},
+    "trade_id": {"source": "o.t", "required": false, "type": "non-negative integer/string", "rule": "canonical null when absent"}
+  },
+  "canonical_order_keys": ["s", "S", "o", "f", "q", "p", "ap", "X", "l", "z", "T", "t", "b", "a", "m", "wt", "ot"],
+  "identity_versions": {
+    "v2": "immutable historical API and bytes; existing callers remain on V2",
+    "v3": "new explicit API and scientific identity; dedicated verifier only"
+  },
+  "fixture_requirements": ["official_um_top_level", "official_cm_top_level", "legacy_nested_fallback", "pair_conflict", "subtype_conflict", "symbol_pair_mismatch", "duplicate_replay", "same_key_collision"],
+  "outcome_boundary": "metadata-only synthetic fixtures; no active v8 root, checkpoint, return, or final-holdout access"
+}

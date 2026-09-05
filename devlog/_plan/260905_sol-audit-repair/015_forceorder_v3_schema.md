@@ -79,6 +79,98 @@ the specified canonical null; `X` and status-related fields are not omitted.
 Duplicate payloads/reconnect replays collapse; same-key different canonical
 payloads are collisions and fail closed.
 
+## Exact callable API and default wiring
+
+The historical V2 module and its public call signatures are immutable. The
+following V2 functions remain available with their current behavior and are
+the default for every existing caller:
+
+```python
+def validate_forceorder_envelope(
+    envelope: Mapping[str, Any], *,
+    complete_bar_opens: Iterable[datetime] = (),
+) -> ValidatedForceOrder
+
+def forceorder_identity_key(envelope: Mapping[str, Any]) -> str
+
+def deduplicate_forceorders(
+    envelopes: Iterable[Mapping[str, Any]], *,
+    complete_bar_opens: Iterable[datetime] = (),
+) -> DeduplicationReceipt
+```
+
+The corrected adapter is a separate module with an explicit V3 API; it does
+not monkey-patch or delegate the V2 functions:
+
+```python
+def normalize_forceorder_payload_v3(
+    payload: Mapping[str, Any],
+) -> tuple[tuple[Any, ...], dict[str, Any]]
+
+def validate_forceorder_envelope_v3(
+    envelope: Mapping[str, Any], *,
+    complete_bar_opens: Iterable[datetime] = (),
+) -> ValidatedForceOrderV3
+
+def forceorder_identity_key_v3(envelope: Mapping[str, Any]) -> str
+
+def deduplicate_forceorders_v3(
+    envelopes: Iterable[Mapping[str, Any]], *,
+    complete_bar_opens: Iterable[datetime] = (),
+) -> DeduplicationReceiptV3
+```
+
+The V3 result types mirror the V2 metadata-only receipt fields and add the
+canonical market, pair symbol, and subtype. `Mapping`, `Iterable`,
+`datetime`, and `Literal` are the normative typing vocabulary; an unknown
+identity version or malformed payload fails closed.
+
+Collector adapters are versioned in the same way. These existing functions
+remain unchanged and continue to use V2 by default:
+
+```python
+def route_liquidation_event(
+    payload: dict[str, Any], requested_symbol: str = "ALL", *,
+    endpoint: str | None = None,
+) -> tuple[str, str]
+
+def observed_forceorder_pressure(
+    payload: dict[str, Any], *, endpoint: str | None = None,
+) -> dict[str, Any]
+```
+
+Only the following new functions select V3, and they do so explicitly:
+
+```python
+def route_liquidation_event_v3(
+    payload: dict[str, Any], requested_symbol: str = "ALL", *,
+    endpoint: str | None = None,
+) -> tuple[str, str]
+
+def observed_forceorder_pressure_v3(
+    payload: dict[str, Any], *, endpoint: str | None = None,
+) -> dict[str, Any]
+```
+
+The inventory seam also defaults to V2 and rejects an unknown selector:
+
+```python
+def build_forceorder_metadata(
+    envelopes: Iterable[Mapping[str, Any]], *,
+    identity_version: Literal["v2", "v3"] = "v2",
+    complete_bar_opens: Iterable[datetime] = (),
+) -> dict[str, Any]
+```
+
+`build_inventory(root=DEFAULT_ROOT)` and all existing production callers retain
+their V2 behavior. The dedicated V3 verifier is the sole caller that passes
+`identity_version="v3"`, and it uses synthetic official-shaped fixtures only;
+it never opens or writes the active v8 root. The verifier imports the V3
+normalizer, validator, deduplicator, both V3 collector adapters, and this
+explicit inventory selector, then asserts field-for-field agreement across
+the complete parser → collector → inventory chain. V2 tests continue to import
+the original module unchanged.
+
 ## Required verification
 
 The V3 verifier must read the new matrix and invoke the same normalizer used by

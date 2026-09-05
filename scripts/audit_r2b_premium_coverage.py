@@ -11,6 +11,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -21,6 +23,11 @@ FEATURES = {
     "derivatives.premium": "premium",
     "derivatives.premium_zscore": "premium_zscore90",
 }
+REPO_ROOT = Path(__file__).resolve().parents[1]
+AUTHORITATIVE_R2B_MANIFEST = REPO_ROOT / "campaigns" / "r2b_restricted_derivatives_v1" / "premium_archive_manifest.csv"
+ROOT_DECLARATION_COLUMNS = ("causal_root", "raw_root", "acquisition_root", "data_root")
+ROOT_HASH_COLUMNS = ("causal_root_tree_sha256", "raw_root_tree_sha256", "acquisition_root_sha256", "data_root_tree_sha256")
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$", re.IGNORECASE)
 GROUPINGS = {
     "symbol_timeframe_year": ["symbol", "timeframe", "year"],
     "symbol_timeframe_month": ["symbol", "timeframe", "month"],
@@ -38,7 +45,96 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def validate_premium_manifest(path: Path) -> pd.DataFrame:
+def _nonempty(value: object) -> str | None:
+    if value is None or pd.isna(value):
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def _declared_manifest_value(manifest: pd.DataFrame, columns: tuple[str, ...]) -> str | None:
+    values: set[str] = set()
+    for column in columns:
+        if column not in manifest:
+            continue
+        values.update(value for value in (_nonempty(item) for item in manifest[column]) if value is not None)
+    if len(values) > 1:
+        raise ValueError(f"premium manifest contains conflicting root declarations: {sorted(values)}")
+    return next(iter(values), None)
+
+
+def _resolve_archive_path(local_path: object, *, raw_root: Path | None) -> Path:
+    value = _nonempty(local_path)
+    if value is None:
+        raise ValueError("premium manifest contains a blank local_path")
+    candidate = Path(value)
+    if candidate.is_absolute():
+        resolved = candidate.resolve()
+    else:
+        normalized = value.replace("\\", "/")
+        marker = "data/raw/um/premiumIndexKlines/"
+        lower = normalized.casefold()
+        marker_index = lower.find(marker)
+        if raw_root is not None and marker_index >= 0:
+            suffix = normalized[marker_index + len(marker) :]
+            resolved = (raw_root / Path(suffix)).resolve()
+        else:
+            resolved = (REPO_ROOT / candidate).resolve()
+    if raw_root is not None:
+        root = raw_root.resolve()
+        try:
+            os.path.commonpath([str(root), str(resolved)])
+            if os.path.commonpath([str(root), str(resolved)]) != str(root):
+                raise ValueError(f"premium archive escapes declared raw root: {resolved}")
+        except ValueError as exc:
+            raise ValueError(f"premium archive escapes declared raw root: {resolved}") from exc
+    return resolved
+
+
+def _verify_archive_objects(manifest: pd.DataFrame, *, raw_root: Path | None) -> dict[str, int]:
+    required = {"local_path", "published_sha256", "computed_sha256"}
+    missing = required - set(manifest.columns)
+    if missing:
+        raise ValueError(f"premium manifest missing archive verification columns: {sorted(missing)}")
+    seen: dict[Path, tuple[str, str]] = {}
+    missing_count = checksum_failures = size_failures = 0
+    for row in manifest.itertuples(index=False):
+        path = _resolve_archive_path(getattr(row, "local_path"), raw_root=raw_root)
+        expected = str(getattr(row, "computed_sha256")).strip().lower()
+        published = str(getattr(row, "published_sha256")).strip().lower()
+        if path in seen:
+            if seen[path] != (expected, published):
+                raise ValueError(f"premium manifest has conflicting checksums for one archive: {path}")
+            continue
+        seen[path] = (expected, published)
+        if not path.is_file():
+            missing_count += 1
+            continue
+        computed = sha256_file(path)
+        if computed != expected or computed != published:
+            checksum_failures += 1
+        object_size = getattr(row, "object_size", None)
+        if object_size is not None and not pd.isna(object_size):
+            try:
+                if path.stat().st_size != int(object_size):
+                    size_failures += 1
+            except (TypeError, ValueError):
+                size_failures += 1
+    if missing_count or checksum_failures or size_failures:
+        raise ValueError(
+            "premium archive verification failed: "
+            f"missing={missing_count}, checksum_failures={checksum_failures}, size_failures={size_failures}"
+        )
+    return {"archive_objects_verified": len(seen), "archive_missing_count": 0, "archive_checksum_failures": 0, "archive_size_failures": 0}
+
+
+def validate_premium_manifest(
+    path: Path,
+    *,
+    expected_root: Path | None = None,
+    expected_root_sha256: str | None = None,
+    verify_archives: bool = False,
+) -> pd.DataFrame:
     """Validate the authoritative R2B premium archive manifest.
 
     The historical R1 derivative manifest is intentionally rejected: accepting
@@ -65,8 +161,22 @@ def validate_premium_manifest(path: Path) -> pd.DataFrame:
     sha_mismatch = manifest["published_sha256"].astype(str).str.lower() != manifest["computed_sha256"].astype(str).str.lower()
     if sha_mismatch.any():
         raise ValueError(f"premium manifest contains checksum mismatches: {int(sha_mismatch.sum())}")
+    malformed_sha = ~manifest["published_sha256"].astype(str).str.strip().map(lambda value: bool(SHA256_RE.fullmatch(value))) | ~manifest["computed_sha256"].astype(str).str.strip().map(lambda value: bool(SHA256_RE.fullmatch(value)))
+    if malformed_sha.any():
+        raise ValueError(f"premium manifest contains malformed SHA256 values: {int(malformed_sha.sum())}")
     if manifest.empty or manifest["symbol"].astype(str).nunique() < 3:
         raise ValueError("premium manifest resolves to an unexpectedly small symbol set; refusing R1-style anchor")
+    declared_root = _declared_manifest_value(manifest, ROOT_DECLARATION_COLUMNS)
+    declared_root_sha256 = _declared_manifest_value(manifest, ROOT_HASH_COLUMNS)
+    if expected_root is not None:
+        if declared_root is not None and Path(declared_root).resolve() != expected_root.resolve():
+            raise ValueError(f"premium manifest root declaration conflicts with causal root: {declared_root}")
+        if declared_root is not None and Path(declared_root).resolve() != expected_root.resolve():
+            raise ValueError("premium manifest root declaration is not the expected causal root")
+    if expected_root_sha256 is not None and declared_root_sha256 != expected_root_sha256.lower():
+        raise ValueError("premium manifest root hash conflicts with causal root")
+    if verify_archives:
+        _verify_archive_objects(manifest, raw_root=expected_root)
     return manifest
 
 
@@ -150,8 +260,27 @@ def _rows_for_group(frame: pd.DataFrame, grouping: str, keys: list[str], feature
     return rows
 
 
-def audit(panel_root: Path, derivative_manifest: Path, dataset_probe: Path, feature_availability: Path) -> tuple[pd.DataFrame, dict[str, object]]:
-    premium_manifest = validate_premium_manifest(derivative_manifest)
+def audit(
+    panel_root: Path,
+    derivative_manifest: Path,
+    dataset_probe: Path,
+    feature_availability: Path,
+    *,
+    expected_raw_root: Path | None = None,
+    expected_raw_root_sha256: str | None = None,
+) -> tuple[pd.DataFrame, dict[str, object]]:
+    resolved_manifest = derivative_manifest.resolve()
+    if resolved_manifest != AUTHORITATIVE_R2B_MANIFEST.resolve():
+        raise ValueError(
+            "R2B coverage audit requires the authoritative acquisition manifest: "
+            f"{AUTHORITATIVE_R2B_MANIFEST.resolve()}"
+        )
+    premium_manifest = validate_premium_manifest(
+        derivative_manifest,
+        expected_root=expected_raw_root,
+        expected_root_sha256=expected_raw_root_sha256,
+        verify_archives=True,
+    )
     acquired_symbols = set(premium_manifest["symbol"].astype(str))
     files = sorted(panel_root.glob("market=um/symbol=*/timeframe=*/year=*/part-000.parquet"))
     if not files:
@@ -187,6 +316,9 @@ def audit(panel_root: Path, derivative_manifest: Path, dataset_probe: Path, feat
         "premium_manifest_integrity_failures": int((premium_manifest["integrity_status"] != "PASS").sum()),
         "premium_manifest_sha256": sha256_file(derivative_manifest.resolve()),
         "premium_manifest_path": str(derivative_manifest.resolve()),
+        "premium_manifest_declared_root": _declared_manifest_value(premium_manifest, ROOT_DECLARATION_COLUMNS),
+        "premium_manifest_declared_root_sha256": _declared_manifest_value(premium_manifest, ROOT_HASH_COLUMNS),
+        "premium_archive_objects_verified": True,
         "binance_vision_premium_symbol_prefix_count_from_census": source_prefixes,
         "feature_availability_rows": premium_availability,
         "root_cause_before_repair": "ARCHIVE_NOT_ACQUIRED for panel symbols outside BTCUSDT/ETHUSDT; the original anchor acquisition script was hard-coded to those two symbols.",
@@ -205,12 +337,31 @@ def main() -> int:
     parser.add_argument("--dataset-probe", type=Path, default=Path("data/census/r1_full_history_v1/census_summary.json"))
     parser.add_argument("--feature-availability", type=Path, default=Path("campaigns/r1_final_panel_v1/feature_availability_final.csv"))
     parser.add_argument("--out-dir", type=Path, default=Path("campaigns/r2b_restricted_derivatives_v1"))
+    parser.add_argument("--expected-raw-root", type=Path, default=None, help="causal raw root used to resolve manifest local_path values")
+    parser.add_argument("--expected-raw-root-sha256", default=None, help="declared causal raw-root tree hash")
     args = parser.parse_args()
     args.out_dir.mkdir(parents=True, exist_ok=True)
-    coverage, summary = audit(args.panel_root, args.derivative_manifest, args.dataset_probe, args.feature_availability)
-    coverage.to_csv(args.out_dir / "premium_coverage_audit.csv", index=False)
-    summary["artifact_sha256"] = {"premium_coverage_audit.csv": sha256_file(args.out_dir / "premium_coverage_audit.csv")}
-    (args.out_dir / "premium_provenance_summary.json").write_text(json.dumps(summary, indent=2, default=str), encoding="utf-8")
+    coverage, summary = audit(
+        args.panel_root,
+        args.derivative_manifest,
+        args.dataset_probe,
+        args.feature_availability,
+        expected_raw_root=args.expected_raw_root,
+        expected_raw_root_sha256=args.expected_raw_root_sha256,
+    )
+    coverage_path = args.out_dir / "premium_coverage_audit.csv"
+    summary_path = args.out_dir / "premium_provenance_summary.json"
+    coverage_bytes = coverage.to_csv(index=False).encode("utf-8")
+    if coverage_path.exists() and coverage_path.read_bytes() != coverage_bytes:
+        raise ValueError(f"immutable audit artifact already exists with different bytes: {coverage_path}")
+    if not coverage_path.exists():
+        coverage_path.write_bytes(coverage_bytes)
+    summary["artifact_sha256"] = {"premium_coverage_audit.csv": hashlib.sha256(coverage_bytes).hexdigest()}
+    summary_bytes = json.dumps(summary, indent=2, default=str).encode("utf-8")
+    if summary_path.exists() and summary_path.read_bytes() != summary_bytes:
+        raise ValueError(f"immutable provenance summary already exists with different bytes: {summary_path}")
+    if not summary_path.exists():
+        summary_path.write_bytes(summary_bytes)
     print(json.dumps(summary, indent=2, default=str))
     return 0
 
