@@ -44,7 +44,18 @@ def _synthetic_inventory() -> dict[str, Any]:
     used_sha = "a" * 64
     hypotheses = {hypothesis: list(blocks) for hypothesis in PRIMARY_HYPOTHESES}
     days = {hypothesis: [f"2026-01-{index:02d}" for index in range(1, 31)] for hypothesis in PRIMARY_HYPOTHESES}
-    contributions = {hypothesis: {used_sha: {"effective_month": "2026-09", "complete_count": 1}} for hypothesis in PRIMARY_HYPOTHESES}
+    contributions = {
+        hypothesis: {
+            used_sha: {
+                "effective_month": "2026-09",
+                "complete_count": 1,
+                "roster_sha256": used_sha,
+                "block_ids": list(blocks),
+                "day_ids": list(days[hypothesis]),
+            }
+        }
+        for hypothesis in PRIMARY_HYPOTHESES
+    }
     return {
         "calendar": {"independent_utc_days": 30, "independent_utc_6h_blocks": 120},
         "gap_blocks_by_scope": {"R3_H01": ["2026-01-01T00:00:00+00:00"]},
@@ -58,8 +69,12 @@ def _synthetic_inventory() -> dict[str, Any]:
             "health_gap_count": 1,
             "health_restart_count": 0,
             "source_unavailable_records": 1,
+            "rollover_gap_count": 0,
+            "incomplete_bucket_count": 0,
+            "no_imputation": True,
+            "strict_15m_boundary": {"rejected": 0},
         },
-        "streams": {}, "cycles": {},
+        "streams": {}, "cycles": {"missing_cycle_count": 0},
         "usable_blocks_by_hypothesis": hypotheses,
         "usable_days_by_hypothesis": days,
         "roster_contribution_by_hypothesis": contributions,
