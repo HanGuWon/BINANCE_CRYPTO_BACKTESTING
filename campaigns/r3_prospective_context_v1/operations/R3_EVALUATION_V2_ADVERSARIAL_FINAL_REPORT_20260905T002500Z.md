@@ -11,12 +11,12 @@ access the final holdout or R2B2.
 1. **Starting HEAD/origin.** The work phase started from
    `388c3252ace9da571125e1fa8d812b0479ef69db` with origin at the same SHA.
 
-2. **Final HEAD/origin.** Before this governance-only commit, the checkout was
-   `d7fe0a7e6a3967d034673dbc4c98c19e51a46f83` and origin was
-   `4e519bf98cbec4de138c20197e8ef399f1f27874` (three commits ahead locally).
-   The exact post-push HEAD and matching origin are the commit containing this
-   report and are recorded by the non-force push in the final response; no
-   scientific source commit is changed.
+2. **Final HEAD/origin.** The governance descendants were pushed non-force as
+   `522f1b445be10d1dc82fc2af7549a5290d84b605`,
+   `9dbd3eaf2de02accff2bef02abe0457970680ea7`, and
+   `3dabdfb47f13fb05cc079bee8ccb7224004c8774`; the final receipt-citation
+   commit is reported separately after this report update. The remote is kept
+   synchronized and no scientific source commit is changed.
 
 3. **Scientific source-tree.** Frozen SHA256
    `b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688`, with
@@ -185,9 +185,9 @@ access the final holdout or R2B2.
 ## Receipts and provenance
 
 - Full pytest receipt: `operations/R3_V2_FULL_PYTEST_RECEIPT_20260905.json`
-  (331 passed, 1 warning in 120.62s, exit code 0); the underlying cxc evidence
-  receipt is `.codexclaw/evidence/01a0230d-0a21-7e02-ab97-a10534161680/test-receipt.json`
-  (SHA256 `903e42653ee1c9d90b3c42044e33f2fbf065ca00982615e7b445dad6c8793e45`).
+  (331 passed, 1 warning in 121.27s, exit code 0); immutable cxc receipt copy
+  `operations/R3_V2_CXC_TEST_RECEIPT_20260905T004218Z.json` has SHA256
+  `d1e5a2f213ab4e8785fa0ad761a88082df4d8cc215c66bf1b1ae6c45993f4425`.
   Its global `dirty=true` is recorded honestly; scientific scope is clean.
 - V2 reproducibility manifest SHA256
   `0cb2400f2ada8cc35882563d49af14f8e33e4148f21cc128ce02c8127849a104`.
