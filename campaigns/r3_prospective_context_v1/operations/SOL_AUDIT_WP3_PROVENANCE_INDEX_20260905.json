@@ -1,0 +1,163 @@
+{
+  "active_v8_identity": {
+    "causal_or_data_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1/scientific_raw_v8",
+    "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+    "launch_manifest_sha256": "cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659",
+    "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+    "seal_sha256": "ab83232d90e800bf8178c6f3d22138382fb102b9d14213e12a798c0f2c68ad85",
+    "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+    "status": "CURRENT_FROZEN"
+  },
+  "base_commit": "9e532aeea014547283776b1728b2222ae1622fad",
+  "branch": "codex/sol-audit-repair-v1",
+  "corrections": [
+    {
+      "new_sha256": "74c614ae98758256934c0b5fbc16967e038c8b787f92e9f78d11c35f68bed9fa",
+      "old_sha256": "0b08e6818d76dde38a08a69b86d241ea6339fe33e4cdf037e9ae51f2df1480e4",
+      "path": "campaigns/r3_prospective_context_v1/campaign_spec.toml",
+      "reason": "live amendment, horizon-map, and adversarial manifest references were stale"
+    },
+    {
+      "new_sha256": "62aacb71c9561cbe54ff6c5ce1e472b7007ec44e7518a56420769fa79b20e118",
+      "old_sha256": "8e96f3ab855f4680f6125e883f0cabc7429c893de6ab251322a5a88274c6af29",
+      "path": "campaigns/r3_prospective_context_v1/R3_PROTOCOL.md",
+      "reason": "live protocol now names adversarial V2 and its horizon map; short V2 is historical"
+    },
+    {
+      "new_sha256": "bee7c53431e0416f29559c0be8a3674ed804e58e16ac49c45275444054ee5073",
+      "old_sha256": "829e8802c24cbbda5bfae000d48e90bc1caed4225c5c7380b70e2a674a7bf9a6",
+      "path": "campaigns/r3_prospective_context_v1/multiple_testing_plan.md",
+      "reason": "multiple-testing plan now names the authoritative adversarial amendment"
+    },
+    {
+      "new_sha256": "e507e670e8a04b092e4a86ace899df972d4fbf0e4f5b0a1b1004eac541fe3ef4",
+      "old_sha256": "50f1463eca25060b46c5bdd76f9922cd9ea0ec38d448b4e8cee8599fcf1d5f3f",
+      "path": "campaigns/r3_prospective_context_v1/metrics_contract.md",
+      "reason": "metrics contract now names the authoritative adversarial amendment"
+    },
+    {
+      "new_sha256": "95c717e5035466cc5ddf394854281af97fb56b09b33849f51dbaea6fb818e1b6",
+      "old_sha256": "4313730a95b9a48cf994c3db22def2817c55f7f69ed96389852e0bb6e02e6636",
+      "path": "campaigns/r3_prospective_context_v1/promotion_policy.md",
+      "reason": "promotion policy now names the authoritative adversarial amendment"
+    }
+  ],
+  "dispositions": [
+    {
+      "causal_or_data_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1/scientific_raw_v8",
+      "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+      "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+      "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+      "status": "CURRENT_FROZEN",
+      "label": "active sealed v8"
+    },
+    {
+      "causal_or_data_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1/scientific_raw_v8",
+      "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+      "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+      "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+      "status": "HISTORICAL_EVIDENCE/SUPERSEDED_BY_ADVERSARIAL_V2",
+      "label": "short V2 amendment and manifest; bytes preserved"
+    },
+    {
+      "causal_or_data_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1/raw_v1",
+      "implementation_commit": "da6869c43303cb21c89a76b031f71f21abc06f14",
+      "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+      "source_tree_sha256": "134268865234f9cef6c6fc3f47a682a88184bfe78b6ad7b972675f3487597a51",
+      "status": "INVALID_SUPERSEDED/BLOCKED",
+      "label": "old R3 launch manifest and superseded-ready root"
+    },
+    {
+      "causal_or_data_root": "NOT_APPLICABLE",
+      "implementation_commit": "PREDECESSOR_CONTRACT",
+      "registry_sha256": "NOT_APPLICABLE",
+      "source_tree_sha256": "NOT_APPLICABLE",
+      "status": "HISTORICAL_SNAPSHOT",
+      "label": "R3_SOURCE_DEPENDENCY_MATRIX.json V1 predecessor"
+    },
+    {
+      "causal_or_data_root": "NOT_A_SCIENTIFIC_IDENTITY",
+      "implementation_commit": "0f0bfa9d3bb860fc09262f3bee92aaca734ed8da",
+      "registry_sha256": "NOT_A_SCIENTIFIC_IDENTITY",
+      "source_tree_sha256": "NOT_A_SCIENTIFIC_IDENTITY",
+      "status": "HARNESS_REPAIR_ONLY",
+      "label": "isolated ForceOrder V3 harness repair"
+    },
+    {
+      "causal_or_data_root": "NOT_A_SCIENTIFIC_IDENTITY",
+      "implementation_commit": "820f88f3626276796304ccbbe1983e6c02cb6710",
+      "registry_sha256": "NOT_A_SCIENTIFIC_IDENTITY",
+      "source_tree_sha256": "NOT_A_SCIENTIFIC_IDENTITY",
+      "status": "HARNESS_REPAIR_ONLY",
+      "label": "isolated SOL core harness repair"
+    },
+    {
+      "causal_or_data_root": "NOT_A_SCIENTIFIC_IDENTITY",
+      "implementation_commit": "ea933604fd97eee3503f901af634785c7c16c3c7",
+      "registry_sha256": "NOT_A_SCIENTIFIC_IDENTITY",
+      "source_tree_sha256": "NOT_A_SCIENTIFIC_IDENTITY",
+      "status": "HARNESS_REPAIR_ONLY",
+      "label": "isolated strict-verifier fixture repair"
+    },
+    {
+      "causal_or_data_root": "NOT_APPLICABLE",
+      "implementation_commit": "2c39febfd7350d0bbcb12ed7185fcb52933b5324",
+      "registry_sha256": "NOT_APPLICABLE",
+      "source_tree_sha256": "NOT_APPLICABLE",
+      "status": "HISTORICAL_SNAPSHOT",
+      "label": "canonical state index snapshot; not rewritten"
+    }
+  ],
+  "final_holdout_status": "UNTOUCHED",
+  "merge_action": "NONE",
+  "outcome_values_accessed": false,
+  "r2b2_status": "NOT_STARTED",
+  "record_type": "SOL_AUDIT_WP3_PROVENANCE_INDEX",
+  "references": [
+    {
+      "path": "campaigns/r3_prospective_context_v1/R3_EVALUATION_AMENDMENT_V2_ADVERSARIAL.md",
+      "sha256": "ac788de08e77a5eb87b7b5a6619ada104668df3dc00f6908491ee2e1afa79672",
+      "status": "AUTHORITATIVE_FROZEN"
+    },
+    {
+      "path": "campaigns/r3_prospective_context_v1/R3_EVALUATION_HORIZON_MAP_V1.json",
+      "sha256": "7cd935a33ac7ed47d1b9c7e037d5033b3add694934730eca5ebadda48fbb98e5",
+      "status": "AUTHORITATIVE_FROZEN"
+    },
+    {
+      "path": "campaigns/r3_prospective_context_v1/R3_EVALUATION_AMENDMENT_V2_ADVERSARIAL_REPRODUCIBILITY_MANIFEST.json",
+      "sha256": "0cb2400f2ada8cc35882563d49af14f8e33e4148f21cc128ce02c8127849a104",
+      "status": "AUTHORITATIVE_FROZEN"
+    },
+    {
+      "path": "campaigns/r3_prospective_context_v1/R3_EVALUATION_AMENDMENT_V2.md",
+      "sha256": "8f12263c107e8b1fb2596c72f5c3e0c741a17339a42f95aab67df86b87738c38",
+      "status": "HISTORICAL_PRESERVED"
+    },
+    {
+      "path": "campaigns/r3_prospective_context_v1/R3_EVALUATION_AMENDMENT_V2_REPRODUCIBILITY_MANIFEST.json",
+      "sha256": "ee840ad17dfaf246991f758d6420fd790f8bfcfaa0279ef4d2626ed5d93543a7",
+      "status": "HISTORICAL_PRESERVED"
+    },
+    {
+      "path": "campaigns/r3_prospective_context_v1/R3_SOURCE_DEPENDENCY_MATRIX_V2_FORCEORDER.json",
+      "sha256": "31802e1e09c6b1558cbb0a6938609fe36b15722bb4870ab0656e24ff09de77f6",
+      "status": "HISTORICAL_SUPERSEDED_BY_FUTURE_V3"
+    },
+    {
+      "path": "campaigns/r3_prospective_context_v1/R3_SOURCE_DEPENDENCY_MATRIX.json",
+      "sha256": "cedb4b0e8c41db89dbe38987f425f27fa0fe6b8d80a675880b870f767bb5ca58",
+      "status": "HISTORICAL_PRESERVED"
+    },
+    {
+      "path": "campaigns/r3_prospective_context_v1/R3_LAUNCH_MANIFEST.json",
+      "sha256": "6bed78e0c544249ece7faad9d8bdb1fd4ae3488c721eb029a9e4d65d3bbd1cc5",
+      "status": "INVALID_SUPERSEDED/BLOCKED"
+    }
+  ],
+  "repair_commits": [
+    "0f0bfa9d3bb860fc09262f3bee92aaca734ed8da",
+    "820f88f3626276796304ccbbe1983e6c02cb6710",
+    "ea933604fd97eee3503f901af634785c7c16c3c7"
+  ]
+}

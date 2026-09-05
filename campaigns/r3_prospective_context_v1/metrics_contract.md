@@ -2,8 +2,10 @@
 
 This preregistration defines data-quality gates and later statistical estimands;
 it does not authorize outcome evaluation during collection. The immutable
-contract is `R3_EVALUATION_AMENDMENT_V2.md` and the sole horizon is
-`R3_HORIZON_15M_NEXT_NATIVE_BAR_V1` (`15m`, one bar, no alternatives).
+contract is `R3_EVALUATION_AMENDMENT_V2_ADVERSARIAL.md` and the sole horizon is
+`R3_HORIZON_15M_NEXT_NATIVE_BAR_V1` (`15m`, one bar, no alternatives). The
+short V2 amendment remains preserved historical evidence superseded by the
+adversarial V2 bytes.
 
 The symbolic response interval is `[T_exec, T_exec + 15m]`, where `T_exec` is
 the next executable native 15-minute open. The strict causal rule is

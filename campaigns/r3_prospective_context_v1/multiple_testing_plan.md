@@ -6,7 +6,9 @@ threshold, horizon, polarity, subgroup, or diagnostic grids. The sole horizon
 is `R3_HORIZON_15M_NEXT_NATIVE_BAR_V1`, a native 15-minute one-bar response;
 its selection basis is `EX_ANTE_NATIVE_COLLECTION_CADENCE_AND_MECHANISM_ALIGNMENT`.
 
-`R3_EVALUATION_AMENDMENT_V2.md` is the immutable contract for these six rows.
+`R3_EVALUATION_AMENDMENT_V2_ADVERSARIAL.md` is the immutable contract for
+these six rows. The short `R3_EVALUATION_AMENDMENT_V2.md` remains preserved
+historical evidence superseded by adversarial V2.
 Holm step-down controls two-sided alpha 0.05 across exactly six primary tests.
 The primary dependence units are complete UTC six-hour blocks with a fixed
 10,000-draw wild Rademacher bootstrap (seed 1729); the symbol-and-block

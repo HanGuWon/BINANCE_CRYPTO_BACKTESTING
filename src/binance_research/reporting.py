@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
+import io
+import os
 from pathlib import Path
 from typing import Mapping
 
@@ -28,6 +29,8 @@ REQUIRED_ARTIFACTS = (
 
 
 class ArtifactWriter:
+    """Write machine artifacts into an immutable experiment directory."""
+
     def __init__(self, output_dir: Path) -> None:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -40,7 +43,9 @@ class ArtifactWriter:
         for name in REQUIRED_ARTIFACTS:
             table = tables.get(name, pd.DataFrame([{"status": "INSUFFICIENT EVIDENCE"}]))
             path = self.output_dir / name
-            table.to_csv(path, index=True if "correlation" in name or "overlap" in name else False)
+            buffer = io.StringIO()
+            table.to_csv(buffer, index=True if "correlation" in name or "overlap" in name else False, lineterminator="\n")
+            write_immutable_text(path, buffer.getvalue(), description=f"artifact {name}")
             paths.append(path)
         return paths
 
@@ -53,7 +58,7 @@ class ArtifactWriter:
             "",
             "- Origin Skill: experiment-agent",
             "- Origin Mode: run",
-            f"- Origin Date: {datetime.now(UTC).isoformat()}",
+            f"- Origin Date: {metadata.get('origin_date') or metadata.get('timestamp') or metadata.get('created_at') or 'NOT_SPECIFIED'}",
             f"- Verification Status: {metadata.get('verification_status', 'UNVERIFIED')}",
             f"- Harness Verification: {metadata.get('harness_verification_status', 'NOT_ASSERTED')}",
             f"- Experiment Evidence: {metadata.get('experiment_evidence_status', 'INSUFFICIENT EVIDENCE')}",
@@ -69,7 +74,7 @@ class ArtifactWriter:
             "## Run metadata",
             "",
             "```json",
-            json.dumps(metadata, indent=2, default=str),
+            json.dumps(metadata, indent=2, sort_keys=True, default=str),
             "```",
             "",
             "## Method and leakage protections",
@@ -90,5 +95,33 @@ class ArtifactWriter:
             "backfilled from Alpaca or extrapolated. Negative and empty results remain in artifacts.",
         ]
         path = self.output_dir / "research_report.md"
-        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        write_immutable_text(path, "\n".join(lines) + "\n", description="research report")
         return path
+
+
+def write_immutable_bytes(path: Path, payload: bytes, *, description: str = "artifact") -> Path:
+    """Create *path* once, allowing only an exact-byte idempotent repeat.
+
+    The exclusive create protects against concurrent writers. A symlink is
+    never followed, including a dangling link, so an experiment artifact
+    cannot be redirected outside its declared output directory.
+    """
+    destination = Path(path)
+    if destination.is_symlink():
+        raise ValueError(f"{description} destination must not be a symlink: {destination}")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with destination.open("xb") as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+    except FileExistsError:
+        if destination.is_symlink():
+            raise ValueError(f"{description} destination must not be a symlink: {destination}")
+        if destination.read_bytes() != payload:
+            raise ValueError(f"{description} immutable collision: {destination}")
+    return destination
+
+
+def write_immutable_text(path: Path, text: str, *, description: str = "artifact") -> Path:
+    return write_immutable_bytes(path, text.encode("utf-8"), description=description)

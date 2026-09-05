@@ -8,7 +8,7 @@ import uuid
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 
 @dataclass(frozen=True)
@@ -73,11 +73,27 @@ class ExperimentRegistry:
         self.path = Path(path)
 
     def append(self, record: ExperimentRecord) -> None:
+        values = asdict(record)
+        payload = _canonical_json(values) + "\n"
+        payload_bytes = payload.encode("utf-8")
+        identity = canonical_experiment_identity(values)
+        if self.path.exists():
+            for line in self.path.read_bytes().splitlines(keepends=True):
+                if not line.strip():
+                    continue
+                try:
+                    existing = json.loads(line.decode("utf-8"))
+                except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+                    raise ValueError(f"invalid experiment registry record: {self.path}") from exc
+                existing_identity = canonical_experiment_identity(existing)
+                if existing.get("experiment_id") == record.experiment_id or existing_identity == identity:
+                    if line == payload_bytes:
+                        return
+                    raise ValueError(f"immutable experiment identity collision: {record.experiment_id}")
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        payload = json.dumps(asdict(record), sort_keys=True, separators=(",", ":")) + "\n"
-        descriptor = os.open(self.path, os.O_APPEND | os.O_CREAT | os.O_WRONLY, 0o644)
+        descriptor = os.open(self.path, os.O_APPEND | os.O_CREAT | os.O_WRONLY | getattr(os, "O_BINARY", 0), 0o644)
         try:
-            os.write(descriptor, payload.encode("utf-8"))
+            os.write(descriptor, payload_bytes)
             os.fsync(descriptor)
         finally:
             os.close(descriptor)
@@ -86,3 +102,14 @@ class ExperimentRegistry:
         if not self.path.exists():
             return []
         return [ExperimentRecord(**json.loads(line)) for line in self.path.read_text(encoding="utf-8").splitlines() if line]
+
+
+def _canonical_json(values: Mapping[str, Any]) -> str:
+    return json.dumps(dict(values), sort_keys=True, separators=(",", ":"), default=str)
+
+
+def canonical_experiment_identity(record_or_mapping: ExperimentRecord | Mapping[str, Any]) -> str:
+    """Return the stable identity hash for a record, ignoring only its timestamp."""
+    values = asdict(record_or_mapping) if isinstance(record_or_mapping, ExperimentRecord) else dict(record_or_mapping)
+    values.pop("timestamp", None)
+    return hashlib.sha256(_canonical_json(values).encode("utf-8")).hexdigest()

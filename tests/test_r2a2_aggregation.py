@@ -22,6 +22,8 @@ from scripts.aggregate_r2a2 import (
     checkpoint_path,
     cohort_subset,
     evaluate_temporal_replication,
+    infer_input_membership_scope,
+    membership_label,
     main,
 )
 import scripts.aggregate_r2a2 as aggregation
@@ -204,6 +206,39 @@ def test_cohort_subset_is_functional_and_distinct() -> None:
     assert len(cohort_subset(trades, "spot", "top20", mapping)) == 1
     assert len(cohort_subset(trades, "spot", "top50", mapping)) == 2
     assert len(cohort_subset(trades, "spot", "top100", mapping)) == 3
+
+
+def test_membership_scope_uses_registry_and_fails_closed_on_ambiguity() -> None:
+    assert infer_input_membership_scope(pd.DataFrame({"trial_id": ["T"]})) == "top50"
+    assert infer_input_membership_scope(pd.DataFrame({"cohort": ["TOP50", "top50"]})) == "top50"
+    with pytest.raises(RuntimeError, match="mixed or unknown"):
+        infer_input_membership_scope(pd.DataFrame({"cohort": ["top20", "top50"]}))
+    with pytest.raises(RuntimeError, match="mixed or unknown"):
+        infer_input_membership_scope(pd.DataFrame({"cohort": ["not-a-cohort"]}))
+    with pytest.raises(RuntimeError, match="empty"):
+        infer_input_membership_scope(pd.DataFrame({"cohort": [None]}))
+
+
+def test_top100_label_explicitly_identifies_top50_subset() -> None:
+    assert membership_label("top100", "top50") == "TOP50_MEMBERSHIP_SUBSET_DIAGNOSTIC"
+    assert membership_label("top50", "top50") == "TOP50_UNIVERSE_DIAGNOSTIC"
+
+
+def test_synthetic_aggregation_emits_membership_labels_and_report(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    module, root, _ = _synthetic_aggregation(monkeypatch, tmp_path)
+    monkeypatch.setattr(sys, "argv", ["aggregate_r2a2.py", "--root", str(root)])
+    assert module.main() == 0
+    diagnostics = pd.read_csv(module.CAMPAIGN / "cohort_diagnostics.csv")
+    assert set(diagnostics["membership_label"]) == {"TOP20_UNIVERSE_DIAGNOSTIC", "TOP50_UNIVERSE_DIAGNOSTIC", "TOP50_MEMBERSHIP_SUBSET_DIAGNOSTIC"}
+    summary = pd.read_csv(module.CAMPAIGN / "cohort_summary.csv")
+    symbols = pd.read_csv(module.CAMPAIGN / "symbol_cohort_summary.csv")
+    assert "membership_label" in summary.columns
+    assert "membership_label" in symbols.columns
+    manifest = json.loads((module.CAMPAIGN / "aggregate_manifest.json").read_text(encoding="utf-8"))
+    assert manifest["input_membership_scope"] == "top50"
+    assert manifest["top100_membership_label"] == "TOP50_MEMBERSHIP_SUBSET_DIAGNOSTIC"
+    report = (module.CAMPAIGN / "aggregate_report.md").read_text(encoding="utf-8")
+    assert all(heading in report for heading in ["## Input membership scope", "## Diagnostic labels", "## Unit/trial arithmetic", "## Reproducibility"])
 
 
 def test_checkpoint_path_and_artifact_hashes_are_pinned(tmp_path: Path) -> None:

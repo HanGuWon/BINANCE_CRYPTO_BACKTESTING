@@ -50,8 +50,11 @@ confidence precision before prospective outcome analysis; returns cannot choose
 its end.
 
 The outcome-blind unlock contract is frozen in
-`R3_EVALUATION_AMENDMENT_V2.md`, with the immutable horizon artifact
-`R3_EVALUATION_HORIZON_V1.json`. The exact point-in-time rule is
+`R3_EVALUATION_AMENDMENT_V2_ADVERSARIAL.md`, with the immutable horizon
+artifact `R3_EVALUATION_HORIZON_MAP_V1.json`. The short
+`R3_EVALUATION_AMENDMENT_V2.md` and its V1 horizon/manifest are preserved
+historical evidence superseded by the adversarial V2 bytes. The exact
+point-in-time rule is
 `source_available_time < next_executable_open_time`; equality is rejected.
 V2 fixes UTC six-hour dependence blocks, Holm correction across exactly six
 hypotheses, explicit timestamped gap/block accounting, evidence minima, and a

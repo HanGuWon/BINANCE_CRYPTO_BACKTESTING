@@ -29,5 +29,4 @@ packages = ["src/binance_research"]
 
 [tool.pytest.ini_options]
 addopts = "-ra"
-testpaths = ["tests"]
-
+testpaths = ["tests", "ops/r3/tests"]

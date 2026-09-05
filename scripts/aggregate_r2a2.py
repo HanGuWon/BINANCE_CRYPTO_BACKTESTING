@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import io
 import json
 import subprocess
 from pathlib import Path
@@ -16,6 +17,7 @@ import sys
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "src"))
 from r2a_engine import HOLDOUT_BOUNDARY_BY_TF, _hac_t_stat  # noqa: E402
+from binance_research.reporting import write_immutable_text  # noqa: E402
 
 CAMPAIGN = ROOT / "campaigns" / "r2a2_temporal_horizon_v1"
 SEED = 1729
@@ -27,7 +29,9 @@ EXPECTED_OUTCOME_SOURCE_TREE_SHA256 = "07572aaae5b70f05958fe36c223b2569439547b2c
 REQUIRED_TRADE_FIELDS = {"decision_time", "symbol", "side", "signal_value", "entry_time", "exit_time", "gross_return", "funding_cashflow", "net_return"}
 CANONICAL_CHECKPOINT_ROOT = Path("D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2a2/checkpoints_v10").resolve()
 SCIENTIFIC_SOURCE_PATHS = ("scripts", "src", "tests", "configs", "campaigns/r2a2_temporal_horizon_v1")
-GENERATED_AGGREGATE_ARTIFACTS = {"fold_results.csv", "horizon_results.csv", "temporal_replication.csv", "multiple_testing.csv", "bootstrap_results.csv", "cohort_diagnostics.csv", "yearly_diagnostics.csv", "symbol_concentration.csv", "mfe_mae_diagnostics.csv", "candidate_shortlist.csv", "holdout_guard_proof.json", "aggregate_manifest.json"}
+GENERATED_AGGREGATE_ARTIFACTS = {"fold_results.csv", "horizon_results.csv", "temporal_replication.csv", "multiple_testing.csv", "bootstrap_results.csv", "cohort_diagnostics.csv", "cohort_summary.csv", "symbol_cohort_summary.csv", "yearly_diagnostics.csv", "symbol_concentration.csv", "mfe_mae_diagnostics.csv", "candidate_shortlist.csv", "holdout_guard_proof.json", "aggregate_report.md", "aggregate_manifest.json"}
+COHORTS = ("top20", "top50", "top100")
+LEGACY_INPUT_MEMBERSHIP_SCOPE = "top50"
 
 
 def sha256(path: Path) -> str:
@@ -41,6 +45,42 @@ def sha256(path: Path) -> str:
 def aggregate_artifact_hashes(directory: Path, names: list[str]) -> dict[str, str]:
     """Hash a fixed artifact list in stable order for repeatability proofs."""
     return {name: sha256(directory / name) for name in sorted(names)}
+
+
+def infer_input_membership_scope(registry: pd.DataFrame) -> str:
+    """Resolve the frozen input cohort, failing closed on ambiguous metadata."""
+    if "cohort" not in registry.columns:
+        return LEGACY_INPUT_MEMBERSHIP_SCOPE
+    if registry.empty or registry["cohort"].isna().any():
+        raise RuntimeError("registry cohort scope is empty; refusing aggregation")
+    values = registry["cohort"].astype(str).str.strip().str.lower()
+    if (values == "").any():
+        raise RuntimeError("registry cohort scope is empty; refusing aggregation")
+    unique = set(values)
+    if len(unique) != 1 or not unique.issubset(set(COHORTS)):
+        raise RuntimeError(f"registry cohort scope is mixed or unknown: {sorted(unique)}")
+    return str(next(iter(unique)))
+
+
+def membership_label(cohort: str, input_scope: str) -> str:
+    """Return an explicit membership label for every cohort diagnostic row."""
+    cohort = str(cohort).strip().lower()
+    input_scope = str(input_scope).strip().lower()
+    if cohort not in COHORTS or input_scope not in COHORTS:
+        raise ValueError("unknown cohort membership scope")
+    if cohort == "top100" and input_scope == "top50":
+        return "TOP50_MEMBERSHIP_SUBSET_DIAGNOSTIC"
+    return f"{cohort.upper()}_UNIVERSE_DIAGNOSTIC"
+
+
+def _write_frame(path: Path, frame: pd.DataFrame, *, index: bool = False) -> Path:
+    buffer = io.StringIO()
+    frame.to_csv(buffer, index=index, lineterminator="\n")
+    return write_immutable_text(path, buffer.getvalue(), description=f"aggregate artifact {path.name}")
+
+
+def _write_json(path: Path, value: object, *, description: str) -> Path:
+    return write_immutable_text(path, json.dumps(value, indent=2, sort_keys=True, default=str) + "\n", description=description)
 
 
 def aggregation_source_state() -> tuple[str, bool]:
@@ -216,8 +256,9 @@ def main() -> int:
     aggregate_commit, aggregate_dirty = aggregation_source_state()
     if aggregate_dirty:
         raise RuntimeError("aggregation scientific source tree is dirty; commit before reading outcomes")
+    input_membership_scope = infer_input_membership_scope(registry)
     universe = pd.read_csv(CAMPAIGN.parent / "r1_final_panel_v1" / "universe_monthly.csv")
-    cohort_map = {(str(r.market), str(r.universe_month), str(r.symbol), cohort): _as_bool(getattr(r, "selected_" + cohort)) for r in universe.itertuples(index=False) for cohort in ("top20", "top50", "top100")}
+    cohort_map = {(str(r.market), str(r.universe_month), str(r.symbol), cohort): _as_bool(getattr(r, "selected_" + cohort)) for r in universe.itertuples(index=False) for cohort in COHORTS}
     fold_rows: list[dict] = []
     horizon_rows: list[dict] = []
     bootstrap_rows: list[dict] = []
@@ -252,7 +293,7 @@ def main() -> int:
             share = fold_concentration["top_symbol_share_abs"]
             trial_shares[trial.trial_id].append(share)
             concentration_rows.append({"trial_id": trial.trial_id, "fold_id": fold.fold_id, "scope": "fold_diagnostic", **fold_concentration})
-            for cohort in ("top20", "top50", "top100"):
+            for cohort in COHORTS:
                 if trades.empty:
                     subset = trades
                 else:
@@ -261,7 +302,7 @@ def main() -> int:
                 cs_mean = float(cs.mean()) if len(cs) else np.nan
                 cs_std = float(cs.std(ddof=0)) if len(cs) else np.nan
                 cohort_symbols = {symbol for (mkt, _month, symbol, name), selected in cohort_map.items() if mkt == trial.market and name == cohort and selected}
-                cohort_rows.append({"trial_id": trial.trial_id, "fold_id": fold.fold_id, "cohort": cohort, "cohort_universe_symbol_count": int(len(cohort_symbols)), "trades": int(len(subset)), "aggregate_observations": int(len(cs)), "mean_net_return": cs_mean, "sharpe": float(cs_mean / cs_std) if np.isfinite(cs_std) and cs_std > 0 else np.nan, "hac_t": float(_hac_t_stat(cs)) if len(cs) > 1 else np.nan})
+                cohort_rows.append({"trial_id": trial.trial_id, "fold_id": fold.fold_id, "cohort": cohort, "membership_label": membership_label(cohort, input_membership_scope), "cohort_universe_symbol_count": int(len(cohort_symbols)), "trades": int(len(subset)), "aggregate_observations": int(len(cs)), "mean_net_return": cs_mean, "sharpe": float(cs_mean / cs_std) if np.isfinite(cs_std) and cs_std > 0 else np.nan, "hac_t": float(_hac_t_stat(cs)) if len(cs) > 1 else np.nan})
     for trial in registry.itertuples(index=False):
         parts = trial_series[trial.trial_id]
         combined = pd.concat(parts).sort_index() if parts else pd.Series(dtype=float)
@@ -283,23 +324,30 @@ def main() -> int:
     horizon = add_cross_market_diagnostics(horizon)
     multiple = horizon[["trial_id", "feature_id", "variant", "market", "timeframe", "side", "horizon_bars", "aggregate_hac_t", "p_value", "fdr_q_value", "bonferroni_p"]].copy()
     out = CAMPAIGN
-    pd.DataFrame(fold_rows).to_csv(out / "fold_results.csv", index=False)
-    horizon.to_csv(out / "horizon_results.csv", index=False)
-    horizon[["trial_id", "feature_id", "variant", "market", "timeframe", "side", "horizon_bars", "valid_fold_count", "positive_fold_fraction", "aggregate_hac_t", "fdr_q_value", "max_top_symbol_share_abs", "catastrophic_reversal", "temporal_replication"]].to_csv(out / "temporal_replication.csv", index=False)
-    multiple.to_csv(out / "multiple_testing.csv", index=False)
-    pd.DataFrame(bootstrap_rows).to_csv(out / "bootstrap_results.csv", index=False)
-    pd.DataFrame(cohort_rows).to_csv(out / "cohort_diagnostics.csv", index=False)
-    pd.DataFrame(yearly_rows).to_csv(out / "yearly_diagnostics.csv", index=False)
-    pd.DataFrame(concentration_rows).to_csv(out / "symbol_concentration.csv", index=False)
-    pd.DataFrame({"trial_id": registry.trial_id, "mfe": np.nan, "mae": np.nan, "time_to_mfe": np.nan, "time_to_mae": np.nan, "reason": "checkpoint schema has no intratrade path; diagnostic only; not silently inferred"}).to_csv(out / "mfe_mae_diagnostics.csv", index=False)
+    _write_frame(out / "fold_results.csv", pd.DataFrame(fold_rows))
+    _write_frame(out / "horizon_results.csv", horizon)
+    _write_frame(out / "temporal_replication.csv", horizon[["trial_id", "feature_id", "variant", "market", "timeframe", "side", "horizon_bars", "valid_fold_count", "positive_fold_fraction", "aggregate_hac_t", "fdr_q_value", "max_top_symbol_share_abs", "catastrophic_reversal", "temporal_replication"]])
+    _write_frame(out / "multiple_testing.csv", multiple)
+    _write_frame(out / "bootstrap_results.csv", pd.DataFrame(bootstrap_rows))
+    cohort_frame = pd.DataFrame(cohort_rows)
+    _write_frame(out / "cohort_diagnostics.csv", cohort_frame)
+    cohort_summary = cohort_frame.groupby(["cohort", "membership_label"], as_index=False, dropna=False).agg(rows=("cohort", "size"), cohort_universe_symbol_count=("cohort_universe_symbol_count", "sum"), trades=("trades", "sum"), aggregate_observations=("aggregate_observations", "sum"), mean_net_return=("mean_net_return", "mean"), sharpe=("sharpe", "mean"), hac_t=("hac_t", "mean"))
+    _write_frame(out / "cohort_summary.csv", cohort_summary)
+    symbol_rows = [{"market": market, "universe_month": month, "symbol": symbol, "cohort": cohort, "membership_label": membership_label(cohort, input_membership_scope)} for (market, month, symbol, cohort), selected in sorted(cohort_map.items()) if selected]
+    _write_frame(out / "symbol_cohort_summary.csv", pd.DataFrame(symbol_rows, columns=["market", "universe_month", "symbol", "cohort", "membership_label"]))
+    _write_frame(out / "yearly_diagnostics.csv", pd.DataFrame(yearly_rows))
+    _write_frame(out / "symbol_concentration.csv", pd.DataFrame(concentration_rows))
+    _write_frame(out / "mfe_mae_diagnostics.csv", pd.DataFrame({"trial_id": registry.trial_id, "mfe": np.nan, "mae": np.nan, "time_to_mfe": np.nan, "time_to_mae": np.nan, "reason": "checkpoint schema has no intratrade path; diagnostic only; not silently inferred"}))
     shortlist_cols = ["trial_id", "feature_id", "variant", "market", "timeframe", "side", "horizon_bars", "valid_fold_count", "positive_fold_fraction", "aggregate_hac_t", "fdr_q_value", "max_top_symbol_share_abs", "catastrophic_reversal", "temporal_replication"]
-    horizon.loc[horizon.temporal_replication == "TEMPORAL_REPLICATION", shortlist_cols].to_csv(out / "candidate_shortlist.csv", index=False)
+    _write_frame(out / "candidate_shortlist.csv", horizon.loc[horizon.temporal_replication == "TEMPORAL_REPLICATION", shortlist_cols])
     proof = {"checkpoint_root": str(root), "holdout_boundaries": {key: value.isoformat() for key, value in HOLDOUT_BOUNDARY_BY_TF.items()}, "checked_files": int(len(fold_rows)), "status": "PASS", "method": "decision_time, entry_time, and exit_time asserted strictly before each timeframe boundary; no holdout path opened", "final_holdout_status": "UNTOUCHED"}
-    (out / "holdout_guard_proof.json").write_text(json.dumps(proof, indent=2), encoding="utf-8")
-    aggregate_manifest = {"checkpoint_root": str(root), "outcome_manifest_sha256": sha256(manifest_path), "outcome_implementation_sha": run_manifest.get("implementation_sha"), "outcome_registry_sha256": run_manifest.get("registry_sha256"), "outcome_source_tree_sha256": run_manifest.get("source_tree_sha256"), "outcome_source_dirty": run_manifest.get("source_dirty"), "registry_sha256": sha256(CAMPAIGN / "trial_registry.csv"), "units": int(len(fold_rows)), "expected_units": int(len(expected_units)), "failed_units": 0, "aggregate_implementation_sha": aggregate_commit, "aggregate_source_dirty": aggregate_dirty, "aggregate_script_sha256": sha256(Path(__file__))}
-    artifact_names = ["fold_results.csv", "horizon_results.csv", "temporal_replication.csv", "multiple_testing.csv", "bootstrap_results.csv", "cohort_diagnostics.csv", "yearly_diagnostics.csv", "symbol_concentration.csv", "mfe_mae_diagnostics.csv", "candidate_shortlist.csv", "holdout_guard_proof.json"]
+    _write_json(out / "holdout_guard_proof.json", proof, description="holdout guard proof")
+    aggregate_manifest = {"checkpoint_root": str(root), "outcome_manifest_sha256": sha256(manifest_path), "outcome_implementation_sha": run_manifest.get("implementation_sha"), "outcome_registry_sha256": run_manifest.get("registry_sha256"), "outcome_source_tree_sha256": run_manifest.get("source_tree_sha256"), "outcome_source_dirty": run_manifest.get("source_dirty"), "registry_sha256": sha256(CAMPAIGN / "trial_registry.csv"), "units": int(len(fold_rows)), "expected_units": int(len(expected_units)), "failed_units": 0, "aggregate_implementation_sha": aggregate_commit, "aggregate_source_dirty": aggregate_dirty, "aggregate_script_sha256": sha256(Path(__file__)), "input_membership_scope": input_membership_scope, "top100_membership_label": membership_label("top100", input_membership_scope)}
+    report = "\n".join(["# Aggregate metadata report", "", "## Input membership scope", "", f"- Input scope: `{input_membership_scope}`", "", "## Diagnostic labels", "", f"- Top100 diagnostic: `{membership_label('top100', input_membership_scope)}`", "- Cohort labels are metadata-only and do not change arithmetic.", "", "## Unit/trial arithmetic", "", f"- Observed units: `{len(fold_rows)}`", f"- Expected units: `{len(expected_units)}`", f"- Trial rows: `{len(horizon)}`", "- Historical six-thousand-unit arithmetic is unchanged.", "", "## Reproducibility", "", "- Outputs are serialized with stable ordering and immutable-write semantics.", "- No timestamps or outcome values are included in this metadata report.", ""])
+    write_immutable_text(out / "aggregate_report.md", report, description="aggregate report")
+    artifact_names = ["fold_results.csv", "horizon_results.csv", "temporal_replication.csv", "multiple_testing.csv", "bootstrap_results.csv", "cohort_diagnostics.csv", "cohort_summary.csv", "symbol_cohort_summary.csv", "yearly_diagnostics.csv", "symbol_concentration.csv", "mfe_mae_diagnostics.csv", "candidate_shortlist.csv", "holdout_guard_proof.json", "aggregate_report.md"]
     aggregate_manifest["artifact_sha256"] = aggregate_artifact_hashes(out, artifact_names)
-    (out / "aggregate_manifest.json").write_text(json.dumps(aggregate_manifest, indent=2), encoding="utf-8")
+    _write_json(out / "aggregate_manifest.json", aggregate_manifest, description="aggregate manifest")
     print(json.dumps({"units": len(fold_rows), "trials": len(horizon), "fdr_survivors": int((horizon.fdr_q_value <= .05).sum()), "replications": int((horizon.temporal_replication == "TEMPORAL_REPLICATION").sum()), "bootstrap_samples": BOOTSTRAP_SAMPLES, "bootstrap_blocks": "calendar_month"}, indent=2))
     return 0
 

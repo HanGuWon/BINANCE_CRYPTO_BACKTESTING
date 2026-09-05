@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from pathlib import Path
 import inspect
+import os
+import subprocess
+import sys
 
 import pandas as pd
 import pytest
@@ -61,3 +64,28 @@ def test_regime_attribution_uses_decision_time_not_future_entry_bar() -> None:
     trades = [pd.DataFrame({"feature_id": ["sig"], "decision_time": [times.iloc[0] + pd.Timedelta(minutes=30)], "entry_bar": [2], "net_return": [0.1]})]
     result = _regime_table(trades, regimes, regime_times=times)
     assert result.loc[result["regime_type"] == "volatility_regime", "regime"].item() == "low"
+
+
+def test_cli_defaults_are_repo_root_independent(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.chdir(tmp_path)
+    assert cli._load_config(None)["rule"]["holding_bars"] == 4
+    args = cli.build_parser().parse_args(["collect", "--symbol", "BTCUSDT"])
+    assert args.output == cli.REPO_ROOT / "data/raw/forward"
+    download = cli.build_parser().parse_args(["download", "--market", "um", "--dataset", "klines", "--symbol", "BTCUSDT", "--year", "2024", "--month", "1"])
+    assert download.raw_root == cli.REPO_ROOT / "data/raw"
+
+
+def test_cli_help_subprocess_succeeds_from_unrelated_cwd(tmp_path: Path) -> None:
+    env = os.environ.copy()
+    src = str(cli.REPO_ROOT / "src")
+    env["PYTHONPATH"] = src + os.pathsep + env.get("PYTHONPATH", "")
+    result = subprocess.run([sys.executable, "-m", "binance_research.cli", "collect", "--symbol", "BTCUSDT", "--help"], cwd=tmp_path, env=env, capture_output=True, text=True, check=False)
+    assert result.returncode == 0, result.stderr
+    assert "--output" in result.stdout
+
+
+def test_reproducible_runtime_contract_documented() -> None:
+    document = (cli.REPO_ROOT / "docs/REPRODUCIBLE_RUNTIME.md").read_text(encoding="utf-8")
+    assert "Python 3.11" in document
+    assert "python -m pytest -q tests ops/r3/tests -p no:cacheprovider" in document
+    assert 'python -m pip install -e ".[dev]"' in document

@@ -24,10 +24,12 @@ from .statistics import correlation_matrix, deflated_sharpe_probability, hierarc
 from .synthetic import generate_synthetic_bars
 
 TIMEFRAME_MINUTES = {"1m": 1, "3m": 3, "5m": 5, "15m": 15, "30m": 30, "1h": 60, "2h": 120, "4h": 240, "6h": 360, "8h": 480, "12h": 720, "1d": 1440}
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def _load_config(path: Path | None) -> dict[str, Any]:
-    return tomllib.loads((path or Path("configs/core.toml")).read_text(encoding="utf-8"))
+    config_path = path if path is not None else REPO_ROOT / "configs/core.toml"
+    return tomllib.loads(config_path.read_text(encoding="utf-8"))
 
 
 def _load_bars(path: Path) -> pd.DataFrame:
@@ -253,11 +255,11 @@ def generate_synthetic(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="binance-research", description="Research-only Binance indicator harness"); sub = parser.add_subparsers(dest="command", required=True)
-    download = sub.add_parser("download"); download.add_argument("--market", choices=["spot", "um", "cm"], required=True); download.add_argument("--dataset", required=True); download.add_argument("--symbol", required=True); download.add_argument("--interval"); download.add_argument("--year", type=int, required=True); download.add_argument("--month", type=int, choices=range(1, 13), required=True); download.add_argument("--cadence", choices=["monthly", "daily"], default="monthly"); download.add_argument("--day", type=int, choices=range(1, 32)); download.add_argument("--raw-root", type=Path, default=Path("data/raw")); download.add_argument("--processed-output", type=Path); download.set_defaults(handler=download_archive)
+    download = sub.add_parser("download"); download.add_argument("--market", choices=["spot", "um", "cm"], required=True); download.add_argument("--dataset", required=True); download.add_argument("--symbol", required=True); download.add_argument("--interval"); download.add_argument("--year", type=int, required=True); download.add_argument("--month", type=int, choices=range(1, 13), required=True); download.add_argument("--cadence", choices=["monthly", "daily"], default="monthly"); download.add_argument("--day", type=int, choices=range(1, 32)); download.add_argument("--raw-root", type=Path, default=REPO_ROOT / "data/raw"); download.add_argument("--processed-output", type=Path); download.set_defaults(handler=download_archive)
     validate = sub.add_parser("validate-data"); validate.add_argument("--input", type=Path, required=True); validate.add_argument("--timeframe", choices=TIMEFRAME_MINUTES, required=True); validate.set_defaults(handler=validate_data)
     run = sub.add_parser("run"); run.add_argument("--input", type=Path, required=True); run.add_argument("--output", type=Path, required=True); run.add_argument("--market", choices=["spot", "um", "cm"], default="spot"); run.add_argument("--symbol", default="UNKNOWN"); run.add_argument("--timeframe", choices=TIMEFRAME_MINUTES, default="1h"); run.add_argument("--config", type=Path); run.add_argument("--final-holdout", action="store_true"); run.set_defaults(handler=run_research)
-    collect = sub.add_parser("collect"); collect.add_argument("--symbol", required=True); collect.add_argument("--output", type=Path, default=Path("data/raw/forward")); collect.set_defaults(handler=collect_snapshot)
-    liquidations = sub.add_parser("collect-liquidations"); liquidations.add_argument("--symbol", default="ALL"); liquidations.add_argument("--seconds", type=float, default=60.0); liquidations.add_argument("--output", type=Path, default=Path("data/raw/forward")); liquidations.set_defaults(handler=collect_liquidations)
+    collect = sub.add_parser("collect"); collect.add_argument("--symbol", required=True); collect.add_argument("--output", type=Path, default=REPO_ROOT / "data/raw/forward"); collect.set_defaults(handler=collect_snapshot)
+    liquidations = sub.add_parser("collect-liquidations"); liquidations.add_argument("--symbol", default="ALL"); liquidations.add_argument("--seconds", type=float, default=60.0); liquidations.add_argument("--output", type=Path, default=REPO_ROOT / "data/raw/forward"); liquidations.set_defaults(handler=collect_liquidations)
     synthetic = sub.add_parser("generate-synthetic"); synthetic.add_argument("--rows", type=int, default=1000); synthetic.add_argument("--timeframe", choices=TIMEFRAME_MINUTES, default="1h"); synthetic.add_argument("--seed", type=int, default=1729); synthetic.add_argument("--output", type=Path, required=True); synthetic.set_defaults(handler=generate_synthetic)
     return parser
 
