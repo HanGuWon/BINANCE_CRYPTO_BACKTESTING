@@ -1,0 +1,15 @@
+{
+  "status": "INVALID/SUPERSEDED",
+  "campaign_id": "r3_prospective_context_v1",
+  "launch_version": "production-v4",
+  "recorded_at_utc": "2026-09-02T05:47:00Z",
+  "control_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v4-INVALID_MISSING_VERIFY_IMPORT_20260902",
+  "scientific_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v4-INVALID_ACTIVATION_20260902",
+  "failure_code": "R3_BLOCKED_IMPLEMENTATION",
+  "failure_stage": "SCIENTIFIC_ACTIVATION",
+  "failure_reason": "_probe_scientific_evidence referenced verify_manifest_chain without importing it; activation stopped before a verified scientific cycle.",
+  "historical_outcomes_accessed": false,
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED",
+  "superseded_by": "production-v5-after-verify-manifest-chain-import-fix"
+}

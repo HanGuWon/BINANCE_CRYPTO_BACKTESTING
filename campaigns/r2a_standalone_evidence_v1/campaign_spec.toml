@@ -1,0 +1,52 @@
+schema_version = 1
+campaign_id = "r2a_standalone_evidence_v1"
+preregistration_commit = "dd4f0011519575f5474ba759d5764a7d27d5db66"  # original freeze
+amendment_001_commit = "801cde50ec661d8c65cfa9ed7af76b42aa3c48fd"
+data_root = "data/processed/r1_gap_safe_cohort"  # LOCAL STORAGE ONLY: junction to D:
+
+[universe]
+primary_cohort = "top50"
+diagnostic_cohorts = ["top20", "top100"]
+markets = ["spot", "um"]
+timeframes = ["15m", "1h", "4h"]
+sides = { spot = ["LONG"], um = ["LONG", "SHORT"] }
+
+[splits]  # UTC; from campaigns/r1_final_panel_v1/split_metadata_final.csv
+train_boundary_utc = "2024-01-20T00:00:00+00:00"
+validation_boundary_utc = "2024-02-10T00:00:00+00:00"
+operational_embargo_bars = 1
+purge_bars_24h = { "15m" = 96, "1h" = 24, "4h" = 6 }
+final_holdout = "EXCLUDED_FROM_R2A"
+
+[execution]
+decision_time = "completed_bar_close"
+fill_time = "next_executable_open"
+same_close_fill_allowed = false
+
+[costs]
+spot_taker_bps = 10.0
+spot_slippage_bps = 5.0
+um_taker_bps = 5.0
+um_slippage_bps = 5.0
+funding_cost_source = "actual crossed funding events"
+
+[features]
+selection_rule = "R2A_PRIMARY per corrected feature_availability_final.csv"
+excluded_r2b = ["derivatives.premium", "derivatives.premium_zscore"]
+excluded_forward_shadow = [
+  "microstructure.spread",
+  "microstructure.top_book_imbalance",
+  "derivatives.oi_change",
+]
+
+[parameter_grid]  # frozen coarse variants; no post-validation tuning
+ema_fast_slow = [[10, 30], [20, 50], [50, 200]]
+rsi_period_thresholds = [[7, 30, 70], [14, 30, 70], [21, 30, 70]]
+donchian_period = [20, 48, 55]
+roc_period = [6, 12, 24]
+
+[statistics]
+hac_lags = "Newey-West automatic"
+bootstrap = "time-block, block = 1 calendar month, preserve cross-section"
+multiple_testing = "BH-FDR within market x timeframe family"
+alpha_fdr = 0.05

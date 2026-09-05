@@ -1,0 +1,424 @@
+{
+  "record_type": "R3_CODEXCLAW_CLASSIFICATION",
+  "recorded_at_utc": "2026-09-03T02:05:00Z",
+  "root": ".codexclaw",
+  "inventory_scope": "All files present under .codexclaw at capture time; this artifact is outside .codexclaw and is therefore not self-included.",
+  "total_files": 58,
+  "total_bytes": 514341,
+  "entries": [
+    {
+      "path": "attest.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 914,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "evidence/01a0230d-0a21-7e02-ab97-a10534161680/r2b-real-qual-1.json",
+      "category": "A_REFERENCED_EVIDENCE",
+      "tracked_state": "untracked",
+      "bytes": 1132,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "evidence/01a0230d-0a21-7e02-ab97-a10534161680/r2b-real-qual-2.json",
+      "category": "A_REFERENCED_EVIDENCE",
+      "tracked_state": "untracked",
+      "bytes": 1132,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "evidence/01a0230d-0a21-7e02-ab97-a10534161680/r2b-real-qual-final-1.json",
+      "category": "A_REFERENCED_EVIDENCE",
+      "tracked_state": "untracked",
+      "bytes": 1132,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "evidence/01a0230d-0a21-7e02-ab97-a10534161680/r2b-real-qual-final-2.json",
+      "category": "A_REFERENCED_EVIDENCE",
+      "tracked_state": "untracked",
+      "bytes": 1132,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "evidence/01a0230d-0a21-7e02-ab97-a10534161680/r2b-real-qual-vector-1.json",
+      "category": "A_REFERENCED_EVIDENCE",
+      "tracked_state": "untracked",
+      "bytes": 0,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "evidence/01a0230d-0a21-7e02-ab97-a10534161680/test-receipt.json",
+      "category": "A_REFERENCED_EVIDENCE",
+      "tracked_state": "untracked",
+      "bytes": 2023,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "evidence/p4_forward_ranking_pytest.txt",
+      "category": "A_REFERENCED_EVIDENCE",
+      "tracked_state": "untracked",
+      "bytes": 100,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "evidence/r3_scope.txt",
+      "category": "A_REFERENCED_EVIDENCE",
+      "tracked_state": "untracked",
+      "bytes": 100,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/adversarially-repair-the-final-r3-pre-boundary-s/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 10686,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/adversarially-repair-the-final-r3-pre-boundary-s/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 9174,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/clear-the-false-r3-forward-ranking-blocker-and-c/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 3436,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/clear-the-false-r3-forward-ranking-blocker-and-c/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 3158,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/close-r2b-v7-provenance-and-build-r3-prospective/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 7061,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/close-r2b-v7-provenance-and-build-r3-prospective/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 835,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/close-the-last-four-r3-launchability-gaps-correc/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 6919,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/close-the-last-four-r3-launchability-gaps-correc/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 5572,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/complete-r3-pre-boundary-launch-conformance-pres/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 7519,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/complete-r3-pre-boundary-launch-conformance-pres/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 4558,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/continue-the-repaired-r3-repository-on-branch-re/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 15983,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/continue-the-repaired-r3-repository-on-branch-re/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 11874,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/correct-the-frozen-r2b-v6-execution-gap-defect-a/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 8506,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/correct-the-frozen-r2b-v6-execution-gap-defect-a/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 2539,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/execute-and-verify-the-authorized-r2b-restricted/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 6615,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/execute-and-verify-the-authorized-r2b-restricted/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 914,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/finalize-r3-prospective-collection-conformance-f/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 7734,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/finalize-r3-prospective-collection-conformance-f/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 1960,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/goal-implement-and-qualify-the-real-r3-post-boun/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 22121,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/goal-implement-and-qualify-the-real-r3-post-boun/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 21057,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/goal-perform-the-final-real-time-r3-burn-in-and/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 19386,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/goal-perform-the-final-real-time-r3-burn-in-and/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 17938,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/implement-and-qualify-the-real-production-wiring/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 7871,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/implement-and-qualify-the-real-production-wiring/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 6773,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/operationalize-and-protect-the-already-active-r3/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 20178,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/operationalize-and-protect-the-already-active-r3/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 15284,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/reconcile-the-stale-r3-worktree-with-the-canonic/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 20098,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/reconcile-the-stale-r3-worktree-with-the-canonic/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 9814,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/repair-and-fully-qualify-the-final-r3-production/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 8247,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/repair-and-fully-qualify-the-final-r3-production/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 7372,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/repair-only-the-r3-production-entrypoint-import/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 7530,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/repair-only-the-r3-production-entrypoint-import/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 6416,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/repair-the-r3-august-source-expected-set-semanti/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 8357,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/repair-the-r3-august-source-expected-set-semanti/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 7219,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/repair-the-r3-prospective-context-v1-launch-cont/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "tracked",
+      "bytes": 6829,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/repair-the-r3-prospective-context-v1-launch-cont/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 2196,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/run-august-2026-um-top50-engineering-shadow-from/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 7349,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/run-august-2026-um-top50-engineering-shadow-from/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 6424,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/safely-complete-the-r2b-restricted-derivatives-v/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 9464,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/safely-complete-the-r2b-restricted-derivatives-v/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 1638,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/safely-finish-the-corrected-binance-r2a-2-tempor/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "tracked",
+      "bytes": 7233,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/safely-finish-the-corrected-binance-r2a-2-tempor/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 2741,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/safely-repair-r2b-premium-availability-timestamp/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 5043,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/safely-repair-r2b-premium-availability-timestamp/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 2758,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/seal-the-r3-launch-v2-safety-patch-then-execute/goalplan.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 10384,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "goalplans/seal-the-r3-launch-v2-safety-patch-then-execute/ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 8102,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "ledger.jsonl",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 114693,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "render-observations.jsonl",
+      "category": "C_SESSION_NOISE",
+      "tracked_state": "untracked",
+      "bytes": 0,
+      "action": "PRESERVE"
+    },
+    {
+      "path": "sessions/01a0230d-0a21-7e02-ab97-a10534161680.json",
+      "category": "B_OPERATIONAL_STATE",
+      "tracked_state": "untracked",
+      "bytes": 1118,
+      "action": "PRESERVE"
+    }
+  ],
+  "ignore_mutation": false,
+  "deleted_paths": [],
+  "notes": [
+    "A_REFERENCED_EVIDENCE contains receipt/evidence files retained for provenance.",
+    "B_OPERATIONAL_STATE contains goalplans, ledgers, session bindings, and current attest state; these are preserved for auditability.",
+    "C_SESSION_NOISE is retained but not referenced by scientific conclusions.",
+    "No blanket .gitignore rule was added and no .codexclaw path was deleted."
+  ]
+}

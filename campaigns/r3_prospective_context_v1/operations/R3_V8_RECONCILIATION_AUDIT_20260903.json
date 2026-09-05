@@ -1,0 +1,82 @@
+{
+  "record_type": "R3_V8_RECONCILIATION_AUDIT",
+  "recorded_at_utc": "2026-09-03T02:48:17.535818Z",
+  "purpose": "Outcome-blind operational reconciliation of the already-running sealed v8 collector",
+  "current_head": "d58a96e3020a277a96c62f80a5a971dd59c0b0ea",
+  "origin_head": "0a8c5f21d882af521511e29643d26ac85f2056b7",
+  "ahead_behind_current_head_vs_origin": "2 0",
+  "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+  "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "scientific_scope_status": "clean",
+  "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8",
+  "roster_sha256": "bb05514dfc78cfca3b736488b1454f4cb022da0110e2cbf69f53c505f543ea79",
+  "writer_count": 1,
+  "writer_pids": [
+    153760
+  ],
+  "duplicate_writers": [],
+  "lock_alive": true,
+  "cycle_count": 73,
+  "health_count": 73,
+  "manifest_entry_count": 73,
+  "missing_cycle_count": 0,
+  "latest_cycle_id": "cycle-20260903T024503281858Z",
+  "latest_cycle_completed_at": "2026-09-03T02:45:26.930548Z",
+  "latest_target_bar_open": "2026-09-03T02:30:00Z",
+  "latest_target_bar_close": "2026-09-03T02:45:00Z",
+  "manifest_sha256": "6883e66dd4a3112d61952a4713c778baef12f115c6c37af20a1dcd2e8ae28d96",
+  "manifest_chain_verification": true,
+  "seal_sha256": "ab83232d90e800bf8178c6f3d22138382fb102b9d14213e12a798c0f2c68ad85",
+  "seal_status": "SEALED",
+  "gap_count": 12,
+  "restart_count": 12,
+  "gap_reason": "reported_source_or_restart_gap",
+  "watchdog_state": "YELLOW",
+  "disk_state": "GREEN",
+  "free_disk_bytes": 136144461824,
+  "service": {
+    "startup_fallback_valid": true,
+    "task_scheduler_registered": false,
+    "task_scheduler_reason": "Access denied / task absent under current token",
+    "launcher_collision_exit_code": 73,
+    "restart_disposition": "SAFE_SKIP_LIVE_RESTART"
+  },
+  "captured_outputs": [
+    {
+      "label": "outcome-blind watchdog",
+      "command": "uv Python ops/r3/r3_ops.py watch --exact-v8 --root D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8 --roster campaigns/r3_prospective_context_v1/rosters/2026-09.json --manifest D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_MANIFEST_2026-09.json --seal D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_SEAL_RECEIPT.json",
+      "result": "R3_V8_WATCHDOG_SNAPSHOT; cycle_count=73; writer_count=1; chain=true; seal=SEALED; state=YELLOW; disk=GREEN"
+    },
+    {
+      "label": "operations qualification",
+      "command": "uv Python ops/r3/verify_ops_layer.py",
+      "result": "R3_OPS_C_CHECK=PASS targeted=7 passed launcher_collision_exit=73"
+    },
+    {
+      "label": "daily operations receipt",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_DAILY_OPERATIONS_RECEIPTS.jsonl",
+      "result": "APPENDED date=2026-09-03; observed_cycle_count=32; missing_cycle_count=0; outcomes_accessed=false"
+    }
+  ],
+  "append_only_guard": {
+    "new_receipt_path": "campaigns/r3_prospective_context_v1/operations/R3_V8_RECONCILIATION_AUDIT_20260903.json",
+    "legacy_final_audit_path": "campaigns/r3_prospective_context_v1/operations/R3_V8_FINAL_OPERATIONS_AUDIT_20260902.json",
+    "legacy_final_audit_sha256_at_capture": "2ab08b6b9ae64e4619bee69ecc34b32ba08ea2ae95c4bf816f1b58453794cfad",
+    "legacy_final_audit_overwritten": false,
+    "rerun_policy": "new timestamped path only; never overwrite prior audit"
+  },
+  "negative_access": {
+    "outcomes_accessed": false,
+    "returns_accessed": false,
+    "performance_accessed": false,
+    "final_holdout_accessed": false,
+    "r2b2_accessed": false,
+    "payload_streams_opened": false,
+    "collector_stopped": false,
+    "new_root_created": false,
+    "v9_created": false
+  },
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED"
+}

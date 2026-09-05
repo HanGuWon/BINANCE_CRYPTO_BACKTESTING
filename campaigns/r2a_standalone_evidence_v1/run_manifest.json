@@ -1,0 +1,28 @@
+{
+  "campaign": "r2a_standalone_evidence_v1",
+  "r1_source_commit": "26d475da5b3747011a7c488118920bf3fc5950e3",
+  "preregistration_freeze_commit": "801cde50ec661d8c65cfa9ed7af76b42aa3c48fd",
+  "implementation_commit_at_run_start": "33f52ce3e9f0e3d406e4ff2eadb633e6d12f1491",
+  "outcome_commit": "33f52ce3e9f0e3d406e4ff2eadb633e6d12f1491",
+  "registry_sha256_at_run": "a64aedfea95f2134db7069ed516742a2991122ca41ffdef05afe8014f7bbea76",
+  "trial_count_registered": 252,
+  "trials_completed": 252,
+  "trials_failed": 0,
+  "trials_censored": 0,
+  "artifact_sha256": {
+    "R2A_PROTOCOL.md": "1c04d9548ff7c2e535c439163f2c8291da907c5f668d5a6369706263f5cd24af",
+    "R2A_PROTOCOL_AMENDMENT_001.md": "c4c56780a1bcdf6f9e2f76e4dbe895cfd78bb1de5f744404e936a866f8cc2eec",
+    "campaign_spec.toml": "bf88c770b92aa0f31897f85320b1973ca1a9555dc5ef6b740b865378606719da",
+    "trial_registry.csv": "a64aedfea95f2134db7069ed516742a2991122ca41ffdef05afe8014f7bbea76",
+    "validation_results.csv": "ffff3e5ab74cf119b7bb83c6c79df9466f3a6f917f5d9de2a0e5a1dfd24b3c55",
+    "train_descriptive.csv": "7eb4b496ca0ab6f07bfda980d86df19dd571accb849ddb95b88760853e843e61",
+    "hac_results.csv": "bdc537362bd83c3143da43a18bdb710781e744da008c663560612bfd7705b90d",
+    "bootstrap_results.csv": "2d5270418ac54e921adb1a71e15b2e5a28beb015f3f6ff03aff46b27425c7877",
+    "multiple_testing.csv": "ad6e3a9b3ae00d1a3597861e8dc9aa548ef5566888deba4a2c7d5b8e22f182d5",
+    "walk_forward_results.csv": "39d9dadc9d6094c28f675ff6e37b7dce3e4695e210d9c1523445d181d7aa4d2f",
+    "yearly_stability.csv": "32dd24b922b2845080df5fd606b650dfca97d9c818930bebed7136c4b919d760",
+    "cohort_diagnostics.csv": "3e1fe598c0a0e3177d646369978114f4b0f3d77e7782ffaaccf442c8ae60908f",
+    "symbol_concentration.csv": "220559292eb820ae3a36c377b980a4ae92d36e9a88e77f9fefc8d645427dcca4",
+    "candidate_shortlist.csv": "4777db74dcead4e0959adf7eb4d61128e39ca71f1a0779f06202a64cccf108ee"
+  }
+}

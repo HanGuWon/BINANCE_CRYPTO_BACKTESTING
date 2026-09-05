@@ -1,0 +1,23 @@
+{
+  "command": "python -m pytest -q",
+  "status": "PASS",
+  "exit_code": 0,
+  "passed": 182,
+  "failed": 0,
+  "pytest_summary": "182 passed, 1 warning in 125.88s (0:02:05)",
+  "run_timestamp": "2026-08-28T21:02:08.215+09:00",
+  "scientific_source_dirty": false,
+ "warnings": 1,
+  "warning_summary": "UserWarning: timezone information dropped when converting a PeriodArray/Index in test_r16_semantics.py",
+  "holdout_status": "UNTOUCHED",
+  "source_commit_for_tested_scientific_files": "0b817ba96e6745bf91cc59ea1a9a4db17cd25575",
+  "source_tree_sha256": "dff86356a7be4a2ec30b466f3de5c7b774c4ad1092324f525a8d3f9202f17825",
+  "source_tree_scope": ["scripts", "src", "tests", "configs"],
+  "receipt_source_identity": {
+    "cxc_commit_sha": "07a69f15b935aac920a4835a8a4eae5d22aaf941",
+    "cxc_tree_hash": "cf9b7d36eabbb257bf148c8de2fbd298af0b9a164e1e06d84bc956463cb5c619",
+    "cxc_global_dirty": true,
+    "scientific_scope_status": "clean",
+    "scientific_scope_command": "git status --porcelain -- scripts src tests configs"
+  }
+}

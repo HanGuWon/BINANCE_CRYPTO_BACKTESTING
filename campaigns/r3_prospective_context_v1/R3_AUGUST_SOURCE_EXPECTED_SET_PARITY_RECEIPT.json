@@ -1,0 +1,30 @@
+{
+  "august_roster_sha256": "ec2609bb7df0019984d41be3c5f18154591f5c8735a71557de7207c5606a00cc",
+  "months": [
+    {
+      "effective_month": "2025-06",
+      "roster_sha256": "1bc5ce9486face82a74558197c380123e91982586c918d9f0ed86c079d009658",
+      "symbols": 50
+    },
+    {
+      "effective_month": "2025-08",
+      "roster_sha256": "02feb77d1030673456dc381d94b94b0faf2c20944d8ef19a036c9f1e3a761379",
+      "symbols": 50
+    },
+    {
+      "effective_month": "2026-07",
+      "roster_sha256": "fb6b4dc38b6e97b2ef533e00b0e5865951113bf87cfd5b285f3b1d20d4b8bd00",
+      "symbols": 50
+    },
+    {
+      "effective_month": "2026-08",
+      "roster_sha256": "ec2609bb7df0019984d41be3c5f18154591f5c8735a71557de7207c5606a00cc",
+      "symbols": 50
+    }
+  ],
+  "outcomes_accessed": false,
+  "ranking_input": "precomputed_artifact_control_only",
+  "september_roster": "NOT_BUILT_BEFORE_BOUNDARY",
+  "source_sha256": "4776921533f2b26331bd43b659e3ddf346481372d33ddb5dd4e6768076ed3b9a",
+  "status": "PASS"
+}

@@ -15,6 +15,15 @@ Strategy/indicator evidence: `INSUFFICIENT EVIDENCE`
 These statuses are intentionally separate. No strategy has been shown to be
 profitable.
 
+## R3 prospective state
+
+R3 currently collects prospective causal market-state context under the sealed
+v8 identity. Collection is outcome-blind and append-only; it has no outcome
+result. The historical V2.1 harness and R1/R2A/R2A.2/R2B evidence remain
+preserved. The current canonical identity and stale-worktree disposition are
+indexed in
+`campaigns/r3_prospective_context_v1/R3_CANONICAL_STATE_INDEX.json`.
+
 The repository began empty. The implementation is therefore isolated as a Python
 package under `src/binance_research`; there is no production bot behavior to
 change or preserve.

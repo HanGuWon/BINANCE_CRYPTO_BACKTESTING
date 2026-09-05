@@ -1,0 +1,4 @@
+INVALID/SUPERSEDED legacy R2A.2 campaign runner. It used raw != 0 without
+matching signal sign to the trial side and is not an executable for scientific
+outcomes. The file is retained for provenance only; use run_r2a2_v2.py after
+the strict qualification and source-cleanliness gates.

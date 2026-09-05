@@ -1,0 +1,9 @@
+{
+  "method": "canonical UTF-8 LF; JSON sorted keys and non-scientific path normalization; CSV stable header and row order with deterministic NaN/float text",
+  "artifacts": {
+    "aggregate_manifest.json": {"canonical_file_sha256": "30f217f4635878a1b6a754900ab6027b9666aaef72d0ade3a8afc25d37e1722d", "portable_semantic_sha256": "7a79ff379f273cbe079c14eaf517a6b37dba320de763a4b26a67f653b122cdbd"},
+    "fold_results.csv": {"canonical_file_sha256": "25d0d78f04318707d51adfddcfb58297da3b69e109847197cbbec5089fc1bda9", "portable_semantic_sha256": "cb2e64f633a2402b012cee8b41aeee1d06c053b1c0986881676379c53d9aa783"},
+    "bootstrap_results.csv": {"canonical_file_sha256": "7b2c83b49266c681f418e9a20453b95b8a194d88cd070eec9c9efb5b7ac8132d", "portable_semantic_sha256": "d5a3cd80a17fb2159ee1e5b796c84a07ce27b1f7fb28f583296c9b1644b0e232"},
+    "holdout_guard_proof.json": {"canonical_file_sha256": "52dcf30835d3ee77eb387b9e449337e450fa270b604ba35d17b78d403a644abe", "portable_semantic_sha256": "f9af1e819300f83118bbbe9e934ad26096807ffdfd2ae7e6318c5381a0356143"}
+  }
+}

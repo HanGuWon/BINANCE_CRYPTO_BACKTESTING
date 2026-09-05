@@ -1,0 +1,42 @@
+{
+  "ahead_behind": "0\t0",
+  "branch": "research/r2b-restricted-derivatives-v1",
+  "cycle_count": 142,
+  "final_holdout": "UNTOUCHED",
+  "head": "388c3252ace9da571125e1fa8d812b0479ef69db",
+  "health_count": 142,
+  "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+  "manifest_chain_verification": true,
+  "manifest_entry_count": 142,
+  "manifest_sha256": "cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659",
+  "no_root_or_manifest_rewrite": true,
+  "origin_head": "388c3252ace9da571125e1fa8d812b0479ef69db",
+  "outcomes_accessed": false,
+  "r2b2": "NOT_STARTED",
+  "record_type": "R3_V2_FIREWALL_ROOT_IDENTITY_AUDIT",
+  "recorded_at_utc": "2026-09-04T14:51:12.992319+00:00",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8",
+  "root_byte_count_after": 178924326,
+  "root_byte_count_before": 178924326,
+  "root_file_count_after": 1004,
+  "root_file_count_before": 1004,
+  "root_stable_during_audit": true,
+  "root_tree_sha256_after": "b82728c8c0bfc537cfcfb1d3b424ed858bb782abcf35f5c185e294cd93fe68aa",
+  "root_tree_sha256_before": "b82728c8c0bfc537cfcfb1d3b424ed858bb782abcf35f5c185e294cd93fe68aa",
+  "scientific_source_dirty": false,
+  "scientific_source_status_output": "",
+  "seal_sha256": "ab83232d90e800bf8178c6f3d22138382fb102b9d14213e12a798c0f2c68ad85",
+  "seal_status": "SEALED",
+  "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+  "watchdog_reasons": [
+    "reported_source_or_restart_gap"
+  ],
+  "watchdog_state": "YELLOW",
+  "writer": {
+    "authorized_writer_count": 1,
+    "duplicate_writers": [],
+    "lock_alive": true,
+    "lock_pid": 179808
+  }
+}

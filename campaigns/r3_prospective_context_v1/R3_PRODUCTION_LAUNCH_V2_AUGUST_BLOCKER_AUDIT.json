@@ -1,0 +1,23 @@
+{
+  "state": "R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE",
+  "audit_type": "outcome_blind_source_blocker_reverification",
+  "implementation_commit": "9dc483f389c0c44b055231937de46562b29c8623",
+  "production_v2_control_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v2",
+  "failed_symbol": "1000BTTCUSDT",
+  "historical_census_evidence": {
+    "asset_taxonomy": "um,1000BTTCUSDT,BTTC,PERPETUAL_VERIFIED,historical fundingRate archive presence",
+    "volume_manifest_rows_found": 4,
+    "archive_months_observed": ["2022-01", "2022-02", "2022-03", "2022-04"]
+  },
+  "current_public_exchange_info": {
+    "endpoint": "https://fapi.binance.com/fapi/v1/exchangeInfo",
+    "symbol_present": false,
+    "matching_bttc_symbols": []
+  },
+  "launch_error": "daily fallback failed for 1000BTTCUSDT day 1: HTTP Error 404: Not Found",
+  "disposition": "Historical taxonomy evidence does not establish current August source availability; source completion is impossible for this candidate under the frozen expected-set contract. Do not patch or resume production-v2; any future repair requires a new versioned root and identity.",
+  "v1_temporal_sha256": "5bb38de8c19175784e8e8a8561ca233b3951338962a245e039d9acc4199f0e6b",
+  "outcomes": "NOT_STARTED",
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED"
+}

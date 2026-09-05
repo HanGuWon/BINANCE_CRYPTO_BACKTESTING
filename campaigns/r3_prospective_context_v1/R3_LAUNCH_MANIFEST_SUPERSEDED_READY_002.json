@@ -1,0 +1,11 @@
+{
+  "campaign_id": "r3_prospective_context_v1",
+  "status": "R3_READY_FOR_PROSPECTIVE_LAUNCH",
+  "implementation_commit": "da6869c43303cb21c89a76b031f71f21abc06f14",
+  "source_tree_sha256": "134268865234f9cef6c6fc3f47a682a88184bfe78b6ad7b972675f3487597a51",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "pilot_receipt_sha256": "e8309d227977cc450fb44af0521d1c8e512ea7286309a2a1a1720e2586a0a1c9",
+  "final_holdout_status": "UNTOUCHED",
+  "r2b2_status": "NOT_STARTED",
+  "outcome_analysis_status": "NOT_STARTED"
+}

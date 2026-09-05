@@ -1,0 +1,12 @@
+{
+  "checkpoint_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r2a2\\checkpoints_v10",
+  "holdout_boundaries": {
+    "15m": "2024-02-10T00:15:00+00:00",
+    "1h": "2024-02-10T01:00:00+00:00",
+    "4h": "2024-02-10T04:00:00+00:00"
+  },
+  "checked_files": 6048,
+  "status": "PASS",
+  "method": "decision_time, entry_time, and exit_time asserted strictly before each timeframe boundary; no holdout path opened",
+  "final_holdout_status": "UNTOUCHED"
+}

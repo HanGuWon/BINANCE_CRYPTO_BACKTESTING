@@ -1,0 +1,51 @@
+schema_version = 1
+campaign_id = "r2a2_temporal_horizon_v1"
+parent_campaign = "r2a_standalone_evidence_v1"
+parent_corrected_outcome_commit = "a051eeeceae9cee34ee4a0150e94de51e6747747"
+data_root = "data/processed/r1_gap_safe_cohort"  # LOCAL STORAGE ONLY (D: junction)
+
+[universe]
+markets = ["spot", "um"]
+timeframes = ["15m", "1h", "4h"]
+sides = { spot = ["LONG"], um = ["LONG", "SHORT"] }
+primary_cohort = "top50"
+diagnostic_cohorts = ["top20", "top100"]
+feature_selection = "ALL structurally eligible R2A registry features/variants (no grade-based filtering)"
+
+[horizons.bars]
+"15m" = [4, 16, 48, 96]
+"1h" = [4, 12, 24]
+"4h" = [3, 6]
+
+[folds]  # fixed six-month calendar validation blocks, strictly pre-holdout
+blocks = ["2020-H1", "2020-H2", "2021-H1", "2021-H2", "2022-H1", "2022-H2", "2023-H1", "2023-H2"]
+training = "expanding; only data before each fold start"
+minimum_valid_folds_for_replication = 4
+minimum_trades_per_valid_fold = 30
+
+[splits]
+operational_embargo_bars = 1  # split boundaries only, never trade latency
+purge_bars_24h_equivalent = { "15m" = 96, "1h" = 24, "4h" = 6 }  # scaled per horizon at runtime
+final_holdout = "EXCLUDED_ABSOLUTELY"
+
+[costs]
+spot_taker_bps = 10.0
+spot_slippage_bps = 5.0
+um_taker_bps = 5.0
+um_slippage_bps = 5.0
+um_funding = "actual crossed funding events; cashflow = -side * sum(rates)"
+
+[statistics]
+unit = "time-indexed aggregate decision-time portfolio series (equal-weight active signals)"
+hac = "Newey-West automatic on aggregate series"
+bootstrap = { type = "calendar-block", preserve = "all symbols together", samples = 1000, seed = 1729 }
+fdr = { method = "BH", q = 0.05, family = "full expanded preregistered registry" }
+bonferroni = "descriptive secondary"
+
+[grading.frozen]
+minimum_valid_folds = 4
+minimum_positive_fold_fraction = 0.75
+maximum_fdr_q = 0.05
+minimum_abs_hac_t_on_aggregate = 3.0
+maximum_top_symbol_share = 0.5
+catastrophic_reversal_rule = "worst-fold aggregate mean < -2x best-fold aggregate mean fails"

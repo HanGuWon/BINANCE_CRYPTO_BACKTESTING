@@ -1,0 +1,23 @@
+{
+  "status": "INVALID/SUPERSEDED",
+  "campaign_id": "r3_prospective_context_v1",
+  "launch_version": "production-v3",
+  "recorded_at_utc": "2026-09-02T13:48:00Z",
+  "control_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v3",
+  "scientific_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v1",
+  "raw_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\raw",
+  "failure_code": "R3_BLOCKED_LAUNCH_IDENTITY",
+  "failure_stage": "SEPTEMBER_ROSTER_FREEZE",
+  "failure_reason": "_validate_artifact_references paired roster_path with logical roster_sha256 instead of roster_file_sha256; launch stopped before seal or scientific activation.",
+  "historical_outcomes_accessed": false,
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED",
+  "preserved_stage_artifacts": {
+    "august_source_acquisition.json": "038c0880d385092e7b8df76eca471028960f3df4eb1cd110cbd17ae4127f8c8f",
+    "august_source_verification.json": "d8ef1582764ecfaa28e95977bb614700a41174a921ae886b6dafb7f9a915cff5",
+    "R3_AUGUST_2026_SOURCE_VERIFICATION_RECEIPT.json": "5d758f1dd07f4cd7137fc42020c27d5a699d999f1592852d4ce873b5ce826718",
+    "september_ranking.json": "57418e856f41f2548909c22afbde91429e49496910f904208d27d86ccf02e535",
+    "ranking/universe_monthly.csv": "73ef7df417225b5810ea3befaeeb8bf478c2d2908323c204ce8db1c442be6094"
+  },
+  "superseded_by": "production-v4-after-artifact-reference-fix"
+}

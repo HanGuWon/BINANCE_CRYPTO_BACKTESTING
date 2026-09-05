@@ -1,0 +1,56 @@
+{
+  "status": "PASS",
+  "purpose": "R3_V3_IDENTITY_RECONCILIATION",
+  "recorded_at_utc": "2026-09-02T02:22:38Z",
+  "branch": "research/r2b-restricted-derivatives-v1",
+  "head": "510caa220501c29bbf8962d70f19f7e28df498bc",
+  "origin_head": "510caa220501c29bbf8962d70f19f7e28df498bc",
+  "origin_ahead_behind": "0 0",
+  "pytest_receipt_implementation_commit": "f716784661a902126f6bc84198459c817204cd97",
+  "pytest_receipt_source_tree_sha256": "2bf4deb475ff103335c66254364f9aae651a707ac421ffbbb0b7cff21fa9b40e",
+  "pytest_receipt_commit_is_ancestor": true,
+  "head_delta_from_pytest_receipt": {
+    "commit": "510caa220501c29bbf8962d70f19f7e28df498bc",
+    "changed_paths": [
+      "campaigns/r3_prospective_context_v1/R3_AUGUST_DISCOVERY_PATH_HISTORICAL_PARITY_RECEIPT.json",
+      "campaigns/r3_prospective_context_v1/R3_V3_IDENTITY_RECONCILIATION_RECEIPT.json"
+    ],
+    "scientific_scope_changed": false,
+    "source_tree_sha_unchanged": true
+  },
+  "current_source_tree_sha256": "2bf4deb475ff103335c66254364f9aae651a707ac421ffbbb0b7cff21fa9b40e",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "scientific_source_status_command": "git status --porcelain -- scripts src tests configs",
+  "scientific_source_status_output": "",
+  "discovery_parity_receipt": "campaigns/r3_prospective_context_v1/R3_AUGUST_DISCOVERY_PATH_HISTORICAL_PARITY_RECEIPT.json",
+  "discovery_parity_receipt_sha256": "4f0216ee2429fa1fdbcc8ba2d54c091a25a7476a0394425a306dc3e02e82f73a",
+  "production_v1_temporal_gate_sha256": "5bb38de8c19175784e8e8a8561ca233b3951338962a245e039d9acc4199f0e6b",
+  "production_v2_preservation": {
+    "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v2",
+    "file_count": 4,
+    "files": {
+      "temporal_gate.json": "778e0a4c797d399638316f349dc2a8cae6d7ad0e6108ebaf9901b1b10b32ee71",
+      "august_source/census/asset_taxonomy.csv": "76ee7e9973b66c3842f26cbb2147bd527c2ecf9fdb18798d73025f1c1b7c4d33",
+      "august_source/census/volume_archive_manifest.csv": "40ab5342ff42676cc1ec15ee7e292afd6d529679b194f609cf176edf618eb10a",
+      "august_source/census/volume_size_estimate.json": "494f969e10ceaf9cd695740309b80f3b82e4cf8387766b6bbd7b48640fdc7f01"
+    }
+  },
+  "production_v3_control_root": {
+    "path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v3",
+    "file_count": 0,
+    "fresh": true
+  },
+  "engineering_shadow_v3_root": {
+    "path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\engineering_shadow_september_launch_v3",
+    "file_count": 0,
+    "fresh": true
+  },
+  "scientific_root": {
+    "path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v1",
+    "exists": false,
+    "fresh": true
+  },
+  "outcomes_accessed": false,
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED"
+}

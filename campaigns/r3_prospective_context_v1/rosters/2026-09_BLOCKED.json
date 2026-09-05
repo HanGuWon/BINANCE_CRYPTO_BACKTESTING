@@ -1,0 +1,9 @@
+{
+  "effective_month": "2026-09",
+  "status": "R3_WAITING_FOR_COMPLETED_AUGUST_RANKING",
+  "reason": "Before the September boundary, August 2026 is not complete; collection cannot infer or invent September membership.",
+  "required_prior_month": "2026-08",
+  "source_artifact": "campaigns/r1_final_panel_v1/universe_monthly.csv",
+  "outcomes_accessed": false,
+  "final_holdout_status": "UNTOUCHED"
+}

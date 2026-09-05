@@ -1,0 +1,45 @@
+schema_version = 1
+campaign_id = "r2b_restricted_derivatives_v1"
+status = "VERIFIED_R2B_CORRECTED_PREHOLDOUT_COMPLETED_NO_ROBUST_TEMPORAL_REPLICATION"
+parent_campaign = "r2a2_temporal_horizon_v1"
+data_root = "D:/BINANCE_CRYPTO_BACKTESTING_DATA/processed/r2b_restricted_derivatives_v1_repaired_v2_causal3"
+raw_root = "D:/BINANCE_CRYPTO_BACKTESTING_DATA/raw/um/premiumIndexKlines"
+holdout_boundary_utc = "2024-02-10T00:00:00Z"
+archive_cutoff_month = "2024-01"
+feature_semantics = "R2B_SIGNAL_SEMANTICS_AMENDMENT_002"
+outcome_run_permitted = false
+outcome_run_started = true
+final_holdout_accessed = false
+historical_protocol = "R2B_HISTORICAL_OUTCOME_PROTOCOL_001.md"
+fold_registry = "fold_registry.csv"
+cost_contract = "R2B_COST_CONTRACT_001.md"
+statistics_contract = "R2B_STATISTICS_CONTRACT_001.md"
+grading_contract = "R2B_GRADING_CONTRACT_001.md"
+multiple_testing_family_size = 72
+outcome_checkpoint_root = "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r2b_restricted_derivatives_v1_checkpoints_v7"
+outcome_report = "R2B_CORRECTED_HISTORICAL_OUTCOME_REPORT_2026-08-28.md"
+aggregation_root = "campaigns/r2b_restricted_derivatives_v1/corrected_aggregation_v7"
+
+[universe]
+market = "um"
+cohort = "top50"
+symbols_selected_through = "2024-01"
+timeframes = ["15m", "1h", "4h"]
+sides = ["LONG", "SHORT"]
+
+[horizons.bars]
+"15m" = [4, 16, 48, 96]
+"1h" = [4, 12, 24]
+"4h" = [3, 6]
+
+[causal_rules]
+source_interval = "15m"
+aggregation = "complete_contiguous_buckets_only"
+asof = "source_available_time < next_executable_open_time"
+native_source_available_time = "15m source kline close time"
+derived_source_available_time = "maximum constituent 15m close time for the complete 1h/4h bucket"
+exact_boundary = "reject when source_available_time >= next_executable_open_time"
+missingness = "fail_closed_explicit_status"
+execution = "next_open_with_existing_r2a2_guards"
+signal_variants = ["PRESSURE_CONTINUATION", "CROWDING_REVERSION"]
+signal_rule = "strict_zero_centered_sign; LONG requires +1; SHORT requires -1; 0/NaN reject"
