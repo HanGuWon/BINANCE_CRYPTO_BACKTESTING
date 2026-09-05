@@ -1,0 +1,44 @@
+{
+  "record_type": "SOL_AUDIT_WP4_FULL_PYTEST_RECEIPT_V1",
+  "run_id": 1,
+  "command": "python -m pytest -q tests ops/r3/tests -p no:cacheprovider",
+  "safety_environment": {
+    "SOL_AUDIT_OUTCOME_BLIND": "1",
+    "runtime_file_guard": "enabled",
+    "runtime_guard_events": 0,
+    "historical_checkpoint_reader": "explicitly skipped by module guard",
+    "static_allowlist_status": "BLOCKED_BY_HISTORICAL_READER_NODE",
+    "excluded_historical_nodeids": [
+      "tests/test_r2b_checkpoint_verifier.py::test_verifier_rejects_v6_execution_gap_with_exact_counts"
+    ]
+  },
+  "exit_code": 0,
+  "pytest_summary": {
+    "passed": 435,
+    "skipped": 4,
+    "warnings": 2,
+    "failed": 0,
+    "errors": 0,
+    "text": "435 passed, 4 skipped, 2 warnings in 73.77s (0:01:13)"
+  },
+  "skipped_nodeids": [
+    "tests/test_r171_verification.py::test_campaign_artifacts_are_consistent",
+    "tests/test_r2b_checkpoint_verifier.py::test_verifier_rejects_v6_execution_gap_with_exact_counts",
+    "tests/test_r3_forward_ranking.py::test_precomputed_control_is_explicitly_non_scientific",
+    "tests/test_wp3_immutable_outputs.py::test_immutable_writer_rejects_symlink_without_following"
+  ],
+  "implementation_sha": "6b5e5c5d5c49a17583c269d10e34c0b5e92534a2",
+  "source_tree_sha256": "ad3130626cd661274ba96488d7b0998bf021a433b84af7c0801e41b1cae80163",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "scientific_source_dirty": false,
+  "scientific_source_status": "CLEAN",
+  "final_holdout_status": "UNTOUCHED",
+  "outcome_analysis_status": "NOT_STARTED",
+  "r2b2_status": "NOT_STARTED",
+  "qualification_comparison_path": ".codexclaw\\evidence\\01a0230d-0a21-7e02-ab97-a10534161680\\wp4-qualification-comparison-full.json",
+  "qualification_comparison_sha256": "ce6e043b9800959f76eb4b1271cb4f425878323424d4c701efde816c6b3d47d9",
+  "transcript_path": ".codexclaw\\evidence\\01a0230d-0a21-7e02-ab97-a10534161680\\wp4-full-pytest-run1.txt",
+  "transcript_sha256": "23a2bbc805d5439a95abee7b40ee6f0c3fe0d1f45a7e3f5f7be9e35f69e31ed5",
+  "allowlist_sha256": "a60b5161387cf1c223727ad417097cbebced5edbf2eb8a44d39ee3c6f23147ba",
+  "captured_at_utc": "2026-09-05T05:30:57.9071618Z"
+}

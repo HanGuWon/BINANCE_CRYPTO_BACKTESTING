@@ -1,0 +1,13 @@
+{
+  "record_type": "SOL_AUDIT_WP4_RECEIPT_SUPERSESSION_V1",
+  "superseded_receipt_path": "campaigns/r3_prospective_context_v1/full_pytest_receipt.json",
+  "superseded_receipt_sha256": "56c43a22840f609de1512044e89f60899dfc1d909efc934a2acf75f3e6632221",
+  "superseded_reason": "Prior canonical receipt predates the outcome-blind full qualification and is preserved unchanged.",
+  "replacement_receipts": [
+    "SOL_AUDIT_WP4_FULL_PYTEST_RECEIPT_20260905_RUN1.json",
+    "SOL_AUDIT_WP4_FULL_PYTEST_RECEIPT_20260905_RUN2.json"
+  ],
+  "replacement_qualification_status": "PASS_WITH_EXPLICIT_OUTCOME_BLIND_BOUNDARY",
+  "historical_outcome_or_holdout_accessed": false,
+  "captured_at_utc": "2026-09-05T05:30:57.9380982Z"
+}
