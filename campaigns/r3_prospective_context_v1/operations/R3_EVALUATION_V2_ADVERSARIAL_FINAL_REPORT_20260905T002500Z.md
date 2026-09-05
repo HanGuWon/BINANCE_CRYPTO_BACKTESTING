@@ -185,9 +185,9 @@ access the final holdout or R2B2.
 ## Receipts and provenance
 
 - Full pytest receipt: `operations/R3_V2_FULL_PYTEST_RECEIPT_20260905.json`
-  (331 passed, 1 warning, exit code 0); the underlying cxc evidence receipt is
-  `.codexclaw/evidence/01a0230d-0a21-7e02-ab97-a10534161680/test-receipt.json`
-  (SHA256 `32713327d2f7c15698c15f88bfe9ac956a4e7574501679e6aeddd485cf1facc0`).
+  (331 passed, 1 warning in 195.29s, exit code 0); the underlying cxc evidence
+  receipt is `.codexclaw/evidence/01a0230d-0a21-7e02-ab97-a10534161680/test-receipt.json`
+  (SHA256 `4097c03e1e30c36b676ab935ad45890c0090d88d71a9a18faaedfabc01c333e8`).
   Its global `dirty=true` is recorded honestly; scientific scope is clean.
 - V2 reproducibility manifest SHA256
   `0cb2400f2ada8cc35882563d49af14f8e33e4148f21cc128ce02c8127849a104`.
