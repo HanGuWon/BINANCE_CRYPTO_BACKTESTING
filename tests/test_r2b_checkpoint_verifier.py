@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -12,6 +13,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from verify_r2b_checkpoints import verify  # noqa: E402
 from evidence_paths import resolve_preserved_v6_root  # noqa: E402
+
+
+if os.environ.get("SOL_AUDIT_OUTCOME_BLIND") == "1":
+    pytestmark = pytest.mark.skip(reason="historical checkpoint reader is excluded by the explicit outcome-blind qualification boundary")
 
 
 def test_verifier_rejects_v6_execution_gap_with_exact_counts() -> None:
