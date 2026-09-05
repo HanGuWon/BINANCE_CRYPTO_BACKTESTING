@@ -34,6 +34,7 @@ def test_qualification_transcript_normalization_keeps_summary_and_strips_duratio
     second = normalize_transcript("tests/test_x.py::test_ok\n1 passed in 9.99s\n")
     assert first == second
     assert "passed" in first
+    assert normalize_transcript("1 passed in 1.23s (0:00:01)\n") == normalize_transcript("1 passed in 9.99s (0:00:09)\n")
 
 
 def test_live_guard_reads_repository_metadata_only(capsys) -> None:

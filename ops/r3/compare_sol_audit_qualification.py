@@ -12,7 +12,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SUMMARY_RE = re.compile(r"^(?P<summary>.*\b(?:passed|failed|error|skipped).*)$")
-DURATION_RE = re.compile(r"\s+in\s+[0-9.]+s\.?$")
+DURATION_RE = re.compile(r"\s+in\s+[0-9.]+s(?:\s+\([^)]*\))?\.?$")
 PATH_RE = re.compile(r"(?:[A-Za-z]:[\\/]|/)[^\s]+")
 
 
