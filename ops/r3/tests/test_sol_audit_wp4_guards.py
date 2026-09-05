@@ -17,6 +17,18 @@ def test_allowlist_flags_persisted_reader_only_when_path_is_literal(tmp_path: Pa
     assert any("persisted" in finding for finding in audit_module(unsafe))
 
 
+def test_allowlist_rejects_computed_historical_checkpoint_reader(tmp_path: Path) -> None:
+    unsafe = tmp_path / "test_historical_reader.py"
+    unsafe.write_text(
+        "from evidence_paths import resolve_preserved_v6_root\n"
+        "def test_historical_reader():\n"
+        "    return resolve_preserved_v6_root()\n",
+        encoding="utf-8",
+    )
+    findings = audit_module(unsafe)
+    assert any("forbidden historical reader symbol" in finding for finding in findings)
+
+
 def test_qualification_transcript_normalization_keeps_summary_and_strips_duration() -> None:
     first = normalize_transcript("tests\\test_x.py::test_ok\n1 passed in 1.23s\n")
     second = normalize_transcript("tests/test_x.py::test_ok\n1 passed in 9.99s\n")

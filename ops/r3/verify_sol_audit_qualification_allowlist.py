@@ -14,8 +14,24 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TEST_ROOTS = (REPO_ROOT / "tests", REPO_ROOT / "ops/r3/tests")
 NODEID_RE = re.compile(r"^(?:tests|ops/r3/tests)[/\\].+::")
-FORBIDDEN_PATH_TOKENS = ("scientific_raw_v8", "r2a2/checkpoints", "r2a2\\checkpoints")
-FORBIDDEN_IMPORTS = {"scripts.verify_r2a2_checkpoints", "scripts.run_r2a2_outcomes"}
+FORBIDDEN_PATH_TOKENS = (
+    "scientific_raw_v8",
+    "r2a2/checkpoints",
+    "r2a2\\checkpoints",
+    "r2b_restricted_derivatives_v1_checkpoints",
+    "r2b_restricted_derivatives_v1_checkpoints_v6",
+)
+# These modules resolve or open historical checkpoint/outcome roots.  A test
+# importing the checkpoint verifier cannot be admitted to an outcome-blind
+# qualification run, even when the actual path is computed rather than
+# written as a literal.
+FORBIDDEN_IMPORTS = {
+    "scripts.verify_r2a2_checkpoints",
+    "scripts.run_r2a2_outcomes",
+    "scripts.verify_r2b_checkpoints",
+    "verify_r2b_checkpoints",
+}
+FORBIDDEN_SYMBOLS = {"resolve_preserved_v6_root"}
 FORBIDDEN_CALLS = {"read_feather", "read_pickle"}
 PERSISTED_READ_CALLS = {"open", "read_csv", "read_parquet", "read_feather", "read_pickle", "read_bytes", "read_text"}
 
@@ -57,6 +73,8 @@ def audit_module(path: Path) -> list[str]:
             module = node.module if isinstance(node, ast.ImportFrom) and node.module else ""
             if module in FORBIDDEN_IMPORTS or any(name in FORBIDDEN_IMPORTS for name in names):
                 findings.append(f"line {node.lineno}: forbidden outcome import")
+            if any(name in FORBIDDEN_SYMBOLS for name in names):
+                findings.append(f"line {node.lineno}: forbidden historical reader symbol")
         if isinstance(node, ast.Call):
             function = node.func
             name = function.attr if isinstance(function, ast.Attribute) else function.id if isinstance(function, ast.Name) else ""
