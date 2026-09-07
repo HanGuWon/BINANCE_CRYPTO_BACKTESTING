@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [switch]$PreflightOnly,
     [string]$AuthorizationReceipt,
@@ -33,13 +33,13 @@ try {
         }
         try {
             $authorization = Get-Content -Raw -LiteralPath $AuthorizationReceipt | ConvertFrom-Json
-            $preflightReceipt = [string]$authorization.preflight_receipt_path
+            $authorizationPreflightReceipt = [string]$authorization.preflight_receipt_path
         }
         catch {
             Write-Output "resume authorization receipt is invalid: $AuthorizationReceipt"
             exit 74
         }
-        if ([string]::IsNullOrWhiteSpace($preflightReceipt) -or -not (Test-Path -LiteralPath $preflightReceipt -PathType Leaf)) {
+        if ([string]::IsNullOrWhiteSpace($authorizationPreflightReceipt) -or -not (Test-Path -LiteralPath $authorizationPreflightReceipt -PathType Leaf)) {
             Write-Output 'resume authorization preflight receipt is missing'
             exit 74
         }
@@ -54,7 +54,7 @@ try {
     if ($preflightExit -ne 0) { exit $preflightExit }
     if ($PreflightOnly) { exit 0 }
 
-    & $Python $OpsScript verify-resume-authorization --exact-v8 --root $ScientificRoot --roster $Roster --manifest $LaunchManifest --seal $LaunchSeal --authorization $AuthorizationReceipt --preflight-receipt $preflightReceipt --consume
+    & $Python $OpsScript verify-resume-authorization --exact-v8 --root $ScientificRoot --roster $Roster --manifest $LaunchManifest --seal $LaunchSeal --authorization $AuthorizationReceipt --preflight-receipt $authorizationPreflightReceipt --consume
     $authorizationExit = $LASTEXITCODE
     if ($authorizationExit -ne 0) { exit $authorizationExit }
 
