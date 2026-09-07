@@ -49,26 +49,39 @@ try {
     if (-not [string]::IsNullOrWhiteSpace($PreflightReceipt)) {
         $preflightArgs += @('--receipt', $PreflightReceipt)
     }
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
     & $Python $OpsScript @preflightArgs
     $preflightExit = $LASTEXITCODE
+    $ErrorActionPreference = $previousErrorActionPreference
     if ($preflightExit -ne 0) { exit $preflightExit }
     if ($PreflightOnly) { exit 0 }
 
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
     & $Python $OpsScript verify-resume-authorization --exact-v8 --root $ScientificRoot --roster $Roster --manifest $LaunchManifest --seal $LaunchSeal --authorization $AuthorizationReceipt --preflight-receipt $authorizationPreflightReceipt --consume
     $authorizationExit = $LASTEXITCODE
+    $ErrorActionPreference = $previousErrorActionPreference
     if ($authorizationExit -ne 0) { exit $authorizationExit }
 
     # Re-check identity and the writer census immediately after consuming the
     # lease. A race or collision fails closed and the collector is never called.
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
     & $Python $OpsScript preflight --exact-v8 --root $ScientificRoot --roster $Roster --manifest $LaunchManifest --seal $LaunchSeal
     $postAuthorizationPreflightExit = $LASTEXITCODE
+    $ErrorActionPreference = $previousErrorActionPreference
     if ($postAuthorizationPreflightExit -ne 0) { exit $postAuthorizationPreflightExit }
 
     # Keep the collector in this foreground process so the existing scientific
     # PID lock spans the full lifetime. The collector performs its own resume,
     # chain, and seal checks; this wrapper never creates a fresh root.
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
     & $Python $Collector --mode SCIENTIFIC --persistent --root $ScientificRoot --roster-artifact $Roster --launch-manifest $LaunchManifest
-    exit $LASTEXITCODE
+    $collectorExit = $LASTEXITCODE
+    $ErrorActionPreference = $previousErrorActionPreference
+    exit $collectorExit
 }
 finally {
     Pop-Location
