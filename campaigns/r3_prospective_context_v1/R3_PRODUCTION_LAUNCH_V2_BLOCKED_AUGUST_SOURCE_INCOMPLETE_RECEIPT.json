@@ -1,0 +1,32 @@
+{
+  "state": "R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE",
+  "branch": "research/r2b-restricted-derivatives-v1",
+  "implementation_commit": "9dc483f389c0c44b055231937de46562b29c8623",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "failed_stage": "AUGUST_SOURCE_ACQUISITION",
+  "error": "daily fallback failed for 1000BTTCUSDT day 1: HTTP Error 404: Not Found",
+  "production_v2_control_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v2",
+  "partial_evidence": {
+    "temporal_gate": "PASS",
+    "temporal_gate_sha256": "778e0a4c797d399638316f349dc2a8cae6d7ad0e6108ebaf9901b1b10b32ee71",
+    "census_status": "ESTIMATED_ONLY",
+    "census_objects": 46169,
+    "primary_candidate_symbols": 1485,
+    "v2_files": 4,
+    "v2_file_sha256": {
+      "temporal_gate.json": "778e0a4c797d399638316f349dc2a8cae6d7ad0e6108ebaf9901b1b10b32ee71",
+      "august_source/census/asset_taxonomy.csv": "76ee7e9973b66c3842f26cbb2147bd527c2ecf9fdb18798d73025f1c1b7c4d33",
+      "august_source/census/volume_archive_manifest.csv": "40ab5342ff42676cc1ec15ee7e292afd6d529679b194f609cf176edf618eb10a",
+      "august_source/census/volume_size_estimate.json": "494f969e10ceaf9cd695740309b80f3b82e4cf8387766b6bbd7b48640fdc7f01"
+    }
+  },
+  "production_v1": {
+    "preserved": true,
+    "temporal_gate_sha256": "5bb38de8c19175784e8e8a8561ca233b3951338962a245e039d9acc4199f0e6b"
+  },
+  "downstream_stages": "NOT_STARTED",
+  "outcomes": "NOT_STARTED",
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED",
+  "action": "STOP; do not patch or resume this root; use a new versioned root for any future repair."
+}

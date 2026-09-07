@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/processed/r2b_restricted_derivatives_v1_repaired",
+  "partition_files": 1467,
+  "rows": 8357398,
+  "holdout_boundary_utc": "2024-02-10T00:00:00Z",
+  "holdout_rows": 0,
+  "alignment_violations": 0,
+  "max_timestamp_by_timeframe": {
+    "15m": "2024-02-09T23:45:00Z",
+    "1h": "2024-02-09T23:00:00Z",
+    "4h": "2024-02-09T20:00:00Z"
+  },
+  "max_source_timestamp_by_timeframe": {
+    "15m": "2024-02-09T23:45:00Z",
+    "1h": "2024-02-09T23:00:00Z",
+    "4h": "2024-02-09T20:00:00Z"
+  },
+  "method": "read-only scan; source timestamp is never later than completed-bar decision timestamp; no final-holdout path opened",
+  "final_holdout_status": "UNTOUCHED"
+}

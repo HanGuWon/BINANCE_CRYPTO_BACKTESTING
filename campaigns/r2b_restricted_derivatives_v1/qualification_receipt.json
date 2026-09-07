@@ -1,0 +1,171 @@
+{
+  "final_holdout_status": "UNTOUCHED",
+  "market": "um",
+  "matrix": {
+    "features": [
+      "derivatives.premium",
+      "derivatives.premium_zscore"
+    ],
+    "horizons": {
+      "15m": [
+        4,
+        16,
+        48,
+        96
+      ],
+      "1h": [
+        4,
+        12,
+        24
+      ],
+      "4h": [
+        3,
+        6
+      ]
+    },
+    "sides": [
+      "LONG",
+      "SHORT"
+    ],
+    "timeframes": [
+      "15m",
+      "1h",
+      "4h"
+    ],
+    "variants": [
+      "PRESSURE_CONTINUATION",
+      "CROWDING_REVERSION"
+    ]
+  },
+  "mode": "SYNTHETIC_REFERENCE_ONLY",
+  "outcome_run_started": false,
+  "qualification_payload_sha256": "90995f4b4e76948c83e0cb62044264bb5bc093f17dfc9ce899baf78decceae3f",
+  "qualification_result_identity": "4d50f019220d949d727465b2780c8b01eefe7a18cfab79c4d0d33c376d8fe027",
+  "records_compared": 33420,
+  "required_fields": [
+    "decision_time",
+    "symbol",
+    "side",
+    "signal_variant",
+    "signal_value",
+    "source_open_time",
+    "source_available_time",
+    "entry_time",
+    "exit_time",
+    "gross_return",
+    "funding_cashflow",
+    "net_return"
+  ],
+  "scenarios": [
+    {
+      "funding": "positive",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "15m"
+    },
+    {
+      "funding": "negative",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "15m"
+    },
+    {
+      "funding": "none",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "15m"
+    },
+    {
+      "funding": "positive",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "15m"
+    },
+    {
+      "funding": "negative",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "15m"
+    },
+    {
+      "funding": "none",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "15m"
+    },
+    {
+      "funding": "positive",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "1h"
+    },
+    {
+      "funding": "negative",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "1h"
+    },
+    {
+      "funding": "none",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "1h"
+    },
+    {
+      "funding": "positive",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "1h"
+    },
+    {
+      "funding": "negative",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "1h"
+    },
+    {
+      "funding": "none",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "1h"
+    },
+    {
+      "funding": "positive",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "4h"
+    },
+    {
+      "funding": "negative",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "4h"
+    },
+    {
+      "funding": "none",
+      "gap_segment": true,
+      "missing_premium": false,
+      "timeframe": "4h"
+    },
+    {
+      "funding": "positive",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "4h"
+    },
+    {
+      "funding": "negative",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "4h"
+    },
+    {
+      "funding": "none",
+      "gap_segment": true,
+      "missing_premium": true,
+      "timeframe": "4h"
+    }
+  ],
+  "spot_control_status": "OUT_OF_SCOPE_ENGINE_CONTROL_ONLY",
+  "status": "PASS"
+}

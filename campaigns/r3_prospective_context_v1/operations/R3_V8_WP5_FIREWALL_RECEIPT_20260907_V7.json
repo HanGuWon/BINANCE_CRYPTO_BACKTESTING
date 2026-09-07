@@ -1,0 +1,73 @@
+{
+  "allowlist": [
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_OUTAGE_AND_RECOVERY_20260907_V2.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_OUTAGE_AND_RECOVERY_20260907_V3.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_WP5_FIREWALL_RECEIPT_20260907_V6.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_FORCEORDER_V3_MIGRATION_CONTINUATION_20260907.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_DAILY_OPERATIONS_RECEIPTS.jsonl",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_DAILY_OPERATIONS_RECEIPTS.lock",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\devlog\\_plan\\260905_sol-audit-independent-attestation-20260905\\145_recovery_wp0_watchdog_20260907.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\devlog\\_plan\\260905_sol-audit-independent-attestation-20260905\\168_wp2_launch_receipt_20260907_v4.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\devlog\\_plan\\260905_sol-audit-independent-attestation-20260905\\175_wp3_verification_20260907.json"
+  ],
+  "body_sha256": "7cb3eb683dec84a8e1cf97e4e2ce0682ac197c4a6e3b5fa7c24e24607166b058",
+  "checks": {
+    "duplicate_writers": [],
+    "final_holdout": "UNTOUCHED",
+    "forceorder_v3_migration": "NOT_STARTED",
+    "independent_snapshot_formula": "466 - 204 = 262",
+    "launch_seal": "SEALED",
+    "manifest_chain": "PASS",
+    "market_payloads_accessed": false,
+    "nonqualifying_cycle_preserved": "cycle-20260907T033004700902Z: NONQUALIFYING_TARGET_BEFORE_AUTHORIZATION",
+    "outage_period_formula": "262 - 87 = 175",
+    "outcomes_accessed": false,
+    "pre_existing_gap_formula": "284 - 197 = 87",
+    "r2b2": "NOT_ACCESSED",
+    "scientific_scope_git_status": "clean",
+    "single_writer": true,
+    "temporal_boundary_proof": "44h / 15m = 176; 176 - 1 = 175",
+    "total_gap_formula": "87 + 175 = 262",
+    "v2_preserved_sha256": "3212f220c6ece18cc0a830b8051891f85f0cbf78b7a00aaf7c049e2f602b2e13",
+    "v3_accounting_sha256": "0a00b1a47f15ec4a772fd5fc6c1169c9563e8854802d85fa8f6b3c14b03d1008",
+    "v6_preserved_sha256": "607a768fdddcdcdcb1c38792ee3f46e802a383905dfc2f805bbb7f9cdf57e89b"
+  },
+  "command": "python -m ops.r3.verify_r3_v8_wp5_firewall_v7 --receipt campaigns/r3_prospective_context_v1/operations/R3_V8_WP5_FIREWALL_RECEIPT_20260907_V7.json",
+  "exit_code": 0,
+  "final_holdout": "UNTOUCHED",
+  "forceorder_v3_migration": "NOT_STARTED",
+  "identity": {
+    "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+    "launch_manifest_sha256": "cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659",
+    "launch_seal_sha256": "ab83232d90e800bf8178c6f3d22138382fb102b9d14213e12a798c0f2c68ad85",
+    "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+    "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8",
+    "roster_sha256": "bb05514dfc78cfca3b736488b1454f4cb022da0110e2cbf69f53c505f543ea79",
+    "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688"
+  },
+  "migration_prerequisite_state": "FORCEORDER_V3_MIGRATION_SAFETY_PREREQUISITE_RESTORED",
+  "outcomes_accessed": false,
+  "r2b2": "NOT_ACCESSED",
+  "receipt_path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_WP5_FIREWALL_RECEIPT_20260907_V7.json",
+  "record_type": "R3_V8_WP5_FIREWALL",
+  "recorded_at_utc": "2026-09-07T07:48:20.898936Z",
+  "schema_version": 2,
+  "status": "PASS",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "3451478ab378465ad4029ad7987398593d607172b16391b6c2ffc3982dda15cf",
+  "supersedes": {
+    "file_sha256": "607a768fdddcdcdcb1c38792ee3f46e802a383905dfc2f805bbb7f9cdf57e89b",
+    "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_WP5_FIREWALL_RECEIPT_20260907_V6.json",
+    "reason": "V7 binds the corrected V3 outage-period and temporal accounting decomposition; V6 remains immutable.",
+    "status": "SUPERSEDED_BY_V7"
+  },
+  "verifier": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\ops\\r3\\verify_r3_v8_wp5_firewall_v7.py",
+  "write_contract": {
+    "atomic_publish_required": true,
+    "body_sha256_algorithm": "SHA256 of canonical UTF-8 JSON with body_sha256 omitted",
+    "create_mode": "O_CREAT|O_EXCL",
+    "flush_fsync_before_publish": true,
+    "overwrite": false,
+    "write_once": true
+  }
+}

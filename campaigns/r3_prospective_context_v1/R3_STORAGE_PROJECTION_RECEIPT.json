@@ -1,0 +1,22 @@
+{
+  "basis": "single completed 15-minute shadow cycle multiplied by absolute UTC grid cycles; control/health overhead excluded and reported separately",
+  "campaign_id": "r3_prospective_context_v1",
+  "cycles_per_period": {
+    "24h": 96,
+    "30d": 2880,
+    "7d": 672,
+    "90d": 8640
+  },
+  "generated_at": "2026-08-30T10:22:26.329794+00:00",
+  "manifest_sha256": "ba723e28587a6fe31af272506b51bad911a92fa43b4a36fa930b9b18900e2266",
+  "mode": "ENGINEERING_SHADOW",
+  "one_cycle_raw_bytes": 761664,
+  "outcomes_accessed": false,
+  "projected_raw_bytes": {
+    "24h": 73119744,
+    "30d": 2193592320,
+    "7d": 511838208,
+    "90d": 6580776960
+  },
+  "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\engineering_shadow_august_v4_final2"
+}

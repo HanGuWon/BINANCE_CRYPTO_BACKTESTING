@@ -1,0 +1,160 @@
+{
+  "schema_version": 2,
+  "record_type": "R3_V8_OUTAGE_AND_RECOVERY",
+  "receipt_path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_OUTAGE_AND_RECOVERY_20260907_V3.json",
+  "recorded_at_utc": "2026-09-07T07:45:00Z",
+  "outcomes_accessed": false,
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_ACCESSED",
+  "forceorder_v3_migration": "NOT_STARTED",
+  "immutability": "new receipt; V2 remains preserved as immutable historical evidence and is explicitly superseded",
+  "supersedes": {
+    "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_OUTAGE_AND_RECOVERY_20260907_V2.json",
+    "file_sha256": "3212f220c6ece18cc0a830b8051891f85f0cbf78b7a00aaf7c049e2f602b2e13",
+    "body_sha256": "97eacca30891f2a9c04f4b937a6b2441e66d0e0ad72ffcfd08202f331877a61e",
+    "status": "SUPERSEDED_BY_V3",
+    "reason": "V2 preserved the snapshot and pre-existing gap but did not state the exact outage-period 175-cycle decomposition and 44-hour temporal proof."
+  },
+  "write_contract": {
+    "write_once": true,
+    "atomic_publish_required": true,
+    "create_mode": "O_CREAT|O_EXCL",
+    "overwrite": false,
+    "flush_fsync_before_publish": true,
+    "body_sha256_algorithm": "SHA256 of canonical UTF-8 JSON with body_sha256 omitted"
+  },
+  "body_sha256": "bf77acdd474d31a1d74f65b0349fa55cc2f11ba31ff77f2a34e8b61452c54884",
+  "pre_outage": {
+    "collector_process_count": 0,
+    "authorized_writer_count": 0,
+    "active_lock": "ABSENT",
+    "last_cycle_id": "cycle-20260905T073004537033Z",
+    "observed_cycle_count": 197,
+    "expected_cycle_count": 284,
+    "historical_missing_cycle_count": 87,
+    "gap_count": 32,
+    "restart_count": 32,
+    "manifest_chain": "PASS",
+    "launch_seal": "SEALED"
+  },
+  "recovery_detection": {
+    "receipt": "devlog/_plan/260905_sol-audit-independent-attestation-20260905/145_recovery_wp0_watchdog_20260907.json",
+    "detected_at_utc": "2026-09-07T01:55:16.9347051Z",
+    "failure_cause": "UNKNOWN",
+    "cause_basis": "Operational evidence showed clean shutdown/network-error context but did not establish a more specific cause; no market payloads were inspected.",
+    "expected_missing_boundaries": 87,
+    "no_backfill": true
+  },
+  "outage_period": {
+    "start_boundary_utc": "2026-09-05T07:30:00Z",
+    "end_boundary_utc": "2026-09-07T03:30:00Z",
+    "elapsed_hours": 44,
+    "native_step_minutes": 15,
+    "native_step_count": 176,
+    "intervening_missing_cycle_count": 175,
+    "formula": "176 native 15-minute steps - 1 endpoint interval = 175 outage-period missing cycles",
+    "endpoint_basis": "last pre-outage boundary 2026-09-05T07:30Z; authorized-resume boundary 2026-09-07T03:30Z",
+    "source": "UTC wall-clock boundary arithmetic only; no market payloads or outcome values inspected",
+    "no_backfill": true
+  },
+  "daily_operations_receipt": {
+    "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_DAILY_OPERATIONS_RECEIPTS.jsonl",
+    "append_lock": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_DAILY_OPERATIONS_RECEIPTS.lock",
+    "unique_date": "2026-09-07",
+    "matching_line_count": 1,
+    "line_sha256": "84bb9206d0c0db1cb671df597725e6dd7a44d4169a967bfb8491c7421e99386d",
+    "verification_command": "python -m ops.r3.r3_ops daily-receipt --exact-v8 --date 2026-09-07 --destination campaigns/r3_prospective_context_v1/operations/R3_V8_DAILY_OPERATIONS_RECEIPTS.jsonl"
+  },
+  "evidence_anchors": {
+    "wp0_watchdog": {
+      "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\devlog\\_plan\\260905_sol-audit-independent-attestation-20260905\\145_recovery_wp0_watchdog_20260907.json",
+      "sha256": "5a0222eb49684ae79afea006c368262727ad88b406f4d50c13138c286b49d8ad",
+      "gap_formula": "284 expected - 197 observed = 87 historical missing"
+    },
+    "wp2_launch": {
+      "path": "devlog/_plan/260905_sol-audit-independent-attestation-20260905/168_wp2_launch_receipt_20260907_v4.json",
+      "sha256": "92f6ded575a5ebf8f4c00a07a89f36e7448a2a1f86d564659baa87022dfa8b44"
+    },
+    "wp2_collision": {
+      "path": "devlog/_plan/260905_sol-audit-independent-attestation-20260905/167_wp2_collision_receipt_20260907.json",
+      "sha256": "e62d839418f5a532366d6a894a354b3a3388cf39fed86b91cd13bd2a1a91c229",
+      "expected_exit_code": 73
+    },
+    "wp3_verification": {
+      "path": "devlog/_plan/260905_sol-audit-independent-attestation-20260905/175_wp3_verification_20260907.json",
+      "sha256": "b99e7ae8de773b3517a5751d5023b3a41c53115b42d583d88acf419044e67aa9"
+    }
+  },
+  "authorized_resume": {
+    "authorization_receipt": "devlog/_plan/260905_sol-audit-independent-attestation-20260905/168_wp2_launch_receipt_20260907_v4.json",
+    "preflight_exit_code": 0,
+    "authorization_consumed_at_utc": "2026-09-07T03:21:55.964916Z",
+    "writer_create_time_utc": "2026-09-07T03:21:57.970641Z",
+    "writer_pid": 180656,
+    "wrapper_pid": 180288,
+    "launcher": "ops/r3/launch_r3_v8_resume.ps1",
+    "resume_mode": "EXISTING_SEALED_V8_ONLY",
+    "restart_gap_disposition": "preserved; no historical reconstruction or synthetic cycle metadata"
+  },
+  "post_recovery": {
+    "first_post_recovery_cycle_id": "cycle-20260907T033004700902Z",
+    "first_post_recovery_cycle_disposition": "NONQUALIFYING_TARGET_BEFORE_AUTHORIZATION; retained, not counted as strict qualifying recovery cycle",
+    "first_strict_qualifying_cycle_id": "cycle-20260907T034504683926Z",
+    "strict_qualifying_cycle_ids_observed": [
+      "cycle-20260907T034504683926Z",
+      "cycle-20260907T040004697630Z"
+    ],
+    "minimum_two_future_cycles_met": true,
+    "daily_receipt_cycle_count_on_2026-09-07": 7,
+    "latest_cycle_at_receipt": "cycle-20260907T050004700730Z"
+  },
+  "current_snapshot": {
+    "collector_process_count": 1,
+    "authorized_writer_count": 1,
+    "writer_pid": 180656,
+    "lock_alive": true,
+    "duplicate_writers": [],
+    "observed_cycle_count": 204,
+    "expected_cycle_count": 466,
+    "missing_cycle_count": 262,
+    "historical_missing_cycle_count_preserved": 87,
+    "gap_count": 40,
+    "restart_count": 40,
+    "manifest_chain": "PASS",
+    "launch_seal": "SEALED",
+    "source": "outcome-blind r3_ops watch --exact-v8 and 2026-09-07 daily operations receipt"
+  },
+  "accounting": {
+    "pre_existing_missing": 87,
+    "pre_existing_formula": "284 expected - 197 observed = 87",
+    "outage_period_missing": 175,
+    "outage_period_formula": "262 current snapshot missing - 87 pre-existing missing = 175",
+    "total_missing_snapshot": 262,
+    "total_formula": "87 pre-existing + 175 outage-period = 262 total missing",
+    "independent_snapshot_formula": "466 expected - 204 observed = 262",
+    "reconciliation": "PASS"
+  },
+  "nonqualifying_cycle_preservation": {
+    "cycle_id": "cycle-20260907T033004700902Z",
+    "disposition": "NONQUALIFYING_TARGET_BEFORE_AUTHORIZATION",
+    "counted_as_strict_recovery_cycle": false,
+    "mutation": "NONE"
+  },
+  "identity": {
+    "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8",
+    "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+    "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+    "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+    "roster_sha256": "bb05514dfc78cfca3b736488b1454f4cb022da0110e2cbf69f53c505f543ea79",
+    "launch_manifest_sha256": "cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659",
+    "launch_seal_sha256": "ab83232d90e800bf8178c6f3d22138382fb102b9d14213e12a798c0f2c68ad85"
+  },
+  "outcome_firewall": {
+    "outcomes_accessed": false,
+    "final_holdout": "UNTOUCHED",
+    "r2b2": "NOT_ACCESSED",
+    "forceorder_v3_migration": "NOT_STARTED",
+    "market_payloads_or_returns_accessed": false
+  },
+  "recovery_state": "R3_PROSPECTIVE_COLLECTION_RECOVERED_WITH_PRESERVED_GAP"
+}

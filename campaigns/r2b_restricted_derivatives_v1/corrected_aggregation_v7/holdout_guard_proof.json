@@ -1,0 +1,7 @@
+{
+  "checked_units": 576,
+  "checkpoint_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r2b_restricted_derivatives_v1_checkpoints_v7",
+  "final_holdout_status": "UNTOUCHED",
+  "method": "equal-weight decision-time series; calendar-month blocks preserving all symbols together",
+  "status": "PASS"
+}

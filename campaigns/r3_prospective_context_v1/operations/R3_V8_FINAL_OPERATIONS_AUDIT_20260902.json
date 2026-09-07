@@ -1,0 +1,149 @@
+{
+  "ahead_behind": "0\t0",
+  "branch": "research/r2b-restricted-derivatives-v1",
+  "evaluation_amendment": "NOT_YET_AUTHORIZED",
+  "final_holdout": "UNTOUCHED",
+  "head": "7c828d5085ea787c32c713649aa7fbcd8a74e452",
+  "origin": "7c828d5085ea787c32c713649aa7fbcd8a74e452",
+  "outcomes": "NOT_STARTED",
+  "outcomes_accessed": false,
+  "r2b2": "NOT_STARTED",
+  "record_type": "R3_V8_FINAL_OPERATIONS_AUDIT",
+  "recorded_at_utc": "2026-09-02T12:57:31.895981+00:00",
+  "restart_disposition": "SAFE_SKIP_LIVE_RESTART",
+  "restart_reason": "live v8 evidence was left running; no destructive restart was authorized",
+  "scientific_scope_status": "clean",
+  "startup_fallback": {
+    "command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\ops\\r3\\install_r3_v8_startup.ps1 -ValidateOnly",
+    "exit_code": 0,
+    "output": "Shortcut             : C:\\Users\\user\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\R3-Prospective-Scien\n                       tific-v8.lnk\nTargetPath           : C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\nArguments            : -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\ops\\r3\n                       \\launch_r3_v8_resume.ps1\"\nWorkingDirectory     : C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\nValid                : True\nCredentialsCommitted : False",
+    "valid": true
+  },
+  "state": "R3_PROSPECTIVE_COLLECTION_OPERATIONALLY_STABILIZED",
+  "task_scheduler": {
+    "command": "Get-ScheduledTask -TaskName 'R3-Prospective-Scientific-v8'; Get-ScheduledTaskInfo -TaskName 'R3-Prospective-Scientific-v8'",
+    "exit_code": 1,
+    "output": "Get-ScheduledTask : 'R3-Prospective-Scientific-v8'\uacfc(\uc640) \uac19\uc740 'TaskName' \uc18d\uc131\uc744 \uac00\uc9c4 MSFT_ScheduledTask \uac1c\uccb4\uac00 \uc5c6\uc2b5\ub2c8\ub2e4. \uc18d\uc131 \uac12\uc744 \uac80\uc99d\ud558\uace0 \ub2e4\uc2dc \n\uc2dc\ub3c4\ud558\uc2ed\uc2dc\uc624.\nAt line:1 char:1\n+ Get-ScheduledTask -TaskName 'R3-Prospective-Scientific-v8'; Get-Sched ...\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n    + CategoryInfo          : ObjectNotFound: (R3-Prospective-Scientific-v8:String) [Get-ScheduledTask], CimJobExcepti \n   on\n    + FullyQualifiedErrorId : CmdletizationQuery_NotFound_TaskName,Get-ScheduledTask\n \nGet-ScheduledTaskInfo : The system cannot find the file specified.\nAt line:1 char:61\n+ ... ntific-v8'; Get-ScheduledTaskInfo -TaskName 'R3-Prospective-Scientifi ...\n+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n    + CategoryInfo          : ObjectNotFound: (PS_ScheduledTask:Root/Microsoft/...S_ScheduledTask) [Get-ScheduledTaskI \n   nfo], CimException\n    + FullyQualifiedErrorId : HRESULT 0x80070002,Get-ScheduledTaskInfo",
+    "registered": false
+  },
+  "watchdog": {
+    "cycle_count": 17,
+    "expected_cycle_count": 17,
+    "first_cycle": {
+      "actual_collection_start": "2026-09-02T08:45:03.275383+00:00",
+      "clock_calibration_id": "cal-6079cd9429f76825ca7540b0",
+      "cycle_completed_at": "2026-09-02T08:45:44.999278+00:00",
+      "cycle_id": "cycle-20260902T084503275383Z",
+      "eligible_next_execution_time": "2026-09-02T09:00:00+00:00",
+      "scheduled_collection_time": "2026-09-02T08:45:05+00:00",
+      "target_bar_close": "2026-09-02T08:45:00+00:00",
+      "target_bar_open": "2026-09-02T08:30:00+00:00"
+    },
+    "health_count": 17,
+    "identity": {
+      "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+      "manifest_chain_verification": true,
+      "manifest_path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_MANIFEST_2026-09.json",
+      "manifest_sha256": "cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659",
+      "outcomes_accessed": false,
+      "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+      "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8",
+      "roster_file_sha256": "102e1b2eb89977083142662bb8ccc1a2aad8e548095721901a42ae1de72f5d17",
+      "roster_sha256": "bb05514dfc78cfca3b736488b1454f4cb022da0110e2cbf69f53c505f543ea79",
+      "scientific_scope_status": "clean",
+      "seal_path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_SEAL_RECEIPT.json",
+      "seal_sha256": "ab83232d90e800bf8178c6f3d22138382fb102b9d14213e12a798c0f2c68ad85",
+      "seal_status": "SEALED",
+      "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688"
+    },
+    "last_cycle": {
+      "actual_collection_start": "2026-09-02T12:45:03.291915+00:00",
+      "clock_calibration_id": "cal-f49db8584febc43875fc6177",
+      "cycle_completed_at": "2026-09-02T12:45:26.195609+00:00",
+      "cycle_id": "cycle-20260902T124503291915Z",
+      "eligible_next_execution_time": "2026-09-02T13:00:00+00:00",
+      "scheduled_collection_time": "2026-09-02T12:45:05+00:00",
+      "target_bar_close": "2026-09-02T12:45:00+00:00",
+      "target_bar_open": "2026-09-02T12:30:00+00:00"
+    },
+    "latest_health": {
+      "bytes": 19913409,
+      "evidence_mode": "SCIENTIFIC",
+      "gap_count": 5,
+      "manifest_sha256": "1f3936e13079907c375b6306f7781b946edd8b843b9637f74ef9e3383b8be665",
+      "pid": 153760,
+      "restart_count": 5,
+      "roster_sha256": "bb05514dfc78cfca3b736488b1454f4cb022da0110e2cbf69f53c505f543ea79",
+      "stream_status": "CYCLE_COMPLETE",
+      "timestamp": "2026-09-02T12:45:28.492480+00:00"
+    },
+    "launch_seal_verification": true,
+    "manifest_chain_verification": true,
+    "manifest_entry_count": 17,
+    "missing_cycle_count": 0,
+    "outcomes_accessed": false,
+    "reasons": [
+      "reported_source_or_restart_gap"
+    ],
+    "record_type": "R3_V8_WATCHDOG_SNAPSHOT",
+    "recorded_at_utc": "2026-09-02T12:57:31.791465+00:00",
+    "state": "YELLOW",
+    "storage": {
+      "bytes_cycle_max": 1335240,
+      "bytes_cycle_median": 1077921.5,
+      "bytes_cycle_p95_inclusive": 1319392.5,
+      "bytes_deltas": [
+        1314110,
+        1013488,
+        1242237,
+        981449,
+        1192129,
+        809738,
+        811687,
+        864933,
+        945121,
+        1121920,
+        1335240,
+        1093210,
+        1154558,
+        1065852,
+        1089991,
+        1027188
+      ],
+      "disk_state": "GREEN",
+      "free_disk_bytes": 136287186944,
+      "manifest_observation_count": 16,
+      "observed_bytes_per_hour": 4311686.0,
+      "projected_bytes_30d": 3104413920.0,
+      "projected_bytes_7d": 724363248.0,
+      "projected_bytes_per_day": 103480464.0,
+      "projected_days_to_zero": 1317.0330096703085
+    },
+    "writer": {
+      "authorized_writer_count": 1,
+      "duplicate_writers": [],
+      "lock_alive": true,
+      "lock_pid": 153760,
+      "process_tree": [
+        {
+          "command_line": "C:\\Users\\user\\AppData\\Roaming\\uv\\python\\cpython-3.11-windows-x86_64-none\\python.exe C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\scripts\\run_r3_prospective_collector.py --mode SCIENTIFIC --persistent --root D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8 --roster-artifact C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\rosters\\2026-09.json --launch-manifest D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_MANIFEST_2026-09.json",
+          "create_time": "2026-09-02T08:30:42.148899+00:00",
+          "executable": "C:\\Users\\user\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\python.exe",
+          "name": "python.exe",
+          "parent_pid": 158632,
+          "pid": 153760,
+          "role": "lock owner / authorized writer"
+        },
+        {
+          "command_line": "C:\\Users\\user\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts\\python.exe C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\scripts\\run_r3_prospective_collector.py --mode SCIENTIFIC --persistent --root D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8 --roster-artifact C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\rosters\\2026-09.json --launch-manifest D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_MANIFEST_2026-09.json",
+          "create_time": "2026-09-02T08:30:42.137051+00:00",
+          "executable": "C:\\Users\\user\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts\\python.exe",
+          "name": "python.exe",
+          "parent_pid": 148584,
+          "pid": 158632,
+          "role": "authorized wrapper/descendant"
+        }
+      ]
+    }
+  }
+}

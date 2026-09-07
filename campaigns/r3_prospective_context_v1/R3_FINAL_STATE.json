@@ -1,0 +1,20 @@
+{
+  "campaign_id": "r3_prospective_context_v1",
+  "branch": "research/r2b-restricted-derivatives-v1",
+  "head_commit": "0d6a56dca2d36d1ac759528bcd0d3ea47baa42b4",
+  "status": "R3_BLOCKED_ROSTER_PROVENANCE",
+  "reason": "September 2026 requires a completed August UM ranking, which is not present in the authoritative causal universe artifact.",
+  "pilot_status": "ENGINEERING_PILOT_ONLY",
+  "canonical_august_roster": "rosters/2026-08.json",
+  "canonical_august_roster_sha256": "ec2609bb7df0019984d41be3c5f18154591f5c8735a71557de7207c5606a00cc",
+  "september_roster_receipt": "rosters/2026-09_BLOCKED.json",
+  "engineering_shadow_receipt": "R3_ENGINEERING_SHADOW_BLOCKED.json",
+  "shadow_symbols_collected": 0,
+  "historical_outcomes_accessed": false,
+  "final_holdout_status": "UNTOUCHED",
+  "r2b2_status": "NOT_STARTED",
+  "full_pytest_receipt": "full_pytest_receipt.json",
+  "pytest_summary": "229 passed, 1 warning in 104.96s (0:01:44)",
+  "scientific_source_dirty": false,
+  "scientific_activation": "NOT_ACTIVATED"
+}

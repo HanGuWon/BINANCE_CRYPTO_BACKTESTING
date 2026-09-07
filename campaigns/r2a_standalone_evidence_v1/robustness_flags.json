@@ -1,0 +1,1262 @@
+[
+  {
+    "trial_id": "T0001",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0002",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0003",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0004",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0005",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0006",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0007",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0008",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0009",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0010",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0011",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0012",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0013",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0014",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0015",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0016",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0017",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0018",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0019",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0020",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0021",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0022",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0023",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0024",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0025",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0026",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0027",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0028",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0029",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0030",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0031",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0032",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0033",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0034",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0035",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0036",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0037",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0038",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0039",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0040",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0041",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0042",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0043",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0044",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0045",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0046",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0047",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0048",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0049",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0050",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0051",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0052",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0053",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0054",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0055",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0056",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 0
+  },
+  {
+    "trial_id": "T0057",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0058",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0059",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 0
+  },
+  {
+    "trial_id": "T0060",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0061",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0062",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0063",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0064",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0065",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0066",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0067",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0068",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0069",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0070",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0071",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0072",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0073",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0074",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0075",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0076",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0077",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0078",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0079",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0080",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0081",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0082",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0083",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0084",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0085",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0086",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0087",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0088",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0089",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0090",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0091",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0092",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0093",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0094",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0095",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0096",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0097",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0098",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0099",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0100",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0101",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0102",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0103",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0104",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0105",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0106",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0107",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0108",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0109",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0110",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0111",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0112",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0113",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0114",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0115",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0116",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0117",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0118",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0119",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0120",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0121",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0122",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0123",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0124",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0125",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0126",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0127",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0128",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0129",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0130",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0131",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0132",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0133",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0134",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0135",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0136",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0137",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0138",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0139",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0140",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 0
+  },
+  {
+    "trial_id": "T0141",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0142",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0143",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 0
+  },
+  {
+    "trial_id": "T0144",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0145",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0146",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0147",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0148",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0149",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0150",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0151",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0152",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0153",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0154",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0155",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0156",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 0
+  },
+  {
+    "trial_id": "T0157",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0158",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0159",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0160",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0161",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0162",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0163",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0164",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0165",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0166",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0167",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0168",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0169",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0170",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0171",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0172",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0173",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0174",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0175",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0176",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0177",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0178",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0179",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0180",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0181",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0182",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0183",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0184",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0185",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0186",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0187",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0188",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0189",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0190",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0191",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0192",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0193",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0194",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0195",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0196",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0197",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0198",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0199",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0200",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0201",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0202",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0203",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0204",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0205",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0206",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0207",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0208",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0209",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0210",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0211",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0212",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0213",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0214",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0215",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0216",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0217",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0218",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0219",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0220",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0221",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0222",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0223",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0224",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0225",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0226",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 0
+  },
+  {
+    "trial_id": "T0227",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0228",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0229",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 0
+  },
+  {
+    "trial_id": "T0230",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0231",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0232",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0233",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0234",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0235",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0236",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0237",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0238",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0239",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0240",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0241",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0242",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 0
+  },
+  {
+    "trial_id": "T0243",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0244",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0245",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0246",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0247",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0248",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0249",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0250",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0251",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  },
+  {
+    "trial_id": "T0252",
+    "note": "INSUFFICIENT_ROBUSTNESS_EVIDENCE",
+    "fold_count": 1
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "state": "R3_PRODUCTION_ENTRYPOINT_REPAIR_VERIFIED",
+  "command": "python -m pytest -q",
+  "exit_code": 0,
+  "passed": 306,
+  "failed": 0,
+  "warnings": 1,
+  "summary": "306 passed, 1 warning in 127.30s (0:02:07)",
+  "focused_summary": "19 passed in 2.51s",
+  "implementation_commit": "62653b13ea041a9b15ea6822957e9b5f9f0e3c00",
+  "source_tree_sha256": "a3744375436d47bf9f57c035307d800f6229675075b7b005f18d0e41f21db1fd",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "cxc_receipt": ".codexclaw/evidence/01a0230d-0a21-7e02-ab97-a10534161680/test-receipt.json",
+  "scientific_source_scope": "clean",
+  "outcomes": "NOT_STARTED",
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED"
+}

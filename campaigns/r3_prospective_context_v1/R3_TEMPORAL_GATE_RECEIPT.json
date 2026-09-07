@@ -1,0 +1,12 @@
+{
+  "campaign_id": "r3_prospective_context_v1",
+  "as_of_utc": "2026-08-30T00:00:00Z",
+  "stage": "A",
+  "august_roster_status": "VALID_FOR_ENGINEERING_SHADOW_ONLY",
+  "september_roster_status": "R3_WAITING_FOR_COMPLETED_AUGUST_RANKING",
+  "required_boundary_utc": "2026-09-01T00:00:00Z",
+  "reason": "Before the September boundary, August is not complete. Do not approximate August volume or fabricate September membership.",
+  "historical_outcomes_accessed": false,
+  "final_holdout_status": "UNTOUCHED",
+  "r2b2_status": "NOT_STARTED"
+}

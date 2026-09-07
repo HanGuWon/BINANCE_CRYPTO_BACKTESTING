@@ -1,0 +1,16 @@
+{
+  "kind": "test",
+  "sourceIdentity": {
+    "kind": "resolved",
+    "commitSha": "3dabdfb47f13fb05cc079bee8ccb7224004c8774",
+    "dirty": true,
+    "treeHash": "a3a01d46ba6fd279d5baf253f96fa02c565144d03b62a1a4c6bc33dd48d8257a",
+    "capturedAt": "2026-09-05T00:42:18.120Z"
+  },
+  "command": "python -m pytest -q",
+  "exitCode": 0,
+  "pytestSummary": "331 passed, 1 warning in 121.27s (0:02:01)",
+  "createdAt": "2026-09-05T00:42:18.235Z",
+  "ownerSessionId": "01a0230d-0a21-7e02-ab97-a10534161680",
+  "checkEpoch": "c-20260905002837-aeb414"
+}

@@ -1,0 +1,29 @@
+{
+  "bytes": 761664,
+  "campaign_id": "r3_prospective_context_v1",
+  "files": 254,
+  "final_holdout": "UNTOUCHED",
+  "gap_count": 1,
+  "generated_at": "2026-08-30T10:22:26.329794+00:00",
+  "implementation_commit": "b9f1f2a3b14b24b8f72629fe57d0e1748040aa03",
+  "liquidation_events": 1,
+  "manifest_chain_verified": true,
+  "manifest_sha256": "ba723e28587a6fe31af272506b51bad911a92fa43b4a36fa930b9b18900e2266",
+  "mode": "ENGINEERING_SHADOW",
+  "outcomes_accessed": false,
+  "prior_root_disposition": {
+    "engineering_shadow_august_v3": "PRESERVED_IMMUTABLE"
+  },
+  "r2b2": "NOT_STARTED",
+  "restart_count": 0,
+  "returns_or_pnl_computed": false,
+  "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\engineering_shadow_august_v4_final2",
+  "root_tree_sha256": "071eccee5412f289bb602797179ae9c2e591799e3688da10e44f1740f86e2a11",
+  "roster_artifact": "campaigns/r3_prospective_context_v1/rosters/2026-08.json",
+  "roster_sha256": "ec2609bb7df0019984d41be3c5f18154591f5c8735a71557de7207c5606a00cc",
+  "rows": 354,
+  "status": "VERIFIED_WAITING_FOR_AUGUST_CLOSE",
+  "symbols": 50,
+  "unknown_market_liquidations": 0,
+  "v3_manifest_sha256": "1dcc3ed4e6e893a39b6004a130aae0ec783afbbfc6b7d9986a35ad985222b8db"
+}

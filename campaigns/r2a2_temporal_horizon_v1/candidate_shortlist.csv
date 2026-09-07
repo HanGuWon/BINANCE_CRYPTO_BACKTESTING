@@ -1,0 +1,1 @@
+trial_id,feature_id,variant,market,timeframe,side,horizon_bars,valid_fold_count,positive_fold_fraction,aggregate_hac_t,fdr_q_value,max_top_symbol_share_abs,catastrophic_reversal,temporal_replication

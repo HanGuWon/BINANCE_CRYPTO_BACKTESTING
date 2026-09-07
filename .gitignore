@@ -36,6 +36,11 @@ data/census/**
 artifacts/**
 reports/generated/**
 
+# R2B large audit exports remain local; commit the compact provenance summary
+# and checksum manifest instead of multi-megabyte planning/coverage tables.
+campaigns/r2b_restricted_derivatives_v1/premium_acquisition_plan.csv
+campaigns/r2b_restricted_derivatives_v1/premium_coverage_audit.csv
+
 # Builds
 build/
 dist/

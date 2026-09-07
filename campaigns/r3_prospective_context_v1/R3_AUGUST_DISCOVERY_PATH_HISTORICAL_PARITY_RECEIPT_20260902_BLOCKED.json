@@ -1,0 +1,18 @@
+{
+  "block_code": "R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE",
+  "block_reason": "authoritative monthly object retrieval failed",
+  "effective_month": "2026-08",
+  "final_holdout": "UNTOUCHED",
+  "implementation_commit": "93451ba0fd00234768821f163cf3162c55b0e2f6",
+  "outcomes_accessed": false,
+  "r2b2": "NOT_STARTED",
+  "ranking_input": "AUTHORITATIVE_MONTH_SCOPED_DISCOVERY",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "source_month": "2026-07",
+  "source_tree_sha256": "b0eafbd71d4f56111076cb75a53e4ec1a8fab4666c09034fddb2e113d9a96aa2",
+  "status": "BLOCKED",
+  "terminal_state": "R3_BLOCKED_DISCOVERY_PATH_PARITY",
+  "work_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_forward_rank_work_discovery_preflight",
+  "superseded_by": "R3_AUGUST_DISCOVERY_PATH_HISTORICAL_PARITY_RECEIPT.json",
+  "supersession_reason": "Unicode Vision archive URLs were percent-encoded in dcd62a6; the corrected replay completed at bc7b760."
+}

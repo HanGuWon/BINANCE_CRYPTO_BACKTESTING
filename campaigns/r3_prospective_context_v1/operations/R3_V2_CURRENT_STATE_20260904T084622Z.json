@@ -1,0 +1,31 @@
+{
+  "accrual_report": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\reports\\R3_EVIDENCE_ACCRUAL_V2_20260904T084622Z.md",
+  "final_holdout_status": "UNTOUCHED",
+  "inventory": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_OUTCOME_BLIND_EVIDENCE_INVENTORY_V2_20260904T084622Z.json",
+  "outcome_values_accessed": false,
+  "r2b2_status": "NOT_STARTED",
+  "readiness": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_EVALUATION_READINESS_V2_20260904T084622Z.json",
+  "record_type": "R3_V2_METADATA_STATE_INDEX",
+  "state": "R3_EVALUATION_PREREGISTERED_COLLECTION_CONTINUES",
+  "superseded_v1_receipts": [
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_CODEXCLAW_CLASSIFICATION_20260903.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_EVALUATION_FINAL_INTEGRITY_RECEIPT_20260903.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_EVALUATION_READINESS_RECEIPT_20260903.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_EVALUATION_READINESS_RECEIPT_20260903_FINAL.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_EVALUATION_READINESS_RECEIPT_20260903_FINAL_PRE_FIREWALL_SUPERSEDED.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_EVALUATION_READINESS_RECEIPT_20260903_PRECHECK_SUPERSEDED.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_LOCAL_AHEAD_SCOPE_AUDIT_20260903.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_OUTCOME_BLIND_EVIDENCE_INVENTORY_20260903.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_OUTCOME_BLIND_EVIDENCE_INVENTORY_20260903_FINAL.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_OUTCOME_BLIND_EVIDENCE_INVENTORY_20260903_INVALID.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_OUTCOME_BLIND_EVIDENCE_INVENTORY_20260903_INVALID_BOUNDARY.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_OUTCOME_BLIND_EVIDENCE_INVENTORY_20260903_PRE_BOUNDARY_CHECK.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_REMOTE_PROVENANCE_SYNC_20260903.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_AUTHORIZED_RESUME_RECEIPT_20260903.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_FINAL_OPERATIONS_AUDIT_20260903.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_RECONCILIATION_AUDIT_20260903.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_RESUME_STABILITY_RECEIPT_20260903.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\campaigns\\r3_prospective_context_v1\\operations\\R3_WORKTREE_DISCOVERY_20260903.json"
+  ],
+  "v1_disposition": "SUPERSEDED_PREREGISTRATION_BLOCKED_NOT_INVALID_OUTCOME_EVIDENCE"
+}

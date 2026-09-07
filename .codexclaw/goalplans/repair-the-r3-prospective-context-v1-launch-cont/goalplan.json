@@ -1,0 +1,26 @@
+{
+  "objective": "Repair the R3 prospective context v1 launch contract before any scientific collection: close prior R2B provenance, correct USD-M rate-limit telemetry and response metadata, freeze canonical closed 15m klines, correct depth/liquidation continuity claims, normalize array streams, make causal materialization key-safe, freeze August Top50 and month rollover, implement an append-only long-run public collector with manifest chain and health receipts, run a real outcome-blind engineering pilot, project storage from real payloads, qualify all required failure/restart cases, then either launch corrected Top50 collection or stop READY/BLOCKED. Never evaluate returns/PnL/Sharpe/hit rate, access final holdout, or start R2B2; preserve the six-hypothesis registry unless definitions change.",
+  "slug": "repair-the-r3-prospective-context-v1-launch-cont",
+  "createdAt": "2026-08-28T13:42:46.551Z",
+  "updatedAt": "2026-08-28T13:55:00.000Z",
+  "activeWorkPhaseId": "p0",
+  "workPhases": [
+    {"id":"p0","title":"Audit identities and block the existing launch contract","status":"in_progress","tasks":[{"id":"p0t1","title":"Verify R2B/R3 identities and write launch erratum","status":"done"},{"id":"p0t2","title":"Freeze USD-M rate, canonical price, depth, and pilot boundaries in docs","status":"done"}],"criteriaIds":["c0"]},
+    {"id":"p1","title":"Implement USD-M metadata and stream-specific normalization","status":"pending","tasks":[{"id":"p1t1","title":"Add get_with_metadata and rate-limit/error telemetry","status":"pending"},{"id":"p1t2","title":"Add closed-kline source and array response normalizers","status":"pending"}],"criteriaIds":["c1"]},
+    {"id":"p2","title":"Harden causal keys, universe roster, and rollover","status":"pending","tasks":[{"id":"p2t1","title":"Make materialization key-safe and fail closed on mixed sources","status":"pending"},{"id":"p2t2","title":"Freeze August roster and implement month rollover receipts","status":"pending"}],"criteriaIds":["c2"]},
+    {"id":"p3","title":"Build long-run collector, manifest chain, and health contract","status":"pending","tasks":[{"id":"p3t1","title":"Implement single-instance append-only prospective runner","status":"pending"},{"id":"p3t2","title":"Implement rotation manifests, health receipts, and graceful restart","status":"pending"}],"criteriaIds":["c3"]},
+    {"id":"p4","title":"Run real outcome-blind pilot and seal corrected launch","status":"pending","tasks":[{"id":"p4t1","title":"Execute deterministic real public-data pilot and measure payload storage","status":"pending"},{"id":"p4t2","title":"Run all qualification/full tests and freeze launch or blocked state","status":"pending"}],"criteriaIds":["c4"]}
+  ],
+  "criteria": [
+    {"id":"c0","scenario":"Existing R3 launch is explicitly blocked and all contract corrections are documented before collection.","expectedEvidence":"Erratum, identity audit, USD-M rate/price/depth/pilot documentation, holdout guards.","capturedEvidence":"campaigns/r3_prospective_context_v1/R3_LAUNCH_ERRATUM_001.md; campaigns/r3_prospective_context_v1/campaign_spec.toml; campaigns/r3_prospective_context_v1/R3_LAUNCH_MANIFEST.json; live /fapi/v1/exchangeInfo receipt verified REQUEST_WEIGHT=2400/min on 2026-08-28; commit 6686a4a","status":"met"},
+    {"id":"c1","scenario":"REST metadata, canonical closed klines, and stream-specific normalization are implemented and tested.","expectedEvidence":"Metadata/error telemetry, endpoint weights, closed-candle rejection, array normalizer tests.","capturedEvidence":"","status":"open"},
+    {"id":"c2","scenario":"Causal materialization is source-key safe and August universe/rollover are immutable and fail closed.","expectedEvidence":"Mixed-key tests, August roster hash, rollover state machine and receipts.","capturedEvidence":"","status":"open"},
+    {"id":"c3","scenario":"Production-science collector, append-only manifest chain, and health receipts are operationally complete.","expectedEvidence":"Runner, lock/restart/gap behavior, chain verifier, health schema and tests.","capturedEvidence":"","status":"open"},
+    {"id":"c4","scenario":"Real outcome-blind pilot passes or is honestly blocked; full verification stops before outcomes.","expectedEvidence":"Real pilot receipt/storage projections, targeted/full pytest, no returns/PnL/hit-rate, final state READY or ACTIVE/BLOCKED.","capturedEvidence":"","status":"open"}
+  ],
+  "host": {
+    "armed": false,
+    "armedAt": null,
+    "source": "none"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "record_type": "R3_V8_RESUME_STABILITY_RECEIPT",
+  "recorded_at_utc": "2026-09-03T13:47:00.330490Z",
+  "branch": "research/r2b-restricted-derivatives-v1",
+  "purpose": "Outcome-blind post-resume stability check after the authorized v8 launcher reacquired the existing collector lock.",
+  "resume_receipt": "campaigns/r3_prospective_context_v1/operations/R3_V8_AUTHORIZED_RESUME_RECEIPT_20260903.json",
+  "identity": {
+    "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+    "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+    "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+    "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8",
+    "manifest_chain_verification": true,
+    "launch_seal_verification": true,
+    "outcomes_accessed": false
+  },
+  "watch": {
+    "recorded_at_utc": "2026-09-03T13:47:00.330490Z",
+    "state": "YELLOW",
+    "reasons": [
+      "reported_source_or_restart_gap"
+    ],
+    "cycle_count": 116,
+    "expected_cycle_count": 117,
+    "health_count": 116,
+    "manifest_entry_count": 116,
+    "missing_cycle_count": 1,
+    "first_cycle_id": "cycle-20260902T084503275383Z",
+    "latest_cycle_id": "cycle-20260903T134504766572Z",
+    "latest_cycle_completed_at": "2026-09-03T13:45:28.732047Z",
+    "eligible_next_execution_time": "2026-09-03T14:00:00Z",
+    "latest_health_timestamp": "2026-09-03T13:45:32.764204Z",
+    "latest_health_manifest_sha256": "ae8d9427e3b769550c6a32bbcdab6fb1a11eb912408691951f050f3773076522",
+    "gap_count": 23,
+    "restart_count": 23,
+    "authorized_writer_count": 1,
+    "duplicate_writers": [],
+    "lock_alive": true,
+    "lock_pid": 164504,
+    "disk_state": "GREEN",
+    "free_disk_bytes": 135235428352
+  },
+  "interpretation": {
+    "new_cycle_after_resume": true,
+    "restart_gap_preserved": true,
+    "missing_cycle_is_expected_gap_metadata": true,
+    "new_root_created": false,
+    "raw_or_manifest_rewritten": false,
+    "final_holdout": "UNTOUCHED",
+    "r2b2": "NOT_STARTED"
+  }
+}

@@ -116,8 +116,9 @@ def census_1d(census_dir: Path, output_dir: Path, *, workers: int = 2) -> tuple[
     return taxonomy, manifest
 
 
-def acquire_1d(manifest: pd.DataFrame, *, workers: int = 2) -> pd.DataFrame:
-    client = BinanceArchiveClient(Path("data/raw"), timeout=90, max_retries=3)
+def acquire_1d(manifest: pd.DataFrame, *, workers: int = 2, raw_root: Path | None = None) -> pd.DataFrame:
+    """Acquire verified native 1d archives into an explicit raw root."""
+    client = BinanceArchiveClient(Path(raw_root) if raw_root is not None else Path("data/raw"), timeout=90, max_retries=3)
     requests = []
     for row in manifest.itertuples():
         year, month = (int(part) for part in str(row.archive_month).split("-"))
@@ -155,15 +156,25 @@ def acquire_1d(manifest: pd.DataFrame, *, workers: int = 2) -> pd.DataFrame:
     return pd.DataFrame(records).sort_values(["market", "symbol", "archive_month"])
 
 
-def build_monthly_cohorts(manifest: pd.DataFrame, taxonomy: pd.DataFrame, output_dir: Path) -> pd.DataFrame:
+def build_monthly_cohorts(manifest: pd.DataFrame, taxonomy: pd.DataFrame, output_dir: Path, *, census_dir: Path | None = None) -> pd.DataFrame:
     """Aggregate complete prior calendar months and freeze diagnostic cohorts."""
     census_rows = []
     for row in manifest.itertuples():
-        integrity = getattr(row, "integrity_status", None)
+        # Fail closed: every ranking object must explicitly prove PASS plus a
+        # matching published/computed checksum pair and an existing raw file.
+        required = ("integrity_status", "published_sha256", "computed_sha256", "raw_path")
+        missing_columns = [column for column in required if not hasattr(row, column)]
+        if missing_columns:
+            raise RuntimeError("MISSING_INTEGRITY_PROVENANCE: row lacks " + ", ".join(missing_columns))
+        integrity = getattr(row, "integrity_status")
         if integrity is None or (isinstance(integrity, float) and pd.isna(integrity)):
             raise RuntimeError("MISSING_INTEGRITY_PROVENANCE: row lacks integrity_status")
         if str(integrity) != "PASS":
             continue
+        published = getattr(row, "published_sha256")
+        computed = getattr(row, "computed_sha256")
+        if pd.isna(published) or pd.isna(computed) or str(published) != str(computed):
+            raise RuntimeError("CHECKSUM_MISMATCH_OR_MISSING: refusing ranking without provenance")
         raw_path = Path(getattr(row, "raw_path", ""))
         if not raw_path.exists():
             continue
@@ -172,11 +183,16 @@ def build_monthly_cohorts(manifest: pd.DataFrame, taxonomy: pd.DataFrame, output
         summary = _summarize_1d_archive(raw_path)
         observed_days = int(summary["observed_days"])
         coverage = observed_days / expected_days
+        if str(summary["integrity_status"]) != "PASS":
+            raise RuntimeError(f"SECOND_PASS_ISSUES:{summary['issue_codes']} for {raw_path}")
+        if coverage != 1.0:
+            raise RuntimeError(f"SECOND_PASS_COVERAGE_NE_1.0 for {raw_path}")
         census_rows.append({"market": row.market, "symbol": row.symbol, "volume_month": str(month), "prior_month_expected_days": expected_days, "prior_month_observed_days": observed_days, "coverage_ratio": coverage, "prior_month_quote_volume": float(summary["quote_volume"]), "volume_integrity_status": summary["integrity_status"], "issue_codes": summary["issue_codes"]})
     volumes = pd.DataFrame(census_rows)
     census_frames = []
+    census_dir = Path(census_dir) if census_dir is not None else Path("data/census/r1_full_history_v1")
     for market in ("spot", "um"):
-        census = pd.read_csv(Path("data/census/r1_full_history_v1") / f"{market}_archive_symbol_census.csv")
+        census = pd.read_csv(census_dir / f"{market}_archive_symbol_census.csv")
         census_frames.append(census[["market", "symbol", "first_archive_month"]])
     census = pd.concat(census_frames, ignore_index=True).rename(columns={"first_archive_month": "first_archive_observed"})
     volumes = volumes.merge(census, on=["market", "symbol"], how="left")

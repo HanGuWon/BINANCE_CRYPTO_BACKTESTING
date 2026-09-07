@@ -1,0 +1,22 @@
+{
+  "campaign_id": "r3_prospective_context_v1",
+  "status": "PASS",
+  "evidence_mode": "ENGINEERING_SHADOW",
+  "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\engineering_shadow_august_v5_retry",
+  "roster_artifact": "rosters/2026-08.json",
+  "roster_sha256": "ec2609bb7df0019984d41be3c5f18154591f5c8735a71557de7207c5606a00cc",
+  "cycles": 4,
+  "manifest_sha256": "9ae1f8ded599f28db05d02ae12acce00dae34267ee7bdafb958b16dde7861953",
+  "files": 263,
+  "rows": 1425,
+  "bytes": 3132500,
+  "gap_count": 4,
+  "calibration_ids": ["cal-f6172fb27e7f4b1772969dbd"],
+  "absolute_grid": true,
+  "target_bar_span_seconds": 900,
+  "scheduled_delay_seconds": 5,
+  "actual_start_after_scheduled": true,
+  "ws_corrected_receipts": true,
+  "scientific_rows": 0,
+  "prior_root_disposition": "engineering_shadow_august_v5 INVALID_SUPERSEDED by Erratum 009"
+}

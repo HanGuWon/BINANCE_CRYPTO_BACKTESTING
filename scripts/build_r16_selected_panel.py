@@ -42,21 +42,37 @@ def selected_manifest(cohorts: pd.DataFrame, census_dir: Path, *, top_column: st
     return result.sort_values(["market", "symbol", "archive_month"]).reset_index(drop=True)
 
 
-OFF_GRID_AUDIT_SYMBOLS = {("spot", symbol) for symbol in ("BCCUSDT", "BNBUSDT", "BTCUSDT", "ETHUSDT", "LTCUSDT", "NEOUSDT")}
+OFF_GRID_AUDIT_SYMBOLS = {
+    "15m": {("spot", symbol) for symbol in ("BCCUSDT", "BNBUSDT", "BTCUSDT", "ETHUSDT", "LTCUSDT", "NEOUSDT")},
+    # The same February-2018 Spot anomaly propagates to the native 1h/4h
+    # archives of these six series; quarantine stays fail-closed per grid.
+    "1h": {("spot", symbol) for symbol in ("BCCUSDT", "BNBUSDT", "BTCUSDT", "ETHUSDT", "LTCUSDT", "NEOUSDT")},
+    "4h": {("spot", "ICXUSDT"), ("spot", "ONTUSDT")},
+}
+_BTC_REFERENCE_CACHE: dict[tuple[str, str], pd.DataFrame | None] = {}
 
 
-def quarantine_local_off_grid_rows(source: pd.DataFrame, market: str, symbol: str) -> tuple[pd.DataFrame, int]:
+def _infer_timeframe(panel: pd.DataFrame) -> str:
+    if "timeframe" in panel.columns:
+        values = panel["timeframe"].dropna().astype(str).unique()
+        if len(values) == 1 and values[0] in {"15m", "1h", "4h"}:
+            return values[0]
+    raise ValueError("panel timeframe must be explicit for causal joins")
+
+
+def quarantine_local_off_grid_rows(source: pd.DataFrame, market: str, symbol: str, *, timeframe: str = "15m") -> tuple[pd.DataFrame, int]:
     """Remove every off-grid row (absolute UTC phase check), never snap.
 
     Only the six audited February-2018 spot series may contain off-grid rows;
     any other series fails closed. The normal return-to-grid row is preserved.
     """
     stamps = pd.to_datetime(source["open_time"], utc=True)
-    step_ns = int(pd.Timedelta(minutes=15).value)
+    step_ms = {"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}[timeframe]
+    step_ns = step_ms * 1_000_000
     off_grid = (stamps.astype("datetime64[ns, UTC]").astype("int64") % step_ns) != 0
     if not off_grid.any():
         return source, 0
-    if (market, symbol) not in OFF_GRID_AUDIT_SYMBOLS:
+    if (market, symbol) not in OFF_GRID_AUDIT_SYMBOLS.get(timeframe, set()):
         raise DataIntegrityError("unexpected off-grid rows for unaudited series " + market + "/" + symbol)
     mask = off_grid.to_numpy()
     return source.loc[~mask].copy(), int(mask.sum())
@@ -83,10 +99,18 @@ def acquire_selected(manifest: pd.DataFrame, *, workers: int = 2, timeframe: str
     with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
         futures = [pool.submit(acquire, request) for request in requests]
         for number, future in enumerate(as_completed(futures), start=1):
-            rows.append(future.result())
+            try:
+                rows.append(future.result())
+            except Exception as exc:
+                # A missing remote archive is a real coverage gap, not an
+                # implementation error; record it and keep the run going.
+                print(f"acquire failed: {type(exc).__name__}: {exc}", flush=True)
             if number % 50 == 0:
                 print(f"acquired selected context {number}/{len(futures)}", flush=True)
-    return pd.DataFrame(rows)
+    frame = pd.DataFrame(rows)
+    if "market" not in frame.columns:
+        frame = pd.DataFrame(columns=["market", "symbol", "archive_month", "raw_path", "published_sha256", "computed_sha256", "timeframe"])
+    return frame
 
 
 def materialize_selected(manifest: pd.DataFrame, output_root: Path) -> dict[str, object]:
@@ -154,7 +178,7 @@ def materialize_native_selected(manifest: pd.DataFrame, *, timeframe: str, outpu
         if not frames:
             continue
         source = pd.concat(frames, ignore_index=True).drop_duplicates("open_time").sort_values("open_time").reset_index(drop=True)
-        source, quarantined = quarantine_local_off_grid_rows(source, market, symbol)
+        source, quarantined = quarantine_local_off_grid_rows(source, market, symbol, timeframe=timeframe)
         counts["quarantined_off_grid_rows"] = int(counts["quarantined_off_grid_rows"]) + quarantined
         counts["objects"] += len(frames)
         try:
@@ -162,6 +186,7 @@ def materialize_native_selected(manifest: pd.DataFrame, *, timeframe: str, outpu
         except DataIntegrityError as exc:
             counts["failed_groups"].append({"market": market, "symbol": symbol, "reason": str(exc)})
             continue
+        step_ms_map = {"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}
         bars = bars.rename(columns={"open_time": "timestamp"}).copy()
         bars["market"], bars["symbol"] = market, symbol
         bars["timeframe"] = timeframe
@@ -170,12 +195,39 @@ def materialize_native_selected(manifest: pd.DataFrame, *, timeframe: str, outpu
         bars["row_class"] = bars["universe_month"].map(lambda month: "RESEARCH_ELIGIBLE" if month in selected_months else "WARMUP_CONTEXT_ONLY")
         features = compute_gap_safe_features(CoreFeatureEngine(), bars.rename(columns={"timestamp": "open_time"}), timeframe)
         features = features.drop(columns=["open_time"], errors="ignore")
+        # Context columns are recomputed after causal joins; drop the stale
+        # engine-pass versions (computed before btc/funding/premium existed)
+        # so the final concat keeps the post-join values only.
+        stale_context = [column for column in ("btc_regime", "sig_btc_regime", "market_breadth", "sig_market_breadth") if column in features.columns]
+        features = features.drop(columns=stale_context)
         panel = pd.concat([bars.reset_index(drop=True), features.reset_index(drop=True)], axis=1)
         panel = panel.loc[:, ~panel.columns.duplicated()]
-        panel = attach_btc_context(panel, btc_source_market=market, timeframe=timeframe)
+        # Stage B/C: build the BTC reference from a SEPARATE completed-bar
+        # table, never from this symbol's own rows, then join causally.
+        btc_reference = _load_btc_reference(market, timeframe)
+        if btc_reference is not None:
+            panel = attach_btc_context(panel, btc_reference, timeframe=timeframe)
+        else:
+            for column in ("btc_close", "btc_source_market", "btc_source_symbol", "btc_source_open_time", "btc_source_close_time", "btc_source_age"):
+                panel[column] = np.nan
+            panel["btc_coverage_status"] = "HISTORICAL_UNAVAILABLE"
         if market == "um":
             panel = attach_um_funding(panel, symbol)
-            panel = attach_um_premium(panel, timeframe)
+            panel = attach_um_premium(panel, symbol=symbol, timeframe=timeframe)
+        # Recompute the context-derived engine outputs on the enriched frame
+        # so btc_regime/sig_btc_regime reflect real causal BTC history.
+        from binance_research.features import _optional
+        btc_close = _optional(panel, "btc_close")
+        btc_ema = btc_close.ewm(span=200, adjust=False, min_periods=200).mean()
+        btc_distance = (btc_close - btc_ema) / btc_ema.replace(0, np.nan)
+        panel["btc_regime"] = np.select([btc_distance > 0.005, btc_distance < -0.005], [1.0, -1.0], default=0.0)
+        panel.loc[btc_ema.isna(), "btc_regime"] = np.nan
+        panel.loc[panel["btc_close"].isna(), "btc_regime"] = np.nan
+        panel["sig_btc_regime"] = panel["btc_regime"]
+        # Stage D ordering: CoreFeatureEngine runs on enriched sources.  The
+        # per-symbol engine pass above already consumed btc/funding/premium
+        # columns when present; breadth joins as a cross-sectional second pass
+        # in finalize_breadth() once every symbol's Stage-A panel exists.
         provenance = f"r1.7-selected-native-{timeframe}"
         write_partitioned_panel(panel, output_root, provenance=provenance)
         counts[f"rows_{timeframe}"] += len(panel)
@@ -187,34 +239,132 @@ def materialize_native_selected(manifest: pd.DataFrame, *, timeframe: str, outpu
     return counts
 
 
-def attach_btc_context(panel: pd.DataFrame, btc_source_market: str, timeframe: str) -> pd.DataFrame:
-    """Causally backward-join same-timeframe BTCUSDT close from the given market."""
-    source = panel[(panel["market"] == btc_source_market) & (panel["symbol"] == "BTCUSDT")][["timestamp", "close"]].rename(
-        columns={"timestamp": "btc_source_timestamp", "close": "btc_close"}
-    ).drop_duplicates("btc_source_timestamp").sort_values("btc_source_timestamp")
+def finalize_breadth(manifest: pd.DataFrame, *, timeframe: str, output_root: Path, cohorts: pd.DataFrame) -> dict[str, object]:
+    """Cross-sectional second pass: cohort-aware breadth joined back into rows."""
+    from binance_research.features import build_cohort_aware_breadth
+
+    frames = []
+    for (market, symbol), group in manifest.groupby(["market", "symbol"], sort=True):
+        pattern = output_root / f"market={market}" / f"symbol={symbol}" / f"timeframe={timeframe}"
+        for path in sorted(pattern.glob("year=*/part-000.parquet")):
+            frame = pd.read_parquet(path, columns=["timestamp", "market", "symbol", "close"])
+            frames.append(frame)
+    if not frames:
+        return {"breadth_rows": 0}
+    panel = pd.concat(frames, ignore_index=True)
+    diagnostics = build_cohort_aware_breadth(panel, cohorts, timeframe=timeframe)
+    diagnostics = diagnostics.rename(columns={
+        "breadth_pct_above_ema50": "breadth_pct_above_ema50",
+        "coverage_status": "breadth_coverage_status",
+    })
+    diagnostics["market_breadth"] = diagnostics["breadth_pct_above_ema50"]
+    for (market, symbol), group in manifest.groupby(["market", "symbol"], sort=True):
+        pattern = output_root / f"market={market}" / f"symbol={symbol}" / f"timeframe={timeframe}"
+        if not pattern.is_dir():
+            continue
+        for year_directory in sorted(pattern.glob("year=*")):
+            path = year_directory / "part-000.parquet"
+            frame = pd.read_parquet(path)
+            year = int(year_directory.name.split("=")[1])
+            window = diagnostics[
+                (diagnostics["market"] == market)
+                & (diagnostics["timestamp"].dt.year == year)
+            ][["timestamp", "selected_count", "valid_count", "valid_fraction", "breadth_pct_above_ema50", "breadth_coverage_status", "market_breadth"]]
+            frame = frame.drop(columns=["selected_count", "valid_count", "valid_fraction", "breadth_pct_above_ema50", "breadth_coverage_status", "market_breadth"], errors="ignore")
+            # The stale engine-pass breadth signal (computed before the real
+            # cross-sectional breadth existed) must not shadow the joined one.
+            frame = frame.drop(columns=["sig_market_breadth"], errors="ignore")
+            frame = frame.merge(window.drop_duplicates("timestamp"), on="timestamp", how="left")
+            import numpy as _np
+            frame["sig_market_breadth"] = _np.select(
+                [frame["market_breadth"] >= 0.6, frame["market_breadth"] <= 0.4],
+                [1.0, -1.0],
+                default=0.0,
+            )
+            frame.loc[frame["market_breadth"].isna(), "sig_market_breadth"] = _np.nan
+            frame.to_parquet(path, index=False)
+    return {"breadth_rows": len(diagnostics)}
+
+
+def _load_btc_reference(market: str, timeframe: str, *, manifest: pd.DataFrame | None = None) -> pd.DataFrame | None:
+    """Load BTCUSDT native bars for the same market/timeframe from raw archives."""
+    cache_key = (market, timeframe)
+    if cache_key in _BTC_REFERENCE_CACHE:
+        return _BTC_REFERENCE_CACHE[cache_key]
+    if market == "spot":
+        root = Path("data/raw/spot/klines/BTCUSDT") / timeframe
+    else:
+        root = Path("data/raw/um/klines/BTCUSDT") / timeframe
+    if not root.is_dir():
+        _BTC_REFERENCE_CACHE[cache_key] = None
+        return None
+    frames = []
+    for path in sorted(root.glob("BTCUSDT-*.zip")):
+        try:
+            frames.append(load_kline_archive(path))
+        except Exception:
+            _BTC_REFERENCE_CACHE[cache_key] = None
+            return None
+    if not frames:
+        _BTC_REFERENCE_CACHE[cache_key] = None
+        return None
+    source = pd.concat(frames, ignore_index=True).drop_duplicates("open_time").sort_values("open_time").reset_index(drop=True)
+    stamps = source["open_time"].astype("datetime64[ns, UTC]")
+    reference = pd.DataFrame({"timestamp": stamps})
+    step_ms = {"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}[timeframe]
+    reference["segment_id"] = (stamps.diff().fillna(pd.Timedelta(milliseconds=step_ms)) != pd.Timedelta(milliseconds=step_ms)).cumsum()
+    reference["close"] = source["close"].to_numpy()
+    result = build_btc_reference(reference, source_market=market)
+    _BTC_REFERENCE_CACHE[cache_key] = result
+    return result
+
+
+def build_btc_reference(btc_bars: pd.DataFrame, *, source_market: str) -> pd.DataFrame:
+    """Build a standalone completed-bar BTCUSDT reference table."""
+    reference = btc_bars[["timestamp", "close", "segment_id"]].copy()
+    reference = reference.rename(columns={"timestamp": "btc_open_time", "close": "btc_close", "segment_id": "btc_segment_id"})
+    step_ms = {"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}
+    return reference.assign(btc_source_market=source_market, btc_source_symbol="BTCUSDT").drop_duplicates("btc_open_time").sort_values("btc_open_time")
+
+
+def attach_btc_context(panel: pd.DataFrame, btc_reference: pd.DataFrame, *, timeframe: str) -> pd.DataFrame:
+    """Causally backward-join the same completed BTC bar at decision time.
+
+    decision_timestamp is the completed bar close (bar open + interval).  The
+    joined BTC bar must satisfy btc_close_time <= decision_timestamp; a future
+    BTC bar is never used and missing history stays NaN fail-closed.
+    """
+    step_ms = {"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}[timeframe]
+    reference = btc_reference.copy()
+    reference["btc_close_time"] = (pd.to_datetime(reference["btc_open_time"], utc=True).astype("datetime64[ns, UTC]") + pd.Timedelta(milliseconds=step_ms)).astype("datetime64[ns, UTC]")
     frame = panel.copy()
-    frame["_decision_ts"] = frame["timestamp"] - pd.Timedelta(milliseconds=1)
+    frame["_decision_ts"] = (pd.to_datetime(frame["timestamp"], utc=True).astype("datetime64[ns, UTC]") + pd.Timedelta(milliseconds=step_ms)).astype("datetime64[ns, UTC]")
     merged = pd.merge_asof(
         frame.sort_values("_decision_ts"),
-        source,
+        reference.sort_values("btc_close_time"),
         left_on="_decision_ts",
-        right_on="btc_source_timestamp",
+        right_on="btc_close_time",
         direction="backward",
-    ).drop(columns=["_decision_ts"])
-    merged["btc_source_market"] = btc_source_market
-    merged["btc_source_symbol"] = "BTCUSDT"
-    age_bars = (merged["_decision_ts"] - merged["btc_source_timestamp"]) if "_decision_ts" in merged else None
-    merged["btc_source_age"] = None
-    merged.loc[merged["btc_close"].notna(), "btc_source_age"] = (
-        merged.loc[merged["btc_close"].notna(), "_decision_ts"] - merged.loc[merged["btc_close"].notna(), "btc_source_timestamp"]
-    ) / pd.Timedelta(milliseconds={"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}[timeframe])
-    merged = merged.drop(columns=["_decision_ts"], errors="ignore")
+        allow_exact_matches=True,
+    )
+    merged["btc_source_age"] = (merged["_decision_ts"] - merged["btc_close_time"]).dt.total_seconds().div(step_ms / 1000)
+    merged.loc[merged["btc_close"].isna(), "btc_source_age"] = np.nan
     merged["btc_coverage_status"] = np.where(merged["btc_close"].notna(), "AVAILABLE", "NO_PRIOR_OBSERVATION")
+    # A stale NaN btc_regime column from the pre-context engine pass must not
+    # shadow the freshly recomputed context after the causal join.
     return merged
 
 
+def drop_stale_context_columns(panel: pd.DataFrame) -> pd.DataFrame:
+    """Remove engine-pass context columns that require post-join recomputation."""
+    stale = [column for column in ("btc_regime", "sig_btc_regime", "market_breadth", "sig_market_breadth") if column in panel.columns]
+    if stale:
+        panel = panel.drop(columns=stale)
+    return panel
+
+
 def attach_um_funding(panel: pd.DataFrame, symbol: str) -> pd.DataFrame:
-    """Attach event-level 90-event funding z-score via backward-asof (causal)."""
+    """Attach event-level funding rate + 90-event z-score with ONE clean as-of join."""
     from binance_research.derivatives import backward_asof_event_feature, funding_event_zscore
 
     events = load_funding_events(symbol)
@@ -225,26 +375,22 @@ def attach_um_funding(panel: pd.DataFrame, symbol: str) -> pd.DataFrame:
         frame["funding_source_timestamp"] = pd.NaT
         frame["funding_coverage_status"] = "HISTORICAL_UNAVAILABLE"
         return frame
-    scored = funding_event_zscore(events.rename(columns={"funding_rate": "funding_rate"}))
-    scored = scored.rename(columns={"timestamp": "event_timestamp", "funding_zscore": "funding_zscore90"})
-    frame = panel.rename(columns={"timestamp": "bar_timestamp"}).copy()
-    frame["bar_timestamp"] = pd.to_datetime(frame["bar_timestamp"], utc=True)
-    frame = backward_asof_event_feature(
-        frame.sort_values("bar_timestamp"),
-        scored[["event_timestamp", "funding_rate", "funding_zscore90"]],
-        bar_timestamp="bar_timestamp",
-        event_timestamp="event_timestamp",
-        value_column="funding_rate",
+    scored = funding_event_zscore(events).rename(columns={"timestamp": "funding_source_timestamp", "funding_zscore": "funding_zscore90"})
+    step_ms = {"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}[_infer_timeframe(panel)]
+    frame = panel.copy()
+    frame["_decision_ts"] = (pd.to_datetime(frame["timestamp"], utc=True).astype("datetime64[ns, UTC]") + pd.Timedelta(milliseconds=step_ms)).astype("datetime64[ns, UTC]")
+    scored["funding_source_timestamp"] = pd.to_datetime(scored["funding_source_timestamp"], utc=True).astype("datetime64[ns, UTC]")
+    merged = pd.merge_asof(
+        frame.sort_values("_decision_ts"),
+        scored[["funding_source_timestamp", "funding_rate", "funding_zscore90"]],
+        left_on="_decision_ts",
+        right_on="funding_source_timestamp",
+        direction="backward",
+        allow_exact_matches=True,
     )
-    zframe = backward_asof_event_feature(
-        frame,
-        scored[["event_timestamp", "funding_zscore90"]].rename(columns={"funding_zscore90": "_z"}),
-        bar_timestamp="bar_timestamp",
-        event_timestamp="event_timestamp",
-        value_column="_z",
-    ).rename(columns={"_z": "funding_zscore90", "event_timestamp": "funding_source_timestamp"})
-    zframe["funding_coverage_status"] = np.where(zframe["funding_rate"].notna(), "AVAILABLE", "NO_PRIOR_EVENT")
-    return zframe.rename(columns={"bar_timestamp": "timestamp"})
+    assert (merged.loc[merged["funding_source_timestamp"].notna(), "funding_source_timestamp"] <= merged.loc[merged["funding_source_timestamp"].notna(), "_decision_ts"]).all()
+    merged["funding_coverage_status"] = np.where(merged["funding_rate"].notna(), "AVAILABLE", "NO_PRIOR_EVENT")
+    return merged.drop(columns=["_decision_ts"])
 
 
 def load_funding_events(symbol: str) -> pd.DataFrame | None:
@@ -283,13 +429,17 @@ def load_funding_events(symbol: str) -> pd.DataFrame | None:
     return events
 
 
-def attach_um_premium(panel: pd.DataFrame, timeframe: str) -> pd.DataFrame:
-    """Attach UM premiumIndexKlines CLOSE and 90-bar gap-safe z-score."""
-    root = Path("data/raw/um/premiumIndexKlines") / "BTCUSDT" / timeframe
+def attach_um_premium(panel: pd.DataFrame, *, symbol: str, timeframe: str) -> pd.DataFrame:
+    """Attach THIS symbol's UM premiumIndexKlines CLOSE and 90-bar gap-safe z-score.
+
+    Never substitutes BTC premium for another symbol.  Missing history is NaN
+    with HISTORICAL_UNAVAILABLE coverage.
+    """
+    root = Path("data/raw/um/premiumIndexKlines") / symbol / timeframe
     frames = []
     if root.is_dir():
         import io, zipfile as _zf
-        for path in sorted(root.glob("BTCUSDT-*.zip")):
+        for path in sorted(root.glob(symbol + "-*.zip")):
             try:
                 with _zf.ZipFile(path) as archive:
                     name = next(n for n in archive.namelist() if n.endswith(".csv"))
@@ -316,14 +466,18 @@ def attach_um_premium(panel: pd.DataFrame, timeframe: str) -> pd.DataFrame:
     for _, positions in raw.groupby(segment_id.to_numpy(), sort=False).groups.items():
         z.iloc[list(positions)] = _rolling_zscore(values.iloc[list(positions)], 90).to_numpy()
     raw = raw[["timestamp", "premium"]].assign(premium_zscore90=z)
-    out["_decision_ts"] = out["timestamp"] - pd.Timedelta(milliseconds=1)
+    raw["timestamp"] = pd.to_datetime(raw["timestamp"], utc=True).astype("datetime64[ns, UTC]")
+    step_ms = {"15m": 900_000, "1h": 3_600_000, "4h": 14_400_000}[timeframe]
+    out["_decision_ts"] = (pd.to_datetime(out["timestamp"], utc=True).astype("datetime64[ns, UTC]") + pd.Timedelta(milliseconds=step_ms)).astype("datetime64[ns, UTC]")
     merged = pd.merge_asof(
         out.sort_values("_decision_ts"),
         raw.rename(columns={"timestamp": "premium_source_timestamp"}),
         left_on="_decision_ts",
         right_on="premium_source_timestamp",
         direction="backward",
-    ).drop(columns=["_decision_ts"])
+    )
+    assert (merged.loc[merged["premium_source_timestamp"].notna(), "premium_source_timestamp"] <= merged.loc[merged["premium_source_timestamp"].notna(), "_decision_ts"]).all()
+    merged = merged.drop(columns=["_decision_ts"])
     merged["premium_coverage_status"] = np.where(merged["premium"].notna(), "AVAILABLE", "NO_PRIOR_OBSERVATION")
     return merged
 
@@ -346,7 +500,7 @@ def main() -> int:
     cohorts = pd.read_csv(args.campaign_dir / "universe_monthly.csv")
     args.campaign_dir.mkdir(parents=True, exist_ok=True)
     manifest_name = {
-        "15m": "selected_intraday_manifest.csv",
+        "15m": "selected_15m_manifest.csv",
         "1h": "selected_1h_manifest.csv",
         "4h": "selected_4h_manifest.csv",
     }[args.timeframe]
@@ -390,7 +544,8 @@ def main() -> int:
     estimate_path = args.campaign_dir / estimate_name
     if args.acquire:
         acquired = acquire_selected(manifest, workers=args.workers, timeframe=args.timeframe)
-        manifest = manifest.merge(acquired, on=["market", "symbol", "archive_month"], how="left")
+        if len(acquired):
+            manifest = manifest.merge(acquired, on=["market", "symbol", "archive_month"], how="left", suffixes=("", "_acquired"))
         manifest.to_csv(manifest_path, index=False)
         estimate["status"] = "ACQUIRED"
         estimate["free_disk_after_bytes"] = int(shutil.disk_usage(Path.cwd()).free)
@@ -399,6 +554,8 @@ def main() -> int:
         if "raw_path" not in manifest.columns:
             raise RuntimeError("selected manifest lost raw_path; refusing silent materialization")
         counts = materialize_native_selected(manifest, timeframe=args.timeframe, output_root=output_root)
+        breadth_counts = finalize_breadth(manifest, timeframe=args.timeframe, output_root=output_root, cohorts=cohorts)
+        counts["breadth"] = breadth_counts
         (args.campaign_dir / summary_name).write_text(json.dumps(counts, indent=2), encoding="utf-8")
         print(json.dumps(counts, indent=2))
     return 0

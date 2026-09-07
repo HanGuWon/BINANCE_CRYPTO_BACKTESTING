@@ -1,0 +1,17 @@
+{
+  "holdout_boundary_utc": {
+    "15m": "2024-02-10T00:15:00+00:00",
+    "1h": "2024-02-10T01:00:00+00:00",
+    "4h": "2024-02-10T04:00:00+00:00"
+  },
+  "loader_predicate_pushdown": "pyarrow pc.less(timestamp_ns, boundary) before to_pandas; holdout rows never materialized",
+  "runtime_guards": [
+    "r2a_engine.assert_no_holdout enforced in load_panel_pre_holdout caller and run_single_trial",
+    "aggregate_r2a_results.main re-asserts stamps < holdout boundary for every trial before statistics"
+  ],
+  "tests_enforcing": [
+    "tests/test_r2a_execution.py::test_holdout_timestamps_rejected",
+    "tests/test_r2a_execution.py::test_exact_purge_embargo_boundaries_match_split_metadata"
+  ],
+  "final_holdout_status": "UNTOUCHED"
+}

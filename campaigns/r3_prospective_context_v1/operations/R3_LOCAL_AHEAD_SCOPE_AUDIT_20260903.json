@@ -1,0 +1,87 @@
+{
+  "record_type": "R3_LOCAL_AHEAD_SCOPE_AUDIT",
+  "recorded_at_utc": "2026-09-03T07:27:33.3407157Z",
+  "branch": "research/r2b-restricted-derivatives-v1",
+  "local_head_before_push": "b39fd181cbafd9912fe4ba5a0bd65c9bc197983b",
+  "origin_head_before_push": "0a8c5f21d882af521511e29643d26ac85f2056b7",
+  "ahead_behind_before_push": "5 0",
+  "local_only_commits": [
+    {
+      "commit": "20907f98f6773b6ef9b33074fe6124b0f846f4ad",
+      "title": "docs: reconcile stale R3 worktree state",
+      "paths": [
+        "README.md",
+        "campaigns/r3_prospective_context_v1/R3_CANONICAL_STATE_INDEX.json",
+        "campaigns/r3_prospective_context_v1/operations/R3_CODEXCLAW_CLASSIFICATION_20260903.json",
+        "campaigns/r3_prospective_context_v1/operations/R3_PROSPECTIVE_OPERATIONS_RUNBOOK_V1.md",
+        "campaigns/r3_prospective_context_v1/operations/R3_STALE_WORKTREE_DISPOSITION_20260903.md",
+        "campaigns/r3_prospective_context_v1/operations/R3_WORKTREE_DISCOVERY_20260903.json",
+        "devlog/_plan/260903_reconcile-stale-r3-worktree-v8/000_plan.md",
+        "devlog/_plan/260903_reconcile-stale-r3-worktree-v8/010_phase1.md",
+        "devlog/_plan/260903_reconcile-stale-r3-worktree-v8/020_phase2.md",
+        "devlog/_plan/260903_reconcile-stale-r3-worktree-v8/030_phase3.md",
+        "devlog/_plan/260903_reconcile-stale-r3-worktree-v8/040_phase4.md",
+        "devlog/_plan/260903_reconcile-stale-r3-worktree-v8/050_phase5.md",
+        "reports/R3_CURRENT_STATE.md"
+      ],
+      "scope_class": "docs_campaign_operations_runbook_index_readme"
+    },
+    {
+      "commit": "d58a96e3020a277a96c62f80a5a971dd59c0b0ea",
+      "title": "docs: clarify R3 v8 evidence anchor",
+      "paths": [
+        "campaigns/r3_prospective_context_v1/R3_CANONICAL_STATE_INDEX.json",
+        "campaigns/r3_prospective_context_v1/operations/R3_PROSPECTIVE_OPERATIONS_RUNBOOK_V1.md",
+        "reports/R3_CURRENT_STATE.md"
+      ],
+      "scope_class": "docs_campaign_operations_index"
+    },
+    {
+      "commit": "4187f12702e51bf278320be0d7d9261c0686c18e",
+      "title": "ops: record outcome-blind R3 v8 reconciliation",
+      "paths": [
+        "campaigns/r3_prospective_context_v1/R3_CANONICAL_STATE_INDEX.json",
+        "campaigns/r3_prospective_context_v1/operations/R3_V8_DAILY_OPERATIONS_RECEIPTS.jsonl",
+        "campaigns/r3_prospective_context_v1/operations/R3_V8_RECONCILIATION_AUDIT_20260903.json",
+        "devlog/_plan/260903_reconcile-stale-r3-worktree-v8/040_phase4.md",
+        "reports/R3_CURRENT_STATE.md"
+      ],
+      "scope_class": "campaign_operations_devlog_report"
+    },
+    {
+      "commit": "287cdc060fa657e6f8fab42013618354dbbc21d0",
+      "title": "ops: finalize R3 v8 state audit",
+      "paths": [
+        "campaigns/r3_prospective_context_v1/R3_CANONICAL_STATE_INDEX.json",
+        "campaigns/r3_prospective_context_v1/operations/R3_V8_FINAL_OPERATIONS_AUDIT_20260903.json",
+        "reports/R3_CURRENT_STATE.md"
+      ],
+      "scope_class": "campaign_operations_report"
+    },
+    {
+      "commit": "b39fd181cbafd9912fe4ba5a0bd65c9bc197983b",
+      "title": "docs: certify stabilized R3 v8 state",
+      "paths": [
+        "campaigns/r3_prospective_context_v1/R3_CANONICAL_STATE_INDEX.json",
+        "campaigns/r3_prospective_context_v1/operations/R3_V8_FINAL_OPERATIONS_AUDIT_20260903.json",
+        "reports/R3_CURRENT_STATE.md"
+      ],
+      "scope_class": "campaign_operations_report"
+    }
+  ],
+  "allowlist": [
+    "README.md",
+    "reports/",
+    "campaigns/r3_prospective_context_v1/",
+    "devlog/_plan/260903_reconcile-stale-r3-worktree-v8/"
+  ],
+  "forbidden_scientific_prefixes": ["scripts/", "src/", "tests/", "configs/"],
+  "scientific_scope_status": "clean",
+  "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "unrelated_worktree_preserved": true,
+  "unrelated_worktree_staged": false,
+  "outcomes_accessed": false,
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED"
+}

@@ -1,0 +1,17 @@
+{
+  "campaign_id": "r3_prospective_context_v1",
+  "production_profile": "v6",
+  "status": "INVALID/SUPERSEDED",
+  "recorded_at_utc": "2026-09-02T07:20:00Z",
+  "implementation_commit": "cd141f5b0142736746d04a830eb2af22a781d4c7",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "control_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1/launch_control/2026-09-production-v6",
+  "shadow_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1/engineering_shadow_september_launch_v6",
+  "scientific_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/r3_prospective_context_v1/scientific_raw_v6",
+  "failure_stage": "SEPTEMBER_ENGINEERING_SHADOW",
+  "failure_code": "R3_BLOCKED_IMPLEMENTATION",
+  "failure_reason": "Manifest was finalized while the concurrent forceOrder writer was still appending liquidation files; verifier observed 363 files/837 rows/1295484 bytes versus manifest 347 files/812 rows/1270102 bytes.",
+  "outcomes": "NOT_STARTED",
+  "final_holdout": "UNTOUCHED",
+  "action": "Preserve the v6 roots unchanged as immutable evidence; do not resume them. The next production profile must use a post-stream-stop reconciliation manifest."
+}

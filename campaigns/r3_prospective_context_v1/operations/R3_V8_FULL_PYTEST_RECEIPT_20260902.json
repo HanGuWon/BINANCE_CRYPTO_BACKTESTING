@@ -1,0 +1,15 @@
+{
+  "command": "C:\\Users\\user\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts\\python.EXE -m pytest -q",
+  "exit_code": 0,
+  "final_holdout": "UNTOUCHED",
+  "implementation_commit": "7c828d5085ea787c32c713649aa7fbcd8a74e452",
+  "outcomes": "NOT_STARTED",
+  "outcomes_accessed": false,
+  "passed_count": 331,
+  "r2b2": "NOT_STARTED",
+  "record_type": "R3_V8_FULL_PYTEST_RECEIPT",
+  "recorded_at_utc": "2026-09-02T12:57:14.017931+00:00",
+  "scientific_scope_status": "clean",
+  "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+  "summary": "331 passed, 1 warning in 100.79s (0:01:40)"
+}

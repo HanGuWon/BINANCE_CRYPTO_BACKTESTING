@@ -1,0 +1,93 @@
+{
+  "campaign_id": "r3_prospective_context_v1",
+  "schema_version": 1,
+  "status": "FROZEN_OUTCOME_BLIND",
+  "source_available_rule": "source_available_time < next_executable_open_time",
+  "equality_boundary": "REJECT",
+  "execution_anchor": "T_exec = first executable open after all required sources are available",
+  "native_kline_availability": "close timestamp of the completed native 15m kline",
+  "derived_bucket_availability": "maximum close timestamp of all complete constituent native 15m klines",
+  "rest_snapshot_source_available_time": "corrected_response_receipt_time if present, else response_received_at",
+  "forceOrder_event_boundary": "exchange_event_time from the normalized envelope (payload E); order T/t is descriptive only",
+  "forceOrder_source_available_time": "corrected_response_receipt_time if present, else collector_receipt_time",
+  "source_selection_tie_break": "choose max(source_available_time, exchange_event_time, source_identity) in ascending tuple order; source_identity is the lowercase SHA256 identity",
+  "forceOrder_execution_anchor": "T_exec = min scheduled open such that T_exec > exchange_event_time and T_exec > forceOrder_source_available_time",
+  "finite_rule": "all timestamps and numeric inputs must be finite; missing, non-finite, or exact-boundary values are ineligible",
+  "bootstrap_rule": "fit the restricted null model, multiply complete-block residuals by Rademacher draws, retain original studentization, inclusive absolute tail (1+exceedances)/(10000+1)",
+  "degeneracy_rule": "reject the hypothesis observation set if the tested design rank is below its declared rank, any required cell is absent, or robust variance is non-positive",
+  "horizons": {
+    "H01": {
+      "response_key": "FWD_15M",
+      "window_start": "T_exec",
+      "window_end": "next_completed_15m_close",
+      "start_offset_minutes": 0,
+      "end_offset_minutes": 15,
+      "response_formula": "log(C[T_exec+15m]/C[T_exec])",
+      "source_streams": ["closed_price_kline_15m"],
+      "endpoint_semantics": "close of the single completed native 15m bar immediately following T_exec",
+      "overlap": "independent",
+      "primary": true
+    },
+    "H02": {
+      "response_key": "FWD_1H",
+      "window_start": "T_exec",
+      "window_end": "T_exec+60m",
+      "start_offset_minutes": 0,
+      "end_offset_minutes": 60,
+      "response_formula": "log(C[T_exec+60m]/C[T_exec])",
+      "source_streams": ["closed_price_kline_15m", "open_interest"],
+      "endpoint_semantics": "endpoint requires four complete native 15m closes through T_exec+60m",
+      "overlap": "independent",
+      "primary": true
+    },
+    "H03": {
+      "response_key": "LIQ_CONT_15M",
+      "window_start": "T_exec",
+      "window_end": "T_exec+15m",
+      "start_offset_minutes": 0,
+      "end_offset_minutes": 15,
+      "response_formula": "log(C[event_symbol,T_exec+15m]/C[event_symbol,T_exec])",
+      "source_streams": ["forceOrder", "closed_price_kline_15m"],
+      "endpoint_semantics": "immediate post-event closed 15m response for a candidate forceOrder identity whose event boundary and receipt pass the strict rule",
+      "overlap": "liquidation_event_window",
+      "primary": true
+    },
+    "H04": {
+      "response_key": "LIQ_REVERSION_15M_TO_1H",
+      "window_start": "T_exec+15m",
+      "window_end": "T_exec+60m",
+      "start_offset_minutes": 15,
+      "end_offset_minutes": 60,
+      "response_formula": "log(C[event_symbol,T_exec+60m]/C[event_symbol,T_exec+15m])",
+      "source_streams": ["forceOrder", "closed_price_kline_15m"],
+      "endpoint_semantics": "incremental delayed response after the H03 endpoint; candidate identity is retained but H04 requires both +15m and +60m endpoints",
+      "overlap": "non_overlapping_with_H03",
+      "non_overlapping": true,
+      "primary": true
+    },
+    "H05": {
+      "response_key": "FWD_1H",
+      "window_start": "T_exec",
+      "window_end": "T_exec+60m",
+      "start_offset_minutes": 0,
+      "end_offset_minutes": 60,
+      "response_formula": "log(C[T_exec+60m]/C[T_exec])",
+      "source_streams": ["premiumIndex", "premiumIndexKlines_15m", "closed_price_kline_15m"],
+      "endpoint_semantics": "one-hour closed-kline response with funding and premium sources available before T_exec",
+      "overlap": "independent",
+      "primary": true
+    },
+    "H06": {
+      "response_key": "FWD_1H",
+      "window_start": "T_exec",
+      "window_end": "T_exec+60m",
+      "start_offset_minutes": 0,
+      "end_offset_minutes": 60,
+      "response_formula": "log(C[T_exec+60m]/C[T_exec])",
+      "source_streams": ["closed_price_kline_15m", "btc_context", "breadth_context"],
+      "endpoint_semantics": "one-hour closed-kline response with oriented BTC/breadth context fixed at T_exec",
+      "overlap": "independent",
+      "primary": true
+    }
+  }
+}

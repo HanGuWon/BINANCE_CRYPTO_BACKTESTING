@@ -1,0 +1,23 @@
+{
+  "campaign_id": "r3_prospective_context_v1",
+  "state": "R3_PREBOUNDARY_LAUNCH_IMPLEMENTATION_VERIFIED_WAITING_FOR_AUGUST_CLOSE",
+  "boundary_utc": "2026-09-01T00:00:00Z",
+  "implementation_commit": "b9f1f2a3b14b24b8f72629fe57d0e1748040aa03",
+  "verification_commit": "e298804008cd2538319fe9424b94996579c8e5b7",
+  "source_tree_sha256": "ea9f64be50e70c969aa15b86fa5e906272beb47bec2e10251de8f01d64b405a7",
+  "canonical_august_roster": "rosters/2026-08.json",
+  "canonical_august_roster_sha256": "ec2609bb7df0019984d41be3c5f18154591f5c8735a71557de7207c5606a00cc",
+  "forward_ranking_parity": "PASS",
+  "september_roster": "NOT_BUILT_BEFORE_BOUNDARY",
+  "engineering_shadow_v3": "PRESERVED_IMMUTABLE",
+  "engineering_shadow_v4_final_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\engineering_shadow_august_v4_final2",
+  "engineering_shadow_v4_manifest_sha256": "ba723e28587a6fe31af272506b51bad911a92fa43b4a36fa930b9b18900e2266",
+  "engineering_shadow_v4_root_tree_sha256": "071eccee5412f289bb602797179ae9c2e591799e3688da10e44f1740f86e2a11",
+  "shadow_scientific_primary_stream_parity": "PASS",
+  "pytest": "244 passed, 1 warning",
+  "outcomes": "NOT_STARTED",
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_STARTED",
+  "scientific_activation": "NOT_ACTIVATED",
+  "launch_manifest": "BLOCKED_ROSTER_PROVENANCE"
+}

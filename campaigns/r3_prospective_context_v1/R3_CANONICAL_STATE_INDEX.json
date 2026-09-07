@@ -1,0 +1,238 @@
+{
+  "record_type": "R3_CANONICAL_STATE_INDEX",
+  "recorded_at_utc": "2026-09-03T13:48:33Z",
+  "current_state": "R3_EVALUATION_PREREGISTRATION_BLOCKED",
+  "canonical_repository": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트",
+  "canonical_branch": "research/r2b-restricted-derivatives-v1",
+  "canonical_head": "2c39febfd7350d0bbcb12ed7185fcb52933b5324",
+  "origin_head": "2c39febfd7350d0bbcb12ed7185fcb52933b5324",
+  "ahead_behind": "0 0",
+  "head_interpretation": "origin-synchronized documentation/operations descendant; authorized-resume receipts are append-only and the sealed v8 scientific source identity remains frozen and unchanged",
+  "frozen_identity": {
+    "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+    "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+    "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+    "scientific_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8",
+    "roster_path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\rosters\\2026-09.json",
+    "roster_sha256": "bb05514dfc78cfca3b736488b1454f4cb022da0110e2cbf69f53c505f543ea79",
+    "roster_file_sha256": "102e1b2eb89977083142662bb8ccc1a2aad8e548095721901a42ae1de72f5d17",
+    "launch_manifest_path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_MANIFEST_2026-09.json",
+    "launch_manifest_sha256": "cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659",
+    "launch_seal_path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_SEAL_RECEIPT.json",
+    "launch_seal_sha256": "ab83232d90e800bf8178c6f3d22138382fb102b9d14213e12a798c0f2c68ad85",
+    "launch_seal_status": "SEALED"
+  },
+  "collector": {
+    "source_cwd": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트",
+    "writer_pid": 164504,
+    "wrapper_pid": 161716,
+    "writer_executable": "C:\\Users\\user\\AppData\\Roaming\\uv\\python\\cpython-3.11-windows-x86_64-none\\python.exe",
+    "wrapper_executable": "C:\\Users\\user\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts\\python.exe",
+    "authorized_writer_count": 1,
+    "duplicate_writers": [],
+    "cycle_count": 116,
+    "health_count": 116,
+    "manifest_entry_count": 116,
+    "missing_cycle_count": 1,
+    "latest_cycle_id": "cycle-20260903T134504766572Z",
+    "latest_cycle_completed_at": "2026-09-03T13:45:28.732047Z",
+    "latest_target_bar_open": "2026-09-03T13:30:00Z",
+    "latest_target_bar_close": "2026-09-03T13:45:00Z",
+    "manifest_chain_verification": true,
+    "launch_seal_verification": true,
+    "gap_count": 23,
+    "restart_count": 23,
+    "gap_reason": "reported_source_or_restart_gap",
+    "watchdog_state": "YELLOW",
+    "disk_state": "GREEN",
+    "free_disk_bytes": 135235428352,
+    "bytes_cycle_median": 1066029.0,
+    "bytes_cycle_p95_inclusive": 1452663.1,
+    "bytes_cycle_max": 1735185,
+    "projected_bytes_7d": 716371488.0,
+    "projected_bytes_30d": 3070163520.0
+  },
+  "service": {
+    "launcher": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\ops\\r3\\launch_r3_v8_resume.ps1",
+    "startup_fallback_valid": true,
+    "startup_shortcut": "C:\\Users\\user\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\R3-Prospective-Scientific-v8.lnk",
+    "task_scheduler_registered": false,
+    "task_scheduler_reason": "Access denied / task absent under current token",
+    "launcher_collision_exit_code": 73,
+    "restart_disposition": "SAFE_SKIP_LIVE_RESTART",
+    "restart_reason": "stopping the live immutable v8 evidence could endanger the campaign"
+  },
+  "receipts": {
+    "worktree_discovery": "campaigns/r3_prospective_context_v1/operations/R3_WORKTREE_DISCOVERY_20260903.json",
+    "codexclaw_classification": "campaigns/r3_prospective_context_v1/operations/R3_CODEXCLAW_CLASSIFICATION_20260903.json",
+    "stale_worktree_disposition": "campaigns/r3_prospective_context_v1/operations/R3_STALE_WORKTREE_DISPOSITION_20260903.md",
+    "daily_operations": "campaigns/r3_prospective_context_v1/operations/R3_V8_DAILY_OPERATIONS_RECEIPTS.jsonl",
+    "full_pytest": "campaigns/r3_prospective_context_v1/operations/R3_V8_FULL_PYTEST_RECEIPT_20260902.json",
+    "final_operations_audit": "campaigns/r3_prospective_context_v1/operations/R3_V8_FINAL_OPERATIONS_AUDIT_20260903.json",
+    "historical_final_operations_audit": "campaigns/r3_prospective_context_v1/operations/R3_V8_FINAL_OPERATIONS_AUDIT_20260902.json",
+    "reconciliation_audit": "campaigns/r3_prospective_context_v1/operations/R3_V8_RECONCILIATION_AUDIT_20260903.json",
+    "outcome_blind_inventory": "campaigns/r3_prospective_context_v1/operations/R3_OUTCOME_BLIND_EVIDENCE_INVENTORY_20260903_FINAL.json",
+    "evaluation_amendment": "campaigns/r3_prospective_context_v1/R3_EVALUATION_AMENDMENT_V1.md",
+    "evaluation_readiness": "campaigns/r3_prospective_context_v1/operations/R3_EVALUATION_READINESS_RECEIPT_20260903_FINAL.json",
+    "final_integrity": "campaigns/r3_prospective_context_v1/operations/R3_EVALUATION_FINAL_INTEGRITY_RECEIPT_20260903.json",
+    "authorized_resume": "campaigns/r3_prospective_context_v1/operations/R3_V8_AUTHORIZED_RESUME_RECEIPT_20260903.json",
+    "resume_stability": "campaigns/r3_prospective_context_v1/operations/R3_V8_RESUME_STABILITY_RECEIPT_20260903.json",
+    "evidence_accrual_report": "reports/R3_EVIDENCE_ACCRUAL.md",
+    "pytest_summary": "331 passed, 1 warning in 100.79s (0:01:40)",
+    "pytest_exit_code": 0,
+    "pytest_receipt_execution_head": "7c828d5085ea787c32c713649aa7fbcd8a74e452",
+    "pytest_receipt_source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688"
+  },
+  "worktrees": [
+    {
+      "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트",
+      "head": "2c39febfd7350d0bbcb12ed7185fcb52933b5324",
+      "branch": "research/r2b-restricted-derivatives-v1",
+      "status": "CURRENT",
+      "collector_source": true,
+      "scientific_scope_status": "clean",
+      "relative_to_sealed_v8_anchor": "origin-synchronized documentation/operations descendants; scientific identity unchanged"
+    },
+    {
+      "path": "C:\\Users\\user\\.codex\\worktrees\\ef86\\BINANCE 지표용 테스트",
+      "head": "9a70508eafe973405cfad165a0c8598288bc7aa0",
+      "branch": null,
+      "status": "HISTORICAL_EVIDENCE",
+      "collector_source": false,
+      "scientific_scope_status": "clean",
+      "relative_to_canonical": "0 ahead / 27 behind",
+      "disposition": "preserved untouched/read-only; never launch from this path"
+    }
+  ],
+  "supersession_chain": [
+    {
+      "artifact": "R3_PRODUCTION_LAUNCH_ATTEMPT_V1_BLOCKED_IMPLEMENTATION.json",
+      "classification": "INVALID_SUPERSEDED",
+      "reason": "historical blocked launch attempt; preserved"
+    },
+    {
+      "artifact": "R3_PRODUCTION_V3_INVALID_SUPERSEDED.json",
+      "classification": "INVALID_SUPERSEDED",
+      "reason": "v3 launch identity superseded by later verified lineage"
+    },
+    {
+      "artifact": "R3_PRODUCTION_V4_INVALID_SUPERSEDED.json",
+      "classification": "INVALID_SUPERSEDED",
+      "reason": "v4 launch identity superseded by later verified lineage"
+    },
+    {
+      "artifact": "R3_PRODUCTION_V5_INVALID_SUPERSEDED.json",
+      "classification": "INVALID_SUPERSEDED",
+      "reason": "v5 launch identity superseded by later verified lineage"
+    },
+    {
+      "artifact": "R3_PRODUCTION_V6_INVALID_SUPERSEDED.json",
+      "classification": "INVALID_SUPERSEDED",
+      "reason": "v6 launch identity superseded by later verified lineage"
+    },
+    {
+      "artifact": "R3_PRODUCTION_V7_INVALID_SUPERSEDED.json",
+      "classification": "INVALID_SUPERSEDED",
+      "reason": "v7 launch identity superseded by sealed v8"
+    },
+    {
+      "artifact": "R3_LAUNCH_MANIFEST_SUPERSEDED_BLOCKED.json",
+      "classification": "SUPERSEDED",
+      "reason": "blocked manifest retained for history"
+    },
+    {
+      "artifact": "R3_LAUNCH_MANIFEST_SUPERSEDED_READY_002.json",
+      "classification": "SUPERSEDED",
+      "reason": "pre-v8 ready manifest retained for history"
+    },
+    {
+      "artifact": "R3_LAUNCH_MANIFEST.json",
+      "classification": "HISTORICAL_EVIDENCE",
+      "reason": "repository-local historical manifest; active sealed manifest is D-backed v8"
+    },
+    {
+      "artifact": "R3_LAUNCH_SEAL_RECEIPT.json",
+      "classification": "HISTORICAL_EVIDENCE",
+      "reason": "repository-local historical seal receipt"
+    },
+    {
+      "artifact": "R3_ENGINEERING_SHADOW_*.json and R3_SHADOW_SCIENTIFIC_PARITY_RECEIPT.json",
+      "classification": "INVALID_SUPERSEDED",
+      "reason": "engineering/shadow evidence is not the active scientific v8 stream"
+    },
+    {
+      "artifact": "R3_POST_BOUNDARY_* and R3_PREBOUNDARY_* receipts",
+      "classification": "HISTORICAL_EVIDENCE",
+      "reason": "pre-v8 planning/launchability evidence retained without reinterpretation"
+    },
+    {
+      "artifact": "R3_AUGUST_* and R3_FORWARD_RANKING_* receipts",
+      "classification": "HISTORICAL_EVIDENCE",
+      "reason": "prior universe/discovery evidence; no current v8 membership rewrite"
+    },
+    {
+      "artifact": "R3_STAGE_A_* and R3_TEMPORAL_GATE_RECEIPT.json",
+      "classification": "HISTORICAL_EVIDENCE",
+      "reason": "earlier staged gate evidence retained"
+    },
+    {
+      "artifact": "R3_V3_IDENTITY_RECONCILIATION_RECEIPT.json and R3_FINAL_STATE.json",
+      "classification": "HISTORICAL_EVIDENCE",
+      "reason": "historical state reports; this index is the only current state"
+    },
+    {
+      "artifact": "R3_V8_DAILY_OPERATIONS_RECEIPTS.jsonl",
+      "classification": "CURRENT",
+      "reason": "append-only outcome-blind operations evidence"
+    },
+    {
+      "artifact": "R3_WORKTREE_DISCOVERY_20260903.json, R3_CODEXCLAW_CLASSIFICATION_20260903.json, R3_STALE_WORKTREE_DISPOSITION_20260903.md",
+      "classification": "CURRENT",
+      "reason": "this reconciliation's append-only evidence"
+    },
+    {
+      "artifact": "R3_CANONICAL_STATE_INDEX.json and reports/R3_CURRENT_STATE.md",
+      "classification": "CURRENT",
+      "reason": "authoritative current-state surfaces"
+    },
+    {
+      "artifact": "R3_V8_RECONCILIATION_AUDIT_20260903.json",
+      "classification": "CURRENT",
+      "reason": "new immutable timestamped operational snapshot; prior final audit remains unchanged"
+    },
+    {
+      "artifact": "R3_V8_FINAL_OPERATIONS_AUDIT_20260902.json",
+      "classification": "HISTORICAL_EVIDENCE",
+      "reason": "prior immutable final audit retained byte-for-byte"
+    },
+    {
+      "artifact": "R3_V8_FINAL_OPERATIONS_AUDIT_20260903.json",
+      "classification": "CURRENT",
+      "reason": "new immutable final operational snapshot; reruns require a new timestamped path"
+    }
+  ],
+  "historical_state_taxonomy": {
+    "R3_BLOCKED_ROSTER_PROVENANCE": "HISTORICAL_EVIDENCE / SUPERSEDED by verified September roster",
+    "R3_WAITING_FOR_COMPLETED_AUGUST_RANKING": "HISTORICAL_EVIDENCE / SUPERSEDED by sealed v8 launch",
+    "R3_BLOCKED_AUGUST_SOURCE_INCOMPLETE": "HISTORICAL_EVIDENCE / SUPERSEDED by later source repair",
+    "R3_PROSPECTIVE_SCIENTIFIC_COLLECTION_ACTIVE_VERIFIED": "HISTORICAL_EVIDENCE / superseded by current operations state",
+    "R3_PROSPECTIVE_COLLECTION_OPERATIONALLY_STABILIZED": "HISTORICAL_EVIDENCE / superseded by final outcome-blind verification",
+    "R3_PROSPECTIVE_COLLECTION_OPERATIONALLY_STABILIZED_VERIFIED": "HISTORICAL_EVIDENCE / superseded by evaluation-gate reconciliation",
+    "R3_EVALUATION_PREREGISTRATION_BLOCKED": "CURRENT / horizon key absent; collection continues"
+  },
+  "codexclaw_classification_path": "campaigns/r3_prospective_context_v1/operations/R3_CODEXCLAW_CLASSIFICATION_20260903.json",
+  "outcome_boundary": {
+    "evaluation_amendment": "FROZEN_R3_EVALUATION_AMENDMENT_V1_BUT_HORIZON_BLOCKED",
+    "outcomes_accessed": false,
+    "outcomes": "NOT_STARTED",
+    "final_holdout": "UNTOUCHED",
+    "r2b2": "NOT_STARTED",
+    "no_returns_or_performance_fields_in_index": true
+  },
+  "prohibitions": [
+    "Do not launch from the detached worktree.",
+    "Do not reset, checkout, merge, force-push, delete, or rewrite historical evidence.",
+    "Do not stop the active collector for cleanup.",
+    "Do not inspect or compute outcomes, returns, PnL, H01-H06 performance, final holdout, or R2B2."
+  ]
+}

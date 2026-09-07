@@ -1,0 +1,29 @@
+{
+  "aggregate_implementation_commit": "0b817ba96e6745bf91cc59ea1a9a4db17cd25575",
+  "aggregate_source_tree_sha256": "dff86356a7be4a2ec30b466f3de5c7b774c4ad1092324f525a8d3f9202f17825",
+  "artifact_sha256": {
+    "bootstrap_results.csv": "7b2c83b49266c681f418e9a20453b95b8a194d88cd070eec9c9efb5b7ac8132d",
+    "candidate_shortlist.csv": "6db1f4f770916559383354382b105cfde5e5df7481a995104a2e7e87e4d1707d",
+    "fold_results.csv": "25d0d78f04318707d51adfddcfb58297da3b69e109847197cbbec5089fc1bda9",
+    "holdout_guard_proof.json": "52dcf30835d3ee77eb387b9e449337e450fa270b604ba35d17b78d403a644abe",
+    "horizon_results.csv": "ac47446b8f37bf6c6eb1e881438ed2fb6165c4e444a54c67412d5946cdf8c9a2",
+    "multiple_testing.csv": "c48b73bf147bc787235b7872ec8c7dffbf2350afbb5464300d8c24fe0d60e8cf",
+    "symbol_concentration.csv": "ca10ad1c6d81913757629b31ae9e0d46310c5b42cf7410c13e64bc2cf6e33553",
+    "temporal_replication.csv": "d545c3218fe86c1896f60dd0ba17463e5d0f6c7f42a6669f908ffe80fa637aa6",
+    "yearly_diagnostics.csv": "d2f6f1679e59b8f1bf1c9c29dc1edb975291a4c32fbb58cf64fa90c790a511e6"
+  },
+  "bh_q": 0.05,
+  "bootstrap_samples": 1000,
+  "bootstrap_seed": 1729,
+  "causal_root_tree_sha256": "6eef4e59225cb45c2833452a883249b11f03469298c1ecfb3837c5f4aaa27a7d",
+  "checkpoint_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r2b_restricted_derivatives_v1_checkpoints_v7",
+  "family_size": 72,
+  "final_holdout_status": "UNTOUCHED",
+  "fold_registry_sha256": "25e479c98867b4cf0d4a7ff767bde306eca8bba0cbf66565191c32a4da5a06f6",
+  "outcome_implementation_commit": "67d006ae3205384e08a3e8ed68f8225708077305",
+  "outcome_manifest_sha256": "8ce7f75620c578dab808ddf7d7e7b2d610135680d5ed4515999cd899753f0602",
+  "outcome_source_tree_sha256": "0c3c264e6685b8d3704f4cccc1214448af0ae9036a1d8977d29f086553b98d93",
+  "registry_sha256": "3c61d923fe2cf88714c8cd2592264800ef2880db894dd2a21170fdf4fcc85302",
+  "status": "PASS",
+  "unit_count": 576
+}

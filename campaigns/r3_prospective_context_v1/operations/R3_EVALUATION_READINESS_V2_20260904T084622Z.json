@@ -1,0 +1,360 @@
+{
+  "auto_start": false,
+  "contract_version": "r3-evaluation-readiness-v2",
+  "family": {
+    "correction": "HOLM_STEP_DOWN_ALPHA_0.05",
+    "count": 6,
+    "hypotheses": [
+      "R3_H01",
+      "R3_H02",
+      "R3_H03",
+      "R3_H04",
+      "R3_H05",
+      "R3_H06"
+    ]
+  },
+  "firewall": {
+    "final_holdout": "UNTOUCHED",
+    "metadata_only": true,
+    "outcome_values_accessed": false,
+    "outcomes_accessed": false,
+    "r2b2": "NOT_STARTED"
+  },
+  "gap_accounting": {
+    "aggregate_gap_count": 174,
+    "block_reasons": {
+      "2026-09-02T06:00:00+00:00": [
+        "RESTART_GAP"
+      ],
+      "2026-09-02T18:00:00+00:00": [
+        "RESTART_GAP"
+      ],
+      "2026-09-03T00:00:00+00:00": [
+        "RESTART_GAP"
+      ],
+      "2026-09-03T06:00:00+00:00": [
+        "RESTART_GAP"
+      ],
+      "2026-09-03T12:00:00+00:00": [
+        "RESTART_GAP"
+      ],
+      "2026-09-04T00:00:00+00:00": [
+        "RESTART_GAP"
+      ],
+      "2026-09-04T06:00:00+00:00": [
+        "RESTART_GAP"
+      ]
+    },
+    "complete": true,
+    "excluded_block_count": 7,
+    "excluded_block_ids": [
+      "2026-09-02T06:00:00+00:00",
+      "2026-09-02T18:00:00+00:00",
+      "2026-09-03T00:00:00+00:00",
+      "2026-09-03T06:00:00+00:00",
+      "2026-09-03T12:00:00+00:00",
+      "2026-09-04T00:00:00+00:00",
+      "2026-09-04T06:00:00+00:00"
+    ],
+    "raw_gap_count": 25,
+    "records": [
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-02T09:03:01.767019+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-02T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-02T09:03:02.773182+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-02T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-02T09:03:04.786752+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-02T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-02T09:03:08.791542+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-02T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-02T10:48:38.723969+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-02T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-02T20:13:46.811863+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-02T18:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T00:38:46.016141+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T00:38:47.017797+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T00:42:07.666276+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T00:59:33.297172+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T02:03:17.592973+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T02:37:41.197843+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T02:46:04.242703+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T03:38:48.381573+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T03:41:51.240822+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T06:45:18.732720+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T07:15:42.399108+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T07:18:45.322490+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T11:43:05.127698+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T11:43:06.190089+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T11:43:08.198930+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T06:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T13:34:53.240994+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T12:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-03T13:37:42.806563+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-03T12:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-04T00:13:46.244739+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-04T00:00:00+00:00"
+        ]
+      },
+      {
+        "category": "RESTART_GAP",
+        "end_time": null,
+        "start_time": "2026-09-04T08:38:43.898548+00:00",
+        "utc_6h_block_ids": [
+          "2026-09-04T06:00:00+00:00"
+        ]
+      }
+    ],
+    "rule": "explicit timestamped gaps mapped to each touched UTC_6H block; overlapping gaps count once; no imputation/backfill"
+  },
+  "gap_attrition": {
+    "effective_hypothesis_counts": {
+      "R3_H01": 50,
+      "R3_H02": 50,
+      "R3_H03": 9194,
+      "R3_H04": 9194,
+      "R3_H05": 50,
+      "R3_H06": 100
+    },
+    "effective_utc_6h_blocks": 2,
+    "raw_hypothesis_counts": {
+      "R3_H01": 400,
+      "R3_H02": 400,
+      "R3_H03": 34538,
+      "R3_H04": 34538,
+      "R3_H05": 400,
+      "R3_H06": 450
+    },
+    "raw_utc_6h_blocks": 9,
+    "rule": "explicit timestamped gaps mapped to each touched UTC_6H block; overlapping gaps count once; no imputation/backfill"
+  },
+  "gates": {
+    "calendar_days": {
+      "observed": 3,
+      "pass": false,
+      "required": 30
+    },
+    "completeness": {
+      "duplicate_cycle_ids": 0,
+      "gap_accounting_complete": true,
+      "missing_cycle_count": 0,
+      "no_imputation": true,
+      "pass": true,
+      "raw_gap_count": 25,
+      "strict_boundary_rejected": 0
+    },
+    "hypotheses": {
+      "R3_H01": {
+        "observed": 50,
+        "pass": false,
+        "required": 5000
+      },
+      "R3_H02": {
+        "observed": 50,
+        "pass": false,
+        "required": 5000
+      },
+      "R3_H03": {
+        "observed": 9194,
+        "pass": true,
+        "required": 1000
+      },
+      "R3_H04": {
+        "observed": 9194,
+        "pass": true,
+        "required": 1000
+      },
+      "R3_H05": {
+        "observed": 50,
+        "pass": false,
+        "required": 5000
+      },
+      "R3_H06": {
+        "observed": 100,
+        "pass": false,
+        "required": 5000
+      }
+    },
+    "roster_months": {
+      "observed": 1,
+      "pass": false,
+      "required": 2
+    },
+    "utc_6h_blocks": {
+      "observed": 2,
+      "pass": false,
+      "required": 120
+    }
+  },
+  "horizon": {
+    "alternatives": [],
+    "bars": 1,
+    "frozen": true,
+    "interval": "15m",
+    "key": "R3_HORIZON_15M_NEXT_NATIVE_BAR_V1",
+    "key_count": 1,
+    "sha256_present": true
+  },
+  "human_authorized": false,
+  "reasons": [
+    "GLOBAL_METADATA_MINIMA_NOT_MET",
+    "HYPOTHESIS_MINIMA_NOT_MET",
+    "HUMAN_AUTHORIZATION_MISSING"
+  ],
+  "record_type": "R3_EVALUATION_READINESS_RECEIPT_V2",
+  "state": "R3_EVALUATION_PREREGISTERED_COLLECTION_CONTINUES"
+}

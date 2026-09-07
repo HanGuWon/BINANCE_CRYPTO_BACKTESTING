@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "record_type": "R3_V8_WP5_FIREWALL",
+  "receipt_path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_WP5_FIREWALL_RECEIPT_20260907.json",
+  "recorded_at_utc": "2026-09-07T05:16:00Z",
+  "write_contract": {
+    "write_once": true,
+    "atomic_publish_required": true,
+    "create_mode": "O_CREAT|O_EXCL",
+    "overwrite": false,
+    "flush_fsync_before_publish": true,
+    "body_sha256_algorithm": "SHA256 of canonical UTF-8 JSON with body_sha256 omitted"
+  },
+  "body_sha256": "068f4795dca191488e4d460e05d9dae1a858d434d664cd9ff4bba9db5c5c33dd",
+  "command": "python -m ops.r3.verify_r3_v8_wp5_firewall",
+  "exit_code": 0,
+  "stdout_sha256": "a21706eb8c9226068a4d7520c822b60a689dc4beb6744e394870edc9d0818bb0",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "verifier": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\ops\\r3\\verify_r3_v8_wp5_firewall.py",
+  "allowlist": [
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_OUTAGE_AND_RECOVERY_20260907.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_FORCEORDER_V3_MIGRATION_CONTINUATION_20260907.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_DAILY_OPERATIONS_RECEIPTS.jsonl",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\devlog\\_plan\\260905_sol-audit-independent-attestation-20260905\\145_recovery_wp0_watchdog_20260907.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\devlog\\_plan\\260905_sol-audit-independent-attestation-20260905\\168_wp2_launch_receipt_20260907_v4.json",
+    "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\devlog\\_plan\\260905_sol-audit-independent-attestation-20260905\\175_wp3_verification_20260907.json"
+  ],
+  "checks": {
+    "wp0_gap_formula": "284 - 197 = 87",
+    "wp3_strict_future_cycles": 2,
+    "single_writer": true,
+    "duplicate_writers": [],
+    "lock_alive": true,
+    "manifest_chain": "PASS",
+    "launch_seal": "SEALED",
+    "scientific_scope_git_status": "clean",
+    "forward_response_materialization_checked": false,
+    "h03_h04_performance_inspection": false,
+    "r2b2_accessed": false,
+    "holdout_accessed": false,
+    "market_payloads_accessed": false
+  },
+  "identity": {
+    "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8",
+    "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+    "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+    "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+    "roster_sha256": "bb05514dfc78cfca3b736488b1454f4cb022da0110e2cbf69f53c505f543ea79",
+    "launch_manifest_sha256": "cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659",
+    "launch_seal_sha256": "ab83232d90e800bf8178c6f3d22138382fb102b9d14213e12a798c0f2c68ad85"
+  },
+  "outcomes_accessed": false,
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_ACCESSED",
+  "forceorder_v3_migration": "NOT_STARTED",
+  "status": "PASS"
+}

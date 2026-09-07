@@ -1,0 +1,7 @@
+hypothesis_id,mechanism,context_inputs,polarity,threshold,primary
+R3_H01,EXECUTION_QUALITY_CONTEXT,spread_bps|microprice_displacement,none,continuous,TRUE
+R3_H02,PRICE_OI_QUADRANT,price_sign|oi_sign,ordered_state,none,TRUE
+R3_H03,LIQUIDATION_CONTINUATION,liquidation_impulse,continuation,continuous,TRUE
+R3_H04,LIQUIDATION_REVERSION,liquidation_impulse,reversion,continuous,TRUE
+R3_H05,CROWDING_STRESS_MODIFIER,funding_rate|premium,modifier_only,none,TRUE
+R3_H06,BTC_BREADTH_CONCORDANCE,btc_return|breadth_return,concordance,continuous,TRUE

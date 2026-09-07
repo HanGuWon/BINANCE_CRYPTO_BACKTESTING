@@ -1,0 +1,278 @@
+{
+  "availability_and_gaps": {
+    "gap_records": 0,
+    "gap_reset_required": true,
+    "gap_state_counts": {
+      "book_ticker": {
+        "COMPLETE": 4600
+      },
+      "cycle_metadata": {
+        "SOURCE_TIME_UNAVAILABLE": 92
+      },
+      "klines_15m": {
+        "COMPLETE": 9297
+      },
+      "liquidation": {
+        "COMPLETE": 23565
+      },
+      "open_interest": {
+        "COMPLETE": 4600
+      },
+      "premium": {
+        "COMPLETE": 4600
+      },
+      "premium_klines_15m": {
+        "COMPLETE": 10437
+      }
+    },
+    "health_gap_count": 18,
+    "health_restart_count": 18,
+    "no_imputation": true,
+    "source_unavailable_records": 92,
+    "strict_15m_boundary": {
+      "accepted": 19734,
+      "missing_boundary_fields": 0,
+      "normalized_records_checked": 19734,
+      "rejected": 0
+    }
+  },
+  "calendar": {
+    "first_observation_time": "2026-09-02T08:14:59.999000+00:00",
+    "independent_utc_6h_blocks": 5,
+    "independent_utc_days": 2,
+    "last_observation_time": "2026-09-03T07:39:46.791000+00:00",
+    "observed_utc_days": 2
+  },
+  "causal_input_presence": {
+    "H01_execution_quality_context": {
+      "input_stream": "book_ticker",
+      "usable_observations": 4600
+    },
+    "H02_price_oi_quadrant": {
+      "input_streams": [
+        "klines_15m",
+        "open_interest"
+      ],
+      "usable_symbol_buckets": 3008
+    },
+    "H03_liquidation_continuation": {
+      "input_stream": "liquidation",
+      "observed_events": 23565
+    },
+    "H04_liquidation_reversion": {
+      "input_stream": "liquidation",
+      "observed_events": 23565
+    },
+    "H05_crowding_stress_modifier": {
+      "funding_rate_observations": 4600,
+      "input_streams": [
+        "premium",
+        "premium_klines_15m"
+      ],
+      "usable_symbol_buckets": 3100
+    },
+    "H06_btc_breadth_concordance": {
+      "btc_symbol": "BTCUSDT",
+      "input_stream": "klines_15m",
+      "usable_breadth_decision_buckets": 70,
+      "usable_kline_symbol_buckets": 3424
+    },
+    "definition": "source_time_available=true, continuity not a gap, required schema keys present; no forward value is constructed"
+  },
+  "cycles": {
+    "cycle_count": 92,
+    "duplicate_cycle_ids": 0,
+    "metadata_stream": {
+      "complete_records": 92,
+      "continuity_state_counts": {
+        "SOURCE_TIME_UNAVAILABLE": 92
+      },
+      "files": 1,
+      "first_timestamp": "2026-09-02T08:45:44.999278+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-03T07:30:25.239587+00:00",
+      "records": 92,
+      "source_available_records": 0,
+      "source_unavailable_records": 92,
+      "symbols": 1
+    }
+  },
+  "dependence": {
+    "btc_synchronization": {
+      "breadth_decision_buckets": 70,
+      "btc_symbol": "BTCUSDT"
+    },
+    "event_spacing_seconds": {
+      "liquidation_event_count": 23565,
+      "median": 0.879,
+      "minimum": 0.0
+    },
+    "liquidation_clustering": {
+      "active_15m_buckets": 67,
+      "event_count": 23565,
+      "max_events_per_bucket": 944
+    },
+    "observations_by_utc_6h_block": {
+      "2026-09-02T06:00:00+00:00": 8925,
+      "2026-09-02T12:00:00+00:00": 18124,
+      "2026-09-02T18:00:00+00:00": 2904,
+      "2026-09-03T00:00:00+00:00": 22784,
+      "2026-09-03T06:00:00+00:00": 4362
+    },
+    "observations_by_utc_day": {
+      "2026-09-02": 29953,
+      "2026-09-03": 27146
+    },
+    "predeclared_block_scheme": "UTC_6H_PRIMARY; UTC_DAY_AND_DAY_X_MARKET_STATE_SENSITIVITY",
+    "simultaneous_cross_symbol_buckets": {
+      "book_ticker": {
+        "buckets_with_multiple_symbols": 66,
+        "max_symbols_in_bucket": 50
+      },
+      "cycle_metadata": {
+        "buckets_with_multiple_symbols": 0,
+        "max_symbols_in_bucket": 1
+      },
+      "klines_15m": {
+        "buckets_with_multiple_symbols": 70,
+        "max_symbols_in_bucket": 50
+      },
+      "liquidation": {
+        "buckets_with_multiple_symbols": 66,
+        "max_symbols_in_bucket": 343
+      },
+      "open_interest": {
+        "buckets_with_multiple_symbols": 66,
+        "max_symbols_in_bucket": 50
+      },
+      "premium": {
+        "buckets_with_multiple_symbols": 66,
+        "max_symbols_in_bucket": 50
+      },
+      "premium_klines_15m": {
+        "buckets_with_multiple_symbols": 71,
+        "max_symbols_in_bucket": 50
+      }
+    }
+  },
+  "integrity": {
+    "confirmatory_root_accessed": false,
+    "payload_values_retained": false,
+    "performance_fields_seen": false,
+    "raw_streams_read": [
+      "book_ticker",
+      "cycle_metadata",
+      "klines_15m",
+      "liquidation",
+      "open_interest",
+      "premium",
+      "premium_klines_15m"
+    ],
+    "secondary_campaign_accessed": false
+  },
+  "interval": "15m",
+  "market": "um",
+  "observed_at_utc": "2026-09-03T07:39:54.778406+00:00",
+  "record_type": "R3_OUTCOME_BLIND_EVIDENCE_INVENTORY",
+  "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8",
+  "streams": {
+    "book_ticker": {
+      "complete_records": 4600,
+      "continuity_state_counts": {
+        "COMPLETE": 4600
+      },
+      "files": 50,
+      "first_timestamp": "2026-09-02T08:45:04.062000+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-03T07:30:26.424000+00:00",
+      "records": 4600,
+      "source_available_records": 4600,
+      "source_unavailable_records": 0,
+      "symbols": 50
+    },
+    "cycle_metadata": {
+      "complete_records": 92,
+      "continuity_state_counts": {
+        "SOURCE_TIME_UNAVAILABLE": 92
+      },
+      "files": 1,
+      "first_timestamp": "2026-09-02T08:45:44.999278+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-03T07:30:25.239587+00:00",
+      "records": 92,
+      "source_available_records": 0,
+      "source_unavailable_records": 92,
+      "symbols": 1
+    },
+    "klines_15m": {
+      "complete_records": 9297,
+      "continuity_state_counts": {
+        "COMPLETE": 9297
+      },
+      "files": 50,
+      "first_timestamp": "2026-09-02T08:29:59.999000+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-03T07:29:59.999000+00:00",
+      "records": 9297,
+      "source_available_records": 9297,
+      "source_unavailable_records": 0,
+      "symbols": 50
+    },
+    "liquidation": {
+      "complete_records": 23565,
+      "continuity_state_counts": {
+        "COMPLETE": 23565
+      },
+      "files": 665,
+      "first_timestamp": "2026-09-02T08:30:45.449000+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-03T07:39:46.791000+00:00",
+      "records": 23565,
+      "source_available_records": 23565,
+      "source_unavailable_records": 0,
+      "symbols": 665
+    },
+    "open_interest": {
+      "complete_records": 4600,
+      "continuity_state_counts": {
+        "COMPLETE": 4600
+      },
+      "files": 50,
+      "first_timestamp": "2026-09-02T08:44:59.700000+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-03T07:30:25.125000+00:00",
+      "records": 4600,
+      "source_available_records": 4600,
+      "source_unavailable_records": 0,
+      "symbols": 50
+    },
+    "premium": {
+      "complete_records": 4600,
+      "continuity_state_counts": {
+        "COMPLETE": 4600
+      },
+      "files": 50,
+      "first_timestamp": "2026-09-02T08:45:05+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-03T07:30:26+00:00",
+      "records": 4600,
+      "source_available_records": 4600,
+      "source_unavailable_records": 0,
+      "symbols": 50
+    },
+    "premium_klines_15m": {
+      "complete_records": 10437,
+      "continuity_state_counts": {
+        "COMPLETE": 10437
+      },
+      "files": 50,
+      "first_timestamp": "2026-09-02T08:14:59.999000+00:00",
+      "gap_records": 0,
+      "last_timestamp": "2026-09-03T07:29:59.999000+00:00",
+      "records": 10437,
+      "source_available_records": 10437,
+      "source_unavailable_records": 0,
+      "symbols": 50
+    }
+  }
+}
