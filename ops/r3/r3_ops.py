@@ -871,11 +871,15 @@ def _validate_zero_writer(writer: Any, *, context: str) -> None:
 def _validate_resume_authorization(
     authorization: dict[str, Any],
     *,
-    authorization_path: Path,
+    root: Path,
+    manifest: Path,
+    seal: Path,
+    roster: Path,
     preflight_receipt_path: Path | None,
     identity: dict[str, Any],
     writer: dict[str, Any],
     now: datetime,
+    consume: bool,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     if set(authorization) != RESUME_AUTHORIZATION_FIELDS:
         raise OperationsAuditError(
@@ -890,14 +894,14 @@ def _validate_resume_authorization(
         raise OperationsAuditError("resume authorization id is not a UUID") from exc
     if not isinstance(authorization.get("authorized_by"), str) or not authorization["authorized_by"].strip():
         raise OperationsAuditError("resume authorization lacks authorized_by")
-    if authorization.get("mode") != "SCIENTIFIC_RESUME_EXISTING_V8":
+    if authorization.get("mode") != "EXISTING_SEALED_V8_ONLY":
         raise OperationsAuditError("resume authorization mode is not existing-v8 scientific resume")
     issued = _parse_time(authorization.get("issued_at_utc"))
     expires = _parse_time(authorization.get("expires_at_utc"))
     now = now.astimezone(UTC)
-    if expires <= issued or expires - issued > timedelta(minutes=15):
-        raise OperationsAuditError("resume authorization expiry window is invalid")
-    if now < issued or now > expires:
+    if expires - issued != timedelta(minutes=10):
+        raise OperationsAuditError("resume authorization expiry window is not exactly ten minutes")
+    if now < issued or now >= expires:
         raise OperationsAuditError("resume authorization is outside its validity window")
     if authorization.get("consumed_at_utc") is not None:
         raise OperationsAuditError("resume authorization has already been consumed")
@@ -945,6 +949,8 @@ def _validate_resume_authorization(
     if not raw_receipt_path.is_absolute():
         raise OperationsAuditError("resume authorization preflight path must be absolute")
     receipt_path = raw_receipt_path.resolve()
+    if consume and preflight_receipt_path is None:
+        raise OperationsAuditError("consume requires an explicit preflight receipt path")
     if not receipt_path.is_file():
         raise OperationsAuditError("resume authorization preflight receipt is missing")
     if preflight_receipt_path is not None and Path(preflight_receipt_path).resolve() != receipt_path:
@@ -985,6 +991,30 @@ def _validate_resume_authorization(
         raise OperationsAuditError("preflight receipt output is not PASS")
     if output.get("identity") != preflight.get("identity") or output.get("writer") != preflight.get("writer"):
         raise OperationsAuditError("preflight receipt output does not match structured fields")
+    command = preflight.get("command")
+    if not isinstance(command, list) or not all(isinstance(item, str) for item in command):
+        raise OperationsAuditError("preflight receipt command is not a string list")
+    expected_command = [
+        "preflight",
+        "--exact-v8",
+        "--root",
+        str(Path(root).resolve()),
+        "--roster",
+        str(Path(roster).resolve()),
+        "--manifest",
+        str(Path(manifest).resolve()),
+        "--seal",
+        str(Path(seal).resolve()),
+        "--receipt",
+        str(receipt_path),
+    ]
+    # The canonical launcher invokes the repository operations script from the
+    # repository root.  Its interpreter path can vary, but argument order and
+    # all identity paths are fixed and therefore auditable.
+    if len(command) < 2 or Path(command[0]).name.lower() != "r3_ops.py" or command[1:] != expected_command:
+        raise OperationsAuditError("preflight receipt command is not the canonical v8 preflight")
+    if Path(str(preflight.get("cwd"))).resolve() != REPO_ROOT.resolve():
+        raise OperationsAuditError("preflight receipt cwd is not the repository root")
     _validate_identity_binding(preflight.get("identity"), identity, context="preflight receipt")
     _validate_zero_writer(preflight.get("writer"), context="preflight receipt")
     if preflight.get("writer") != preflight_writer:
@@ -992,56 +1022,72 @@ def _validate_resume_authorization(
     recorded = _parse_time(preflight.get("recorded_at_utc"))
     if recorded > now or now - recorded > timedelta(minutes=15):
         raise OperationsAuditError("preflight receipt is stale or from the future")
-    if recorded > issued + timedelta(seconds=30):
-        raise OperationsAuditError("preflight receipt was recorded after authorization issuance")
+    if recorded < issued or recorded >= expires:
+        raise OperationsAuditError("preflight receipt timestamp is outside the authorization window")
     return authorization, preflight
 
 
 def verify_resume_authorization(
-    authorization_path: Path,
+    authorization: Path,
     *,
-    preflight_receipt_path: Path | None = None,
-    identity: dict[str, Any] | None = None,
-    writer: dict[str, Any] | None = None,
+    root: Path,
+    manifest: Path,
+    seal: Path,
+    roster: Path,
+    preflight_receipt: Path | None = None,
     now: datetime | None = None,
     consume: bool = False,
 ) -> dict[str, Any]:
     """Validate or atomically consume one existing-v8 resume authorization."""
-    authorization_path = Path(authorization_path).resolve()
-    if identity is None:
-        identity = verify_identity(V8_ROOT, require_exact_v8=True)
-    if writer is None:
-        writer = audit_writer(Path(str(identity["root"])))
+    authorization_path = Path(authorization).resolve()
+    root = Path(root).resolve()
+    manifest = Path(manifest).resolve()
+    seal = Path(seal).resolve()
+    roster = Path(roster).resolve()
     reference_now = (now or datetime.now(UTC)).astimezone(UTC)
     if not consume:
+        identity = verify_identity(root, manifest=manifest, seal=seal, roster=roster, require_exact_v8=True)
+        writer = audit_writer(root)
         authorization = _load_json_object(authorization_path)
         validated, _ = _validate_resume_authorization(
             authorization,
-            authorization_path=authorization_path,
-            preflight_receipt_path=preflight_receipt_path,
+            root=root,
+            manifest=manifest,
+            seal=seal,
+            roster=roster,
+            preflight_receipt_path=preflight_receipt,
             identity=identity,
             writer=writer,
             now=reference_now,
+            consume=False,
         )
         return validated
     # The lease lock serializes consumers.  Re-read and validate inside the
     # lock to close the check/consume TOCTOU window; a second consumer sees the
     # durable consumed_at_utc marker and fails closed.
-    with single_instance_lock(RESUME_AUTHORIZATION_LOCK):
-        authorization = _load_json_object(authorization_path)
-        current_writer = audit_writer(Path(str(identity["root"])))
-        validated, _ = _validate_resume_authorization(
-            authorization,
-            authorization_path=authorization_path,
-            preflight_receipt_path=preflight_receipt_path,
-            identity=identity,
-            writer=current_writer,
-            now=reference_now,
-        )
-        consumed = dict(validated)
-        consumed["consumed_at_utc"] = reference_now.isoformat()
-        _write_json_replace(authorization_path, consumed)
-        return consumed
+    try:
+        with single_instance_lock(RESUME_AUTHORIZATION_LOCK):
+            identity = verify_identity(root, manifest=manifest, seal=seal, roster=roster, require_exact_v8=True)
+            authorization = _load_json_object(authorization_path)
+            current_writer = audit_writer(root)
+            validated, _ = _validate_resume_authorization(
+                authorization,
+                root=root,
+                manifest=manifest,
+                seal=seal,
+                roster=roster,
+                preflight_receipt_path=preflight_receipt,
+                identity=identity,
+                writer=current_writer,
+                now=reference_now,
+                consume=True,
+            )
+            consumed = dict(validated)
+            consumed["consumed_at_utc"] = reference_now.isoformat()
+            _write_json_replace(authorization_path, consumed)
+            return consumed
+    except CollectorLockError as exc:
+        raise OperationsAuditError("resume authorization consumer lock collision") from exc
 
 
 def _git_head() -> str:
@@ -1071,15 +1117,16 @@ def _command_preflight(args: argparse.Namespace) -> int:
 
 
 def _command_verify_resume_authorization(args: argparse.Namespace) -> int:
-    identity = verify_identity(Path(args.root), manifest=Path(args.manifest) if args.manifest else None, seal=Path(args.seal) if args.seal else None, roster=Path(args.roster), require_exact_v8=True)
-    writer = audit_writer(Path(args.root))
     result = verify_resume_authorization(
         Path(args.authorization),
-        preflight_receipt_path=Path(args.preflight_receipt) if args.preflight_receipt else None,
-        identity=identity,
-        writer=writer,
+        root=Path(args.root),
+        manifest=Path(args.manifest) if args.manifest else V8_MANIFEST,
+        seal=Path(args.seal) if args.seal else V8_SEAL,
+        roster=Path(args.roster),
+        preflight_receipt=Path(args.preflight_receipt) if args.preflight_receipt else None,
         consume=args.consume,
     )
+    identity = verify_identity(Path(args.root), manifest=Path(args.manifest) if args.manifest else None, seal=Path(args.seal) if args.seal else None, roster=Path(args.roster), require_exact_v8=True)
     print(_canonical_json({"status": "CONSUMED" if args.consume else "PASS", "authorization": result, "identity": identity}))
     return 0
 

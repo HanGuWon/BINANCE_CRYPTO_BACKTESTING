@@ -5,6 +5,7 @@ import os
 import subprocess
 import shutil
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -86,19 +87,40 @@ def _zero_writer() -> dict[str, object]:
     }
 
 
-def _resume_fixture(tmp_path: Path) -> tuple[Path, Path, dict[str, object], datetime]:
+def _resume_fixture(tmp_path: Path) -> tuple[Path, Path, dict[str, object], datetime, Path, Path, Path, Path]:
     root = tmp_path / "scientific_raw_v8"
     root.mkdir(parents=True)
+    manifest = tmp_path / "manifest.json"
+    seal = tmp_path / "seal.json"
+    roster = tmp_path / "roster.json"
+    manifest.write_text("{}", encoding="utf-8")
+    seal.write_text("{}", encoding="utf-8")
+    roster.write_text("{}", encoding="utf-8")
     identity = _identity()
     identity["root"] = str(root.resolve())
     writer = _zero_writer()
     issued = datetime(2026, 9, 7, 2, 0, tzinfo=UTC)
-    recorded = issued - timedelta(seconds=5)
+    recorded = issued
     payload = {"status": "PASS", "identity": identity, "writer": writer}
+    command = [
+        "r3_ops.py",
+        "preflight",
+        "--exact-v8",
+        "--root",
+        str(root.resolve()),
+        "--roster",
+        str(roster.resolve()),
+        "--manifest",
+        str(manifest.resolve()),
+        "--seal",
+        str(seal.resolve()),
+        "--receipt",
+        str((tmp_path / "preflight.json").resolve()),
+    ]
     preflight = operations.build_preflight_receipt(
         payload,
-        command=["python", "r3_ops.py", "preflight"],
-        cwd=tmp_path,
+        command=command,
+        cwd=operations.REPO_ROOT,
         recorded_at=recorded,
     )
     preflight_path = tmp_path / "preflight.json"
@@ -110,7 +132,7 @@ def _resume_fixture(tmp_path: Path) -> tuple[Path, Path, dict[str, object], date
         "expires_at_utc": (issued + timedelta(minutes=10)).isoformat(),
         "consumed_at_utc": None,
         "authorized_by": "test-authorized-user",
-        "mode": "SCIENTIFIC_RESUME_EXISTING_V8",
+        "mode": "EXISTING_SEALED_V8_ONLY",
         "root": str(root.resolve()),
         "implementation_commit": identity["implementation_commit"],
         "source_tree_sha256": identity["source_tree_sha256"],
@@ -125,7 +147,7 @@ def _resume_fixture(tmp_path: Path) -> tuple[Path, Path, dict[str, object], date
     }
     authorization_path = tmp_path / "authorization.json"
     authorization_path.write_text(operations._canonical_json(authorization) + "\n", encoding="utf-8")
-    return authorization_path, preflight_path, identity, issued + timedelta(minutes=1)
+    return authorization_path, preflight_path, identity, issued + timedelta(minutes=1), root, manifest, seal, roster
 
 
 def test_cycle_and_health_metadata_are_outcome_blind(tmp_path: Path) -> None:
@@ -220,22 +242,28 @@ def test_launcher_and_task_template_are_absolute_and_v8_only() -> None:
 
 
 def test_resume_authorization_validates_and_consumes_atomically(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    authorization_path, preflight_path, identity, now = _resume_fixture(tmp_path)
+    authorization_path, preflight_path, identity, now, root, manifest, seal, roster = _resume_fixture(tmp_path)
     monkeypatch.setattr(operations, "RESUME_AUTHORIZATION_LOCK", tmp_path / "authorization.lock")
+    monkeypatch.setattr(operations, "verify_identity", lambda *args, **kwargs: identity)
     monkeypatch.setattr(operations, "audit_writer", lambda *args, **kwargs: _zero_writer())
 
     checked = operations.verify_resume_authorization(
         authorization_path,
-        preflight_receipt_path=preflight_path,
-        identity=identity,
-        writer=_zero_writer(),
+        root=root,
+        manifest=manifest,
+        seal=seal,
+        roster=roster,
+        preflight_receipt=preflight_path,
         now=now,
     )
     assert checked["consumed_at_utc"] is None
     consumed = operations.verify_resume_authorization(
         authorization_path,
-        preflight_receipt_path=preflight_path,
-        identity=identity,
+        root=root,
+        manifest=manifest,
+        seal=seal,
+        roster=roster,
+        preflight_receipt=preflight_path,
         now=now,
         consume=True,
     )
@@ -244,27 +272,34 @@ def test_resume_authorization_validates_and_consumes_atomically(monkeypatch: pyt
     with pytest.raises(operations.OperationsAuditError, match="already been consumed"):
         operations.verify_resume_authorization(
             authorization_path,
-            preflight_receipt_path=preflight_path,
-            identity=identity,
+            root=root,
+            manifest=manifest,
+            seal=seal,
+            roster=roster,
+            preflight_receipt=preflight_path,
             now=now,
             consume=True,
         )
 
 
 def test_resume_authorization_rejects_missing_or_mismatched_preflight(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    authorization_path, preflight_path, identity, now = _resume_fixture(tmp_path)
+    authorization_path, preflight_path, identity, now, root, manifest, seal, roster = _resume_fixture(tmp_path)
     monkeypatch.setattr(operations, "RESUME_AUTHORIZATION_LOCK", tmp_path / "authorization.lock")
+    monkeypatch.setattr(operations, "verify_identity", lambda *args, **kwargs: identity)
     monkeypatch.setattr(operations, "audit_writer", lambda *args, **kwargs: _zero_writer())
     preflight_path.unlink()
     with pytest.raises(operations.OperationsAuditError, match="preflight receipt is missing"):
         operations.verify_resume_authorization(
             authorization_path,
-            preflight_receipt_path=preflight_path,
-            identity=identity,
+            root=root,
+            manifest=manifest,
+            seal=seal,
+            roster=roster,
+            preflight_receipt=preflight_path,
             now=now,
             consume=True,
         )
-    authorization_path, preflight_path, identity, now = _resume_fixture(tmp_path / "mismatch")
+    authorization_path, preflight_path, identity, now, root, manifest, seal, roster = _resume_fixture(tmp_path / "mismatch")
     altered = json.loads(preflight_path.read_text(encoding="utf-8"))
     altered["identity"]["registry_sha256"] = "9" * 64
     altered["output"]["identity"]["registry_sha256"] = "9" * 64
@@ -272,34 +307,153 @@ def test_resume_authorization_rejects_missing_or_mismatched_preflight(monkeypatc
     with pytest.raises(operations.OperationsAuditError, match="preflight receipt SHA mismatch"):
         operations.verify_resume_authorization(
             authorization_path,
-            preflight_receipt_path=preflight_path,
-            identity=identity,
-            writer=_zero_writer(),
+            root=root,
+            manifest=manifest,
+            seal=seal,
+            roster=roster,
+            preflight_receipt=preflight_path,
             now=now,
         )
 
 
 def test_resume_authorization_rejects_identity_drift_and_active_writer(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    authorization_path, preflight_path, identity, now = _resume_fixture(tmp_path)
+    authorization_path, preflight_path, identity, now, root, manifest, seal, roster = _resume_fixture(tmp_path)
     monkeypatch.setattr(operations, "RESUME_AUTHORIZATION_LOCK", tmp_path / "authorization.lock")
     drifted = dict(identity)
     drifted["registry_sha256"] = "9" * 64
+    monkeypatch.setattr(operations, "verify_identity", lambda *args, **kwargs: drifted)
+    monkeypatch.setattr(operations, "audit_writer", lambda *args, **kwargs: _zero_writer())
     with pytest.raises(operations.OperationsAuditError, match="identity mismatch"):
         operations.verify_resume_authorization(
             authorization_path,
-            preflight_receipt_path=preflight_path,
-            identity=drifted,
-            writer=_zero_writer(),
+            root=root,
+            manifest=manifest,
+            seal=seal,
+            roster=roster,
+            preflight_receipt=preflight_path,
             now=now,
         )
+    monkeypatch.setattr(operations, "verify_identity", lambda *args, **kwargs: identity)
+    monkeypatch.setattr(operations, "audit_writer", lambda *args, **kwargs: {**_zero_writer(), "lock_alive": True, "lock_pid": 99, "authorized_writer_count": 1})
     with pytest.raises(operations.OperationsAuditError, match="current collector lock is active"):
         operations.verify_resume_authorization(
             authorization_path,
-            preflight_receipt_path=preflight_path,
-            identity=identity,
-            writer={**_zero_writer(), "lock_alive": True, "lock_pid": 99, "authorized_writer_count": 1},
+            root=root,
+            manifest=manifest,
+            seal=seal,
+            roster=roster,
+            preflight_receipt=preflight_path,
             now=now,
         )
+
+
+def test_resume_authorization_requires_explicit_preflight_and_strict_time_window(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    authorization_path, preflight_path, identity, now, root, manifest, seal, roster = _resume_fixture(tmp_path)
+    monkeypatch.setattr(operations, "RESUME_AUTHORIZATION_LOCK", tmp_path / "authorization.lock")
+    monkeypatch.setattr(operations, "verify_identity", lambda *args, **kwargs: identity)
+    monkeypatch.setattr(operations, "audit_writer", lambda *args, **kwargs: _zero_writer())
+    with pytest.raises(operations.OperationsAuditError, match="explicit preflight"):
+        operations.verify_resume_authorization(
+            authorization_path,
+            root=root,
+            manifest=manifest,
+            seal=seal,
+            roster=roster,
+            now=now,
+            consume=True,
+        )
+    authorization = json.loads(authorization_path.read_text(encoding="utf-8"))
+    expires = datetime.fromisoformat(authorization["expires_at_utc"])
+    with pytest.raises(operations.OperationsAuditError, match="outside its validity"):
+        operations.verify_resume_authorization(
+            authorization_path,
+            root=root,
+            manifest=manifest,
+            seal=seal,
+            roster=roster,
+            preflight_receipt=preflight_path,
+            now=expires,
+        )
+    authorization["expires_at_utc"] = (datetime.fromisoformat(authorization["issued_at_utc"]) + timedelta(minutes=9)).isoformat()
+    authorization_path.write_text(operations._canonical_json(authorization) + "\n", encoding="utf-8")
+    with pytest.raises(operations.OperationsAuditError, match="expiry window"):
+        operations.verify_resume_authorization(
+            authorization_path,
+            root=root,
+            manifest=manifest,
+            seal=seal,
+            roster=roster,
+            preflight_receipt=preflight_path,
+            now=now,
+        )
+
+
+def test_resume_authorization_rejects_noncanonical_preflight_command_and_old_receipt(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    authorization_path, preflight_path, identity, now, root, manifest, seal, roster = _resume_fixture(tmp_path)
+    monkeypatch.setattr(operations, "RESUME_AUTHORIZATION_LOCK", tmp_path / "authorization.lock")
+    monkeypatch.setattr(operations, "verify_identity", lambda *args, **kwargs: identity)
+    monkeypatch.setattr(operations, "audit_writer", lambda *args, **kwargs: _zero_writer())
+    receipt = json.loads(preflight_path.read_text(encoding="utf-8"))
+    receipt["command"][1] = "watch"
+    preflight_path.write_text(operations._canonical_json(receipt) + "\n", encoding="utf-8")
+    authorization = json.loads(authorization_path.read_text(encoding="utf-8"))
+    authorization["preflight_receipt_sha256"] = operations._sha256(preflight_path)
+    authorization_path.write_text(operations._canonical_json(authorization) + "\n", encoding="utf-8")
+    with pytest.raises(operations.OperationsAuditError, match="canonical v8 preflight"):
+        operations.verify_resume_authorization(
+            authorization_path,
+            root=root,
+            manifest=manifest,
+            seal=seal,
+            roster=roster,
+            preflight_receipt=preflight_path,
+            now=now,
+        )
+    authorization_path, preflight_path, identity, now, root, manifest, seal, roster = _resume_fixture(tmp_path / "old")
+    receipt = json.loads(preflight_path.read_text(encoding="utf-8"))
+    issued = datetime.fromisoformat(json.loads(authorization_path.read_text(encoding="utf-8"))["issued_at_utc"])
+    receipt["recorded_at_utc"] = (issued - timedelta(seconds=1)).isoformat()
+    preflight_path.write_text(operations._canonical_json(receipt) + "\n", encoding="utf-8")
+    authorization = json.loads(authorization_path.read_text(encoding="utf-8"))
+    authorization["preflight_receipt_sha256"] = operations._sha256(preflight_path)
+    authorization_path.write_text(operations._canonical_json(authorization) + "\n", encoding="utf-8")
+    with pytest.raises(operations.OperationsAuditError, match="timestamp is outside"):
+        operations.verify_resume_authorization(
+            authorization_path,
+            root=root,
+            manifest=manifest,
+            seal=seal,
+            roster=roster,
+            preflight_receipt=preflight_path,
+            now=now,
+        )
+
+
+def test_resume_authorization_double_consume_has_one_winner(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    authorization_path, preflight_path, identity, now, root, manifest, seal, roster = _resume_fixture(tmp_path)
+    monkeypatch.setattr(operations, "RESUME_AUTHORIZATION_LOCK", tmp_path / "authorization.lock")
+    monkeypatch.setattr(operations, "verify_identity", lambda *args, **kwargs: identity)
+    monkeypatch.setattr(operations, "audit_writer", lambda *args, **kwargs: _zero_writer())
+
+    def consume() -> str:
+        try:
+            operations.verify_resume_authorization(
+                authorization_path,
+                root=root,
+                manifest=manifest,
+                seal=seal,
+                roster=roster,
+                preflight_receipt=preflight_path,
+                now=now,
+                consume=True,
+            )
+            return "won"
+        except operations.OperationsAuditError:
+            return "blocked"
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(lambda _: consume(), range(2)))
+    assert sorted(results) == ["blocked", "won"]
 
 
 def test_preflight_receipt_is_immutable_and_schema_strict(tmp_path: Path) -> None:
@@ -321,11 +475,15 @@ def test_preflight_receipt_is_immutable_and_schema_strict(tmp_path: Path) -> Non
     with pytest.raises(operations.OperationsAuditError, match="schema drift"):
         operations._validate_resume_authorization(
             {},
-            authorization_path=malformed_path,
+            root=Path("C:/root"),
+            manifest=Path("C:/manifest.json"),
+            seal=Path("C:/seal.json"),
+            roster=Path("C:/roster.json"),
             preflight_receipt_path=None,
             identity=identity,
             writer=writer,
             now=datetime.now(UTC),
+            consume=False,
         )
 
 
