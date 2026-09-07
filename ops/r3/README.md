@@ -5,9 +5,14 @@ The files in this directory supervise the already sealed
 `src/`, `tests/`, and `configs/`, so installing the operational service cannot
 change the frozen scientific source-tree identity.
 
-`launch_r3_v8_resume.ps1` is the only service entrypoint. It runs the
-fail-closed `preflight` command before invoking the existing scientific
-collector and uses the collector's PID lock as the sole writer lock.
+`run_r3_v8_guardian.ps1` is the sole service/supervisor entrypoint. It polls
+the exact sealed-v8 identity and writer metadata, records immutable
+outcome-blind attempts, and invokes `launch_r3_v8_resume.ps1` only after an
+explicit operator authorization lease, a canonical preflight, and a second
+race check. The underlying launcher runs the fail-closed `preflight` command
+before invoking the existing scientific collector and uses the collector's PID
+lock as the sole writer lock. A Startup instance without a lease records
+`AUTHORIZATION_REQUIRED`; it never invents scientific authority.
 `watch_r3_v8.ps1` and `r3_ops.py watch` are read-only: they inspect only
 operational metadata and classify liveness as GREEN, YELLOW, or RED.
 `write_r3_daily_receipt.ps1` appends a one-record-per-UTC-day receipt under the
@@ -20,4 +25,7 @@ to the phase-3 script and must use `MultipleInstancesPolicy=IgnoreNew`.
 
 If the local token cannot register a scheduled task, the phase-3 installer can
 use the native per-user Startup shortcut as a credential-free logon fallback;
-it still invokes the same fail-closed launcher and existing collector lock.
+it invokes the one guardian wrapper, which in turn uses the same fail-closed
+launcher and existing collector lock. The guardian's strict lock is separate
+from the collector lock and stale/malformed guardian locks are never removed
+automatically.

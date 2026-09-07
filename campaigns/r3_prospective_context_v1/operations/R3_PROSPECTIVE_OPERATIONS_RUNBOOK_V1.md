@@ -41,16 +41,28 @@ merge, deletion, or force-push is part of this disposition.
 
 ## Service start and authorized resume
 
-Run from an elevated or ordinary user PowerShell as appropriate for the local
-Task Scheduler registration:
+The single service/supervisor entrypoint is the outcome-blind guardian. Run it
+from an ordinary user PowerShell:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File `
-  "C:\Users\user\Documents\ChatGPT\BINANCE 지표용 테스트\ops\r3\launch_r3_v8_resume.ps1"
+  "C:\Users\user\Documents\ChatGPT\BINANCE 지표용 테스트\ops\r3\run_r3_v8_guardian.ps1" -Persistent -PollSeconds 300
 ```
 
-The launcher performs the v8 manifest/seal/source/registry/roster preflight,
-requires the existing `raw_v1` directory, and then invokes only:
+The guardian polls only process/lock and identity/health/manifest metadata. With
+no explicit authorization lease it records `AUTHORIZATION_REQUIRED` and does
+not launch. For an operator-authorized recovery, supply one absolute,
+unconsumed `EXISTING_SEALED_V8_ONLY` receipt to a one-shot invocation:
+
+```powershell
+python -m ops.r3.r3_v8_guardian --once --authorization `
+  "D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v8\<fresh-authorization>.json"
+```
+
+After an exact preflight, the guardian rechecks writer/lock/identity state and
+invokes only the existing `launch_r3_v8_resume.ps1` path. That launcher performs
+the v8 manifest/seal/source/registry/roster preflight, requires the existing
+`raw_v1` directory, and then invokes only:
 
 ```text
 C:\Users\user\AppData\Roaming\uv\python\cpython-3.11-windows-x86_64-none\python.exe
@@ -74,10 +86,12 @@ current user token and returned `Access is denied`; no task was created. As a
 native, credential-free fallback, `ops/r3/install_r3_v8_startup.ps1` installs
 the user Startup shortcut
 `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\R3-Prospective-Scientific-v8.lnk`.
-It targets the same launcher, runs at logon, and is validated without stopping
-the live collector. If Task Scheduler permission is later granted, register
-the named task and remove the fallback only after `Get-ScheduledTask` and
-`Get-ScheduledTaskInfo` show the expected identity and `IgnoreNew` policy.
+It targets `run_r3_v8_guardian.ps1 -Persistent -PollSeconds 300`, runs at logon,
+and is validated without stopping the live collector. If Task Scheduler
+permission is later granted, register the named task for the same guardian and
+remove the fallback only after `Get-ScheduledTask` and
+`Get-ScheduledTaskInfo` show the expected identity and `IgnoreNew` policy. Never
+run both authorities concurrently.
 
 The phase-3 qualification receipt is written by
 `ops/r3/qualify_r3_v8_service.py`; it records the Task Scheduler denial,
