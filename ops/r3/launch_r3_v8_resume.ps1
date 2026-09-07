@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [switch]$PreflightOnly,
-    [string]$AuthorizationReceipt
+    [string]$AuthorizationReceipt,
+    [string]$PreflightReceipt
 )
 
 $ErrorActionPreference = 'Stop'
@@ -44,7 +45,11 @@ try {
         }
     }
 
-    & $Python $OpsScript preflight --exact-v8 --root $ScientificRoot --roster $Roster --manifest $LaunchManifest --seal $LaunchSeal
+    $preflightArgs = @('preflight', '--exact-v8', '--root', $ScientificRoot, '--roster', $Roster, '--manifest', $LaunchManifest, '--seal', $LaunchSeal)
+    if (-not [string]::IsNullOrWhiteSpace($PreflightReceipt)) {
+        $preflightArgs += @('--receipt', $PreflightReceipt)
+    }
+    & $Python $OpsScript @preflightArgs
     $preflightExit = $LASTEXITCODE
     if ($preflightExit -ne 0) { exit $preflightExit }
     if ($PreflightOnly) { exit 0 }
