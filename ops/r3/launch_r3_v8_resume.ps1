@@ -1,5 +1,8 @@
-﻿[CmdletBinding()]
-param([switch]$PreflightOnly)
+[CmdletBinding()]
+param(
+    [switch]$PreflightOnly,
+    [string]$AuthorizationReceipt
+)
 
 $ErrorActionPreference = 'Stop'
 $RepoRoot = 'C:\Users\user\Documents\ChatGPT\BINANCE 지표용 테스트'
@@ -18,10 +21,43 @@ foreach ($required in @($Python, $OpsScript, $Collector, $ScientificRoot, $Roste
 
 Push-Location -LiteralPath $RepoRoot
 try {
+    if (-not $PreflightOnly) {
+        if ([string]::IsNullOrWhiteSpace($AuthorizationReceipt)) {
+            Write-Output 'an explicit v8 resume authorization receipt is required'
+            exit 74
+        }
+        if (-not (Test-Path -LiteralPath $AuthorizationReceipt -PathType Leaf)) {
+            Write-Output "resume authorization receipt is missing: $AuthorizationReceipt"
+            exit 74
+        }
+        try {
+            $authorization = Get-Content -Raw -LiteralPath $AuthorizationReceipt | ConvertFrom-Json
+            $preflightReceipt = [string]$authorization.preflight_receipt_path
+        }
+        catch {
+            Write-Output "resume authorization receipt is invalid: $AuthorizationReceipt"
+            exit 74
+        }
+        if ([string]::IsNullOrWhiteSpace($preflightReceipt) -or -not (Test-Path -LiteralPath $preflightReceipt -PathType Leaf)) {
+            Write-Output 'resume authorization preflight receipt is missing'
+            exit 74
+        }
+    }
+
     & $Python $OpsScript preflight --exact-v8 --root $ScientificRoot --roster $Roster --manifest $LaunchManifest --seal $LaunchSeal
     $preflightExit = $LASTEXITCODE
     if ($preflightExit -ne 0) { exit $preflightExit }
     if ($PreflightOnly) { exit 0 }
+
+    & $Python $OpsScript verify-resume-authorization --exact-v8 --root $ScientificRoot --roster $Roster --manifest $LaunchManifest --seal $LaunchSeal --authorization $AuthorizationReceipt --preflight-receipt $preflightReceipt --consume
+    $authorizationExit = $LASTEXITCODE
+    if ($authorizationExit -ne 0) { exit $authorizationExit }
+
+    # Re-check identity and the writer census immediately after consuming the
+    # lease. A race or collision fails closed and the collector is never called.
+    & $Python $OpsScript preflight --exact-v8 --root $ScientificRoot --roster $Roster --manifest $LaunchManifest --seal $LaunchSeal
+    $postAuthorizationPreflightExit = $LASTEXITCODE
+    if ($postAuthorizationPreflightExit -ne 0) { exit $postAuthorizationPreflightExit }
 
     # Keep the collector in this foreground process so the existing scientific
     # PID lock spans the full lifetime. The collector performs its own resume,

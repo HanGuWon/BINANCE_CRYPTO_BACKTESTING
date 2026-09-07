@@ -16,6 +16,7 @@ import shutil
 import statistics
 import subprocess
 import sys
+import uuid
 from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -28,6 +29,7 @@ for _path in (REPO_ROOT / "src", REPO_ROOT):
 
 from binance_research.r3_operations import (  # noqa: E402
     CollectorLockError,
+    require_sha256,
     single_instance_lock,
     verify_launch_identity,
     verify_launch_seal,
@@ -128,9 +130,136 @@ RECEIPT_FIELDS = frozenset(
     }
 )
 
+RESUME_AUTHORIZATION_RECORD_TYPE = "R3_V8_RESUME_AUTHORIZATION"
+PREFLIGHT_RECEIPT_RECORD_TYPE = "R3_V8_RECOVERY_PREFLIGHT_RECEIPT"
+RESUME_AUTHORIZATION_LOCK = V8_CONTROL_ROOT / "R3_V8_RESUME_AUTHORIZATION.lock"
+RESUME_AUTHORIZATION_FIELDS = frozenset(
+    {
+        "record_type",
+        "authorization_id",
+        "issued_at_utc",
+        "expires_at_utc",
+        "consumed_at_utc",
+        "authorized_by",
+        "mode",
+        "root",
+        "implementation_commit",
+        "source_tree_sha256",
+        "registry_sha256",
+        "roster_sha256",
+        "launch_manifest_sha256",
+        "launch_seal_sha256",
+        "preflight_receipt_path",
+        "preflight_receipt_sha256",
+        "preflight_exit_code",
+        "preflight_writer",
+    }
+)
+PREFLIGHT_RECEIPT_FIELDS = frozenset(
+    {
+        "record_type",
+        "recorded_at_utc",
+        "command",
+        "cwd",
+        "exit_code",
+        "stdout_sha256",
+        "output",
+        "identity",
+        "writer",
+        "no_launch_assertion",
+        "outcomes_accessed",
+        "final_holdout",
+        "r2b2",
+        "forceorder_v3_migration",
+    }
+)
+
 
 class OperationsAuditError(RuntimeError):
     """A fail-closed operational identity or evidence error."""
+
+
+_IDENTITY_PIN_FIELDS = (
+    "root",
+    "implementation_commit",
+    "source_tree_sha256",
+    "registry_sha256",
+    "roster_sha256",
+    "roster_file_sha256",
+    "manifest_sha256",
+    "seal_sha256",
+    "seal_status",
+    "manifest_chain_verification",
+    "outcomes_accessed",
+)
+
+
+def _canonical_json(value: Any) -> str:
+    """Return the single JSON representation used for receipt hashes."""
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+
+
+def _reject_duplicate_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    value: dict[str, Any] = {}
+    for key, child in pairs:
+        if key in value:
+            raise OperationsAuditError(f"duplicate JSON field: {key}")
+        value[key] = child
+    return value
+
+
+def _load_json_object(path: Path) -> dict[str, Any]:
+    """Load a strict object receipt and reject duplicate keys/constants."""
+    try:
+        value = json.loads(
+            Path(path).read_text(encoding="utf-8"),
+            object_pairs_hook=_reject_duplicate_pairs,
+            parse_constant=lambda constant: (_ for _ in ()).throw(
+                OperationsAuditError(f"non-finite JSON constant: {constant}")
+            ),
+        )
+    except OperationsAuditError:
+        raise
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise OperationsAuditError(f"invalid JSON receipt: {path}") from exc
+    if not isinstance(value, dict):
+        raise OperationsAuditError(f"receipt must be a JSON object: {path}")
+    return value
+
+
+def _write_json_exclusive(path: Path, value: dict[str, Any]) -> None:
+    """Write a new immutable JSON receipt without replacing an existing one."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    encoded = (_canonical_json(value) + "\n").encode("utf-8")
+    try:
+        descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError as exc:
+        raise OperationsAuditError(f"receipt already exists and is immutable: {path}") from exc
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(encoded)
+            handle.flush()
+            os.fsync(handle.fileno())
+    except BaseException:
+        path.unlink(missing_ok=True)
+        raise
+
+
+def _write_json_replace(path: Path, value: dict[str, Any]) -> None:
+    """Atomically replace a mutable lease receipt after validation."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    encoded = (_canonical_json(value) + "\n").encode("utf-8")
+    try:
+        with temporary.open("xb") as handle:
+            handle.write(encoded)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def _sha256(path: Path) -> str:
@@ -657,6 +786,264 @@ def append_daily_receipt(
     return destination
 
 
+def build_preflight_receipt(
+    payload: dict[str, Any],
+    *,
+    command: list[str] | tuple[str, ...],
+    cwd: Path,
+    recorded_at: datetime | None = None,
+) -> dict[str, Any]:
+    """Build the structured, outcome-blind receipt consumed by resume auth.
+
+    ``stdout_sha256`` is intentionally the hash of the canonical JSON payload
+    printed by the preflight command (without a trailing newline).  Keeping
+    the exact representation in ``output`` makes the receipt independently
+    verifiable without trusting shell formatting or locale-specific output.
+    """
+    if not isinstance(payload, dict) or payload.get("status") != "PASS":
+        raise OperationsAuditError("only a successful preflight can authorize resume")
+    identity = payload.get("identity")
+    writer = payload.get("writer")
+    if not isinstance(identity, dict) or not isinstance(writer, dict):
+        raise OperationsAuditError("preflight payload lacks identity/writer objects")
+    if writer.get("authorized_writer_count") != 0 or writer.get("lock_alive"):
+        raise OperationsAuditError("preflight receipt requires no active collector writer")
+    output = _canonical_json(payload)
+    receipt = {
+        "record_type": PREFLIGHT_RECEIPT_RECORD_TYPE,
+        "recorded_at_utc": (recorded_at or datetime.now(UTC)).astimezone(UTC).isoformat(),
+        "command": [str(item) for item in command],
+        "cwd": str(Path(cwd).resolve()),
+        "exit_code": 0,
+        "stdout_sha256": hashlib.sha256(output.encode("utf-8")).hexdigest(),
+        "output": payload,
+        "identity": identity,
+        "writer": writer,
+        "no_launch_assertion": True,
+        "outcomes_accessed": False,
+        "final_holdout": "UNTOUCHED",
+        "r2b2": "NOT_ACCESSED",
+        "forceorder_v3_migration": "NOT_STARTED",
+    }
+    if set(receipt) != PREFLIGHT_RECEIPT_FIELDS:
+        raise OperationsAuditError(
+            f"preflight receipt schema drift: {sorted(set(receipt) ^ PREFLIGHT_RECEIPT_FIELDS)}"
+        )
+    _reject_forbidden(receipt, context="preflight receipt")
+    return receipt
+
+
+def _validate_identity_binding(receipt_identity: Any, identity: dict[str, Any], *, context: str) -> None:
+    if not isinstance(receipt_identity, dict):
+        raise OperationsAuditError(f"{context} identity is not an object")
+    for field in _IDENTITY_PIN_FIELDS:
+        actual = receipt_identity.get(field)
+        expected = identity.get(field)
+        if field == "root":
+            try:
+                actual = str(Path(str(actual)).resolve())
+                expected = str(Path(str(expected)).resolve())
+            except (OSError, TypeError, ValueError) as exc:
+                raise OperationsAuditError(f"{context} identity root is invalid") from exc
+        if actual != expected:
+            raise OperationsAuditError(f"{context} identity mismatch: {field}")
+    if receipt_identity.get("seal_status") != "SEALED":
+        raise OperationsAuditError(f"{context} identity is not SEALED")
+    if receipt_identity.get("manifest_chain_verification") is not True:
+        raise OperationsAuditError(f"{context} manifest chain is not verified")
+    if receipt_identity.get("outcomes_accessed") is not False:
+        raise OperationsAuditError(f"{context} outcomes_accessed must be false")
+
+
+def _validate_zero_writer(writer: Any, *, context: str) -> None:
+    if not isinstance(writer, dict):
+        raise OperationsAuditError(f"{context} writer is not an object")
+    if writer.get("lock_alive") is not False:
+        raise OperationsAuditError(f"{context} collector lock is active")
+    if writer.get("authorized_writer_count") != 0:
+        raise OperationsAuditError(f"{context} authorized writer count is not zero")
+    if writer.get("duplicate_writers") != []:
+        raise OperationsAuditError(f"{context} contains duplicate writers")
+    if writer.get("lock_pid") is not None:
+        raise OperationsAuditError(f"{context} lock_pid must be null when no writer is active")
+
+
+def _validate_resume_authorization(
+    authorization: dict[str, Any],
+    *,
+    authorization_path: Path,
+    preflight_receipt_path: Path | None,
+    identity: dict[str, Any],
+    writer: dict[str, Any],
+    now: datetime,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    if set(authorization) != RESUME_AUTHORIZATION_FIELDS:
+        raise OperationsAuditError(
+            f"resume authorization schema drift: {sorted(set(authorization) ^ RESUME_AUTHORIZATION_FIELDS)}"
+        )
+    _reject_forbidden(authorization, context="resume authorization")
+    if authorization.get("record_type") != RESUME_AUTHORIZATION_RECORD_TYPE:
+        raise OperationsAuditError("resume authorization record type is invalid")
+    try:
+        uuid.UUID(str(authorization.get("authorization_id")))
+    except (ValueError, AttributeError, TypeError) as exc:
+        raise OperationsAuditError("resume authorization id is not a UUID") from exc
+    if not isinstance(authorization.get("authorized_by"), str) or not authorization["authorized_by"].strip():
+        raise OperationsAuditError("resume authorization lacks authorized_by")
+    if authorization.get("mode") != "SCIENTIFIC_RESUME_EXISTING_V8":
+        raise OperationsAuditError("resume authorization mode is not existing-v8 scientific resume")
+    issued = _parse_time(authorization.get("issued_at_utc"))
+    expires = _parse_time(authorization.get("expires_at_utc"))
+    now = now.astimezone(UTC)
+    if expires <= issued or expires - issued > timedelta(minutes=15):
+        raise OperationsAuditError("resume authorization expiry window is invalid")
+    if now < issued or now > expires:
+        raise OperationsAuditError("resume authorization is outside its validity window")
+    if authorization.get("consumed_at_utc") is not None:
+        raise OperationsAuditError("resume authorization has already been consumed")
+    root_value = authorization.get("root")
+    try:
+        if Path(str(root_value)).resolve() != Path(str(identity.get("root"))).resolve():
+            raise OperationsAuditError("resume authorization root mismatch")
+    except (OSError, TypeError, ValueError) as exc:
+        raise OperationsAuditError("resume authorization root is invalid") from exc
+    authorization_identity = {
+        "root": authorization.get("root"),
+        "implementation_commit": authorization.get("implementation_commit"),
+        "source_tree_sha256": authorization.get("source_tree_sha256"),
+        "registry_sha256": authorization.get("registry_sha256"),
+        "roster_sha256": authorization.get("roster_sha256"),
+        "roster_file_sha256": identity.get("roster_file_sha256"),
+        "manifest_sha256": authorization.get("launch_manifest_sha256"),
+        "seal_sha256": authorization.get("launch_seal_sha256"),
+        "seal_status": "SEALED",
+        "manifest_chain_verification": True,
+        "outcomes_accessed": False,
+    }
+    _validate_identity_binding(authorization_identity, identity, context="resume authorization")
+    for field in (
+        "source_tree_sha256",
+        "registry_sha256",
+        "roster_sha256",
+        "launch_manifest_sha256",
+        "launch_seal_sha256",
+        "preflight_receipt_sha256",
+    ):
+        try:
+            require_sha256(str(authorization.get(field)), field)
+        except (ValueError, TypeError) as exc:
+            raise OperationsAuditError(f"resume authorization has invalid {field}") from exc
+    if authorization.get("preflight_exit_code") != 0:
+        raise OperationsAuditError("resume authorization preflight exit code is not zero")
+    _validate_zero_writer(writer, context="current")
+    preflight_writer = authorization.get("preflight_writer")
+    _validate_zero_writer(preflight_writer, context="authorized preflight")
+    try:
+        raw_receipt_path = Path(str(authorization.get("preflight_receipt_path")))
+    except (OSError, TypeError, ValueError) as exc:
+        raise OperationsAuditError("resume authorization preflight path is invalid") from exc
+    if not raw_receipt_path.is_absolute():
+        raise OperationsAuditError("resume authorization preflight path must be absolute")
+    receipt_path = raw_receipt_path.resolve()
+    if not receipt_path.is_file():
+        raise OperationsAuditError("resume authorization preflight receipt is missing")
+    if preflight_receipt_path is not None and Path(preflight_receipt_path).resolve() != receipt_path:
+        raise OperationsAuditError("supplied preflight receipt path does not match authorization")
+    try:
+        actual_receipt_sha = _sha256(receipt_path)
+    except OSError as exc:
+        raise OperationsAuditError("resume authorization preflight receipt cannot be hashed") from exc
+    if actual_receipt_sha != str(authorization.get("preflight_receipt_sha256")).lower():
+        raise OperationsAuditError("resume authorization preflight receipt SHA mismatch")
+    preflight = _load_json_object(receipt_path)
+    if set(preflight) != PREFLIGHT_RECEIPT_FIELDS:
+        raise OperationsAuditError(
+            f"preflight receipt schema drift: {sorted(set(preflight) ^ PREFLIGHT_RECEIPT_FIELDS)}"
+        )
+    _reject_forbidden(preflight, context="preflight receipt")
+    if preflight.get("record_type") != PREFLIGHT_RECEIPT_RECORD_TYPE:
+        raise OperationsAuditError("preflight receipt record type is invalid")
+    if preflight.get("exit_code") != 0:
+        raise OperationsAuditError("preflight receipt exit code is not zero")
+    if preflight.get("no_launch_assertion") is not True:
+        raise OperationsAuditError("preflight receipt lacks the no-launch assertion")
+    if preflight.get("outcomes_accessed") is not False:
+        raise OperationsAuditError("preflight receipt outcomes_accessed must be false")
+    if preflight.get("final_holdout") != "UNTOUCHED":
+        raise OperationsAuditError("preflight receipt final holdout is not UNTOUCHED")
+    if preflight.get("r2b2") != "NOT_ACCESSED":
+        raise OperationsAuditError("preflight receipt records R2B2 access")
+    if preflight.get("forceorder_v3_migration") != "NOT_STARTED":
+        raise OperationsAuditError("preflight receipt records ForceOrder V3 migration")
+    output = preflight.get("output")
+    if not isinstance(output, dict):
+        raise OperationsAuditError("preflight receipt output is not an object")
+    expected_stdout_sha = hashlib.sha256(_canonical_json(output).encode("utf-8")).hexdigest()
+    if preflight.get("stdout_sha256") != expected_stdout_sha:
+        raise OperationsAuditError("preflight receipt output SHA mismatch")
+    if output.get("status") != "PASS":
+        raise OperationsAuditError("preflight receipt output is not PASS")
+    if output.get("identity") != preflight.get("identity") or output.get("writer") != preflight.get("writer"):
+        raise OperationsAuditError("preflight receipt output does not match structured fields")
+    _validate_identity_binding(preflight.get("identity"), identity, context="preflight receipt")
+    _validate_zero_writer(preflight.get("writer"), context="preflight receipt")
+    if preflight.get("writer") != preflight_writer:
+        raise OperationsAuditError("authorization preflight_writer does not match receipt")
+    recorded = _parse_time(preflight.get("recorded_at_utc"))
+    if recorded > now or now - recorded > timedelta(minutes=15):
+        raise OperationsAuditError("preflight receipt is stale or from the future")
+    if recorded > issued + timedelta(seconds=30):
+        raise OperationsAuditError("preflight receipt was recorded after authorization issuance")
+    return authorization, preflight
+
+
+def verify_resume_authorization(
+    authorization_path: Path,
+    *,
+    preflight_receipt_path: Path | None = None,
+    identity: dict[str, Any] | None = None,
+    writer: dict[str, Any] | None = None,
+    now: datetime | None = None,
+    consume: bool = False,
+) -> dict[str, Any]:
+    """Validate or atomically consume one existing-v8 resume authorization."""
+    authorization_path = Path(authorization_path).resolve()
+    if identity is None:
+        identity = verify_identity(V8_ROOT, require_exact_v8=True)
+    if writer is None:
+        writer = audit_writer(Path(str(identity["root"])))
+    reference_now = (now or datetime.now(UTC)).astimezone(UTC)
+    if not consume:
+        authorization = _load_json_object(authorization_path)
+        validated, _ = _validate_resume_authorization(
+            authorization,
+            authorization_path=authorization_path,
+            preflight_receipt_path=preflight_receipt_path,
+            identity=identity,
+            writer=writer,
+            now=reference_now,
+        )
+        return validated
+    # The lease lock serializes consumers.  Re-read and validate inside the
+    # lock to close the check/consume TOCTOU window; a second consumer sees the
+    # durable consumed_at_utc marker and fails closed.
+    with single_instance_lock(RESUME_AUTHORIZATION_LOCK):
+        authorization = _load_json_object(authorization_path)
+        current_writer = audit_writer(Path(str(identity["root"])))
+        validated, _ = _validate_resume_authorization(
+            authorization,
+            authorization_path=authorization_path,
+            preflight_receipt_path=preflight_receipt_path,
+            identity=identity,
+            writer=current_writer,
+            now=reference_now,
+        )
+        consumed = dict(validated)
+        consumed["consumed_at_utc"] = reference_now.isoformat()
+        _write_json_replace(authorization_path, consumed)
+        return consumed
+
+
 def _git_head() -> str:
     return subprocess.run(["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, capture_output=True, text=True, check=True).stdout.strip()
 
@@ -675,7 +1062,25 @@ def _command_preflight(args: argparse.Namespace) -> int:
     if writer.get("authorized_writer_count") == 1:
         print(json.dumps({"status": "COLLECTOR_LOCK_COLLISION", "identity": identity, "writer": writer}, sort_keys=True))
         return 73
-    print(json.dumps({"status": "PASS", "identity": identity, "writer": writer}, sort_keys=True))
+    payload = {"status": "PASS", "identity": identity, "writer": writer}
+    if args.receipt:
+        receipt = build_preflight_receipt(payload, command=sys.argv, cwd=Path.cwd())
+        _write_json_exclusive(Path(args.receipt), receipt)
+    print(_canonical_json(payload))
+    return 0
+
+
+def _command_verify_resume_authorization(args: argparse.Namespace) -> int:
+    identity = verify_identity(Path(args.root), manifest=Path(args.manifest) if args.manifest else None, seal=Path(args.seal) if args.seal else None, roster=Path(args.roster), require_exact_v8=True)
+    writer = audit_writer(Path(args.root))
+    result = verify_resume_authorization(
+        Path(args.authorization),
+        preflight_receipt_path=Path(args.preflight_receipt) if args.preflight_receipt else None,
+        identity=identity,
+        writer=writer,
+        consume=args.consume,
+    )
+    print(_canonical_json({"status": "CONSUMED" if args.consume else "PASS", "authorization": result, "identity": identity}))
     return 0
 
 
@@ -722,7 +1127,12 @@ def _parser() -> argparse.ArgumentParser:
     common.add_argument("--roster", type=Path, default=V8_ROSTER)
     common.add_argument("--exact-v8", action="store_true")
     sub.add_parser("verify", parents=[common])
-    sub.add_parser("preflight", parents=[common])
+    preflight = sub.add_parser("preflight", parents=[common])
+    preflight.add_argument("--receipt", type=Path)
+    resume = sub.add_parser("verify-resume-authorization", parents=[common])
+    resume.add_argument("--authorization", type=Path, required=True)
+    resume.add_argument("--preflight-receipt", type=Path)
+    resume.add_argument("--consume", action="store_true")
     sub.add_parser("watch", parents=[common])
     daily = sub.add_parser("daily-receipt", parents=[common])
     daily.add_argument("--date")
@@ -738,6 +1148,8 @@ def main(argv: list[str] | None = None) -> int:
             return _command_verify(args)
         if args.command == "preflight":
             return _command_preflight(args)
+        if args.command == "verify-resume-authorization":
+            return _command_verify_resume_authorization(args)
         if args.command == "watch":
             return _command_watch(args)
         if args.command == "daily-receipt":
