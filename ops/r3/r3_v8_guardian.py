@@ -27,6 +27,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from ops.r3 import r3_ops  # noqa: E402
+from ops.r3 import r3_v8_authorization  # noqa: E402
 
 
 V8_ROOT = r3_ops.V8_ROOT
@@ -36,6 +37,7 @@ V8_ROSTER = r3_ops.V8_ROSTER
 V8_CONTROL_ROOT = r3_ops.V8_CONTROL_ROOT
 GUARDIAN_LOCK_PATH = V8_CONTROL_ROOT / "R3_V8_GUARDIAN.lock"
 GUARDIAN_RECEIPT_ROOT = r3_ops.OPERATIONS_ROOT / "guardian"
+GUARDIAN_STATE_PATH = GUARDIAN_RECEIPT_ROOT / "R3_V8_GUARDIAN_STATE.json"
 CANONICAL_LAUNCHER = REPO_ROOT / "ops" / "r3" / "launch_r3_v8_resume.ps1"
 DEFAULT_POLL_SECONDS = 300
 GUARDIAN_RECORD_TYPE = "R3_V8_GUARDIAN_ATTEMPT"
@@ -97,6 +99,9 @@ class GuardianConfig:
     receipt_root: Path = GUARDIAN_RECEIPT_ROOT
     authorization: Path | None = None
     preflight_receipt: Path | None = None
+    standing_policy: Path | None = None
+    state_path: Path | None = None
+    receipt_throttle_seconds: int = 900
     poll_seconds: int = DEFAULT_POLL_SECONDS
     # Only in-process synthetic tests may opt into fixture paths. There is no
     # CLI switch for this flag, so production invocations cannot redirect the
@@ -270,9 +275,17 @@ def _validate_config(config: GuardianConfig) -> None:
         "guardian_lock": GUARDIAN_LOCK_PATH,
         "receipt_root": GUARDIAN_RECEIPT_ROOT,
     }
+    if config.standing_policy is not None:
+        expected["standing_policy"] = r3_v8_authorization.STANDING_POLICY_PATH
+    if config.state_path is not None:
+        expected["state_path"] = GUARDIAN_STATE_PATH
     for field, path in expected.items():
         if Path(getattr(config, field)).resolve() != Path(path).resolve():
             raise GuardianError(f"production guardian path override is forbidden: {field}")
+    if config.standing_policy is None:
+        raise GuardianError("production guardian requires the canonical standing recovery policy")
+    if config.authorization is not None:
+        raise GuardianError("production guardian does not accept opaque operator authorization; it mints a child lease from the standing policy")
 
 
 def assess_snapshot(snapshot: Mapping[str, Any]) -> dict[str, Any]:
@@ -319,12 +332,19 @@ def _authorization_metadata(path: Path, *, now: datetime) -> tuple[dict[str, Any
         value = r3_ops._load_json_object(path)
     except Exception as exc:
         return None, f"authorization_invalid:{type(exc).__name__}:{exc}"
-    if set(value) != r3_ops.RESUME_AUTHORIZATION_FIELDS:
+    if set(value) not in (r3_ops.RESUME_AUTHORIZATION_FIELDS, r3_ops.CHILD_RESUME_AUTHORIZATION_FIELDS):
         return None, "authorization_schema_drift"
     if value.get("record_type") != r3_ops.RESUME_AUTHORIZATION_RECORD_TYPE:
         return None, "authorization_record_type_invalid"
     if value.get("mode") != "EXISTING_SEALED_V8_ONLY":
         return None, "authorization_mode_invalid"
+    if set(value) == r3_ops.CHILD_RESUME_AUTHORIZATION_FIELDS:
+        if value.get("authorization_kind") != r3_v8_authorization.CHILD_AUTHORIZATION_KIND:
+            return None, "authorization_kind_invalid"
+        try:
+            r3_v8_authorization._require_sha(value.get("parent_policy_sha256"), "parent_policy_sha256")
+        except Exception:
+            return None, "parent_policy_sha_invalid"
     if value.get("consumed_at_utc") is not None:
         return None, "authorization_already_consumed"
     try:
@@ -356,9 +376,10 @@ def _authorization_metadata(path: Path, *, now: datetime) -> tuple[dict[str, Any
 
 
 def _default_preflight_runner(config: GuardianConfig, authorization: Path, preflight: Path) -> dict[str, Any]:
-    # Existing authorization leases carry an immutable preflight receipt.  Do
-    # not pass -PreflightReceipt for that existing file because the canonical
-    # launcher correctly refuses to replace immutable evidence.
+    # A new standing-policy attempt passes a not-yet-existing child path and
+    # therefore asks the canonical launcher to publish an immutable preflight
+    # receipt. Legacy operator leases already carry a receipt and must not be
+    # replaced.
     command = [
         "powershell.exe",
         "-NoProfile",
@@ -368,6 +389,8 @@ def _default_preflight_runner(config: GuardianConfig, authorization: Path, prefl
         str(Path(config.launcher).resolve()),
         "-PreflightOnly",
     ]
+    if not Path(authorization).is_file():
+        command += ["-PreflightReceipt", str(Path(preflight).resolve())]
     result = subprocess.run(command, cwd=REPO_ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace", check=False)
     return {"command": command, "exit_code": int(result.returncode), "output": (result.stdout or result.stderr or "").strip()}
 
@@ -431,6 +454,100 @@ def _receipt_path(root: Path, *, now: datetime) -> Path:
     return Path(root) / f"R3_V8_GUARDIAN_ATTEMPT_{stamp}_{uuid.uuid4().hex}.json"
 
 
+def _state_path(config: GuardianConfig) -> Path:
+    return Path(config.state_path or (Path(config.receipt_root) / "R3_V8_GUARDIAN_STATE.json")).resolve()
+
+
+def _new_preflight_path(config: GuardianConfig, *, now: datetime) -> Path:
+    root = Path(config.receipt_root) / "preflight"
+    stamp = now.astimezone(UTC).strftime("%Y%m%dT%H%M%S%fZ")
+    return (root / f"R3_V8_GUARDIAN_PREFLIGHT_{stamp}_{uuid.uuid4().hex}.json").resolve()
+
+
+def _pending_child_path(config: GuardianConfig, *, now: datetime) -> Path:
+    root = Path(config.receipt_root) / "child_authorizations"
+    stamp = now.astimezone(UTC).strftime("%Y%m%dT%H%M%S%fZ")
+    return (root / f".pending_{stamp}_{uuid.uuid4().hex}.json").resolve()
+
+
+def _auth_identity(identity: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Normalize watchdog identity names to the authorization contract."""
+    value = dict(identity or {})
+    value.setdefault("launch_manifest_sha256", value.get("manifest_sha256"))
+    value.setdefault("launch_seal_sha256", value.get("seal_sha256"))
+    return value
+
+
+def _receipt_state_key(receipt: Mapping[str, Any]) -> str:
+    writer = receipt.get("writer_before") or {}
+    stable = {
+        "decision": receipt.get("decision"),
+        "reasons": receipt.get("reasons"),
+        "control_identity_sha256": receipt.get("control_identity_sha256"),
+        "authorized_writer_count": writer.get("authorized_writer_count"),
+        "lock_pid": writer.get("lock_pid"),
+        "guardian_lock_disposition": receipt.get("guardian_lock_disposition"),
+    }
+    return _sha256_bytes(_canonical_json(stable).encode("utf-8"))
+
+
+def _publish_receipt(config: GuardianConfig, receipt: Mapping[str, Any], *, now: datetime, throttle: bool) -> dict[str, Any]:
+    """Write transition receipts and suppress unchanged persistent heartbeats."""
+    destination = _receipt_path(config.receipt_root, now=now)
+    state_path = _state_path(config)
+    state: dict[str, Any] = {}
+    try:
+        if state_path.is_file():
+            loaded = r3_ops._load_json_object(state_path)
+            if isinstance(loaded, dict):
+                state = loaded
+    except Exception:
+        # A malformed state file never authorizes a resume; discard only the
+        # in-memory hint and emit a fresh immutable diagnostic receipt.
+        state = {}
+    state_key = _receipt_state_key(receipt)
+    emitted_at = None
+    if state.get("last_emitted_at_utc"):
+        try:
+            emitted_at = r3_ops._parse_time(state["last_emitted_at_utc"])
+        except Exception:
+            emitted_at = None
+    unchanged = state.get("last_state_key") == state_key
+    if throttle and unchanged and emitted_at is not None:
+        age = (now.astimezone(UTC) - emitted_at).total_seconds()
+        if age < max(1, int(config.receipt_throttle_seconds)):
+            state.update({
+                "schema_version": 1,
+                "last_seen_at_utc": now.astimezone(UTC).isoformat(),
+                "poll_count": int(state.get("poll_count", 0) or 0) + 1,
+            })
+            try:
+                r3_ops._write_json_replace(state_path, state)
+            except Exception:
+                pass
+            return {"receipt_path": str(state.get("last_receipt_path") or ""), "receipt": dict(receipt), "emitted": False, "state_key": state_key}
+    result = _write_receipt(receipt, destination=destination)
+    state = {
+        "schema_version": 1,
+        "last_state_key": state_key,
+        "last_decision": receipt.get("decision"),
+        "last_emitted_at_utc": now.astimezone(UTC).isoformat(),
+        "last_seen_at_utc": now.astimezone(UTC).isoformat(),
+        "last_receipt_path": result["receipt_path"],
+        "emission_count": int(state.get("emission_count", 0) or 0) + 1,
+        "poll_count": int(state.get("poll_count", 0) or 0) + 1,
+    }
+    try:
+        r3_ops._write_json_replace(state_path, state)
+    except Exception:
+        # The immutable receipt remains valid even if a best-effort state
+        # update cannot be persisted; no second sink is attempted.
+        pass
+    result["emitted"] = True
+    result["state_key"] = state_key
+    return result
+
+
 def _write_receipt(payload: Mapping[str, Any], *, destination: Path) -> dict[str, Any]:
     body = dict(payload)
     body.pop("receipt_body_sha256", None)
@@ -478,6 +595,7 @@ def _run_once_unlocked(
     snapshot_provider: SnapshotProvider,
     preflight_runner: Runner,
     launcher_runner: Runner,
+    throttle: bool = False,
 ) -> dict[str, Any]:
     before = dict(snapshot_provider(config, now))
     assessed = assess_snapshot(before)
@@ -486,9 +604,62 @@ def _run_once_unlocked(
     launcher: Mapping[str, Any] | None = None
     after_writer: Mapping[str, Any] | None = None
     if decision == "RESUME_ELIGIBLE":
-        if config.authorization is None:
+        # Production operation is standing-policy driven.  The explicit
+        # authorization branch remains for immutable legacy/operator leases and
+        # for backwards-compatible synthetic tests.
+        if config.authorization is None and config.standing_policy is None:
             decision = "AUTHORIZATION_REQUIRED"
-            assessed = {"reasons": ["no_explicit_authorization_lease"]}
+            assessed = {"reasons": ["no_standing_policy_or_explicit_authorization"]}
+        elif config.authorization is None:
+            try:
+                policy_binding = r3_v8_authorization.load_standing_policy(Path(config.standing_policy), now=now)
+                authorization_path = _pending_child_path(config, now=now)
+                preflight_path = Path(config.preflight_receipt or _new_preflight_path(config, now=now)).resolve()
+                if config.preflight_receipt is not None and not Path(config.preflight_receipt).is_absolute():
+                    raise r3_v8_authorization.AuthorizationError("preflight_path_override_not_absolute")
+                preflight = dict(preflight_runner(config, authorization_path, preflight_path))
+                if int(preflight.get("exit_code", 1)) != 0:
+                    decision = "BLOCKED_PREFLIGHT"
+                    assessed = {"reasons": ["canonical_preflight_failed"]}
+                elif not preflight_path.is_file():
+                    decision = "BLOCKED_PREFLIGHT"
+                    assessed = {"reasons": ["immutable_preflight_receipt_missing"]}
+                else:
+                    after = dict(snapshot_provider(config, datetime.now(UTC).astimezone(UTC)))
+                    after_assessed = assess_snapshot(after)
+                    after_writer = after.get("writer")
+                    if after_assessed["decision"] != "RESUME_ELIGIBLE":
+                        decision = "BLOCKED_RACE_CHANGED"
+                        assessed = {"reasons": ["writer_lock_or_identity_changed_after_preflight"]}
+                    else:
+                        child = r3_v8_authorization.mint_child_authorization(
+                            policy_binding,
+                            identity=_auth_identity(after.get("identity")),
+                            preflight_path=preflight_path,
+                            now=now,
+                            destination_root=Path(config.receipt_root) / "child_authorizations",
+                        )
+                        authorization_path = Path(child["path"]).resolve()
+                        r3_v8_authorization.verify_child_metadata(
+                            authorization_path,
+                            policy_binding=policy_binding,
+                            identity=_auth_identity(after.get("identity")),
+                            now=now,
+                        )
+                        preflight = {**preflight, "standing_policy_sha256": policy_binding["policy_sha256"], "child_authorization": child}
+                        launcher = dict(launcher_runner(config, authorization_path, preflight_path))
+                        if int(launcher.get("exit_code", 1)) != 0:
+                            decision = "BLOCKED_LAUNCH_FAILURE"
+                            assessed = {"reasons": ["canonical_authorized_launcher_failed"]}
+                        else:
+                            decision = "RESUME_STARTED"
+                            assessed = {"reasons": []}
+            except r3_v8_authorization.AuthorizationError as exc:
+                decision = "BLOCKED_AUTHORIZATION_POLICY"
+                assessed = {"reasons": [str(exc)]}
+            except Exception as exc:
+                decision = "BLOCKED_AUTHORIZATION_HANDOFF"
+                assessed = {"reasons": [f"child_authorization_error:{type(exc).__name__}:{exc}"]}
         else:
             authorization_path = Path(config.authorization)
             if not authorization_path.is_absolute():
@@ -556,7 +727,7 @@ def _run_once_unlocked(
         launcher=launcher,
         writer_after=after_writer,
     )
-    return _write_receipt(receipt, destination=_receipt_path(config.receipt_root, now=now))
+    return _publish_receipt(config, receipt, now=now, throttle=throttle)
 
 
 def run_once(
@@ -609,7 +780,7 @@ def run_persistent(config: GuardianConfig, *, snapshot_provider: SnapshotProvide
             while True:
                 poll_now = datetime.now(UTC).astimezone(UTC)
                 try:
-                    _run_once_unlocked(config, now=poll_now, snapshot_provider=provider, preflight_runner=preflight, launcher_runner=launcher)
+                    _run_once_unlocked(config, now=poll_now, snapshot_provider=provider, preflight_runner=preflight, launcher_runner=launcher, throttle=True)
                 except Exception as exc:
                     # A malformed receipt/evidence or subprocess failure must
                     # be visible but must not kill the only recovery authority.
@@ -622,7 +793,7 @@ def run_persistent(config: GuardianConfig, *, snapshot_provider: SnapshotProvide
                             snapshot=None,
                             lock_disposition="ACQUIRED_RELEASED",
                         )
-                        _write_receipt(error_receipt, destination=_receipt_path(config.receipt_root, now=poll_now))
+                        _publish_receipt(config, error_receipt, now=poll_now, throttle=True)
                     except Exception:
                         # Do not attempt a second sink or mutate evidence.
                         pass
@@ -657,6 +828,8 @@ def main(argv: list[str] | None = None) -> int:
         authorization=args.authorization,
         preflight_receipt=args.preflight_receipt,
         poll_seconds=args.poll_seconds,
+        standing_policy=r3_v8_authorization.STANDING_POLICY_PATH,
+        state_path=GUARDIAN_STATE_PATH,
     )
     if args.once:
         result = run_once(config)

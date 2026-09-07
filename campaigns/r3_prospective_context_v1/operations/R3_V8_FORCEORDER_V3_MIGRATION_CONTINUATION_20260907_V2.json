@@ -1,0 +1,72 @@
+{
+  "schema_version": 2,
+  "record_type": "R3_V8_FORCEORDER_V3_MIGRATION_CONTINUATION",
+  "receipt_path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_FORCEORDER_V3_MIGRATION_CONTINUATION_20260907_V2.json",
+  "recorded_at_utc": "2026-09-07T08:50:00Z",
+  "body_sha256": "04d458be7f913efb35ccb8bac81a79415cf1ea862cc28e437a518bc319f65825",
+  "supersedes": {
+    "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_FORCEORDER_V3_MIGRATION_CONTINUATION_20260907.json",
+    "file_sha256": "2cd66fba2238ff6e9f353ea109c476cc003dc69ddf09c85d42770077540be7b3",
+    "status": "SUPERSEDED_BY_V2",
+    "reason": "V2 records the restored ForceOrder prerequisite after guardian self-healing closeout; the prior continuation remains immutable."
+  },
+  "prerequisite_state": "FORCEORDER_V3_MIGRATION_SAFETY_PREREQUISITE_RESTORED",
+  "migration_prerequisite_state": "FORCEORDER_V3_MIGRATION_SAFETY_PREREQUISITE_RESTORED",
+  "collector_recovery_state": "R3_PROSPECTIVE_COLLECTION_RECOVERED_WITH_PRESERVED_GAP",
+  "migration_action_in_this_goal": "NONE",
+  "forceorder_v3_migration": "NOT_STARTED",
+  "resume_requires": "separate explicit Goal and independent authorization",
+  "outcomes_accessed": false,
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_ACCESSED",
+  "identity": {
+    "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8",
+    "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+    "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+    "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+    "roster_sha256": "bb05514dfc78cfca3b736488b1454f4cb022da0110e2cbf69f53c505f543ea79",
+    "launch_manifest_sha256": "cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659",
+    "launch_seal_sha256": "ab83232d90e800bf8178c6f3d22138382fb102b9d14213e12a798c0f2c68ad85"
+  },
+  "guardian_evidence": {
+    "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\devlog\\_plan\\260905_sol-audit-independent-attestation-20260905\\180_wp6_live_guardian_closeout_20260907.json",
+    "authority_count": 1,
+    "python_pid": 185608,
+    "wrapper_pid": 175272,
+    "guardian_lock": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_V8_GUARDIAN.lock",
+    "collector_pid": 180656,
+    "collector_writer_count": 1,
+    "chain": "PASS",
+    "seal": "SEALED",
+    "latest_cycle": "cycle-20260907T084504702843Z"
+  },
+  "accounting_evidence": {
+    "v3_path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_OUTAGE_AND_RECOVERY_20260907_V3.json",
+    "v3_file_sha256": "0a00b1a47f15ec4a772fd5fc6c1169c9563e8854802d85fa8f6b3c14b03d1008",
+    "v7_path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_WP5_FIREWALL_RECEIPT_20260907_V7.json",
+    "v7_file_sha256": "ca8ac4d2dd727c862138a9ceb83c62520a4a36f7b0ca6f7722b482afbae128e4",
+    "decomposition": ["284 - 197 = 87", "262 - 87 = 175", "87 + 175 = 262", "466 - 204 = 262", "44h / 15m = 176; 176 - 1 = 175"],
+    "nonqualifying_cycle": "cycle-20260907T033004700902Z: NONQUALIFYING_TARGET_BEFORE_AUTHORIZATION"
+  },
+  "qualification": {
+    "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_GUARDIAN_SYNTHETIC_QUALIFICATION_20260907_V1.json",
+    "cases": 17,
+    "pass": 17,
+    "safe_skip_destructive_live_crash_test": "SAFE_SKIP_DESTRUCTIVE_LIVE_CRASH_TEST"
+  },
+  "closeout": {
+    "scientific_scope_status": "clean",
+    "disk_state": "GREEN",
+    "guardian_reentry_verified": true,
+    "receipt_throttle_verified": true,
+    "collector_continuing": true
+  },
+  "write_contract": {
+    "write_once": true,
+    "atomic_publish_required": true,
+    "create_mode": "O_CREAT|O_EXCL",
+    "overwrite": false,
+    "flush_fsync_before_publish": true,
+    "body_sha256_algorithm": "SHA256 of canonical UTF-8 JSON with body_sha256 omitted"
+  }
+}

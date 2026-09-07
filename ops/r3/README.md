@@ -7,12 +7,18 @@ change the frozen scientific source-tree identity.
 
 `run_r3_v8_guardian.ps1` is the sole service/supervisor entrypoint. It polls
 the exact sealed-v8 identity and writer metadata, records immutable
-outcome-blind attempts, and invokes `launch_r3_v8_resume.ps1` only after an
-explicit operator authorization lease, a canonical preflight, and a second
-race check. The underlying launcher runs the fail-closed `preflight` command
-before invoking the existing scientific collector and uses the collector's PID
-lock as the sole writer lock. A Startup instance without a lease records
-`AUTHORIZATION_REQUIRED`; it never invents scientific authority.
+outcome-blind attempts, and invokes `launch_r3_v8_resume.ps1` only after the
+canonical standing recovery policy has authorized a fresh preflight and a
+single-use child authorization. The child binds the verified policy hash,
+v8 identity, and immutable preflight receipt; parent mismatch, replay, expiry,
+or a forged issuer fail closed. The underlying launcher runs the fail-closed
+`preflight` command before invoking the existing scientific collector and uses
+the collector's PID lock as the sole writer lock. A healthy live writer is
+always a no-action state. Persistent polling re-enters after a child exits and
+throttles unchanged state receipts, while preserving every distinct state
+transition as an immutable attempt. The standing policy is valid only for the
+existing sealed v8 root and never authorizes ForceOrder migration, outcomes, or
+holdout access.
 `watch_r3_v8.ps1` and `r3_ops.py watch` are read-only: they inspect only
 operational metadata and classify liveness as GREEN, YELLOW, or RED.
 `write_r3_daily_receipt.ps1` appends a one-record-per-UTC-day receipt under the

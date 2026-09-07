@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from ops.r3 import r3_ops
+from ops.r3 import r3_v8_authorization as auth
 from ops.r3.r3_v8_guardian import (
     GuardianError,
     GuardianConfig,
@@ -301,3 +302,144 @@ def test_persistent_poll_records_error_instead_of_dying(tmp_path: Path) -> None:
     receipts = list((tmp_path / "receipts").glob("R3_V8_GUARDIAN_ATTEMPT_*.json"))
     assert len(receipts) == 1
     assert json.loads(receipts[0].read_text(encoding="utf-8"))["decision"] == "BLOCKED_GUARDIAN_ERROR"
+
+
+def test_standing_policy_mints_child_and_launcher_receives_child(tmp_path: Path) -> None:
+    now = datetime(2026, 9, 7, 8, 0, tzinfo=UTC)
+    identity = dict(auth.EXPECTED_IDENTITY)
+    identity.update({"manifest_sha256": identity["launch_manifest_sha256"], "seal_sha256": identity["launch_seal_sha256"], "scientific_scope_status": "clean", "outcomes_accessed": False})
+    snapshot = _snapshot(tmp_path)
+    snapshot["identity"] = identity
+    config = _config(tmp_path)
+    config = GuardianConfig(
+        root=config.root,
+        manifest=config.manifest,
+        seal=config.seal,
+        roster=config.roster,
+        launcher=config.launcher,
+        guardian_lock=config.guardian_lock,
+        receipt_root=config.receipt_root,
+        standing_policy=auth.STANDING_POLICY_PATH,
+        allow_test_overrides=True,
+    )
+    preflight_path: Path | None = None
+    child_path: Path | None = None
+
+    def preflight(_: GuardianConfig, authorization: Path, preflight: Path) -> dict[str, object]:
+        nonlocal preflight_path
+        preflight_path = preflight
+        writer = _zero_writer()
+        payload = {"status": "PASS", "identity": identity, "writer": writer}
+        value = {
+            "record_type": r3_ops.PREFLIGHT_RECEIPT_RECORD_TYPE,
+            "recorded_at_utc": now.isoformat(),
+            "command": ["r3_ops.py", "preflight"],
+            "cwd": str(auth.REPO_ROOT),
+            "exit_code": 0,
+            "stdout_sha256": "0" * 64,
+            "output": payload,
+            "identity": identity,
+            "writer": writer,
+            "no_launch_assertion": True,
+            "outcomes_accessed": False,
+            "final_holdout": "UNTOUCHED",
+            "r2b2": "NOT_ACCESSED",
+            "forceorder_v3_migration": "NOT_STARTED",
+        }
+        preflight.parent.mkdir(parents=True, exist_ok=True)
+        preflight.write_text(json.dumps(value), encoding="utf-8")
+        assert not authorization.exists()
+        return {"exit_code": 0, "output": "PASS"}
+
+    def launcher(_: GuardianConfig, authorization: Path, __: Path) -> dict[str, object]:
+        nonlocal child_path
+        child_path = authorization
+        return {"exit_code": 0, "command": ["canonical", "-AuthorizationReceipt", str(authorization)]}
+
+    result = run_once(config, now=now, snapshot_provider=lambda *_: snapshot, preflight_runner=preflight, launcher_runner=launcher)
+    assert result["receipt"]["decision"] == "RESUME_STARTED"
+    assert preflight_path is not None and preflight_path.is_file()
+    assert child_path is not None and child_path.is_file()
+    child = json.loads(child_path.read_text(encoding="utf-8"))
+    assert child["authorization_kind"] == auth.CHILD_AUTHORIZATION_KIND
+    assert child["parent_policy_sha256"] == auth.EXPECTED_POLICY_FILE_SHA256
+
+
+def test_persistent_unchanged_state_is_receipt_throttled(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    values = iter([_snapshot(tmp_path), _snapshot(tmp_path), _snapshot(tmp_path)])
+    calls = {"sleep": 0}
+
+    def stop_after_three(_: float) -> None:
+        calls["sleep"] += 1
+        if calls["sleep"] >= 3:
+            raise KeyboardInterrupt
+
+    assert run_persistent(
+        config,
+        snapshot_provider=lambda *_: next(values),
+        sleep_fn=stop_after_three,
+    ) == 0
+    receipts = list((tmp_path / "receipts").glob("R3_V8_GUARDIAN_ATTEMPT_*.json"))
+    assert len(receipts) == 1
+    state = json.loads((tmp_path / "receipts" / "R3_V8_GUARDIAN_STATE.json").read_text(encoding="utf-8"))
+    assert state["poll_count"] == 3
+    assert state["emission_count"] == 1
+
+
+def test_persistent_guardian_reenters_after_launcher_returns(tmp_path: Path) -> None:
+    identity = dict(auth.EXPECTED_IDENTITY)
+    identity.update({"manifest_sha256": identity["launch_manifest_sha256"], "seal_sha256": identity["launch_seal_sha256"], "scientific_scope_status": "clean", "outcomes_accessed": False})
+    eligible = _snapshot(tmp_path)
+    eligible["identity"] = identity
+    live = _snapshot(
+        tmp_path,
+        writer={"lock_pid": 101, "lock_alive": True, "authorized_writer_count": 1, "duplicate_writers": [], "process_tree": [{"pid": 101}]},
+        census=[{"pid": 101, "candidate": True, "in_authorized_collector_tree": True}],
+        lock_exists=True,
+    )
+    live["identity"] = identity
+    config = GuardianConfig(
+        root=tmp_path / "scientific_raw_v8", manifest=tmp_path / "manifest.json", seal=tmp_path / "seal.json", roster=tmp_path / "roster.json",
+        launcher=tmp_path / "launch_r3_v8_resume.ps1", guardian_lock=tmp_path / "guardian.lock", receipt_root=tmp_path / "receipts",
+        standing_policy=auth.STANDING_POLICY_PATH, allow_test_overrides=True,
+    )
+    values = iter([eligible, eligible, live])
+    launcher_calls: list[Path] = []
+
+    def preflight(_: GuardianConfig, authorization: Path, preflight: Path) -> dict[str, object]:
+        writer = _zero_writer()
+        payload = {"status": "PASS", "identity": identity, "writer": writer}
+        value = {
+            "record_type": r3_ops.PREFLIGHT_RECEIPT_RECORD_TYPE, "recorded_at_utc": datetime.now(UTC).isoformat(),
+            "command": ["r3_ops.py", "preflight"], "cwd": str(auth.REPO_ROOT), "exit_code": 0, "stdout_sha256": "0" * 64,
+            "output": payload, "identity": identity, "writer": writer, "no_launch_assertion": True,
+            "outcomes_accessed": False, "final_holdout": "UNTOUCHED", "r2b2": "NOT_ACCESSED", "forceorder_v3_migration": "NOT_STARTED",
+        }
+        preflight.parent.mkdir(parents=True, exist_ok=True)
+        preflight.write_text(json.dumps(value), encoding="utf-8")
+        assert not authorization.exists()
+        return {"exit_code": 0, "output": "PASS"}
+
+    def launcher(_: GuardianConfig, authorization: Path, __: Path) -> dict[str, object]:
+        launcher_calls.append(authorization)
+        return {"exit_code": 0, "output": "collector child exited cleanly"}
+
+    sleeps = {"count": 0}
+
+    def stop_after_second_poll(_: float) -> None:
+        sleeps["count"] += 1
+        if sleeps["count"] >= 2:
+            raise KeyboardInterrupt
+
+    assert run_persistent(
+        config,
+        snapshot_provider=lambda *_: next(values),
+        preflight_runner=preflight,
+        launcher_runner=launcher,
+        sleep_fn=stop_after_second_poll,
+    ) == 0
+    assert len(launcher_calls) == 1
+    receipts = list((tmp_path / "receipts").glob("R3_V8_GUARDIAN_ATTEMPT_*.json"))
+    decisions = [json.loads(path.read_text(encoding="utf-8"))["decision"] for path in receipts]
+    assert decisions == ["RESUME_STARTED", "NO_ACTION_LIVE"]

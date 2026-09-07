@@ -3,8 +3,6 @@ param(
     [switch]$Once,
     [switch]$Persistent,
     [int]$PollSeconds = 300,
-    [string]$Authorization,
-    [string]$PreflightReceipt,
     [switch]$ValidateOnly
 )
 
@@ -25,7 +23,8 @@ if ($ValidateOnly) {
         WorkingDirectory = $RepoRoot
         DefaultPollSeconds = 300
         PersistentSupported = $true
-        AuthorizationOptional = $true
+        StandingPolicy = Join-Path $RepoRoot 'campaigns\r3_prospective_context_v1\operations\R3_V8_STANDING_RECOVERY_AUTHORIZATION_20260907.json'
+        AuthorizationMode = 'guardian-minted single-use child only'
         OutcomeBlind = $true
         Valid = $true
     }
@@ -38,8 +37,6 @@ if ($Once -and $Persistent) { Write-Error 'choose exactly one of -Once or -Persi
 $guardianArgs = @('-m', 'ops.r3.r3_v8_guardian')
 if ($Once) { $guardianArgs += '--once' } else { $guardianArgs += '--persistent' }
 $guardianArgs += @('--poll-seconds', [string]$PollSeconds)
-if (-not [string]::IsNullOrWhiteSpace($Authorization)) { $guardianArgs += @('--authorization', $Authorization) }
-if (-not [string]::IsNullOrWhiteSpace($PreflightReceipt)) { $guardianArgs += @('--preflight-receipt', $PreflightReceipt) }
 
 Push-Location -LiteralPath $RepoRoot
 try {

@@ -155,6 +155,20 @@ RESUME_AUTHORIZATION_FIELDS = frozenset(
         "preflight_writer",
     }
 )
+# A guardian-minted lease carries the same canonical resume authorization
+# contract plus two provenance fields. Legacy operator-issued leases keep the
+# original closed schema, while child leases are explicitly distinguishable and
+# must bind to a verified standing-policy SHA.
+CHILD_RESUME_AUTHORIZATION_FIELDS = RESUME_AUTHORIZATION_FIELDS | frozenset(
+    {
+        "authorization_kind",
+        "parent_policy_sha256",
+    }
+)
+# Pinned SHA of the checked-in standing existing-v8-only policy. Keeping this
+# value in the canonical consumer means a forged child lease cannot bypass the
+# guardian merely by presenting any well-formed 64-hex parent value.
+EXPECTED_GUARDIAN_PARENT_POLICY_SHA256 = "6a23cf36e00b15ed5e5a46f1273052e946699a8e21a32b56588c4ae4f82e1e7c"
 PREFLIGHT_RECEIPT_FIELDS = frozenset(
     {
         "record_type",
@@ -881,9 +895,11 @@ def _validate_resume_authorization(
     now: datetime,
     consume: bool,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    if set(authorization) != RESUME_AUTHORIZATION_FIELDS:
+    authorization_fields = set(authorization)
+    is_guardian_child = authorization_fields == CHILD_RESUME_AUTHORIZATION_FIELDS
+    if authorization_fields not in (RESUME_AUTHORIZATION_FIELDS, CHILD_RESUME_AUTHORIZATION_FIELDS):
         raise OperationsAuditError(
-            f"resume authorization schema drift: {sorted(set(authorization) ^ RESUME_AUTHORIZATION_FIELDS)}"
+            f"resume authorization schema drift: {sorted(authorization_fields ^ RESUME_AUTHORIZATION_FIELDS)}"
         )
     _reject_forbidden(authorization, context="resume authorization")
     if authorization.get("record_type") != RESUME_AUTHORIZATION_RECORD_TYPE:
@@ -896,6 +912,17 @@ def _validate_resume_authorization(
         raise OperationsAuditError("resume authorization lacks authorized_by")
     if authorization.get("mode") != "EXISTING_SEALED_V8_ONLY":
         raise OperationsAuditError("resume authorization mode is not existing-v8 scientific resume")
+    if is_guardian_child:
+        if authorization.get("authorization_kind") != "GUARDIAN_CHILD":
+            raise OperationsAuditError("guardian child authorization kind is invalid")
+        if authorization.get("authorized_by") != "r3-v8-guardian":
+            raise OperationsAuditError("guardian child issuer is invalid")
+        try:
+            parent_policy_sha = require_sha256(str(authorization.get("parent_policy_sha256")), "parent_policy_sha256")
+        except (ValueError, TypeError) as exc:
+            raise OperationsAuditError("guardian child parent policy SHA is invalid") from exc
+        if parent_policy_sha != EXPECTED_GUARDIAN_PARENT_POLICY_SHA256:
+            raise OperationsAuditError("guardian child parent policy SHA is not the canonical standing policy")
     issued = _parse_time(authorization.get("issued_at_utc"))
     expires = _parse_time(authorization.get("expires_at_utc"))
     now = now.astimezone(UTC)
