@@ -1,7 +1,9 @@
 # WP2 — Sealed-v8 resume authorization implementation closeout
 
 Date: 2026-09-07 KST  
-Implementation commit: `ae69efa` (`ops: gate sealed v8 resume with single-use authorization`)
+Implementation commits: `ae69efa` plus hardening commit `1c3f0fd`
+(`ops: gate sealed v8 resume with single-use authorization` and
+`ops: harden resume lease identity and expiry checks`)
 
 ## Scope
 
@@ -13,7 +15,9 @@ code. The scientific source identity remains the v8 identity pinned by
 ## Implemented gate
 
 `ops/r3/r3_ops.py` now supports a strict structured preflight receipt and the
-`verify-resume-authorization` command. A resume lease is accepted only when:
+`verify-resume-authorization` command with the plan's explicit API
+`(authorization, root, manifest, seal, roster, preflight_receipt, now, consume)`.
+A resume lease is accepted only when:
 
 - the authorization JSON has the exact schema, UUID, existing-v8 scientific
   mode, bounded validity window, and exact v8 identity hashes;
@@ -39,12 +43,13 @@ collector call.
 
 ## Qualification evidence
 
-`pytest -q ops/r3/tests/test_operations_layer.py` — **12 passed**.
+`pytest -q ops/r3/tests/test_operations_layer.py` — **15 passed**.
 
 The tests cover atomic single-use consumption, missing/mismatched preflight,
-identity drift, active-writer rejection, immutable receipt creation, and an
-actual PowerShell subprocess proving missing-auth, verifier-failure, and
-success ordering with exactly one collector call.
+identity drift, active-writer rejection, immutable receipt creation, strict
+ten-minute and timestamp boundaries, canonical command/cwd binding, concurrent
+double-consume, and an actual PowerShell subprocess proving missing-auth,
+verifier-failure, and success ordering with exactly one collector call.
 
 No collector was resumed in WP2. The existing v8 dead-state and 87-cycle gap
 are unchanged.
