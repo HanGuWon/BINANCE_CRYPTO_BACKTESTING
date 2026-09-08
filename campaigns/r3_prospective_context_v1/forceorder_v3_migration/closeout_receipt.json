@@ -1,0 +1,139 @@
+{
+  "record_type": "R3_FORCEORDER_V3_DERIVED_LINEAGE_CLOSEOUT_RECEIPT",
+  "status": "R3_FORCEORDER_V3_DERIVED_LINEAGE_QUALIFIED_READY_FOR_TRANSITION_DECISION",
+  "branch": "codex/r3-forceorder-v3-migration-v1",
+  "head_commit": "1cacd54728126c149832dc3fa8a1f110abe077a4",
+  "remote_head": "1cacd54728126c149832dc3fa8a1f110abe077a4",
+  "audit_branch_remote_head": "672ee0bda2668314f4f29d7d91a6867e2cb77a96",
+  "implementation_commit": "5a3941b8098b166bf9f4d7fb1cd970bc0dbd966b",
+  "source_tree_sha256": "7d253432bd99704e6c4f1ee7ecd688f96ccf6a5c77c926e31d3f44048b95cc9d",
+  "scientific_source_status": "clean",
+  "migration_scientific_scope_clean": true,
+  "canonical_scientific_scope_clean": true,
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "live_registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "registry_unchanged": true,
+  "h03_h04_and_horizon_contract_unchanged": true,
+  "cutoff": {
+    "manifest_id": "20260908T004527Z",
+    "manifest_sha256": "ffd6ff3ffe550c8a121df659f58f133503c86fbaa1a7ca2e59c7d1307a02d35d",
+    "file_count": 1016,
+    "total_rows": 169552,
+    "cutoff_cycle_id": "cycle-20260908T004504497024Z",
+    "cutoff_completed_at": "2026-09-08T09:45:24.370083+09:00",
+    "receipt_sha256": "dee9a256fea34f858b8d34151a1b9d43f11537fc9aa31fe157a0a64cab06f185"
+  },
+  "clean_derived_root": {
+    "path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\derived_forceorder_v3_v1_clean",
+    "tree_sha256_excluding_manifest": "66cea9008cc39e9da178a1dd828ab0763f2ffc8b8746669b4fa58e553364022c",
+    "replay_manifest_sha256": "11f7e1d505373944750d53873c54da39d96f97d405918e1f205e85e58870e951",
+    "liquidation_row_count": 69720,
+    "v2_status_counts": {
+      "INVALID:MARKET_TYPE_NOT_UM": 446,
+      "INVALID:ps_ENUM_INVALID": 69274
+    },
+    "v3_status_counts": {
+      "VALID": 69720
+    },
+    "v3_market_counts": {
+      "cm": 446,
+      "um": 69274
+    },
+    "pressure_side_counts": {
+      "BUY": 33752,
+      "SELL": 35968
+    },
+    "duplicates": 0,
+    "collisions": 0,
+    "inventory_verification": "PASS"
+  },
+  "qualification": {
+    "run1_sha256": "588e265263137552d27700d811eb1ab2f130fc44c2055d2ade1b457c39cd89c9",
+    "run2_sha256": "588e265263137552d27700d811eb1ab2f130fc44c2055d2ade1b457c39cd89c9",
+    "byte_identical": true,
+    "fixture_count": 16,
+    "compared_fields": [
+      "identity_key",
+      "market_type",
+      "event_symbol",
+      "pair_symbol",
+      "subtype",
+      "event_time_ms",
+      "order_trade_time_ms",
+      "trade_id",
+      "forced_side",
+      "position_side",
+      "source_event_time_ms",
+      "source_available_time",
+      "executable_open",
+      "continuity_state",
+      "h03_status",
+      "h04_status",
+      "signed_observed_notional",
+      "raw_payload_sha256",
+      "canonical_payload_sha256",
+      "identity_tuple_sha256",
+      "causal_eligibility",
+      "v3_status",
+      "v3_invalid_reason",
+      "v2_status"
+    ],
+    "classification": {
+      "collision_envelope_count": 2,
+      "duplicate_envelope_count": 1,
+      "invalid_envelope_count": 8,
+      "unique_event_count": 5
+    },
+    "v2_status_counts": {
+      "INVALID:ENDPOINT_INVALID": 2,
+      "INVALID:MARKET_TYPE_NOT_UM": 1,
+      "INVALID:PAYLOAD_SCHEMA_INVALID": 10,
+      "INVALID:ps_ENUM_INVALID": 2,
+      "VALID": 1
+    },
+    "future_append_invariant": true,
+    "strict_boundary_equality_rejected": true,
+    "optimized_and_reference_identical": true
+  },
+  "full_pytest": {
+    "command": "python -m pytest -q",
+    "exit_code": 0,
+    "final_summary": "331 passed, 1 warning in 157.19s (0:02:37)",
+    "implementation_commit": "5a3941b8098b166bf9f4d7fb1cd970bc0dbd966b",
+    "source_tree_sha256": "7d253432bd99704e6c4f1ee7ecd688f96ccf6a5c77c926e31d3f44048b95cc9d",
+    "source_dirty": false,
+    "receipt_sha256": "8a15e3d26a75e60accd236c014e9d8b5d37531cf99716699e6c2e40a027bc82e"
+  },
+  "live_v8": {
+    "state": "YELLOW",
+    "reason": [
+      "reported_source_or_restart_gap"
+    ],
+    "cycle_count": 279,
+    "expected_cycle_count": 550,
+    "missing_cycle_count": 271,
+    "latest_cycle_id": "cycle-20260908T020004504318Z",
+    "latest_health_timestamp": "2026-09-08T11:00:35.439261+09:00",
+    "collector_pid": 183660,
+    "guardian_process_tree": 5,
+    "lock_alive": true,
+    "authorized_writer_count": 1,
+    "duplicate_writers": [],
+    "launch_seal_status": "SEALED",
+    "launch_seal_verification": true,
+    "manifest_chain_verification": true,
+    "raw_v8_mutated": false,
+    "outcomes_accessed": false
+  },
+  "policy": {
+    "final_holdout": "UNTOUCHED",
+    "outcomes_accessed": false,
+    "r2b2": "NOT_ACCESSED",
+    "live_transition": "NOT_EXECUTED",
+    "october_seal": "NOT_EXECUTED",
+    "historical_r3_outcome_run": "NOT_STARTED",
+    "final_holdout_accessed": false
+  },
+  "transition_decision": "OPTION_C_HYBRID preferred for later review; NOT_EXECUTED",
+  "recorded_at_utc": "2026-09-08T02:03:47.8405369Z"
+}
