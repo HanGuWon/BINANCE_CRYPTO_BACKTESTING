@@ -1,0 +1,12 @@
+{
+  "record_type": "R3_FORCEORDER_V3_REPLAY_SUPERSESSION_RECEIPT",
+  "status": "SUPERSEDED_PRELIMINARY",
+  "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\derived_forceorder_v3_v1",
+  "manifest_sha256": "2fc7ad070e50e674147ca3903ed8ee1183d9ab803fbfd29387ee017fe15922ea",
+  "derived_tree_sha256_excluding_manifest": "ef677a1f8758f21c5b738573349492d197fca43d37776114519b939f39abc18",
+  "implementation_commit": "4937ccf",
+  "reason": "Preserved first prefix replay before identity_tuple_sha256 was emitted and before the implementation was recorded with its full commit SHA. It is retained for provenance and is not a qualification root; no files were modified or deleted.",
+  "replacement_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\derived_forceorder_v3_v1_clean",
+  "outcomes_accessed": false,
+  "final_holdout": "UNTOUCHED"
+}

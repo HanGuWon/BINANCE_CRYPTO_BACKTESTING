@@ -152,7 +152,7 @@ def observed_forceorder_pressure(payload: dict[str, Any], *, endpoint: str | Non
         "position_side": order.get("ps"),
         "subtype": order.get("st") or payload.get("st"),
         "signed_observed_notional": signed,
-        "raw_payload_sha256": hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
+        "raw_payload_sha256": hashlib.sha256(json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
     }
 
 

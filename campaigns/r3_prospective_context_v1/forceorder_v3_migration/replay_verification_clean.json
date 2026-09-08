@@ -1,0 +1,30 @@
+{
+  "collision_envelope_count": 0,
+  "collision_keys": [],
+  "cutoff_receipt_sha256": "dee9a256fea34f858b8d34151a1b9d43f11537fc9aa31fe157a0a64cab06f185",
+  "derived_tree_sha256_excluding_manifest": "66cea9008cc39e9da178a1dd828ab0763f2ffc8b8746669b4fa58e553364022c",
+  "duplicate_envelope_count": 0,
+  "file_count": 1016,
+  "final_holdout": "UNTOUCHED",
+  "liquidation_row_count": 69720,
+  "outcomes_accessed": false,
+  "pressure_side_counts": {
+    "BUY": 33752,
+    "SELL": 35968
+  },
+  "raw_v8_mutated": false,
+  "status": "PASS",
+  "total_rows": 169552,
+  "unique_event_count": 69720,
+  "v2_status_counts": {
+    "INVALID:MARKET_TYPE_NOT_UM": 446,
+    "INVALID:ps_ENUM_INVALID": 69274
+  },
+  "v3_market_counts": {
+    "cm": 446,
+    "um": 69274
+  },
+  "v3_status_counts": {
+    "VALID": 69720
+  }
+}

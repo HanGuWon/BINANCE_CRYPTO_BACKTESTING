@@ -1,0 +1,6126 @@
+{
+  "cutoff_cycle": {
+    "cycle_completed_at": "2026-09-08T00:45:24.370083+00:00",
+    "cycle_id": "cycle-20260908T004504497024Z"
+  },
+  "file_count": 1016,
+  "files": [
+    {
+      "bytes": 3001,
+      "path": "cm/AAVEUSD_PERP/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "81f1b2900359f64032bf98fb79d082b3045f10fa09294a06119ecb5a5a984453"
+    },
+    {
+      "bytes": 14961,
+      "path": "cm/ADAUSD_PERP/liquidation.jsonl",
+      "rows": 15,
+      "sha256": "80546f10f76f6c37ec90d2abe78bfb3c56b484b7e4954b6a38101be3c512580e"
+    },
+    {
+      "bytes": 991,
+      "path": "cm/AVAXUSD_PERP/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "b5608f775751d66612bbbec925e8efc6e824e1dc356c26b33bb6773434e530c1"
+    },
+    {
+      "bytes": 1986,
+      "path": "cm/BCHUSD_PERP/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "ae68b239a8375a0e66d7c849c8b16791f1dae29f4a1541b98eecfa0a80478f13"
+    },
+    {
+      "bytes": 8992,
+      "path": "cm/BNBUSD_260925/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "d4e4f5551fb32dbd5b319f18f450b719d25afdb3895b7acb1dc78a11deea4d87"
+    },
+    {
+      "bytes": 1996,
+      "path": "cm/BNBUSD_261225/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "f41659b58fc82ec2e089fef7863f6d85dc5c2263b098f4d522adb8bbd5aeaeb7"
+    },
+    {
+      "bytes": 28906,
+      "path": "cm/BNBUSD_PERP/liquidation.jsonl",
+      "rows": 29,
+      "sha256": "891c62ab0364df7750730b05bd957202b4399425cfc1b8b97f31d56387b1b735"
+    },
+    {
+      "bytes": 7008,
+      "path": "cm/BTCUSD_260925/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "287ee993220f00ebc1f8fb90ca8a49e785f81e2fcafdc438357cc8f90a609572"
+    },
+    {
+      "bytes": 2003,
+      "path": "cm/BTCUSD_261225/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "4a0aa82bab4e0e7812d15c7c7b57cb6754bf358ad32464d7b6de5dfebe8e33a5"
+    },
+    {
+      "bytes": 112717,
+      "path": "cm/BTCUSD_PERP/liquidation.jsonl",
+      "rows": 113,
+      "sha256": "3af7ee33fca652ef8c3ae8d3c8489313284c4e7f5c691bbdd600f8e2796a9e66"
+    },
+    {
+      "bytes": 26094,
+      "path": "cm/DOGEUSD_PERP/liquidation.jsonl",
+      "rows": 26,
+      "sha256": "c991d42604337fe4982c44b5bd7ea3d27f8a7833dd0e1fdb8374562a5603e3f5"
+    },
+    {
+      "bytes": 7932,
+      "path": "cm/DOTUSD_PERP/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "b162b3ff93c7a39ee41898bf9155dd8873412f079b8b98e44ebccb3ffd436471"
+    },
+    {
+      "bytes": 6967,
+      "path": "cm/ETCUSD_PERP/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "9c11451001d21a1cb8d2ec8aafe23012f0e39a56207403821e75e33001be69eb"
+    },
+    {
+      "bytes": 3021,
+      "path": "cm/ETHUSD_260925/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "1f46cc24d901e41ef4f3d875c7407ddf5054abfa8a3d200db3b041fa5b4fbfc8"
+    },
+    {
+      "bytes": 2015,
+      "path": "cm/ETHUSD_261225/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "9c12933ec6439469be6c8d8b8f3e156c556d04b44a4f3f10ee1c422bf3fa3c7e"
+    },
+    {
+      "bytes": 70025,
+      "path": "cm/ETHUSD_PERP/liquidation.jsonl",
+      "rows": 70,
+      "sha256": "782697eff5c1aa24bd1c882bb1dae74f3a31c9f9530fad1d9b9b71ef272ceacb"
+    },
+    {
+      "bytes": 17876,
+      "path": "cm/FILUSD_PERP/liquidation.jsonl",
+      "rows": 18,
+      "sha256": "0ed1b5dcda67293e87b45334805abeff9361cba2853ff532f052068f0daab4ec"
+    },
+    {
+      "bytes": 2992,
+      "path": "cm/LINKUSD_PERP/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "9427294245475cb48912ea26bffe380760775c8771a40bc6f4d520b047c75133"
+    },
+    {
+      "bytes": 4962,
+      "path": "cm/LTCUSD_PERP/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "cf1eaa59ceffce8f239b2cd3f19e2a3e1794a2878f18e95efda3bec45cf32509"
+    },
+    {
+      "bytes": 8968,
+      "path": "cm/NEARUSD_PERP/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "f12b106ffb64b7338dd00a5b52a08d8418e72004cdabcb88ed9829f144498974"
+    },
+    {
+      "bytes": 3004,
+      "path": "cm/SOLUSD_260925/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "014ddaaae4c285b114797bbaca372f3fc1f659466b17d2c8ee4886784d6d458d"
+    },
+    {
+      "bytes": 31979,
+      "path": "cm/SOLUSD_PERP/liquidation.jsonl",
+      "rows": 32,
+      "sha256": "b34e9c5c62d5d79e8d323ee947089be0602c0031250be63860ac28daacc05fa7"
+    },
+    {
+      "bytes": 8991,
+      "path": "cm/SUIUSD_PERP/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "2831e1b9efa955625f433047034674bc44112676ffd5f4c75efbc444072e2443"
+    },
+    {
+      "bytes": 10932,
+      "path": "cm/UNIUSD_PERP/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "20345bc1b6ed17f8000cabaebd58175f4aad1227be678d6c96535c306fd9fe58"
+    },
+    {
+      "bytes": 3978,
+      "path": "cm/XLMUSD_PERP/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "952285a18e5fe65ad7efcb34e2d890f6034021199320b1f1d358d8fd40c456fc"
+    },
+    {
+      "bytes": 6002,
+      "path": "cm/XRPUSD_260925/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "4f3830445d75e7f5dd0d45284e81b6906a937345aa769c37c7e97bc8377405f2"
+    },
+    {
+      "bytes": 998,
+      "path": "cm/XRPUSD_261225/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "9df6791c284672bc9603d179e0ca084c13ea60d263eed26f1d5678918044d1cd"
+    },
+    {
+      "bytes": 45871,
+      "path": "cm/XRPUSD_PERP/liquidation.jsonl",
+      "rows": 46,
+      "sha256": "32cad98779ad39e9f2590a1813f3e614fef1f3d82cdeda5102dd4acf6005a234"
+    },
+    {
+      "bytes": 119532,
+      "path": "um/0GUSDT/liquidation.jsonl",
+      "rows": 120,
+      "sha256": "5fcdba9c20a944f87e7199222245eb22161f93657780839d7071674c22e25261"
+    },
+    {
+      "bytes": 7144,
+      "path": "um/1000000BOBUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "6f522a04996b00c0d646b5b682d358fa8e9ac1b25e8354db539bdb2c27a9dd60"
+    },
+    {
+      "bytes": 13320,
+      "path": "um/1000000MOGUSDT/liquidation.jsonl",
+      "rows": 13,
+      "sha256": "8343105c22dcbb70876799dddb5031cea361c6d931607c8559d272408218a662"
+    },
+    {
+      "bytes": 12245,
+      "path": "um/1000BONKUSDC/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "2eb1581c668814d1537af50f078db0992dfd28a2901f5e9493def7141901e7ce"
+    },
+    {
+      "bytes": 140775,
+      "path": "um/1000BONKUSDT/liquidation.jsonl",
+      "rows": 138,
+      "sha256": "bcb8484fa0e5b10b4ae3dc0f15a9f1870137d4f387460b6d5f45674cf4e6dbb4"
+    },
+    {
+      "bytes": 22341,
+      "path": "um/1000CATUSDT/liquidation.jsonl",
+      "rows": 22,
+      "sha256": "30cdedde7d6ae902b458accfd4161fa98cc2ccbc9cefc086d26b4f8a809e8147"
+    },
+    {
+      "bytes": 4101,
+      "path": "um/1000CHEEMSUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "fc0c4abc5a22c93baffa4f995e3869e07c761261d3301755cd295e31c4872920"
+    },
+    {
+      "bytes": 69361,
+      "path": "um/1000FLOKIUSDT/liquidation.jsonl",
+      "rows": 68,
+      "sha256": "8ea5bb99d8242f970e049c0fbcdef06afe769d3d4ae9524437b22cef1b1c42b3"
+    },
+    {
+      "bytes": 44722,
+      "path": "um/1000LUNCUSDT/liquidation.jsonl",
+      "rows": 44,
+      "sha256": "1b43c9e0a7245cf37acd771a082b2fee95dd8781e9ade919c09703931e707170"
+    },
+    {
+      "bytes": 42827,
+      "path": "um/1000PEPEUSDC/liquidation.jsonl",
+      "rows": 42,
+      "sha256": "067b0bfe642311eaa1fa5976dab28cfe949af94e020f1695e641ffaeda9e6850"
+    },
+    {
+      "bytes": 545593,
+      "path": "um/1000PEPEUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "13070a1a9259d6755390ea441fd3932a00157a6933d64b26631a9f43bb7901ef"
+    },
+    {
+      "bytes": 1428746,
+      "path": "um/1000PEPEUSDT/klines_15m.jsonl",
+      "rows": 593,
+      "sha256": "7122f701cc08a411465e6022f6305a06e0279ed8984a121eb436d9e66a165c62"
+    },
+    {
+      "bytes": 464236,
+      "path": "um/1000PEPEUSDT/liquidation.jsonl",
+      "rows": 455,
+      "sha256": "ff5c52a337b15f3c5c2cbf234d1f83e41214ab05fb3aa9905af09cfa69edaee7"
+    },
+    {
+      "bytes": 536208,
+      "path": "um/1000PEPEUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "43dfa3f68d8dbbb50a3cc1703e8ca3cb050fb9858aec5a80558f64835b144453"
+    },
+    {
+      "bytes": 574648,
+      "path": "um/1000PEPEUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "75e53f8845817d293951dc8ec2ae5a1432bcf91ed76889d354a29dd43f0ea042"
+    },
+    {
+      "bytes": 1720142,
+      "path": "um/1000PEPEUSDT/premium_klines_15m.jsonl",
+      "rows": 713,
+      "sha256": "4810ddb90874779090dc4f1e1cd71773bfd12866c8bc54e56171cf70e24b9d8e"
+    },
+    {
+      "bytes": 21323,
+      "path": "um/1000RATSUSDT/liquidation.jsonl",
+      "rows": 21,
+      "sha256": "22fd2025ef85f3ae5c31a0870a81456a4bb4ff0eeb42a082e8bdd545198d96ea"
+    },
+    {
+      "bytes": 26724,
+      "path": "um/1000SATSUSDT/liquidation.jsonl",
+      "rows": 26,
+      "sha256": "759f3c11b6fbcd7fb913ea0d4211e79758f24afd9da4f014fd77d211650752ed"
+    },
+    {
+      "bytes": 11206,
+      "path": "um/1000SHIBUSDC/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "97ddceeb2042ced4e5a64c2fad5a0b0d3e75f33cbf289aae5ec11be7f66f0a07"
+    },
+    {
+      "bytes": 153580,
+      "path": "um/1000SHIBUSDT/liquidation.jsonl",
+      "rows": 151,
+      "sha256": "e3fa841031e2cc4239445fab206a1da5dc13e43122d7c3c12ca1075bb4a03675"
+    },
+    {
+      "bytes": 14210,
+      "path": "um/1000XECUSDT/liquidation.jsonl",
+      "rows": 14,
+      "sha256": "e2f78fcc9f207fa165464e132924958b012df487d997235c22ee15ec86d15c37"
+    },
+    {
+      "bytes": 10061,
+      "path": "um/1INCHUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "cbf832138036d5b67986229cb3320bf23dab56ba37c61b36f751fb2b4a569460"
+    },
+    {
+      "bytes": 15426,
+      "path": "um/1MBABYDOGEUSDT/liquidation.jsonl",
+      "rows": 15,
+      "sha256": "37fde8d8680931f2310659bc4619e5a69322b8ad968dbf67f3ed5e8864d96115"
+    },
+    {
+      "bytes": 16936,
+      "path": "um/2ZUSDT/liquidation.jsonl",
+      "rows": 17,
+      "sha256": "95e0cd3490eb13f474ef299214d489161bec87d58d53d91c51e63ebac0147aa0"
+    },
+    {
+      "bytes": 636722,
+      "path": "um/4USDT/liquidation.jsonl",
+      "rows": 640,
+      "sha256": "41879dc0c729041bacdf256282b6e209335a8d52cb2c079d38aaa66dd25ea5a3"
+    },
+    {
+      "bytes": 20069,
+      "path": "um/AAOIUSDT/liquidation.jsonl",
+      "rows": 20,
+      "sha256": "1a0469c37f4cfa723bec7820d71b543066cd0332e223f362f4fd1e9b3957aeea"
+    },
+    {
+      "bytes": 15064,
+      "path": "um/AAPLUSDT/liquidation.jsonl",
+      "rows": 15,
+      "sha256": "cc0f1429e07b044d9951d37a93880bc862b14fe8ce78cca2a6d2f56f5a35d439"
+    },
+    {
+      "bytes": 9988,
+      "path": "um/AAVEUSDC/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "6522a670e7c081b304fd3e6cfb0a75762326ee9260602c3866644ed96805e6c2"
+    },
+    {
+      "bytes": 156729,
+      "path": "um/AAVEUSDT/liquidation.jsonl",
+      "rows": 157,
+      "sha256": "de8093d7ef2b5462ad57354b9f409dea1b9a7e42c187125ed2117ff5883074fc"
+    },
+    {
+      "bytes": 539791,
+      "path": "um/ACEUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "9e5f9f24e45d41c648915e8cf864f6e2e9e1c485392af205d584b6551d9704c9"
+    },
+    {
+      "bytes": 1391245,
+      "path": "um/ACEUSDT/klines_15m.jsonl",
+      "rows": 583,
+      "sha256": "00f1def26426b3dc3973e62df10a37c13448633e6fcb5b6bd52c3337cbac48ac"
+    },
+    {
+      "bytes": 195121,
+      "path": "um/ACEUSDT/liquidation.jsonl",
+      "rows": 194,
+      "sha256": "b28dfdc9b25e688e27e7130d29d464b32499ca6e1e4a259f8403a62042c088bc"
+    },
+    {
+      "bytes": 530856,
+      "path": "um/ACEUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "6a726bfe1e8dbb3c99c58641ad2cd3cc5c4a5f2e9003020cd1f4078cadc1d1c2"
+    },
+    {
+      "bytes": 569589,
+      "path": "um/ACEUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "297182e0e57ea80d7c4dbc7990f61c4cb2fc33cfb28eac660346ac882bbe95e4"
+    },
+    {
+      "bytes": 1700724,
+      "path": "um/ACEUSDT/premium_klines_15m.jsonl",
+      "rows": 710,
+      "sha256": "574e4dc02e18e4862fe0a6957b72294510541751b39477712199dffc228ba6cd"
+    },
+    {
+      "bytes": 15046,
+      "path": "um/ACHUSDT/liquidation.jsonl",
+      "rows": 15,
+      "sha256": "4ba4ce37b163ef89b83511c2a4826e9443101bc1d1c34c318e262265a91808cc"
+    },
+    {
+      "bytes": 6008,
+      "path": "um/ACTUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "f3912fa4486db80c186ea877fe7531cded33455b8eaec92c11359cea1897a897"
+    },
+    {
+      "bytes": 20947,
+      "path": "um/ACUUSDT/liquidation.jsonl",
+      "rows": 21,
+      "sha256": "c338b2024b3a2517655c3610f2d01f35cbfcc3e5661788e9b3bffc531038cede"
+    },
+    {
+      "bytes": 23089,
+      "path": "um/ADAUSDC/liquidation.jsonl",
+      "rows": 23,
+      "sha256": "20eb51a337cfb3a976b5067936e7293b08759696453a24b2854916c8a81f0add"
+    },
+    {
+      "bytes": 538981,
+      "path": "um/ADAUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "91588978f983114e8eee4a502ea2755b3d2efbe77fc9d1811c7445ec8a76fb9d"
+    },
+    {
+      "bytes": 1389748,
+      "path": "um/ADAUSDT/klines_15m.jsonl",
+      "rows": 586,
+      "sha256": "d6d099cafcf3b3e097e94ead286b13f14cccf07bbefd239b1f8386523fbafc47"
+    },
+    {
+      "bytes": 464120,
+      "path": "um/ADAUSDT/liquidation.jsonl",
+      "rows": 466,
+      "sha256": "1a9145ea2bbd0814227892609975bf1f91f8027f0110b16defccd320409c42b0"
+    },
+    {
+      "bytes": 530336,
+      "path": "um/ADAUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "0031d17b60d31fd11be0456b11380fe39ac578986eef02699105b1ff5a34ea7c"
+    },
+    {
+      "bytes": 569280,
+      "path": "um/ADAUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "f5ad5fb7564d65523bf6bd08cc6d50ee1e003577b2d99ca37a904367c5358680"
+    },
+    {
+      "bytes": 1690318,
+      "path": "um/ADAUSDT/premium_klines_15m.jsonl",
+      "rows": 706,
+      "sha256": "bf8d311b82faec6e71b7999f529dda70dc872d253a03681211e882e259952ca6"
+    },
+    {
+      "bytes": 2008,
+      "path": "um/ADBEUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "e399b73786e75d534d4eb46c5b3478ddfc633b9b8de2a9663a6a0b013e40b027"
+    },
+    {
+      "bytes": 33230,
+      "path": "um/AEROUSDT/liquidation.jsonl",
+      "rows": 33,
+      "sha256": "cc2bc6e5eba5f244ae4443c214073a0b90865bb666fb7dca340246c1b5036785"
+    },
+    {
+      "bytes": 16172,
+      "path": "um/AEVOUSDT/liquidation.jsonl",
+      "rows": 16,
+      "sha256": "ca5d1bfcf3f96e39498b6ee9e3c140f951acfa8096af0081bbe97db930747bbd"
+    },
+    {
+      "bytes": 1996,
+      "path": "um/AGLDUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "cfdd97fc7a7967ef34306a49656a65f3e8ac66c6c9f6fba4fd407299066e9d56"
+    },
+    {
+      "bytes": 10006,
+      "path": "um/AGTUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "c7c41752fcb7d7903ec2ac4a3c638a11e35080525a8845ddf6e89bc2fbc7f8e8"
+    },
+    {
+      "bytes": 15986,
+      "path": "um/AIAUSDT/liquidation.jsonl",
+      "rows": 16,
+      "sha256": "9b641e03a9721e503bca4d53ede05c8cd9ca2b29befe82cdba71d4e496487cb0"
+    },
+    {
+      "bytes": 6090,
+      "path": "um/AIGENSYNUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "884c6ec4e09fed111983585cba978e153fbd3ef7ae9441dea2b1988a0e73800a"
+    },
+    {
+      "bytes": 7981,
+      "path": "um/AINUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "d8020d9d29e5a162d3278b4625879e1667839c2d017efcc37e30f8ac14be92c5"
+    },
+    {
+      "bytes": 21059,
+      "path": "um/AIOTUSDT/liquidation.jsonl",
+      "rows": 21,
+      "sha256": "284d56d810d3b1e07b6abff1aaa3461c9538b399e4590071a0626535754f3e74"
+    },
+    {
+      "bytes": 51032,
+      "path": "um/AIOUSDT/liquidation.jsonl",
+      "rows": 51,
+      "sha256": "915a2654aca1d97ceac2810295d71b84e4ffeb531c440c86fdbe0c8a53887b90"
+    },
+    {
+      "bytes": 19139,
+      "path": "um/AIXBTUSDT/liquidation.jsonl",
+      "rows": 19,
+      "sha256": "dad4e242ee5ab4438e9cc225a4d29fe58cc22cb50ba2a4f3ac75eff79d8d66c3"
+    },
+    {
+      "bytes": 539254,
+      "path": "um/AKEUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "f9cae7dfc7e4e8c3750551e71735ab55152c6694312023b5be2bda2964a408d2"
+    },
+    {
+      "bytes": 1335901,
+      "path": "um/AKEUSDT/klines_15m.jsonl",
+      "rows": 559,
+      "sha256": "4a7f3cecb83511f26ab09b5b4b4f7d37165531356838cc54da9c17baf882eb3b"
+    },
+    {
+      "bytes": 1883619,
+      "path": "um/AKEUSDT/liquidation.jsonl",
+      "rows": 1879,
+      "sha256": "d2409877382f7ab3541f93ee1bf9afe6781607703a116934e2840bb52fcc2b3c"
+    },
+    {
+      "bytes": 530631,
+      "path": "um/AKEUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "2d340d832e22fc6ed0d0bffd76ff75cb0495901e19765ebdc61474ecfeae9227"
+    },
+    {
+      "bytes": 569312,
+      "path": "um/AKEUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "43edb16c84a4334a7841fa57134491e762734b0a1778dd19065540ef86089141"
+    },
+    {
+      "bytes": 1681612,
+      "path": "um/AKEUSDT/premium_klines_15m.jsonl",
+      "rows": 703,
+      "sha256": "7e2ee87a3245ff569709e5e7cba69ce4a9fda88d4ca3249bb6dbf378065f79ad"
+    },
+    {
+      "bytes": 8028,
+      "path": "um/AKTUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "e455e6144b7a4818d5686642ae17b23bd3ea6292a7cd66e6455175c15a7a8c92"
+    },
+    {
+      "bytes": 3013,
+      "path": "um/ALABUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "6f9fd46413d032348bbd978a73f579d7efaeb7ad4eed29dd482adbfe587c4337"
+    },
+    {
+      "bytes": 7018,
+      "path": "um/ALCHUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "7eabb5741e106e4baed49322b13f86190b2b8b05841992e454b07c9cc08fdd5b"
+    },
+    {
+      "bytes": 71504,
+      "path": "um/ALGOUSDT/liquidation.jsonl",
+      "rows": 71,
+      "sha256": "bcf12535dab499937550720fe47fa2e15955d0f617ab8718f0ac61840700fafd"
+    },
+    {
+      "bytes": 15167,
+      "path": "um/ALICEUSDT/liquidation.jsonl",
+      "rows": 15,
+      "sha256": "a229251723493751465883d463777f298e48d39e3b0bdc470eca9a09f296a6cd"
+    },
+    {
+      "bytes": 141492,
+      "path": "um/ALL/clock_calibration.jsonl",
+      "rows": 274,
+      "sha256": "6918573403b030039159bc6bcfb6eb67195ad8e5aafe020a624bd51ce1ce9f47"
+    },
+    {
+      "bytes": 23972,
+      "path": "um/ALL/collector_status.jsonl",
+      "rows": 51,
+      "sha256": "1bc81f3de607e48d738ea4f35572ad18314b62025e289118007ca98db969c1ad"
+    },
+    {
+      "bytes": 226598,
+      "path": "um/ALL/cycle_metadata.jsonl",
+      "rows": 274,
+      "sha256": "9fdee6a0f9e118159e9508fcb42dc587bce56e92404cbb957d8c798e131946f2"
+    },
+    {
+      "bytes": 36016,
+      "path": "um/ALLOUSDT/liquidation.jsonl",
+      "rows": 36,
+      "sha256": "b04fba125501455204aacd4af67fd999f93ebfae24274f7348fe540760f5612d"
+    },
+    {
+      "bytes": 11947,
+      "path": "um/ALLUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "3171fff4513485bbe767342d898a49f996cc09aaf682d498b32347e387d9fe9e"
+    },
+    {
+      "bytes": 6055,
+      "path": "um/ALPINEUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "4b347262664bd67ac9407d26d567e30b8d084fd548729e757e043c885c5a0ab1"
+    },
+    {
+      "bytes": 14054,
+      "path": "um/ALTUSDT/liquidation.jsonl",
+      "rows": 14,
+      "sha256": "961dc644692597913550ba1181db27b3251001749dbb8dd84c3d8af2117aa76e"
+    },
+    {
+      "bytes": 1004,
+      "path": "um/AMATUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "47bfd056ab3cf00442bd004b1fdf0aa18d79a27df9fef50d64f2677bfc4231af"
+    },
+    {
+      "bytes": 3005,
+      "path": "um/AMDUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "393a27651708199face87bfb60c31f4fd61228ff1552d9d02647225d786af363"
+    },
+    {
+      "bytes": 4022,
+      "path": "um/AMZNUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "61b0914fc0c017bd08b8ed9f8ea567d3150d0a6393bb603d24c9f20ca1da68b8"
+    },
+    {
+      "bytes": 12108,
+      "path": "um/ANIMEUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "102cc06d09c4c1caf5d710a51561ba3816e3641fdfb02e458893c9a940e95aff"
+    },
+    {
+      "bytes": 180872,
+      "path": "um/ANKRUSDT/liquidation.jsonl",
+      "rows": 180,
+      "sha256": "1cc468e6e541da2f52711b502a2c5dfda1719a3fd3b294c6c9c36428c21e2689"
+    },
+    {
+      "bytes": 9193,
+      "path": "um/ANTHROPICUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "a0c3f798b0c5e9b288d9a9864548d1c8d2f4fd51202cde2cc2cd296789c2209c"
+    },
+    {
+      "bytes": 26819,
+      "path": "um/APEUSDT/liquidation.jsonl",
+      "rows": 27,
+      "sha256": "f88e74aae0627bd05e58462b7ded6aee2775acba29be680ad80ad7f2bb992b98"
+    },
+    {
+      "bytes": 5014,
+      "path": "um/API3USDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "b2ea7be6acc1148db281caf34ce0b4c7a8fdc61d2057e1d6bb6cd4986421ef99"
+    },
+    {
+      "bytes": 215749,
+      "path": "um/APRUSDT/liquidation.jsonl",
+      "rows": 216,
+      "sha256": "239b07ad21484a1586bef709bb4cac408d9282e67b53c10385b3ccad61a061cc"
+    },
+    {
+      "bytes": 147009,
+      "path": "um/APTUSDT/liquidation.jsonl",
+      "rows": 147,
+      "sha256": "272d09e5d0bf33669a512eadbbc8ff8527a7e4d9fce74a4736c79a6603b115ba"
+    },
+    {
+      "bytes": 98378,
+      "path": "um/ARBUSDC/liquidation.jsonl",
+      "rows": 98,
+      "sha256": "215e4eeb27d338cf2a6479d8698091e56362f64590d31d22c27ee359fdc06bb5"
+    },
+    {
+      "bytes": 1059355,
+      "path": "um/ARBUSDT/liquidation.jsonl",
+      "rows": 1055,
+      "sha256": "9007191444c1e2126fa722eb96028cf77fae7399a62b9ca02bf8fac76011db68"
+    },
+    {
+      "bytes": 37016,
+      "path": "um/ARCUSDT/liquidation.jsonl",
+      "rows": 37,
+      "sha256": "32ca010768f7570b4cacb74f129fdbda8b230e07b64666480785954c126fe669"
+    },
+    {
+      "bytes": 14043,
+      "path": "um/ARIAUSDT/liquidation.jsonl",
+      "rows": 14,
+      "sha256": "613358bd599fd46117d4d6a0ac2aa3fe283113c7a6d87f6ffb0c845e42224a62"
+    },
+    {
+      "bytes": 18055,
+      "path": "um/ARKMUSDT/liquidation.jsonl",
+      "rows": 18,
+      "sha256": "f3e49c5646a01cdcbc87a5d81ffe869b3f239a9ea224b7c3450a5935041af6e6"
+    },
+    {
+      "bytes": 8000,
+      "path": "um/ARKUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "7d528a668ea9273df1ae82fef4c1c6fa0647f1e7829415fcf289eea18cf673c7"
+    },
+    {
+      "bytes": 1000,
+      "path": "um/ARMUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "54de29a3a2f2ab42852b21075300ca0f1427c88d910eb8f112fe7a24bbf2969f"
+    },
+    {
+      "bytes": 12043,
+      "path": "um/ARPAUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "109280b1f55517818f43c3ee9fbd04d97255ad89a009ffa2b4cecbd7b67575b7"
+    },
+    {
+      "bytes": 136692,
+      "path": "um/ARUSDT/liquidation.jsonl",
+      "rows": 138,
+      "sha256": "d57ce88617d12cff95288546301eabd1b837056f3eea6b985c0d7320abef1299"
+    },
+    {
+      "bytes": 57911,
+      "path": "um/ARXUSDT/liquidation.jsonl",
+      "rows": 58,
+      "sha256": "7a7eba6265d674b5a1fea835dd01aed7ecc1c56d5a648a6013c06fbdadf8a7e2"
+    },
+    {
+      "bytes": 2013,
+      "path": "um/ASMLUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "9cf441eab545956533e3c7ee6d563884dd5894b697053262aaf5fe946e28cd09"
+    },
+    {
+      "bytes": 1002,
+      "path": "um/ASRUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "c8e627c1f93121e9bac8358755175f878bb96664c54c2be6095004462cc2e4c9"
+    },
+    {
+      "bytes": 121553,
+      "path": "um/ASTERUSDT/liquidation.jsonl",
+      "rows": 121,
+      "sha256": "61d969e4c91f4f2f5f17ec562aa551d588f3d4cf8a4cc7fe27cc9be5fa2e8ff3"
+    },
+    {
+      "bytes": 22104,
+      "path": "um/ASTRUSDT/liquidation.jsonl",
+      "rows": 22,
+      "sha256": "46cf9f742747eac6adbea7433788b29bc05e3d0d9ba625e29f36c68121120541"
+    },
+    {
+      "bytes": 11033,
+      "path": "um/ASTSUSDT/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "74833cdd61c55b0c527e09773b8bce95b875272b9f049655fc1c8bab9594f8bc"
+    },
+    {
+      "bytes": 8021,
+      "path": "um/ATHUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "701ae0087f7e4e70376bdac48af6d2023cee2445ac33b7af752a3004f34b4134"
+    },
+    {
+      "bytes": 64091,
+      "path": "um/ATOMUSDT/liquidation.jsonl",
+      "rows": 64,
+      "sha256": "768e9ff2b5d3816a3b2bcf15fec529f076be10dd32a0e276035005f0579cd5ff"
+    },
+    {
+      "bytes": 15907,
+      "path": "um/ATUSDT/liquidation.jsonl",
+      "rows": 16,
+      "sha256": "90aaf91359951e55937ca206fb14ae3fc0208f032ef6ae0a5f9d9b5fe4bf9254"
+    },
+    {
+      "bytes": 21296,
+      "path": "um/AUCTIONUSDT/liquidation.jsonl",
+      "rows": 21,
+      "sha256": "920f1040468cb70655bc80d1c796659240ee64fbce2fe96856df8b89bc60e382"
+    },
+    {
+      "bytes": 9936,
+      "path": "um/AUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "3dc334773c6dc989f08d6e4df5375d0b15e30e7a98d7a604ae00e5ca9f178fe3"
+    },
+    {
+      "bytes": 34274,
+      "path": "um/AVAAIUSDT/liquidation.jsonl",
+      "rows": 34,
+      "sha256": "a4a28f42779e3bed9eb74d1b70b25bb654febe3de2ec6082cf3cc0e49bf09a0e"
+    },
+    {
+      "bytes": 25087,
+      "path": "um/AVAUSDT/liquidation.jsonl",
+      "rows": 25,
+      "sha256": "1c9e7256da3535521ee5bad6783d88bccfb86a8a016ea953f1248cbf33d269f6"
+    },
+    {
+      "bytes": 8044,
+      "path": "um/AVAXUSDC/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "437bfcf20e76ac342e877a23c274f173661d4879e032201d278d349140210f30"
+    },
+    {
+      "bytes": 131055,
+      "path": "um/AVAXUSDT/liquidation.jsonl",
+      "rows": 132,
+      "sha256": "8a3968c1a49cacbdc47dab29bb48b05182983b40fdb0f429a1ff180e2bcca503"
+    },
+    {
+      "bytes": 17087,
+      "path": "um/AVGOUSDT/liquidation.jsonl",
+      "rows": 17,
+      "sha256": "f876da9d23ec689e35052cf9289708af0ef73cd438aefb2243f68c6d8f658493"
+    },
+    {
+      "bytes": 16055,
+      "path": "um/AVNTUSDT/liquidation.jsonl",
+      "rows": 16,
+      "sha256": "71e747883dc6f156d5b888e9d540542b3ca02a432abe3890df196ac37f711768"
+    },
+    {
+      "bytes": 8993,
+      "path": "um/AWEUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "0b6ac823721874c4567cf58cb4259c11c0496533a2f0ca5c03ed636f496f64b6"
+    },
+    {
+      "bytes": 6036,
+      "path": "um/AXLUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "fd95025dc91bde0236fb836bc36eacfdab7d815b1dd42b64d3b7ff9022b9cbe6"
+    },
+    {
+      "bytes": 30813,
+      "path": "um/AXSUSDT/liquidation.jsonl",
+      "rows": 31,
+      "sha256": "143586f3401d49bd8343eaaffaaea06e10e0429015520dfabc04d3a058a76afc"
+    },
+    {
+      "bytes": 40183,
+      "path": "um/AXTIUSDT/liquidation.jsonl",
+      "rows": 40,
+      "sha256": "8b733c69b2aab7908904eacd21fd0e16c4ee19149fae8a08ac6557836f72895e"
+    },
+    {
+      "bytes": 156210,
+      "path": "um/AZTECUSDT/liquidation.jsonl",
+      "rows": 155,
+      "sha256": "300ff72a314c469efd98dd8e438ae778db2533092114e3d4f228c041c38eb34d"
+    },
+    {
+      "bytes": 14895,
+      "path": "um/B2USDT/liquidation.jsonl",
+      "rows": 15,
+      "sha256": "7a689e61f6eaee17beee7e485a1b887bf2fe78b4fd65b7b23208c65754ec4b20"
+    },
+    {
+      "bytes": 10050,
+      "path": "um/BABAUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "0b78b0666e624ef27c4157c50db6373e1e88f5551afd7ed92d96c5ab617c3921"
+    },
+    {
+      "bytes": 24127,
+      "path": "um/BABYUSDT/liquidation.jsonl",
+      "rows": 24,
+      "sha256": "36e0a035efcef9ca01a5e239d1ff7107a5138e5e2fac3f4886c89ff9e53a0dd3"
+    },
+    {
+      "bytes": 9182,
+      "path": "um/BANANAS31USDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "95b9f5cc4f68b04bd7551cb5160f3e4e50cbfe20e0a498d7fa6bb448850a02e2"
+    },
+    {
+      "bytes": 5046,
+      "path": "um/BANANAUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "c0f8d84b1e26db9b8cac2aa1794c9d0fa9b34d8eff97c30210d1704de8a57224"
+    },
+    {
+      "bytes": 12013,
+      "path": "um/BANDUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "2615a10123ea94899b9ec5a17004adc5f38b99d1f44216de71acc5532791f109"
+    },
+    {
+      "bytes": 127580,
+      "path": "um/BANKUSDT/liquidation.jsonl",
+      "rows": 127,
+      "sha256": "c80c31a7acf777b08f156234ab2217c78e50b71ecec5feacf1042be0c9c1ca95"
+    },
+    {
+      "bytes": 11007,
+      "path": "um/BANUSDT/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "d281b861bf8a67d077c65376e6a117f6f09fae40c2a8a53310baeac6c2a7353f"
+    },
+    {
+      "bytes": 20059,
+      "path": "um/BARDUSDT/liquidation.jsonl",
+      "rows": 20,
+      "sha256": "2643a208ed1f042fa748a9f1f887c3c0790ffce70badcc7c18a19a92175ac7d9"
+    },
+    {
+      "bytes": 28181,
+      "path": "um/BASEDUSDT/liquidation.jsonl",
+      "rows": 28,
+      "sha256": "907dda59d1b042d89013e20872e7aa6427cb5b8155366be1ec78343beb9efc62"
+    },
+    {
+      "bytes": 14005,
+      "path": "um/BASUSDT/liquidation.jsonl",
+      "rows": 14,
+      "sha256": "cfeff9b4936770beec2c59bdc40c3d6c7b0937bf7d3bd7b8919be58d3bbb62d0"
+    },
+    {
+      "bytes": 17056,
+      "path": "um/BATUSDT/liquidation.jsonl",
+      "rows": 17,
+      "sha256": "fdf23b916ab05cb79ffb157cf5cf8e66d9d2598154a7394b9effe08ea88d838a"
+    },
+    {
+      "bytes": 25970,
+      "path": "um/BBUSDT/liquidation.jsonl",
+      "rows": 26,
+      "sha256": "fd06fd0df9a640ff9e779809c801d2cd7572b6becbef9a056a4a0964bedfaea8"
+    },
+    {
+      "bytes": 1995,
+      "path": "um/BBXUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "f0f31db86f7c65f5f35680b2ea8157c90688e0dad0a48713d431557201fcf7cc"
+    },
+    {
+      "bytes": 6991,
+      "path": "um/BCHUSDC/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "a71411ea24ffef794106f3b14ae1ac92729cd053db97d66eed8ba8eff13350bc"
+    },
+    {
+      "bytes": 172767,
+      "path": "um/BCHUSDT/liquidation.jsonl",
+      "rows": 173,
+      "sha256": "00ae4f40df77e0878d56540fcf17d55e0bc4129921a799513bb9d1e48a02cca9"
+    },
+    {
+      "bytes": 28296,
+      "path": "um/BEAMXUSDT/liquidation.jsonl",
+      "rows": 28,
+      "sha256": "72cd0e3a24b3bca51c23fb375ac61e16c59324db884139f21d76f5863cc8ea95"
+    },
+    {
+      "bytes": 540631,
+      "path": "um/BEATUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "618f6322edf17b67e78025bb82cb79af88b8e8e59cd7afd8952785d86658df41"
+    },
+    {
+      "bytes": 1374329,
+      "path": "um/BEATUSDT/klines_15m.jsonl",
+      "rows": 576,
+      "sha256": "d66def03c80e1bbccf49d01061463752f3d6d51786f0e4bb6af7e779c9d8f8dd"
+    },
+    {
+      "bytes": 156308,
+      "path": "um/BEATUSDT/liquidation.jsonl",
+      "rows": 156,
+      "sha256": "5ff737b86c7c6d4ffe93775fe9954bfe2cfcfa78e11266ee6752c56005e47c83"
+    },
+    {
+      "bytes": 531165,
+      "path": "um/BEATUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "52922a816e18d7148df2440fa07381919f41fd9d816d59f1408c046cfa58b254"
+    },
+    {
+      "bytes": 570382,
+      "path": "um/BEATUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "d8d82101a1b5ff2fad355d06259b1bfd1706f306eecb76f2efdc752bc8ef2b3a"
+    },
+    {
+      "bytes": 1678774,
+      "path": "um/BEATUSDT/premium_klines_15m.jsonl",
+      "rows": 701,
+      "sha256": "1ef1d1e350db1d72c034c9e14b14574698344748a2ab76f1297ea4445e4daf80"
+    },
+    {
+      "bytes": 3966,
+      "path": "um/BELUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "119f1acd7bb06ab1e00a97127f3e4f3a8bd34e15bbd6be4518a8e28579561278"
+    },
+    {
+      "bytes": 23146,
+      "path": "um/BERAUSDT/liquidation.jsonl",
+      "rows": 23,
+      "sha256": "6896d32171c1a10625d5b674faaab514bd146ea7522f994f1ab95863e9666368"
+    },
+    {
+      "bytes": 3994,
+      "path": "um/BEUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "448d7da08c340a31562021475144a2e9276eacf1e0011c75489c41c0408f8d6e"
+    },
+    {
+      "bytes": 87406,
+      "path": "um/BICOUSDT/liquidation.jsonl",
+      "rows": 87,
+      "sha256": "d1a87227cee89078adf30472c0a7b63cf22e0afca9da19832a381d5f92a21b89"
+    },
+    {
+      "bytes": 22334,
+      "path": "um/BIGTIMEUSDT/liquidation.jsonl",
+      "rows": 22,
+      "sha256": "a9e94809819c2e5f36d848e713723b8e7bdd755cc9954d8093b3f84eed13d060"
+    },
+    {
+      "bytes": 48227,
+      "path": "um/BILLUSDT/liquidation.jsonl",
+      "rows": 48,
+      "sha256": "1ed37b22ecea4385faf60e1ba8ff4e1390cc0bf040aeb58809416d4767ca92ba"
+    },
+    {
+      "bytes": 5006,
+      "path": "um/BIOUSDC/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "cc202b127a97e39500f8d2017964c5553fc19ec0dcfd493a754bf921af1b5175"
+    },
+    {
+      "bytes": 41044,
+      "path": "um/BIOUSDT/liquidation.jsonl",
+      "rows": 41,
+      "sha256": "f09db38acabf9e32f97260b824d9f0534a502d5246a336ad176f5506afbcfe7d"
+    },
+    {
+      "bytes": 13038,
+      "path": "um/BIRBUSDT/liquidation.jsonl",
+      "rows": 13,
+      "sha256": "07d6b5c55d216fcb072e7dbecbd2e3d67bcd8d1ec71440215a51284f0dc8c41a"
+    },
+    {
+      "bytes": 2003,
+      "path": "um/BITOUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "5d84ff20b911b4f899fd13288dc02f471edec5c00ce5557cd254410a41da3a41"
+    },
+    {
+      "bytes": 541487,
+      "path": "um/BLESSUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "507404e0f5e28f457723fe5600587643807e7486782a11333f0719b0773ab559"
+    },
+    {
+      "bytes": 1343635,
+      "path": "um/BLESSUSDT/klines_15m.jsonl",
+      "rows": 562,
+      "sha256": "45921aa61632f16ee14b89ef9655cb15876bfac4ed3295795ccf0e649df74380"
+    },
+    {
+      "bytes": 172531,
+      "path": "um/BLESSUSDT/liquidation.jsonl",
+      "rows": 171,
+      "sha256": "64dc8f64208c812044bbb84faeb0fbc1832a7dc12e637cfee16a3eb1ca347e39"
+    },
+    {
+      "bytes": 532547,
+      "path": "um/BLESSUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "2b8a473600497ab6a81b69261bbb8d094a78482051d608f6b494c9ee6d644a34"
+    },
+    {
+      "bytes": 571449,
+      "path": "um/BLESSUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "e8f2fc2944f9e77774c45756ef773d3dff83e6e93ff7dee0f0d044425e186f54"
+    },
+    {
+      "bytes": 1662338,
+      "path": "um/BLESSUSDT/premium_klines_15m.jsonl",
+      "rows": 693,
+      "sha256": "f05ea1cfee21b2757f88173689c2e867da882bb29b9913cbde07b89313c7d078"
+    },
+    {
+      "bytes": 22188,
+      "path": "um/BLUAIUSDT/liquidation.jsonl",
+      "rows": 22,
+      "sha256": "a87dbb447de2c9dc1b3b3eddad5c7eea49dd1e50beacebcfce3826adf1605448"
+    },
+    {
+      "bytes": 14067,
+      "path": "um/BLURUSDT/liquidation.jsonl",
+      "rows": 14,
+      "sha256": "8e5462eed2f65c8d6f7fc1cd0b7e409d7d01c6f71e4e88486cce70a467b83440"
+    },
+    {
+      "bytes": 8016,
+      "path": "um/BMNRUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "9d708eb4df6bd56f208d7b3ac912f743ff7f0e1128ffe8a7ba202d67b5928f83"
+    },
+    {
+      "bytes": 80133,
+      "path": "um/BMTUSDT/liquidation.jsonl",
+      "rows": 80,
+      "sha256": "9c354faa55302405d52f22835691c28f7ab8c0451b97e0751cb3ecb4626555a4"
+    },
+    {
+      "bytes": 49850,
+      "path": "um/BNBUSDC/liquidation.jsonl",
+      "rows": 50,
+      "sha256": "127962ea11c8e51203e3a79eb677466a7d86431ec107b63c2af2afaa691f9c2a"
+    },
+    {
+      "bytes": 538422,
+      "path": "um/BNBUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "8d09f19751a938fb5cc3a97b1fab7118eb0f5968c84cd239ed817de537f3e320"
+    },
+    {
+      "bytes": 1307384,
+      "path": "um/BNBUSDT/klines_15m.jsonl",
+      "rows": 551,
+      "sha256": "51b7540ebef4c47c943034809d35c264643bf24cae2e44aa7c142c1ac481206d"
+    },
+    {
+      "bytes": 570224,
+      "path": "um/BNBUSDT/liquidation.jsonl",
+      "rows": 572,
+      "sha256": "d46078232dc886971566024f236daaa15054f30fd74b94d92269a5891090965f"
+    },
+    {
+      "bytes": 530358,
+      "path": "um/BNBUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "138b9fe53e54f35c5ec9b83bf404016c3390bde22b2dac6bc7ff721be8b03050"
+    },
+    {
+      "bytes": 570814,
+      "path": "um/BNBUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "0cf81957272008dee66413172c66515f357d88892ea637cdd81c242e4c2f0bf9"
+    },
+    {
+      "bytes": 1649458,
+      "path": "um/BNBUSDT/premium_klines_15m.jsonl",
+      "rows": 690,
+      "sha256": "cafe0a2714faec1bd78fed4dda36788678a413a037dde5e450cb414d83bcff8c"
+    },
+    {
+      "bytes": 22981,
+      "path": "um/BNCUSDT/liquidation.jsonl",
+      "rows": 23,
+      "sha256": "0247bc2d16e884cea23f3878034c00ed4b05944b740cf5c095415f3c9e11d2d8"
+    },
+    {
+      "bytes": 6982,
+      "path": "um/BNTUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "9b68e7076845bbb8748244dfeb2ee9bbd9cba49656ea3857d7b7292d5f02282a"
+    },
+    {
+      "bytes": 28292,
+      "path": "um/BOMEUSDC/liquidation.jsonl",
+      "rows": 28,
+      "sha256": "41add303a22ffafc98479b1400d56bf67ef68532022e4a10f6f734c5f02069a1"
+    },
+    {
+      "bytes": 140268,
+      "path": "um/BOMEUSDT/liquidation.jsonl",
+      "rows": 139,
+      "sha256": "872db93cb20f0fe3570477b089557a6327fb168efbb136653cb7261be7e43fea"
+    },
+    {
+      "bytes": 10085,
+      "path": "um/BRETTUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "bed9ca535039614b70a9def01ff62efb5b290fcad31c538bc70bd39a37c63041"
+    },
+    {
+      "bytes": 8009,
+      "path": "um/BREVUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "ecd06ce13d625b8518e1aac19c7197c3337dee5d73b156fc33f6a1c1e3be9172"
+    },
+    {
+      "bytes": 50232,
+      "path": "um/BROCCOLI714USDT/liquidation.jsonl",
+      "rows": 49,
+      "sha256": "17111f9c5e5d7a3bdf3aa7d9b2020fcd23ba7f8bd6fef58c0b5adcc2c4629189"
+    },
+    {
+      "bytes": 17445,
+      "path": "um/BROCCOLIF3BUSDT/liquidation.jsonl",
+      "rows": 17,
+      "sha256": "512811d7085039e2b37fba4374b0af0e0bcb3f1fa53b43bbef70d88623008d87"
+    },
+    {
+      "bytes": 366066,
+      "path": "um/BRUSDT/liquidation.jsonl",
+      "rows": 368,
+      "sha256": "8ba1591b3abeff906c1d5c76d6a2c64493974d66b237e0f54cd1370a1dbfb1a6"
+    },
+    {
+      "bytes": 22979,
+      "path": "um/BSBUSDT/liquidation.jsonl",
+      "rows": 23,
+      "sha256": "91571bbab32c6fc078dc98fc6e0f10c78100a4e5dcdb29e69ce71548c6dac9f3"
+    },
+    {
+      "bytes": 999,
+      "path": "um/BSPUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "c4bf5c4426b27c98a879ad812a73e0d4455d8c2baa0d3ff480458f8ae6c177e9"
+    },
+    {
+      "bytes": 5987,
+      "path": "um/BSVUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "e2ff24ddc4345941062e324198aaf0945cb02d5dec2610f42aa01a5edee95554"
+    },
+    {
+      "bytes": 3021,
+      "path": "um/BTCDOMUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "ba12f905af65da6298af7709569d6720a9982950c03b54466e521fb7b983fe4d"
+    },
+    {
+      "bytes": 9954,
+      "path": "um/BTCU/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "db1c9cfcd5548b921dcac53f2c13165daba9b94dba31ce9ae3d271a5d665fd69"
+    },
+    {
+      "bytes": 13057,
+      "path": "um/BTCUSD1/liquidation.jsonl",
+      "rows": 13,
+      "sha256": "79b4193fdd615e5b30a3f7caee33524e81c943d08ccce2b0ee84f2b24f46009f"
+    },
+    {
+      "bytes": 303954,
+      "path": "um/BTCUSDC/liquidation.jsonl",
+      "rows": 304,
+      "sha256": "77b9e2d1cb4031cc2da187ff62f8571d6dba9aa183a20f411e7da6d066f05759"
+    },
+    {
+      "bytes": 539312,
+      "path": "um/BTCUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "2a881df8f43f274f8e800ff265683a04c34107f1f4eaf8c5d0fad48a75b1a60f"
+    },
+    {
+      "bytes": 1309706,
+      "path": "um/BTCUSDT/klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "5588267c09243544b496c21d266d013e6548bb492821a67e355c4ef6b4efc1d3"
+    },
+    {
+      "bytes": 2073187,
+      "path": "um/BTCUSDT/liquidation.jsonl",
+      "rows": 2069,
+      "sha256": "2303887b321717ebc6d8a5e5514f30f327c48b1ad0132e777d0aa3e6c90bf45b"
+    },
+    {
+      "bytes": 530619,
+      "path": "um/BTCUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "183d4a7a0812dfefcf4bd142f2cc2934651aba68a57e132802248c401306806c"
+    },
+    {
+      "bytes": 572454,
+      "path": "um/BTCUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "0cd2a7c3e6934ce81c5748c13df2b9bc92a72fd0f5ce7dcd4fec1f51a5707c09"
+    },
+    {
+      "bytes": 1638403,
+      "path": "um/BTCUSDT/premium_klines_15m.jsonl",
+      "rows": 684,
+      "sha256": "e68cb508db374428bbe819848c61e7f45645c3b562f2119ee008ca5433828831"
+    },
+    {
+      "bytes": 26352,
+      "path": "um/BTCUSDT_260925/liquidation.jsonl",
+      "rows": 26,
+      "sha256": "4f45ddd3d15bd97f2cb4309b3a1f6929f645b89cd146dacecb4d0c115b593acf"
+    },
+    {
+      "bytes": 17233,
+      "path": "um/BTCUSDT_261225/liquidation.jsonl",
+      "rows": 17,
+      "sha256": "e35fee8af50c35b48ee68ca7018e11f77b9255da8207fd414d9a882551c08e7d"
+    },
+    {
+      "bytes": 539022,
+      "path": "um/BTRUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "3e041e0d329936f6db4db0657c3768f32a21542406685300d0d5dc75fc866129"
+    },
+    {
+      "bytes": 1311846,
+      "path": "um/BTRUSDT/klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "89216b9acf5f230a0a627fe265d1b31a3c8490611212d6cb90e23843ddd19c27"
+    },
+    {
+      "bytes": 557214,
+      "path": "um/BTRUSDT/liquidation.jsonl",
+      "rows": 557,
+      "sha256": "d3e79583d40093840906313ea3fc71d7fa1a10e8b156b67a073ca54e0c6d9ed8"
+    },
+    {
+      "bytes": 530349,
+      "path": "um/BTRUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "a84a007ed33cf7214688543f3fa03874958b782dbe957d2fdf77ef5fe7bf4881"
+    },
+    {
+      "bytes": 569420,
+      "path": "um/BTRUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "e5b7c5fa1a9a2d9bd38c66843f152654132ae0fb4aacf3bedf4bc8f7dd0cfdf2"
+    },
+    {
+      "bytes": 1629442,
+      "path": "um/BTRUSDT/premium_klines_15m.jsonl",
+      "rows": 681,
+      "sha256": "a7a8fd21d0fba9834f53aacd01b4892b901ac4c95fb44fd3cc61597d4f5a1a64"
+    },
+    {
+      "bytes": 538313,
+      "path": "um/BTWUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "7e7b9bb493cf339c7153455f639a0719ecdc3528334921982ede9f19491fa98a"
+    },
+    {
+      "bytes": 1310432,
+      "path": "um/BTWUSDT/klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "143a9cc69f472c126ac1449f6dad8b6072d75d3afa3af805435536a18047561f"
+    },
+    {
+      "bytes": 357274,
+      "path": "um/BTWUSDT/liquidation.jsonl",
+      "rows": 358,
+      "sha256": "33a3b5e4c0e7b2c542a7dd559c862e33b9de8395a1772a018df016411e2eed68"
+    },
+    {
+      "bytes": 530345,
+      "path": "um/BTWUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "056b85840706dc2cb9d16ec45b89638424f64b55ec1259082a634821d9490a4e"
+    },
+    {
+      "bytes": 569276,
+      "path": "um/BTWUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "6fab9cac1064d6ae255a8dcb694d1b4a64009d509712042cf8e73c37988fa5f8"
+    },
+    {
+      "bytes": 1621009,
+      "path": "um/BTWUSDT/premium_klines_15m.jsonl",
+      "rows": 678,
+      "sha256": "f0d6c59d8038e513b9c260995c57e75640291cbbeb417bc8963b910dac2fedfd"
+    },
+    {
+      "bytes": 1098944,
+      "path": "um/BULLAUSDT/liquidation.jsonl",
+      "rows": 1092,
+      "sha256": "fb9c29b0121d72123ea87da07764bf962c10a28e1c693650c1dbc2aac15527f5"
+    },
+    {
+      "bytes": 180551,
+      "path": "um/BUSDT/liquidation.jsonl",
+      "rows": 182,
+      "sha256": "2c3c05135fe4409a51ec5179c7f95e327b746181ddfca6d16a1bb947c2a61d73"
+    },
+    {
+      "bytes": 19015,
+      "path": "um/BYDUSDT/liquidation.jsonl",
+      "rows": 19,
+      "sha256": "025bdfb1278ba28d4d083e68671986db2107a1b9b9f3b1dcc96ea79360b5b994"
+    },
+    {
+      "bytes": 538607,
+      "path": "um/BZUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "8977f62768d346b5288eb7e84f88f6b8b627de48eeb64a82776892922afc10ad"
+    },
+    {
+      "bytes": 1307921,
+      "path": "um/BZUSDT/klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "b4bef569f0bd4b04967f0b9804a9e6d30ccd62c7c0447e39a39d207b27c5b270"
+    },
+    {
+      "bytes": 153601,
+      "path": "um/BZUSDT/liquidation.jsonl",
+      "rows": 154,
+      "sha256": "771adbc4a3e4979d47104a098cd8aefb4f5e77262e325445035ae4e1b6750acd"
+    },
+    {
+      "bytes": 529504,
+      "path": "um/BZUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "601561ab987d9871321a6fbc97e1ac2a8dc8c54580175a42b249ef54b2bd8be1"
+    },
+    {
+      "bytes": 570447,
+      "path": "um/BZUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "2575281a4f5e63b99f8151a8a9d3379593b889bbb707b6d05e34de60331d3975"
+    },
+    {
+      "bytes": 1573151,
+      "path": "um/BZUSDT/premium_klines_15m.jsonl",
+      "rows": 658,
+      "sha256": "80741bd6cdbcdeea2e6129807f2c176fb15c47519de9c51ff4e52021843a54a8"
+    },
+    {
+      "bytes": 16027,
+      "path": "um/C98USDT/liquidation.jsonl",
+      "rows": 16,
+      "sha256": "169209c0d8b57c159104a209a5cb954292be67ed17724a090505c99d8105dd15"
+    },
+    {
+      "bytes": 98893,
+      "path": "um/CAKEUSDT/liquidation.jsonl",
+      "rows": 99,
+      "sha256": "ef9d10c5eba038939409e8fdbfa70346855efd50bc1a2ba56ee141aaf60dc32a"
+    },
+    {
+      "bytes": 127088,
+      "path": "um/CAPUSDT/liquidation.jsonl",
+      "rows": 127,
+      "sha256": "e28197314e1cfc199723b2ad5c0b908023fb3591928dce63ac4ccdafbf7e2407"
+    },
+    {
+      "bytes": 3000,
+      "path": "um/CARVUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "c56010d6da1b4450d0220b807f58a781f924abc3bb7ae0f952bb87ac8ecb2f5b"
+    },
+    {
+      "bytes": 473300,
+      "path": "um/CATIUSDT/liquidation.jsonl",
+      "rows": 472,
+      "sha256": "8ed278fcc5dc7fa6820db5b791bd267d24d00df5794330f03f7b0f8b41a898e8"
+    },
+    {
+      "bytes": 9038,
+      "path": "um/CBRSUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "dd6ff05b8b2dc0146b6b89ddd2bfe7b284f48e87819e396f761ef60872572390"
+    },
+    {
+      "bytes": 11974,
+      "path": "um/CCUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "9b75086cc105c14e8c51398f9d7da99022e1cb22f083de0445a78b967be65fa1"
+    },
+    {
+      "bytes": 38267,
+      "path": "um/CELOUSDT/liquidation.jsonl",
+      "rows": 38,
+      "sha256": "2b0d8a5b1150a1afe664a17b2443dee261d47e2e61991ecd373f11cd2271e5c1"
+    },
+    {
+      "bytes": 5042,
+      "path": "um/CELRUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "5bb80fbe3f4ba9c3fcab92bbaec902d21b64efc7340f4bf3682a61e277d693b7"
+    },
+    {
+      "bytes": 30204,
+      "path": "um/CETUSUSDT/liquidation.jsonl",
+      "rows": 30,
+      "sha256": "47084d4590e7ecb336dc7b4192e1f92d2f03e0fa23a3e457ab29c98efe937e07"
+    },
+    {
+      "bytes": 292855,
+      "path": "um/CFGUSDT/liquidation.jsonl",
+      "rows": 293,
+      "sha256": "2e47890d830a4ef991c075204cd218ceb232ee92a61c3c24ed20398c21653960"
+    },
+    {
+      "bytes": 24031,
+      "path": "um/CFXUSDT/liquidation.jsonl",
+      "rows": 24,
+      "sha256": "224e0d1cf932d11f70fe15b5dcf8f037460ec34a33c044a39667f03d668b3c5f"
+    },
+    {
+      "bytes": 10040,
+      "path": "um/CGPTUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "4bd614d1e0cfcf0a1ed917f3c1e194be03c66a0537743ca351a2c1950a663770"
+    },
+    {
+      "bytes": 21349,
+      "path": "um/CHILLGUYUSDT/liquidation.jsonl",
+      "rows": 21,
+      "sha256": "3260f3e368c2e6f567dc5e9468e840dc4cb93a8423c4d3b77879b7b5809abe25"
+    },
+    {
+      "bytes": 522891,
+      "path": "um/CHIPUSDT/liquidation.jsonl",
+      "rows": 521,
+      "sha256": "34a4099d2b747b5053cd2846e3ac76344332300dd0ea66376a4137adeb3cd26b"
+    },
+    {
+      "bytes": 4005,
+      "path": "um/CHRUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "cbca48bb7070f8e23a822ec72f19921d3d9b25e395ecd9f71461dc031e817402"
+    },
+    {
+      "bytes": 31955,
+      "path": "um/CHZUSDT/liquidation.jsonl",
+      "rows": 32,
+      "sha256": "b8daaed4b48e07cf90a868c48bac4b878c71033ab8cbb67e3e3f5e1c5f5af68d"
+    },
+    {
+      "bytes": 8036,
+      "path": "um/CIENUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "b2e299892a290e82a6ff6042ba2ce79099a7e1b0b397919ba9cdabf9e8d68cc8"
+    },
+    {
+      "bytes": 6024,
+      "path": "um/CKBUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "0b9f6d1d77b47944549ee4e088a5a474d3a861ce2ef8fc6a6efdb0a888f4aa85"
+    },
+    {
+      "bytes": 14163,
+      "path": "um/CLANKERUSDT/liquidation.jsonl",
+      "rows": 14,
+      "sha256": "774248043f830eaafc0f83269bf2fd3410f6857d0f572ffbf1cf682d9ce5d1ee"
+    },
+    {
+      "bytes": 221661,
+      "path": "um/CLOUSDT/liquidation.jsonl",
+      "rows": 222,
+      "sha256": "40197f32646513cfc8e79aaf456b09c4344101a76339eb0e101e7234a5f3f606"
+    },
+    {
+      "bytes": 538890,
+      "path": "um/CLUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "95bc17cdc8c07854cfbe9bdcbae42461fb9e23597350132a3e1451c204d056f2"
+    },
+    {
+      "bytes": 491,
+      "path": "um/CLUSDT/collector_status.jsonl",
+      "rows": 1,
+      "sha256": "2a9bac7e41076f1058ba6e4bcad8e8978160f57c4c90e0a67127f03932eef8b4"
+    },
+    {
+      "bytes": 1304086,
+      "path": "um/CLUSDT/klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "e5384e1c4794f7cc6195429fc40c25076f9737c398b2af7c989c85262214a3a7"
+    },
+    {
+      "bytes": 281326,
+      "path": "um/CLUSDT/liquidation.jsonl",
+      "rows": 282,
+      "sha256": "d3e6b0bfb114a7f372ac8028e4bea0e6c5ab708877d89d9dc1501a121af6bb84"
+    },
+    {
+      "bytes": 529515,
+      "path": "um/CLUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "b35f94df77f708328fdbb9688299b34ab8d1a3590d3d2b6d06df5043709ea532"
+    },
+    {
+      "bytes": 570452,
+      "path": "um/CLUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "20cb9c0da149d46d5274f178c05dd3a06c6af01a92d1ea19fed47bc507eac209"
+    },
+    {
+      "bytes": 1601975,
+      "path": "um/CLUSDT/premium_klines_15m.jsonl",
+      "rows": 670,
+      "sha256": "04187063948bd3ed927dd0b3acc3700b7c12b7270d7a68a379adb4a6d8d45497"
+    },
+    {
+      "bytes": 37019,
+      "path": "um/COAIUSDT/liquidation.jsonl",
+      "rows": 37,
+      "sha256": "f03b306acf83530497929ed58c9eccf03cb1077bb907c9050b95991d4e22849a"
+    },
+    {
+      "bytes": 1004,
+      "path": "um/COHRUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "47ac81bb21cd0056710af1f720fc9afee3c137174823eacc9ee9f08e04251f54"
+    },
+    {
+      "bytes": 6041,
+      "path": "um/COINUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "eb15bdf0fe7a85b4c28ac5531a98ed2901d40307b7dcbc3e168245c16ede743e"
+    },
+    {
+      "bytes": 244167,
+      "path": "um/COLLECTUSDT/liquidation.jsonl",
+      "rows": 241,
+      "sha256": "41958a0e6fcaee1199c136e0025228fc65de31b055d4d369e1bad3102827de0e"
+    },
+    {
+      "bytes": 31020,
+      "path": "um/COMPUSDT/liquidation.jsonl",
+      "rows": 31,
+      "sha256": "5380d8f65f09ddab8e18ab9c7d10f23ca5f1ed6d9079105ea4a3f867df3c0ecb"
+    },
+    {
+      "bytes": 8089,
+      "path": "um/COOKIEUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "b996b049a9e8859d12e2bf1db26f3abd87aa8f733a63e4c41591de9daf849ad4"
+    },
+    {
+      "bytes": 8052,
+      "path": "um/COPPERUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "749317b1c48c4a7dea688be8e6fa18fc6e8276ebe18076ed974247b559c267e6"
+    },
+    {
+      "bytes": 1005,
+      "path": "um/COSTUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "e1e057d98df5609afefb30fb2860e9a5ac4fc5c5c810cd788568e46df7beef97"
+    },
+    {
+      "bytes": 121506,
+      "path": "um/COTIUSDT/liquidation.jsonl",
+      "rows": 121,
+      "sha256": "4d54a524af3f62d878d66554b75106abf675c0494f353583b1eff4db11f03ee3"
+    },
+    {
+      "bytes": 17990,
+      "path": "um/COWUSDT/liquidation.jsonl",
+      "rows": 18,
+      "sha256": "783963c0987b0f9f7728274d60d13fd216627916e436f87fb24c7b35188dc575"
+    },
+    {
+      "bytes": 540403,
+      "path": "um/CRCLUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "9451e686d4371f73f6ebcb52766aeb3fef7569d87ab6a0113e0fdc32bf1f589d"
+    },
+    {
+      "bytes": 1313019,
+      "path": "um/CRCLUSDT/klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "875adf55fcebcefa340f511c161a3a77fa897557690ecf0654a9525249f086c1"
+    },
+    {
+      "bytes": 64245,
+      "path": "um/CRCLUSDT/liquidation.jsonl",
+      "rows": 64,
+      "sha256": "5f38b88738c94b8ca618d74a7ff657e75b955238d863a4dc5583404648dcfabe"
+    },
+    {
+      "bytes": 531437,
+      "path": "um/CRCLUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "65865c6ccf987d57833758f64e8d130f039de5bb87f4a7798a524a2d9b1b62f1"
+    },
+    {
+      "bytes": 572873,
+      "path": "um/CRCLUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "9d8914ef98fbe6c60129b87971f97be4e87b13bfcc162bbb34c173ce9065060c"
+    },
+    {
+      "bytes": 1566973,
+      "path": "um/CRCLUSDT/premium_klines_15m.jsonl",
+      "rows": 654,
+      "sha256": "4a71d3ce6e627eb7316486f7c0e1f10c2af10b445ef7ff404736fde2bed743a2"
+    },
+    {
+      "bytes": 62327,
+      "path": "um/CRDOUSDT/liquidation.jsonl",
+      "rows": 62,
+      "sha256": "3bb25f82833cab356303eefd513c67a74a13202bf348d52e4b0385b2a2da84ac"
+    },
+    {
+      "bytes": 7006,
+      "path": "um/CRMUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "e4ea4499b99e0ea538142943412281a85fe106b35eeee338526ea6058b8a38be"
+    },
+    {
+      "bytes": 14071,
+      "path": "um/CROSSUSDT/liquidation.jsonl",
+      "rows": 14,
+      "sha256": "f7cd65023fbd330f614dcfbb2bd33184fec4fe80c9f52fe59a236e05d6e65405"
+    },
+    {
+      "bytes": 8040,
+      "path": "um/CRVUSDC/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "57be7240e1daf7617b7dc87dcc0c22b74e1bfe13fd4ae6ddb143f3665a52ecfe"
+    },
+    {
+      "bytes": 127331,
+      "path": "um/CRVUSDT/liquidation.jsonl",
+      "rows": 127,
+      "sha256": "269e56e892f3189a7df04c7255508402c6ee7480d09f5705b9a50b60ab5126ac"
+    },
+    {
+      "bytes": 6027,
+      "path": "um/CRWDUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "c799f1afae85d10843a2cc5c59e1dda6e6f82b9557d87cd0489e58428dbe0710"
+    },
+    {
+      "bytes": 5022,
+      "path": "um/CRWVUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "f888d3b98e8e820f5b0079f0e67c2cc8db69d51d1b1509ccc82e1e88e1392f6c"
+    },
+    {
+      "bytes": 2012,
+      "path": "um/CSCOUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "da3e0a8a08f60dedb419fab1e255b445692462a021c3c5220ae74bb0fd553a5f"
+    },
+    {
+      "bytes": 7194,
+      "path": "um/CSOPSAMSUNG2LUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "05423ee5ba227d6b37ac686102e60e6bda0e0b8651ad6fb81ab2320591ed31e1"
+    },
+    {
+      "bytes": 57709,
+      "path": "um/CSOPSKHYNIX2LUSDT/liquidation.jsonl",
+      "rows": 56,
+      "sha256": "72aac0da2493d46d8f15b243c218954b682d3443b4fb18c30f4bde99189ca066"
+    },
+    {
+      "bytes": 2000,
+      "path": "um/CTKUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "92b96379831922b13b4d098ec505a4bcb632a1caaa05ff663a0657fc395bb598"
+    },
+    {
+      "bytes": 3002,
+      "path": "um/CTRUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "e0b73000c9b7c18d8c2511d1b0e618df57b7767410093b9dc13aab8431764b71"
+    },
+    {
+      "bytes": 10033,
+      "path": "um/CTSIUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "6d884787abdc5dab789dddcb558f58a8be9fe2d2a72aeefd1ee1d766bda0a627"
+    },
+    {
+      "bytes": 6951,
+      "path": "um/CUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "fbfa5aa5fb2ed4a9f8aa402844fecf37a141dd91dcacce29504bdbe077e7e074"
+    },
+    {
+      "bytes": 6006,
+      "path": "um/CVCUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "3424fc41c5b6b981792ac81c0e8c3238dd9fd497d624d1372a6ee496ab40aab0"
+    },
+    {
+      "bytes": 22998,
+      "path": "um/CVXUSDT/liquidation.jsonl",
+      "rows": 23,
+      "sha256": "84eb93f99fe14158200e687cdf81ec4a5449ac883732faed35b09d539d517949"
+    },
+    {
+      "bytes": 14030,
+      "path": "um/CXMTUSDT/liquidation.jsonl",
+      "rows": 14,
+      "sha256": "c89be5cdc1852c28c9aac37bfc1d2077ca6cf6f4867014d09887a296ff8005d3"
+    },
+    {
+      "bytes": 8056,
+      "path": "um/CYBERUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "340176c0983219301b4e8c716133062c4e58b4beee9950d3e282fe68da904ae3"
+    },
+    {
+      "bytes": 538859,
+      "path": "um/CYSUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "316f1be421d1375f1efa012dfea48627834cf48549b9126fc1ff1fee1c65e0df"
+    },
+    {
+      "bytes": 1310502,
+      "path": "um/CYSUSDT/klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "e9e5d422dac57129964a62ad0f4150c5c6afdc0effcee1b6027549662bdb4777"
+    },
+    {
+      "bytes": 532186,
+      "path": "um/CYSUSDT/liquidation.jsonl",
+      "rows": 533,
+      "sha256": "3d7cfefb44b9a1459c98380e58b7a93befb6915260bdd104f27215a933850029"
+    },
+    {
+      "bytes": 530066,
+      "path": "um/CYSUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "9be54f2499a589acd9495a4b07e182cc3851d7868efa49a6b699c053f69484f5"
+    },
+    {
+      "bytes": 569410,
+      "path": "um/CYSUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "e21a32ad87cecd207a25d974199d2ec9db96f553549d0e05c50c16ce789d56cb"
+    },
+    {
+      "bytes": 1534017,
+      "path": "um/CYSUSDT/premium_klines_15m.jsonl",
+      "rows": 641,
+      "sha256": "7b45181f28f36d732521133a252b9b8280606a87a240ac37ed47c3510c5c8fb0"
+    },
+    {
+      "bytes": 1085672,
+      "path": "um/DASHUSDT/liquidation.jsonl",
+      "rows": 1086,
+      "sha256": "d8999815d7de4db95a127b4f45560a4f100f48c70e719886bf5a7f833dd59f2b"
+    },
+    {
+      "bytes": 3029,
+      "path": "um/DATAIPUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "837bb8f7cba3cb907f3f727247f5acbc16d9df52c6b04e71618bc01038ef3641"
+    },
+    {
+      "bytes": 11049,
+      "path": "um/DDOGUSDT/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "bf48e09178471b54da53dbf1d0ead8b9f1790371b41de50fb24299ad7d847bb1"
+    },
+    {
+      "bytes": 17079,
+      "path": "um/DEEPUSDT/liquidation.jsonl",
+      "rows": 17,
+      "sha256": "0624719d6670d82d2bd88c0675066de93a817a26f59ec3178e1414ee2bb2a111"
+    },
+    {
+      "bytes": 52259,
+      "path": "um/DELLUSDT/liquidation.jsonl",
+      "rows": 52,
+      "sha256": "aeaf071026215b0b0e1863c535eca83d4b44855305570cf9701f4701da87aa48"
+    },
+    {
+      "bytes": 84445,
+      "path": "um/DEXEUSDT/liquidation.jsonl",
+      "rows": 84,
+      "sha256": "4bb9174a07cc1cca3a2768330092fc8b18712b7d543ee6f7050dc419daae14ad"
+    },
+    {
+      "bytes": 3986,
+      "path": "um/DIAUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "7771cb00c3c432e61fca197d267e94b03c22bae64d8ba6b4b8d208a1be69e98c"
+    },
+    {
+      "bytes": 2003,
+      "path": "um/DISUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "2d9f5b3d5d8eac689e89fcaf08612c1463fa11977a949e7408d4944abc9c1412"
+    },
+    {
+      "bytes": 5991,
+      "path": "um/DJTUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "150638d2b1b593b6cca6af9f95c4f49da3a09c76538fd712a100e3408e1d3c11"
+    },
+    {
+      "bytes": 11064,
+      "path": "um/DODOXUSDT/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "40547159627992aebbbc62ce71a497dc32213ca55655822cf2e998c7f4c38d7c"
+    },
+    {
+      "bytes": 53137,
+      "path": "um/DOGEUSDC/liquidation.jsonl",
+      "rows": 53,
+      "sha256": "c48eb28e81f89fcbcfba283448612364fe3a3451645673b6c0667794685e00dc"
+    },
+    {
+      "bytes": 540760,
+      "path": "um/DOGEUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "d6cf087f26b884aa41c5db46d32fb44cefd90cda544695edf683f14fa7f43d9e"
+    },
+    {
+      "bytes": 1312423,
+      "path": "um/DOGEUSDT/klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "ccfcfd8dd08f3c6d605e364b0c3965cd6c2092fe1b2e28040516505b1aec3053"
+    },
+    {
+      "bytes": 547312,
+      "path": "um/DOGEUSDT/liquidation.jsonl",
+      "rows": 546,
+      "sha256": "3cbf40fd5c5227b4237c999c6bdb27158ad171a3f039fdf059831d7911cba639"
+    },
+    {
+      "bytes": 531707,
+      "path": "um/DOGEUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "e53808a5e716c48bd9caf84e3562d47729937a7842227f204a61679a3506f5e9"
+    },
+    {
+      "bytes": 570390,
+      "path": "um/DOGEUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "a9363f3ca79a4c1eb0ef4506e56fd213b2a740cb015ece4dcc0fb43037ea59ba"
+    },
+    {
+      "bytes": 1523169,
+      "path": "um/DOGEUSDT/premium_klines_15m.jsonl",
+      "rows": 635,
+      "sha256": "ba9057a8eb3022c54f58655eb2ef3d7863c235adf375387880518d60f7713a57"
+    },
+    {
+      "bytes": 44644,
+      "path": "um/DOGSUSDT/liquidation.jsonl",
+      "rows": 44,
+      "sha256": "26a3534f11bcb0fa65121b6ad9e33dfb7c8b0bf7ffeb45688bc30ecd8863bff4"
+    },
+    {
+      "bytes": 1002,
+      "path": "um/DOLOUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "2d40a586fed6ff989c24c3171295d2a20e72805afe69c5362b465b054b9d8f6d"
+    },
+    {
+      "bytes": 374928,
+      "path": "um/DOODUSDT/liquidation.jsonl",
+      "rows": 372,
+      "sha256": "3f06e0086940dd10d2c6a8ba6b32a93586b41dcf65c12e7b483a629e678163f4"
+    },
+    {
+      "bytes": 47942,
+      "path": "um/DOSUSDT/liquidation.jsonl",
+      "rows": 48,
+      "sha256": "45ae1f6b0709487536e5e5c60f0da3d9954dd7bece348d637270f42cc3648a83"
+    },
+    {
+      "bytes": 164345,
+      "path": "um/DOTUSDT/liquidation.jsonl",
+      "rows": 164,
+      "sha256": "bdb1d358a7194dae92a5f45484448aa1cb2e3a0ae6c49eca2cefac9dc547f108"
+    },
+    {
+      "bytes": 540818,
+      "path": "um/DRAMUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "c79f3ab0e4098c73e3c2a569abc7a2e181007c5fe4c7d89624db4eb98dc0397b"
+    },
+    {
+      "bytes": 1311902,
+      "path": "um/DRAMUSDT/klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "f32acb6569ca3cef97bf8877af80522c645c14d670ad1a52183d5a5c319aa39e"
+    },
+    {
+      "bytes": 7021,
+      "path": "um/DRAMUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "71fb7ec5534e0fe6297da257c54ba13d49ff4cb6ad4cb3395151dc8e3f2ec2f9"
+    },
+    {
+      "bytes": 531448,
+      "path": "um/DRAMUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "26f5ad10bc8b8542e2d2f09dcb9004576a4ccfef1beaa782014b6fa8099f710f"
+    },
+    {
+      "bytes": 572428,
+      "path": "um/DRAMUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "8568c51c8485fa29d4989e5f8816fd307f3826cd1b6253fb2ecdcfaf08ecd437"
+    },
+    {
+      "bytes": 1528186,
+      "path": "um/DRAMUSDT/premium_klines_15m.jsonl",
+      "rows": 638,
+      "sha256": "dc809c52903c209a62a9fa7893da63e5e9e789dc040f8ac4c7cb3567de9f648c"
+    },
+    {
+      "bytes": 12079,
+      "path": "um/DRIFTUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "522f85fbd5c6d2d923fc4f1dd99d63c6e3bf6f8de7db37f3ad72deacc69bf94b"
+    },
+    {
+      "bytes": 77881,
+      "path": "um/DUSKUSDT/liquidation.jsonl",
+      "rows": 78,
+      "sha256": "7e68ad75e59f694e310fcc308b0b240d5d0c3d7411d0cb184a641fa37e064958"
+    },
+    {
+      "bytes": 29212,
+      "path": "um/DYDXUSDT/liquidation.jsonl",
+      "rows": 29,
+      "sha256": "c79ccf356407f94eb67e374e49028594c889f60eaacb409039d36ffe0351388f"
+    },
+    {
+      "bytes": 3017,
+      "path": "um/DYMUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "6e373fe2626fb5f40680b07897b3a3695a05ea8685d55b7263ae059828851a28"
+    },
+    {
+      "bytes": 43093,
+      "path": "um/EDENUSDT/liquidation.jsonl",
+      "rows": 43,
+      "sha256": "cb25d0a563c6fd70bdef4cb6373dcfb0cc5353602c5fa9db3a25f76175a5d579"
+    },
+    {
+      "bytes": 638394,
+      "path": "um/EDGEUSDT/liquidation.jsonl",
+      "rows": 638,
+      "sha256": "3021b1182ae4c6e19574e6065ea44b3f58c07ae285b15a7b3089cd3af421058d"
+    },
+    {
+      "bytes": 65005,
+      "path": "um/EDUUSDT/liquidation.jsonl",
+      "rows": 65,
+      "sha256": "2cca5aa32bf472817561ef3bc53bb0df22627ef0f0be19f78d640892086e8f17"
+    },
+    {
+      "bytes": 495110,
+      "path": "um/EGLDUSDT/liquidation.jsonl",
+      "rows": 497,
+      "sha256": "a2026d6c67cff059156d9ef01b986079b38f96ea66f2a1c7cd2232f899abf955"
+    },
+    {
+      "bytes": 39448,
+      "path": "um/EIGENUSDT/liquidation.jsonl",
+      "rows": 39,
+      "sha256": "ab52c4465d16907e284dc69bc387dc7331dd76744d96b3d890c3fc7feb9f6949"
+    },
+    {
+      "bytes": 34105,
+      "path": "um/ELSAUSDT/liquidation.jsonl",
+      "rows": 34,
+      "sha256": "b8ed142687d642c43e6c88e3b8f36e3ea749b4a1321ebeff1a40b93f2675bf9b"
+    },
+    {
+      "bytes": 24990,
+      "path": "um/ENAUSDC/liquidation.jsonl",
+      "rows": 25,
+      "sha256": "16d0dc177f6e10d42bc251afd0d7d8c54138237d02eae032abb13754643c7152"
+    },
+    {
+      "bytes": 539260,
+      "path": "um/ENAUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "de80cddd2e318756c885301782273e336f353d8a5e66503c0843c34bc4b4e6e3"
+    },
+    {
+      "bytes": 1315509,
+      "path": "um/ENAUSDT/klines_15m.jsonl",
+      "rows": 551,
+      "sha256": "6497ca40fbf6ed0eabcbeb622de4c0ba47fa405439d059f89edb23a09a175bf5"
+    },
+    {
+      "bytes": 434216,
+      "path": "um/ENAUSDT/liquidation.jsonl",
+      "rows": 434,
+      "sha256": "23588c1412722e2eb643dde95d213fc3b09e31182b503747227277e12766ff2f"
+    },
+    {
+      "bytes": 530362,
+      "path": "um/ENAUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "40db63290f130db2f44f2986d03738e4279c42a159f3992f9c35bca092d08ea3"
+    },
+    {
+      "bytes": 569267,
+      "path": "um/ENAUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "e3c9a666bf733b500d2f4281351d03a632937f9c2e72785c896b451772c913a3"
+    },
+    {
+      "bytes": 1517861,
+      "path": "um/ENAUSDT/premium_klines_15m.jsonl",
+      "rows": 634,
+      "sha256": "e6bdf66514644ec8c7f82df05dbfe09fb3e06b4a46bea0edb1e3fff757d0824c"
+    },
+    {
+      "bytes": 44848,
+      "path": "um/ENJUSDT/liquidation.jsonl",
+      "rows": 45,
+      "sha256": "93c02439273a3c6a45d0e1c85f1e26bd4653c6602bbbffc68603653c45f8db14"
+    },
+    {
+      "bytes": 17053,
+      "path": "um/ENSOUSDT/liquidation.jsonl",
+      "rows": 17,
+      "sha256": "291e3036366e25f07920a2b35f4a4bbc0220a99e963c0748a3683f7dd9a992a7"
+    },
+    {
+      "bytes": 47670,
+      "path": "um/ENSUSDT/liquidation.jsonl",
+      "rows": 48,
+      "sha256": "607021b7fc43b16175d0d755655e891e9dbee2ca7b28cb7a16a34a988cd2dbc5"
+    },
+    {
+      "bytes": 42177,
+      "path": "um/EPICUSDT/liquidation.jsonl",
+      "rows": 42,
+      "sha256": "6e79b3c371de32dde567f0a2075664b25990b0de0dd784fd9250cf0365ceadd2"
+    },
+    {
+      "bytes": 17992,
+      "path": "um/ERAUSDT/liquidation.jsonl",
+      "rows": 18,
+      "sha256": "c232c95945d3d55f55a71faf50db94f4efbb51efe50d914301373fd25a02dc19"
+    },
+    {
+      "bytes": 79108,
+      "path": "um/ESPORTSUSDT/liquidation.jsonl",
+      "rows": 78,
+      "sha256": "fbb5e064b6a41f29738134b6f887e5a85904fc220dac3258a1fdef8000085141"
+    },
+    {
+      "bytes": 50922,
+      "path": "um/ESPUSDT/liquidation.jsonl",
+      "rows": 51,
+      "sha256": "47be18632f4561268f360360d1daa8a2da774647f889a3e07705f517537874fe"
+    },
+    {
+      "bytes": 81686,
+      "path": "um/ETCUSDT/liquidation.jsonl",
+      "rows": 82,
+      "sha256": "2622760dd8f5e6aea3247ecdc727ccba8a1f7cb3d7afb102fc0fa39224e82130"
+    },
+    {
+      "bytes": 5983,
+      "path": "um/ETHBTC/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "ff0b72157af29d5ca2b6283824d6509b33a6d2acdc8284e32db3c08ba3b25384"
+    },
+    {
+      "bytes": 2028,
+      "path": "um/ETHFIUSDC/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "0d75a8492ed7b1803f00c7908e1125d7c95ff41874d98668fd71a17d3ce86977"
+    },
+    {
+      "bytes": 78763,
+      "path": "um/ETHFIUSDT/liquidation.jsonl",
+      "rows": 78,
+      "sha256": "b5ca90f0f4ff17bf7b651818097c5d7439b7f6633749179221aae5d3df06bf22"
+    },
+    {
+      "bytes": 1981,
+      "path": "um/ETHU/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "1b9343ec04698f6ccb3fb785f9a5e7f5e103b4b68e4b9e579f2aedfe8a0c566e"
+    },
+    {
+      "bytes": 5997,
+      "path": "um/ETHUSD1/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "ca2ace744ff8f6b7df3fd254c664e8bc4a57bc6c73adcf8d598b0f51a40e822a"
+    },
+    {
+      "bytes": 281112,
+      "path": "um/ETHUSDC/liquidation.jsonl",
+      "rows": 281,
+      "sha256": "0ca304881640034255cd9d18e2c786bbe9e0175446426903ed258c3b9428f070"
+    },
+    {
+      "bytes": 539393,
+      "path": "um/ETHUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "4aaa37c500979f2b331c6afee8be12c4421d20d3df044eb65c15b35e1675afe0"
+    },
+    {
+      "bytes": 1310912,
+      "path": "um/ETHUSDT/klines_15m.jsonl",
+      "rows": 551,
+      "sha256": "f0c448f03290d37ae7613870ba25be8a0744c5850f621be82cb569df95cb3cda"
+    },
+    {
+      "bytes": 2042118,
+      "path": "um/ETHUSDT/liquidation.jsonl",
+      "rows": 2041,
+      "sha256": "b601cb5bb3d717c64327d25d00d63445c12b17df5c70053a95045344300c107d"
+    },
+    {
+      "bytes": 530900,
+      "path": "um/ETHUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "040d141e7b2ac43bbe7003af55bea92cb75901de6df865eee09aed79d7c00f03"
+    },
+    {
+      "bytes": 571662,
+      "path": "um/ETHUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "5dc61ecaf04faad14ccc47f085025c3ea29abdb1c43989066494ee47d1b901bb"
+    },
+    {
+      "bytes": 1496986,
+      "path": "um/ETHUSDT/premium_klines_15m.jsonl",
+      "rows": 625,
+      "sha256": "ba76eb1be6f5bc04166293711c7e73088c230fbbbf7a3e1f73cc883304055c1f"
+    },
+    {
+      "bytes": 19265,
+      "path": "um/ETHUSDT_260925/liquidation.jsonl",
+      "rows": 19,
+      "sha256": "3478f71a3a021ef8b46d188154ff6eb086fa26ad31362b4deeba66fe314c1376"
+    },
+    {
+      "bytes": 16222,
+      "path": "um/ETHUSDT_261225/liquidation.jsonl",
+      "rows": 16,
+      "sha256": "33ea74b398b261c0ecdeb63f3006fd06f8842c1ca2234fd6ddbf769ababb5f01"
+    },
+    {
+      "bytes": 4991,
+      "path": "um/ETHWUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "e6600eea176cad3673035e61f4d487406913e6fe0289f61e3a881dddee243a4c"
+    },
+    {
+      "bytes": 10998,
+      "path": "um/EULUSDT/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "33fdd723ec4eb3e2715e24b034ca906363044bc35f44b6a64589014d620baf0e"
+    },
+    {
+      "bytes": 36177,
+      "path": "um/EVAAUSDT/liquidation.jsonl",
+      "rows": 36,
+      "sha256": "a2998c27297f50259889afe8e275f2740c99e75a8da8835a1c1797a9361c6d6c"
+    },
+    {
+      "bytes": 1001,
+      "path": "um/EWJUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "f3230db85f8999aaa0e535ebe88da90e4c8c0f730619191fa3e013693273a553"
+    },
+    {
+      "bytes": 1000,
+      "path": "um/EWTUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "7ce89532d518b81c9a54b2a7b2d51ecb1ff240010fddeedb8bfbc05e1d419bbb"
+    },
+    {
+      "bytes": 539610,
+      "path": "um/EWYUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "25aa8fc7d5608014f4bf6a1f2c91ae186bb9df591a44efa4b1833a0d5b9d46e7"
+    },
+    {
+      "bytes": 1313790,
+      "path": "um/EWYUSDT/klines_15m.jsonl",
+      "rows": 551,
+      "sha256": "2d91faa14055cd1b4abeaab47b356915e4303b2c6c44b93c0e107c4b4f67388e"
+    },
+    {
+      "bytes": 9017,
+      "path": "um/EWYUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "09530416baab8ee067af4a9640569955a0a25175f5a4a4ed059c37b6c99e9c15"
+    },
+    {
+      "bytes": 530348,
+      "path": "um/EWYUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "e082fd4ae712f9bbfdc92f777d09ffbd10f5a9993fef966b6ebe7d9bca15c86e"
+    },
+    {
+      "bytes": 572170,
+      "path": "um/EWYUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "8eadd48f45d417feaa8f1745dbb204263e28434fe33fdd31cbc99792da31db14"
+    },
+    {
+      "bytes": 1497545,
+      "path": "um/EWYUSDT/premium_klines_15m.jsonl",
+      "rows": 626,
+      "sha256": "d313cc60eab90ea5c50315ad6be4e75ea2108fcd668a1c548a4300bae7f86bd6"
+    },
+    {
+      "bytes": 177658,
+      "path": "um/FARTCOINUSDT/liquidation.jsonl",
+      "rows": 174,
+      "sha256": "0be4002b294c446d6e47f770fd2b26fd21f386038fc314bb65ba75ebfeac0a61"
+    },
+    {
+      "bytes": 120003,
+      "path": "um/FETUSDT/liquidation.jsonl",
+      "rows": 120,
+      "sha256": "8bb126d479db3743c8610ddf23bf4d63ab6c93618688e644d0c1d475f304e2ba"
+    },
+    {
+      "bytes": 238131,
+      "path": "um/FFUSDT/liquidation.jsonl",
+      "rows": 239,
+      "sha256": "3311bf854f13446647957411c6ccfb43994b175924bd42af719fa2c04d54da85"
+    },
+    {
+      "bytes": 11015,
+      "path": "um/FHEUSDT/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "37b3888acb447b3fd22c7ce04cba317a5419ebef99a2d573b2018652282bb03b"
+    },
+    {
+      "bytes": 35135,
+      "path": "um/FIDAUSDT/liquidation.jsonl",
+      "rows": 35,
+      "sha256": "bf6e74c88c58775bc4c8c2591c8ebb76a5247fe5adde0d8bdf5d9b09e35348e4"
+    },
+    {
+      "bytes": 10101,
+      "path": "um/FIGHTUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "957e960fc014c827b89d6934b4dc7ba7f8984c128d3558bb5d2c7b1ba0c6d796"
+    },
+    {
+      "bytes": 25116,
+      "path": "um/FILUSDC/liquidation.jsonl",
+      "rows": 25,
+      "sha256": "403d361369eb26fad39011027b9ba5cddf9dabd48078c481951559a882a8c233"
+    },
+    {
+      "bytes": 361882,
+      "path": "um/FILUSDT/liquidation.jsonl",
+      "rows": 361,
+      "sha256": "e480b082ff8a7c87206f86e88627c2b62a07abad3e1f14851121bc7be0cf03f8"
+    },
+    {
+      "bytes": 4015,
+      "path": "um/FLNCUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "bce20bc7248f90411db2f1c09e82e7c65bf80a6386ab9c1f3a523b6593e60a37"
+    },
+    {
+      "bytes": 1030503,
+      "path": "um/FLOCKUSDT/liquidation.jsonl",
+      "rows": 1024,
+      "sha256": "33dc7635f6967f1a852f1926bac96b709b69ff9b0eeda0a44e75bb919be1f920"
+    },
+    {
+      "bytes": 7068,
+      "path": "um/FLOWUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "3250a5d503465c6fbe7e6afd63e24d486910b415098c61f72ef78cf3c39a7ca6"
+    },
+    {
+      "bytes": 10056,
+      "path": "um/FLUIDUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "d8f43e778bdd0958d00cbffdae06eba3872375ace1c85e5b168dc5a36276cc32"
+    },
+    {
+      "bytes": 8020,
+      "path": "um/FLUXUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "a540553615f37109b7aae056de5e1aeb90f64980fb4dea2bf56c0116ee22265c"
+    },
+    {
+      "bytes": 26138,
+      "path": "um/FOGOUSDT/liquidation.jsonl",
+      "rows": 26,
+      "sha256": "4acda52c24dcdae14f985187f26f4865a4a6aa76cc0bc03ba4f1d134a864fc59"
+    },
+    {
+      "bytes": 23118,
+      "path": "um/FOLKSUSDT/liquidation.jsonl",
+      "rows": 23,
+      "sha256": "5982b428f45c58ab93d6ecb429ebe5a5d58c2b11831b18751b0bc86248c8ca58"
+    },
+    {
+      "bytes": 39185,
+      "path": "um/FORMUSDT/liquidation.jsonl",
+      "rows": 39,
+      "sha256": "bc2600d6ab3ea0d6661c95af8e52f772e8a9aeb083d929c4fc93e4a4c12b4063"
+    },
+    {
+      "bytes": 7012,
+      "path": "um/FRAXUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "b00e52a8485de6d60b211e25cee397e34ec9f9a45de19b9ba40c7635ad5b0a16"
+    },
+    {
+      "bytes": 9983,
+      "path": "um/FUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "e7aacb8edda3deb216565eb471945b8030bdd9c5df63336c7e20506a68b7fa36"
+    },
+    {
+      "bytes": 5002,
+      "path": "um/FWDIUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "a076e485b926f2c965445c139f14b0310ac28d9de3563aea9d5382df1c19498f"
+    },
+    {
+      "bytes": 101793,
+      "path": "um/GALAUSDT/liquidation.jsonl",
+      "rows": 101,
+      "sha256": "2af795b64702c888dc233d06bcdd7cd96b599da32d4639ae5f07e26bc74ce27c"
+    },
+    {
+      "bytes": 4005,
+      "path": "um/GASUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "c87a87c2e0265e01384c4cc4269f5247f4ae542861062f8b0e173dfb843d895f"
+    },
+    {
+      "bytes": 2000,
+      "path": "um/GDXUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "35a03b8f3e03abba97bdd22c1ccce3a41ff992669fd2e875068c3a8281f627e2"
+    },
+    {
+      "bytes": 9070,
+      "path": "um/GENIUSUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "4260f16af51b6da334106fcdd4e7293803d526dcb8c806b77edfcf457e2e2982"
+    },
+    {
+      "bytes": 5062,
+      "path": "um/GIGADEVUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "b8992ce9fdd489d9636e2a19e0940d8d0501a7c7e74ad3f672b5347da1493ebd"
+    },
+    {
+      "bytes": 107981,
+      "path": "um/GIGGLEUSDT/liquidation.jsonl",
+      "rows": 107,
+      "sha256": "8b122dea27ed5819e9979c74e28d71f122d6bf96ece14dccc501cde910135d89"
+    },
+    {
+      "bytes": 2995,
+      "path": "um/GLMUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "4a8ca5399181d56d4bce28d1b01d92a863e5d849735d6c3f9985198748c4b429"
+    },
+    {
+      "bytes": 2006,
+      "path": "um/GLWUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "6fe95ca9e2d767bebf5863a966b7b9b8584e5a17a9008cc3f2456d2f43a3d3e9"
+    },
+    {
+      "bytes": 4002,
+      "path": "um/GMEUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "17a37c6411b3e5e4201b8748a7da8cd133ab104a896d7cbb8ecaab89d6487ea7"
+    },
+    {
+      "bytes": 20067,
+      "path": "um/GMTUSDT/liquidation.jsonl",
+      "rows": 20,
+      "sha256": "0ecab036343da9ea84232c4cdc76543bc6ca1fb8f60d84fba57e11acb2af79c9"
+    },
+    {
+      "bytes": 9011,
+      "path": "um/GMXUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "3336ff7c2541d5a4501ba950d54315a86f42220c6236b69ccd6b04f166c779f1"
+    },
+    {
+      "bytes": 12042,
+      "path": "um/GOATUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "3c19089da68673daa225bb25984e2dc2ffefa2a5e018aecb6d512c8ca65334f8"
+    },
+    {
+      "bytes": 10079,
+      "path": "um/GOOGLUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "e243a687f470c2773a80c80139669821bc0d41d97d29469b66a1fa71181d48ce"
+    },
+    {
+      "bytes": 177617,
+      "path": "um/GPROUSDT/liquidation.jsonl",
+      "rows": 177,
+      "sha256": "c7f012dd1e349c0475cb49d4fec4d6bca8c9983dffbe6bc03b2c73ea4caa030c"
+    },
+    {
+      "bytes": 69149,
+      "path": "um/GPSUSDT/liquidation.jsonl",
+      "rows": 69,
+      "sha256": "1e10ae9ae20caba35d9d445491d974f6677566abbbf1db3a375628b5c0fc070d"
+    },
+    {
+      "bytes": 19086,
+      "path": "um/GRAMUSDT/liquidation.jsonl",
+      "rows": 19,
+      "sha256": "9bbe5683ea3f5f53c6b15ba3f56f3201f9a0a240a5f21ff8dc5d17d14abba9cc"
+    },
+    {
+      "bytes": 39435,
+      "path": "um/GRASSUSDT/liquidation.jsonl",
+      "rows": 39,
+      "sha256": "342632d709e91db9f60b4e9511b197670f73ae9f72b744b5b3a62af112c374dc"
+    },
+    {
+      "bytes": 20318,
+      "path": "um/GRIFFAINUSDT/liquidation.jsonl",
+      "rows": 20,
+      "sha256": "306f1506a088f381b6e2c95ae546aa1be5d75e10c360e5ee8cefc7314dfb7b81"
+    },
+    {
+      "bytes": 28958,
+      "path": "um/GRTUSDT/liquidation.jsonl",
+      "rows": 29,
+      "sha256": "dae0a0b9a90c7eaa66f9717b5f5eca2d94f51dbe345d19374cf64eb426765eb4"
+    },
+    {
+      "bytes": 17021,
+      "path": "um/GRVTUSDT/liquidation.jsonl",
+      "rows": 17,
+      "sha256": "da1a5afae7ac29adb3f2233bf72e86fff251666b4e9951e0b7fe9273b6c7c89e"
+    },
+    {
+      "bytes": 999,
+      "path": "um/GSUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "e6a37947c73190579de62a9de888c9718b026f053894246cfa1d7f0c6d714d36"
+    },
+    {
+      "bytes": 4013,
+      "path": "um/GTCUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "a974a5c1830eea0881bce45a68d747c4d51dfccc1b9e7e3c6f7adfc89b4d20fa"
+    },
+    {
+      "bytes": 32094,
+      "path": "um/GTLBUSDT/liquidation.jsonl",
+      "rows": 32,
+      "sha256": "6ff544e05b389d244d385c3f64f767df5d4bff946dd581fd6ba11c7e3c590912"
+    },
+    {
+      "bytes": 18015,
+      "path": "um/GUAUSDT/liquidation.jsonl",
+      "rows": 18,
+      "sha256": "143c2a85ce2acd25cdf88d1392ebd0f699df742745ff89ac3a53bd39b538c9a3"
+    },
+    {
+      "bytes": 16052,
+      "path": "um/GUNUSDT/liquidation.jsonl",
+      "rows": 16,
+      "sha256": "da074a605704143281847e3b259305002632c90eb1a08589d9fac00c53f797e5"
+    },
+    {
+      "bytes": 7983,
+      "path": "um/GUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "834ef51d7955da5cec54cfe3d3023c7a568264be81acd351c9318b629a5348f2"
+    },
+    {
+      "bytes": 55270,
+      "path": "um/GWEIUSDT/liquidation.jsonl",
+      "rows": 55,
+      "sha256": "5decc6bb68fdd940dfe9923be82359b9b9276605c8e1fce37d389d87389925c7"
+    },
+    {
+      "bytes": 4035,
+      "path": "um/HAEDALUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "52b471f1ee403b7e2db424a32c541115ca3e2782a63468599df5ca2b2e281b3c"
+    },
+    {
+      "bytes": 28123,
+      "path": "um/HANAUSDT/liquidation.jsonl",
+      "rows": 28,
+      "sha256": "b31ffd831dd80da975eb1162caf338fd9f76614c694785ceac3c46616b6eb2aa"
+    },
+    {
+      "bytes": 2015,
+      "path": "um/HANMIUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "f72549ff3c4d79ccbc8da4eb33cf3856964cab30054986fc2a84fe277b8ad840"
+    },
+    {
+      "bytes": 1000,
+      "path": "um/HBARUSDC/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "a1eeb11184020d4ba8146a5a204744843c7ab2e00ec862acafd08e657fc1e9f4"
+    },
+    {
+      "bytes": 63010,
+      "path": "um/HBARUSDT/liquidation.jsonl",
+      "rows": 63,
+      "sha256": "c3ef78162844dc56756356715de79b9e404ac8f9df3dedbb4eef5ba9ac40e44e"
+    },
+    {
+      "bytes": 539254,
+      "path": "um/HEIUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "121fee2e96351c5c6f7e69b57dde0dd5a84ead17e67a7ac892cbdeed93c92a97"
+    },
+    {
+      "bytes": 1308634,
+      "path": "um/HEIUSDT/klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "405748687223f1f6ffd9bfd3c2e7fd6bb5ce9744d2eabfd017bc28ffecd0d54a"
+    },
+    {
+      "bytes": 35101,
+      "path": "um/HEIUSDT/liquidation.jsonl",
+      "rows": 35,
+      "sha256": "2072dcdc812021d83875fc77ca7d395c35be1cad2c4bc110bab0ad49f4803b46"
+    },
+    {
+      "bytes": 530620,
+      "path": "um/HEIUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "91af3d1a0c7b0311213c1823ff1c5211ebe7149a3d87594bc95e4d1c33ba88ef"
+    },
+    {
+      "bytes": 569317,
+      "path": "um/HEIUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "1b1f2d1b990321ecbc9ce0fd66ad7cac109bc8c6daa6037ebe4c0ac22601ab7d"
+    },
+    {
+      "bytes": 1488253,
+      "path": "um/HEIUSDT/premium_klines_15m.jsonl",
+      "rows": 622,
+      "sha256": "7ab1f5efa15fd95b29ca7942e1e3b02ff32055a6b6225fbfe1b89a3fb2cb8823"
+    },
+    {
+      "bytes": 1063853,
+      "path": "um/HEMIUSDT/liquidation.jsonl",
+      "rows": 1058,
+      "sha256": "0a130dbb072fcc2b705265362085833666c72fc7a1dd1d98cdc2d363849eb588"
+    },
+    {
+      "bytes": 1003,
+      "path": "um/HIMSUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "f9f844dfa03fa0d0affcbe1ceecbec6785bf44fb3e1479d317a3e0d964aae8fd"
+    },
+    {
+      "bytes": 63225,
+      "path": "um/HIVEUSDT/liquidation.jsonl",
+      "rows": 63,
+      "sha256": "77b6f07fc472cd93fda23bd5caecbb531a28d6deb79e901febf0c1e240d1ed30"
+    },
+    {
+      "bytes": 27253,
+      "path": "um/HK0625USDT/liquidation.jsonl",
+      "rows": 27,
+      "sha256": "70cb1a90d454abedb061d5b352bf50950dcde05da993a1bee1f5472cb1e25ac6"
+    },
+    {
+      "bytes": 1010,
+      "path": "um/HK0700USDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "4454c67a2bc11303fe3150fe92ccaa6bf7388a76bb9942ddb2a22891e5148fc6"
+    },
+    {
+      "bytes": 1008,
+      "path": "um/HK0992USDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "a56944e47fcfe7af02f07196169e061b536ddae467bb192a617e33759675bde9"
+    },
+    {
+      "bytes": 12128,
+      "path": "um/HK1810USDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "32aa07d5ae03ca38304e2da11a503c8c31822e8e09247f29fd3884a436f1c316"
+    },
+    {
+      "bytes": 15199,
+      "path": "um/HMSTRUSDT/liquidation.jsonl",
+      "rows": 15,
+      "sha256": "ebf90265b365c39e247cca54a9f2eef1d1d211d82ad99f601d470b36f3e64199"
+    },
+    {
+      "bytes": 19045,
+      "path": "um/HOLOUSDT/liquidation.jsonl",
+      "rows": 19,
+      "sha256": "97c71f4b304e4499ec9e2777d1d481d36fd63b58d76fd58ca5b49c88365020f9"
+    },
+    {
+      "bytes": 57322,
+      "path": "um/HOMEUSDT/liquidation.jsonl",
+      "rows": 57,
+      "sha256": "d60681bdcf09245b431149e586755419c97b70b3f1c314ebfcfb9b4a04340e2d"
+    },
+    {
+      "bytes": 32148,
+      "path": "um/HOODUSDT/liquidation.jsonl",
+      "rows": 32,
+      "sha256": "68788145e989a1f86c069d448f61c769aa8bb0e2754397977cc02a4e8aa82385"
+    },
+    {
+      "bytes": 21141,
+      "path": "um/HOTUSDT/liquidation.jsonl",
+      "rows": 21,
+      "sha256": "7a94cecbb4c0f71b852cb9b9d55a725689fac1d09ea8a0fbe1ab9de2c94863a5"
+    },
+    {
+      "bytes": 6010,
+      "path": "um/HPEUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "35efef3e3a1eb9fcf03d1a65cba9db5f1cc84e5a125fed4a9689a9d0eb18005f"
+    },
+    {
+      "bytes": 11032,
+      "path": "um/HUMAUSDT/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "9bfac93ad9805cb5c2ea541c2be59d5963a14a212a4401bb74a34b116eea6422"
+    },
+    {
+      "bytes": 28787,
+      "path": "um/HUSDT/liquidation.jsonl",
+      "rows": 29,
+      "sha256": "c10b886f4f585f2fb8a6a2f29348b35904af7bfdc9d9217d2c9b471bc295796f"
+    },
+    {
+      "bytes": 9061,
+      "path": "um/HYPERUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "a7038512a2e95f79c88bae1a33fca486be3655a1cfb70fb1e8606a159b5eb397"
+    },
+    {
+      "bytes": 540445,
+      "path": "um/HYPEUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "fa2fa3fe0b99d1e783e8c014c663db325b0f058ffb6f404935a713679b583a6b"
+    },
+    {
+      "bytes": 1316174,
+      "path": "um/HYPEUSDT/klines_15m.jsonl",
+      "rows": 551,
+      "sha256": "6a66ba759d2e11b3cbaca2163ebbc2c6dfe6c7b0abb7719317520367e3c160f5"
+    },
+    {
+      "bytes": 431491,
+      "path": "um/HYPEUSDT/liquidation.jsonl",
+      "rows": 430,
+      "sha256": "cf10e2e2e434e746a036b10eb303dd9c4bdff064fe9f8948e237e6f186a04c34"
+    },
+    {
+      "bytes": 531720,
+      "path": "um/HYPEUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "f744532db16d73ee42bc82fadd2fe870cfe82eba4462266042451c7ad4691dd6"
+    },
+    {
+      "bytes": 571194,
+      "path": "um/HYPEUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "fb0ace7198d42e269779ea118fd34ec78e406bfc25c7b5693455d9d817f78ef3"
+    },
+    {
+      "bytes": 1479655,
+      "path": "um/HYPEUSDT/premium_klines_15m.jsonl",
+      "rows": 617,
+      "sha256": "e24799d45736a3328c34dcf449188d79d132a93ef9836cb5185a9f1a2808299f"
+    },
+    {
+      "bytes": 1013,
+      "path": "um/HYUNDAIUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "5b851f80b771d326718be12f2dce1eb60c4b59962caa83006ecdd7e9bd98c7ac"
+    },
+    {
+      "bytes": 1002,
+      "path": "um/IBMUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "97711632fc6e23df14517a692c8122b9978d6524f63e0f836d0bb3aa4536264f"
+    },
+    {
+      "bytes": 20035,
+      "path": "um/ICNTUSDT/liquidation.jsonl",
+      "rows": 20,
+      "sha256": "de2a179e16304dd1293257b623996935e249137a31146864a022cd2c84501adf"
+    },
+    {
+      "bytes": 172057,
+      "path": "um/ICPUSDT/liquidation.jsonl",
+      "rows": 173,
+      "sha256": "480ba56583d1d2939bc69801f55136682b70dcb07d89cd100b41520fd2f29351"
+    },
+    {
+      "bytes": 17075,
+      "path": "um/IDOLUSDT/liquidation.jsonl",
+      "rows": 17,
+      "sha256": "6b8da27a2963b4c1002e6bce4d0583749a598c60e0477ce58bbec494eeb144dc"
+    },
+    {
+      "bytes": 10978,
+      "path": "um/IDUSDT/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "eca53f7a39a84c35b56a23938a3c93414f5aa0c882647075e4bb7ad0c8e9b8bd"
+    },
+    {
+      "bytes": 6981,
+      "path": "um/ILVUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "a63b0222da3dce2f91c274d25dc8c680ccc7f95603f6030443b667008d3f9944"
+    },
+    {
+      "bytes": 12917,
+      "path": "um/IMXUSDT/liquidation.jsonl",
+      "rows": 13,
+      "sha256": "a61060d27cdbf11d1ca5ac1f932ee7af99e156b4dcb8906cbc7c37b8aeb06271"
+    },
+    {
+      "bytes": 10031,
+      "path": "um/INITUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "179a1f31d1ae11c60d07761ee13a298f4b63e42f3babb00a3cd8975e9428811e"
+    },
+    {
+      "bytes": 116977,
+      "path": "um/INJUSDT/liquidation.jsonl",
+      "rows": 117,
+      "sha256": "55520f330c891da5a55f619a281edb33b18cf7e54a8215d6ca2411b16a758f85"
+    },
+    {
+      "bytes": 6022,
+      "path": "um/INTCUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "553e653570a31888d100a0d87594f3a83abd1b3a32528a1d375b38ce84671a38"
+    },
+    {
+      "bytes": 4019,
+      "path": "um/INTWUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "8cd59df18d5234188798d88c6b6d7d388d8cbd1db40571831e395bcf6042fa93"
+    },
+    {
+      "bytes": 6989,
+      "path": "um/INUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "0a16bc26a6f2892243c2c3baad7165a35bc75f7d7f9d4b6b367189356f2fde4e"
+    },
+    {
+      "bytes": 16029,
+      "path": "um/INXUSDT/liquidation.jsonl",
+      "rows": 16,
+      "sha256": "fcdb35127105253bd215da484267892ca46e0e0f253f4adef9924ace36e477a2"
+    },
+    {
+      "bytes": 5007,
+      "path": "um/IONQUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "58b7f7f14f8ebe0ae64681d5cf69043d22697a2a56122c07acd0f72913dad6ad"
+    },
+    {
+      "bytes": 272817,
+      "path": "um/IOSTUSDT/liquidation.jsonl",
+      "rows": 270,
+      "sha256": "aac8b36bcfd5afb3e10e3c7d0cb61dd3a5dbdf0e8fe1c6b7143c4601dc539d3f"
+    },
+    {
+      "bytes": 33229,
+      "path": "um/IOTAUSDT/liquidation.jsonl",
+      "rows": 33,
+      "sha256": "8db18d6996d5fd767be9997c528bec896b4a4d3850bfdb2d7ad951cebe647169"
+    },
+    {
+      "bytes": 19138,
+      "path": "um/IOTXUSDT/liquidation.jsonl",
+      "rows": 19,
+      "sha256": "424c3f509009464553872044d71aaaec635cc2bddcff0b7973be8a5aa3e67dc7"
+    },
+    {
+      "bytes": 20030,
+      "path": "um/IOUSDT/liquidation.jsonl",
+      "rows": 20,
+      "sha256": "70b7a710105148514286b71d9408080ded27962f6e1abb8bc4b9b91d358f674c"
+    },
+    {
+      "bytes": 4016,
+      "path": "um/IRENUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "90ce3f974e8c8f2522feefb1802c12ec00a87a551198dc6fb449ab066dbcfcc4"
+    },
+    {
+      "bytes": 9032,
+      "path": "um/IRYSUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "43ad1a0a62617b13222e3de1fbeaa01c6b7fae521146503cae8e2c300a96223c"
+    },
+    {
+      "bytes": 57423,
+      "path": "um/JASMYUSDT/liquidation.jsonl",
+      "rows": 57,
+      "sha256": "83a0e31978a337377c23558a58a20529ed4513da6dae7707e3a158930f35ca91"
+    },
+    {
+      "bytes": 45216,
+      "path": "um/JCTUSDT/liquidation.jsonl",
+      "rows": 45,
+      "sha256": "bbab6110e26981135695b1d8a4064642be89ad114fe2361709def8baed565898"
+    },
+    {
+      "bytes": 22465,
+      "path": "um/JELLYJELLYUSDT/liquidation.jsonl",
+      "rows": 22,
+      "sha256": "8e632fddb96dd42365f4feb44e719e74b721b7a9b47f47adebd83e1ad616ee0e"
+    },
+    {
+      "bytes": 9003,
+      "path": "um/JOEUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "d5a47bcf419e7209099c1505aabd46dca837c423b72b371c47f19c2918fa2b17"
+    },
+    {
+      "bytes": 25963,
+      "path": "um/JSTUSDT/liquidation.jsonl",
+      "rows": 26,
+      "sha256": "944fe5b75aa865960670ea9d3784c3554aed827b6693153d41a8d4d3d8b656f4"
+    },
+    {
+      "bytes": 79766,
+      "path": "um/JTOUSDT/liquidation.jsonl",
+      "rows": 80,
+      "sha256": "82e2e486d5b422e441e6edd459feb8b1cb9b3c593d9cce83295430ea998c0881"
+    },
+    {
+      "bytes": 121906,
+      "path": "um/JUPUSDT/liquidation.jsonl",
+      "rows": 122,
+      "sha256": "2015a747559c9b7c6bd8f26ee8ce34fe6061495298219d036afc209be4b5d618"
+    },
+    {
+      "bytes": 13044,
+      "path": "um/KAIAUSDT/liquidation.jsonl",
+      "rows": 13,
+      "sha256": "3f140b3e2f26cf0488a89cdd21e120d9ad2811abae6730699752b2c55f4cc6a5"
+    },
+    {
+      "bytes": 11102,
+      "path": "um/KAITOUSDC/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "e3d3b23959e23bab50267d24100379bccec9281cad64c769320705f74d07c8c0"
+    },
+    {
+      "bytes": 65635,
+      "path": "um/KAITOUSDT/liquidation.jsonl",
+      "rows": 65,
+      "sha256": "7819f6b5a9e24d5790405f8e167a52be56aa2d5e140b1d6c3b31bebf1635066c"
+    },
+    {
+      "bytes": 52076,
+      "path": "um/KASUSDT/liquidation.jsonl",
+      "rows": 52,
+      "sha256": "cd75290daebc376572e3b932a6bca0d79fd12f63fff23fc65c1326ef913cfa84"
+    },
+    {
+      "bytes": 10028,
+      "path": "um/KATUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "6c8ffd491ee481f975f663f8d59209952e0fe8e8aeb6bd65a79ecaf35750ad3e"
+    },
+    {
+      "bytes": 34222,
+      "path": "um/KAVAUSDT/liquidation.jsonl",
+      "rows": 34,
+      "sha256": "913cfbadea3bff68fc7c0feb20a38cc36070e9e7cdf104fdc706ec34a0160932"
+    },
+    {
+      "bytes": 8074,
+      "path": "um/KERNELUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "d1f24fe2888396ce7644122bf2ad1bf743ae64378d1d198ec4fe7fcc2edb260e"
+    },
+    {
+      "bytes": 27071,
+      "path": "um/KGENUSDT/liquidation.jsonl",
+      "rows": 27,
+      "sha256": "0ea8c531473d0ef6c4f33eea5ce6bd906e16a8b2fef9c4a402f56b9bb822079e"
+    },
+    {
+      "bytes": 50021,
+      "path": "um/KITEUSDT/liquidation.jsonl",
+      "rows": 50,
+      "sha256": "34c12cd4bd8906488badca74a986e234301da7ba42345a71c77e284643705601"
+    },
+    {
+      "bytes": 8024,
+      "path": "um/KMNOUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "1f76f5b7cef3bdd9cd687e052d92e582c868941b32f3ae138b7df706d0db4ffb"
+    },
+    {
+      "bytes": 17894,
+      "path": "um/KNCUSDT/liquidation.jsonl",
+      "rows": 18,
+      "sha256": "eccbfb237eeca610a5974bd96ae1bcdafbd338658d8f9358b084f7d1aceffd5c"
+    },
+    {
+      "bytes": 20097,
+      "path": "um/KOMAUSDT/liquidation.jsonl",
+      "rows": 20,
+      "sha256": "73c6034a5b1c234c8a303abbfe269012f21886f53f271b93d1b31cfe88e95441"
+    },
+    {
+      "bytes": 541340,
+      "path": "um/KORUUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "29ebda2cf619d635a8ba5be963babc1e2c65b08f7250aada6d01d6b57439532e"
+    },
+    {
+      "bytes": 1313910,
+      "path": "um/KORUUSDT/klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "f6cd097d41eb9ee4ea85404962c496550225318a449f307d4e93977033e97764"
+    },
+    {
+      "bytes": 153826,
+      "path": "um/KORUUSDT/liquidation.jsonl",
+      "rows": 153,
+      "sha256": "370c2e8242df7ea4c90d1eb43bd2e8837cac619939d7e663ba26cc81db8646fa"
+    },
+    {
+      "bytes": 531726,
+      "path": "um/KORUUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "b69d09503e7753c4148fed3bdaaaa9d355c50be8f0fdc8181537ab582188ad05"
+    },
+    {
+      "bytes": 572489,
+      "path": "um/KORUUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "22eea6c2af04b5999b9c6bc5bc7c11ea0c19ff6ae4865562aedbc89bf37dfb60"
+    },
+    {
+      "bytes": 1445071,
+      "path": "um/KORUUSDT/premium_klines_15m.jsonl",
+      "rows": 603,
+      "sha256": "3f1bd339f7cc67491e0bc257a4c67fc9e10d50b2691aec8ec4d76585583f667d"
+    },
+    {
+      "bytes": 23851,
+      "path": "um/KSMUSDT/liquidation.jsonl",
+      "rows": 24,
+      "sha256": "5bc6f9215633c652a7c4f9a0f0fc9f68cd9c6061be10c1a9acdbc47dfdfd2df2"
+    },
+    {
+      "bytes": 3046,
+      "path": "um/KUAISHOUUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "6a71cde9165078dfccec35ec80954921686cfca6e315eef6ead77fba4e2c6a7d"
+    },
+    {
+      "bytes": 118872,
+      "path": "um/LABUSDT/liquidation.jsonl",
+      "rows": 119,
+      "sha256": "eb98a591ac45391b9a638918530996c70e7694f72a9fab875266c67c380319bb"
+    },
+    {
+      "bytes": 161225,
+      "path": "um/LAUSDT/liquidation.jsonl",
+      "rows": 161,
+      "sha256": "6ce5e4bb8781a341d0f689d5e4a54644c72451a87d323f2f8b3fc1fbc9cf2e12"
+    },
+    {
+      "bytes": 33330,
+      "path": "um/LAYERUSDT/liquidation.jsonl",
+      "rows": 33,
+      "sha256": "f182371a82064d8d1951a68b075894fead92a3a125c19ae0789ca257bf11cc02"
+    },
+    {
+      "bytes": 71779,
+      "path": "um/LDOUSDT/liquidation.jsonl",
+      "rows": 72,
+      "sha256": "b2c105febdb452315db78f2f5afa9c47f025374c551220be26720a5c9c227cc1"
+    },
+    {
+      "bytes": 3096,
+      "path": "um/LGELECTRONICSUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "3afa7d19c47d86bd51f18a3dffc7e7894934e328e620322c9e99f84c52cfdf5f"
+    },
+    {
+      "bytes": 31114,
+      "path": "um/LIGHTUSDT/liquidation.jsonl",
+      "rows": 31,
+      "sha256": "b2670f9fb7d66ac37d46d999aca2998795d885571a0b2386d631a08750024d7c"
+    },
+    {
+      "bytes": 18186,
+      "path": "um/LINEAUSDT/liquidation.jsonl",
+      "rows": 18,
+      "sha256": "4a7ab78560b00d7a31a16e90b50151fc9129e072c009f7addf798cf0a84cae7b"
+    },
+    {
+      "bytes": 25988,
+      "path": "um/LINKUSDC/liquidation.jsonl",
+      "rows": 26,
+      "sha256": "24ddb35d56300f0627734bd25d9b5e775cf44e600c1d6e043901e9738b329d9b"
+    },
+    {
+      "bytes": 539784,
+      "path": "um/LINKUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "0f5b2eaefa632fe9e223a77520bb5d4ce1eded4f47d9923d09446356bfadbb31"
+    },
+    {
+      "bytes": 1305417,
+      "path": "um/LINKUSDT/klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "0c53155b6ee2902e0fa45a29a932d82b239a6d0e67ca928cc53fd388d44944c0"
+    },
+    {
+      "bytes": 279272,
+      "path": "um/LINKUSDT/liquidation.jsonl",
+      "rows": 279,
+      "sha256": "552ae021ea358a73851cbd773220cb0be47e6e72038a7360f96eb43b5dfc8cc2"
+    },
+    {
+      "bytes": 531736,
+      "path": "um/LINKUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "4bf37631b1bb9d86523ddcbfeff2e18fd27f27b1e89d5baf535cb8fead66aa7c"
+    },
+    {
+      "bytes": 571231,
+      "path": "um/LINKUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "4dfcf8484b7860f55793c1142f176866af834f1889ae341fc6a9ee362875b207"
+    },
+    {
+      "bytes": 1458403,
+      "path": "um/LINKUSDT/premium_klines_15m.jsonl",
+      "rows": 608,
+      "sha256": "ca047ebcc1a9973758b584ee93b5f03089496b2405c38b41bec23f7657d594ed"
+    },
+    {
+      "bytes": 56319,
+      "path": "um/LISTAUSDT/liquidation.jsonl",
+      "rows": 56,
+      "sha256": "75356d8cd182607a09f6c09d51cff564897e9a142fef8a4fa9d9bb04a0653dd0"
+    },
+    {
+      "bytes": 9037,
+      "path": "um/LITEUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "e0816629f5fcb89ce0f25cda84ad8b3956eca8e5a70ede7a1efe8f681a081a00"
+    },
+    {
+      "bytes": 335602,
+      "path": "um/LITUSDT/liquidation.jsonl",
+      "rows": 336,
+      "sha256": "806d7632cf57be46b97d40597abef8e78ac56b64cac13919e0780c0f123dac53"
+    },
+    {
+      "bytes": 2006,
+      "path": "um/LLYUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "273802f85ade8182b3ebfdd6891d7e807e2ddb59f07fe852cb9d7e7d56402687"
+    },
+    {
+      "bytes": 31832,
+      "path": "um/LPTUSDT/liquidation.jsonl",
+      "rows": 32,
+      "sha256": "6607ecee83d59526b413962527f3ddb7aed6736ff722821e16dd92ee3cc49825"
+    },
+    {
+      "bytes": 6036,
+      "path": "um/LQTYUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "5bd7854e721ab2f24c0402756ce69ec3567de0c1f1b5f30b200892e8fe5cc769"
+    },
+    {
+      "bytes": 1005,
+      "path": "um/LRCXUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "678b0a7bc3f7fd0858b8fd9ba61ca5c94ae62e60f29a516fa0d755defc79f6de"
+    },
+    {
+      "bytes": 8975,
+      "path": "um/LSKUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "b38b92627510431a5f78468e379f8714e0ddf98922db581ab84dcfbfceddf215"
+    },
+    {
+      "bytes": 11966,
+      "path": "um/LTCUSDC/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "5372f7ded5e1b632a989324148851caa641afd0ad1c44eecc4f4c797f0dc2c3e"
+    },
+    {
+      "bytes": 237394,
+      "path": "um/LTCUSDT/liquidation.jsonl",
+      "rows": 238,
+      "sha256": "83b888c138bf5f8b33d2e8fcb3726a836177c67c3bcf03c3c31a6771fd5d5a3d"
+    },
+    {
+      "bytes": 7064,
+      "path": "um/LUMIAUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "141cc965c985480634ade293efa6b65e036cfcdb4ccf15aa92b3e337e3001893"
+    },
+    {
+      "bytes": 91634,
+      "path": "um/LUNA2USDT/liquidation.jsonl",
+      "rows": 91,
+      "sha256": "9ed7ac3cd037edb2dff15eb010ad613a8d0af998d4011170276c2f8c4bc49734"
+    },
+    {
+      "bytes": 22019,
+      "path": "um/LYNUSDT/liquidation.jsonl",
+      "rows": 22,
+      "sha256": "f7f4f8a324c9238c2d97ca4d777e275fe6d04fb2ef0ca443e6d2fe38fcd68ef7"
+    },
+    {
+      "bytes": 14161,
+      "path": "um/MAGICUSDT/liquidation.jsonl",
+      "rows": 14,
+      "sha256": "5d238aedfee76120021bb5464f6f8f6e71d351875ef4d076fbb8246aceaa43b2"
+    },
+    {
+      "bytes": 1038007,
+      "path": "um/MAGMAUSDT/liquidation.jsonl",
+      "rows": 1034,
+      "sha256": "a8aac8ab256ba4702d628d8584e5d0f09fdbb91805dedf63a5039c14ade49675"
+    },
+    {
+      "bytes": 18068,
+      "path": "um/MANAUSDT/liquidation.jsonl",
+      "rows": 18,
+      "sha256": "53de0a967e0b62543a0c43275272b8c658bf59452fe5a3ea9efd18cbde7f51f7"
+    },
+    {
+      "bytes": 13150,
+      "path": "um/MANTAUSDT/liquidation.jsonl",
+      "rows": 13,
+      "sha256": "6e5de47753c964ac569fc0e4c89b0b2cf3d0456613fcafca4c83b7dfd1104059"
+    },
+    {
+      "bytes": 20257,
+      "path": "um/MANTRAUSDT/liquidation.jsonl",
+      "rows": 20,
+      "sha256": "8da11ff272c40f18ec4181012849161643ed8064e6db6b50f0489f93c62c47e4"
+    },
+    {
+      "bytes": 6013,
+      "path": "um/MARAUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "57233263227ce6983d81959c20edea562fc115290aa185907db28a86a7f53a16"
+    },
+    {
+      "bytes": 2545829,
+      "path": "um/MARSCOINUSDT/liquidation.jsonl",
+      "rows": 2509,
+      "sha256": "15305331d6b164688b17bd357dbe0f40027f72cc34511d9a9e8a5414cebf25a0"
+    },
+    {
+      "bytes": 11953,
+      "path": "um/MASKUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "613f404cbf39d1d3e52aa70fac962b06fdef9c27eb269a373d9ceefe6384ec09"
+    },
+    {
+      "bytes": 2016,
+      "path": "um/MAVIAUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "003725727146d8c39f8ae3f424f96f79b9ffd0b685810a94014403dca5407aa3"
+    },
+    {
+      "bytes": 1005,
+      "path": "um/MAVUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "e69428a10f00093b411b2ad16732ef4543a419ce9b4c75864bc0e0f123db350a"
+    },
+    {
+      "bytes": 12015,
+      "path": "um/MDBUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "1bd514c0f5b69e756f4aaeeec0d82c522835350be562b2272998e35654e48d84"
+    },
+    {
+      "bytes": 8030,
+      "path": "um/MEGAUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "18809f779420e8974774e30500ff232a9c492d45b17792e8741d249182f96e7b"
+    },
+    {
+      "bytes": 2021,
+      "path": "um/MEITUANUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "a95e9c598d1239c42af020369f78cb9b8f60bf086f17af5002df351c7ffb129e"
+    },
+    {
+      "bytes": 57096,
+      "path": "um/MELANIAUSDT/liquidation.jsonl",
+      "rows": 56,
+      "sha256": "4cbaaea3c325dcc2dd19c2dcbf5d19d9eedb475ea2ed134da5e4eecd936a4eb2"
+    },
+    {
+      "bytes": 53444,
+      "path": "um/MEMEUSDT/liquidation.jsonl",
+      "rows": 53,
+      "sha256": "dfe95c6a211db889212f0011c8303f5e14216d459aa0436de6f91d3f001e0c00"
+    },
+    {
+      "bytes": 40150,
+      "path": "um/MERLUSDT/liquidation.jsonl",
+      "rows": 40,
+      "sha256": "5710adf735555c93452b0555ca09b924a47b5ecbddd6972104ccd5ff6ce78aa6"
+    },
+    {
+      "bytes": 4018,
+      "path": "um/METAUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "5523b0bbbda19f39665bdf59f94bab9e68112761c8769f0074891159afd25e56"
+    },
+    {
+      "bytes": 57261,
+      "path": "um/METISUSDT/liquidation.jsonl",
+      "rows": 57,
+      "sha256": "bcf623fde0b94aad3bff8635b74635944e9bff92dca53ab70b82e8adeb95a7a6"
+    },
+    {
+      "bytes": 33954,
+      "path": "um/METUSDT/liquidation.jsonl",
+      "rows": 34,
+      "sha256": "71588deb6d57f8ccb828b12043eb4c774b64f5a827350df4acd6aa0f8913972d"
+    },
+    {
+      "bytes": 16055,
+      "path": "um/MEUSDT/liquidation.jsonl",
+      "rows": 16,
+      "sha256": "b107094b4d7c75496217cdb5d8372b87710ff06c8282715c8dd7a90844b2948c"
+    },
+    {
+      "bytes": 8033,
+      "path": "um/MEWUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "dab54549d7f29476e525e670730c450655d56a68e540164bf947eeaf57e7a9fe"
+    },
+    {
+      "bytes": 49129,
+      "path": "um/MINAUSDT/liquidation.jsonl",
+      "rows": 49,
+      "sha256": "d7d20ea6c216bb5fe4e7ee5a744680feb9376c339f4874b54a6819d28e88ea79"
+    },
+    {
+      "bytes": 37463,
+      "path": "um/MINIMAXUSDT/liquidation.jsonl",
+      "rows": 37,
+      "sha256": "a89764570823c4a612f02805cd57c38ff9cf618da21348019294c3ff124fcf11"
+    },
+    {
+      "bytes": 34105,
+      "path": "um/MIRAUSDT/liquidation.jsonl",
+      "rows": 34,
+      "sha256": "54a78a34f35ddd45907a30ddaec8e98981b5a2ade84a4e073de28f64aa6004ab"
+    },
+    {
+      "bytes": 44207,
+      "path": "um/MITOUSDT/liquidation.jsonl",
+      "rows": 44,
+      "sha256": "8be66492206a864a3054089a4720332ba71b9a722c05af3512c4144a53fa7e1c"
+    },
+    {
+      "bytes": 14982,
+      "path": "um/MMTUSDT/liquidation.jsonl",
+      "rows": 15,
+      "sha256": "7d827af36b942c22975d3e7ea4181c13c4dc79861172aad5c3a26d69f0a6df8c"
+    },
+    {
+      "bytes": 6037,
+      "path": "um/MOCAUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "4bf952ab3881b5936f99e113802b83daf2b2786617ea7c25c2506a3023a6074f"
+    },
+    {
+      "bytes": 67146,
+      "path": "um/MONUSDT/liquidation.jsonl",
+      "rows": 67,
+      "sha256": "4a4835a53294ce62c5e38d9f01f42263c08b1e7ccae2d6cbc87a4ef2e79b43ee"
+    },
+    {
+      "bytes": 11132,
+      "path": "um/MOODENGUSDT/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "9e3f66b125c1943f9c8942ff6e82ec190ad960cc3af4523808be513304946b08"
+    },
+    {
+      "bytes": 43443,
+      "path": "um/MORPHOUSDT/liquidation.jsonl",
+      "rows": 43,
+      "sha256": "63b2bacc9dd192bc31333d5014ea96c0399aaed51b37f9a89a825422f40fdb6c"
+    },
+    {
+      "bytes": 30128,
+      "path": "um/MOVEUSDT/liquidation.jsonl",
+      "rows": 30,
+      "sha256": "baf9d72674be78e83b68452f419511bcd98cab1eecba2f12e827ca388e4b433e"
+    },
+    {
+      "bytes": 58417,
+      "path": "um/MOVRUSDT/liquidation.jsonl",
+      "rows": 58,
+      "sha256": "6fb9cd17ac2ad3a6b9415ed0652127e6abd81911745ee722fe5f8bdd2b23cd2e"
+    },
+    {
+      "bytes": 1002,
+      "path": "um/MRKUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "7b9394d6df53f34115f966905543ad48903cdf3bc20d30a2f5f80806e9970664"
+    },
+    {
+      "bytes": 21098,
+      "path": "um/MRNAUSDT/liquidation.jsonl",
+      "rows": 21,
+      "sha256": "1f5af5a0fb605e92982f0c9da1d69909b8fdaaa2bbfdceda20d72cb3fe1e3045"
+    },
+    {
+      "bytes": 540394,
+      "path": "um/MRVLUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "788f450195abe4b921e5aee548ebbdaa36269d16c5b7bde2531e032f876b516a"
+    },
+    {
+      "bytes": 1312988,
+      "path": "um/MRVLUSDT/klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "8b0daf6b82c01395260f2433d0fa7bfcbeb40c03bab8078e5fd6a34b40f43c3c"
+    },
+    {
+      "bytes": 17085,
+      "path": "um/MRVLUSDT/liquidation.jsonl",
+      "rows": 17,
+      "sha256": "6b257eb6ec4e098d6bda3862ef28e1aa7a98c74ef0eed8c14dbf87b59a9e7781"
+    },
+    {
+      "bytes": 531460,
+      "path": "um/MRVLUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "8b04801a1058bbe736064fd14f7bfa45f34dbfe69ef6e1b18f35a67f8691ac37"
+    },
+    {
+      "bytes": 573360,
+      "path": "um/MRVLUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "097ea629a93ee94bde8876a6ab36e842c9c18e480c7c4f4921b1cb7706df8331"
+    },
+    {
+      "bytes": 1454428,
+      "path": "um/MRVLUSDT/premium_klines_15m.jsonl",
+      "rows": 607,
+      "sha256": "1906f9f1b1a6c88a5471a3a03a8e9d5dc9169e01335d986593a3ace559e17c86"
+    },
+    {
+      "bytes": 7027,
+      "path": "um/MSFTUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "2b5dff3cf413e61fe31d5acd4cdbb0f9bfc78de239bee8b611bff40915b372b7"
+    },
+    {
+      "bytes": 540694,
+      "path": "um/MSTRUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "e78be21b3c440f9d8949c20c65c39eb8590f323b76dbe9f5b638d4775b9b0e26"
+    },
+    {
+      "bytes": 1317015,
+      "path": "um/MSTRUSDT/klines_15m.jsonl",
+      "rows": 551,
+      "sha256": "074de320ab296565759671ed16e953e93ab662f099e627613605e90285bf6d97"
+    },
+    {
+      "bytes": 53294,
+      "path": "um/MSTRUSDT/liquidation.jsonl",
+      "rows": 53,
+      "sha256": "28162aae76262afbb6c5a4a7818ccdfda5f5276be9a3d5d351e825398ee6e2c6"
+    },
+    {
+      "bytes": 531571,
+      "path": "um/MSTRUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "5a067d2ceae9527684f66a74ae4f550a052d46bdfa94920345080ba2464cd93f"
+    },
+    {
+      "bytes": 573421,
+      "path": "um/MSTRUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "790d6721cfd2c6bace26f439e009a984d620490ca3546b5acb006cf3d3b88055"
+    },
+    {
+      "bytes": 1426004,
+      "path": "um/MSTRUSDT/premium_klines_15m.jsonl",
+      "rows": 595,
+      "sha256": "09ba9d259471fd855c4801fa04ff8f00666fc70084971e42a6012d7c37bd600f"
+    },
+    {
+      "bytes": 1982,
+      "path": "um/MTLUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "015110007e0a227c62ed7504c3b21c003cbdab3f45570ffee912d41577108a0b"
+    },
+    {
+      "bytes": 594991,
+      "path": "um/MUBARAKUSDT/liquidation.jsonl",
+      "rows": 587,
+      "sha256": "08080853bb0ff63a4b81953a40771b31c1195799427fc21956495a170041c536"
+    },
+    {
+      "bytes": 9894,
+      "path": "um/MUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "0e22290f4cf1ecedc463d2cf9ea19e8c12571e56d133977ed03a930c21e58d2f"
+    },
+    {
+      "bytes": 538470,
+      "path": "um/MUUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "e8f07211e08fec9694ebacddbfd84ed2d71302826cc2d6a51934c6d2db249435"
+    },
+    {
+      "bytes": 1316660,
+      "path": "um/MUUSDT/klines_15m.jsonl",
+      "rows": 552,
+      "sha256": "ffd153616809cf7dd36eb1060e56788ae7e262d00bcfe1cad855785e7ab1e909"
+    },
+    {
+      "bytes": 91921,
+      "path": "um/MUUSDT/liquidation.jsonl",
+      "rows": 92,
+      "sha256": "1001dd6ccc704b8c174ef80901e98afcb922cc3f03f242898585883b4723fdc4"
+    },
+    {
+      "bytes": 529402,
+      "path": "um/MUUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "fb56649d118cba59e36e68b44871f857fb3527438057c18eb16cb3e57fadbe2f"
+    },
+    {
+      "bytes": 571595,
+      "path": "um/MUUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "ab4aa1a867a3dbfc47657b86cf6319856d344a69eb31c0e55f9b5986143338d2"
+    },
+    {
+      "bytes": 1392449,
+      "path": "um/MUUSDT/premium_klines_15m.jsonl",
+      "rows": 583,
+      "sha256": "aa452f9f229d15c1fe37b90fba337d2eec31b93cd073befa5a7917886291bbec"
+    },
+    {
+      "bytes": 15998,
+      "path": "um/MUUUSDT/liquidation.jsonl",
+      "rows": 16,
+      "sha256": "af730548c1ad082afd30bf651b31626fc0fc27bd9b8a6753e9b2cebc04c662c8"
+    },
+    {
+      "bytes": 12053,
+      "path": "um/MVLLUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "5c5fc456ae0cc6093fd9c3b5b9178195097421c7ebebb2e267e5f06e0dd681a1"
+    },
+    {
+      "bytes": 41960,
+      "path": "um/MYXUSDT/liquidation.jsonl",
+      "rows": 42,
+      "sha256": "94112521c488809708ceffbd96e7ad8739cb33f2da4167778e17cd5eebfd0bd4"
+    },
+    {
+      "bytes": 51520,
+      "path": "um/NAORISUSDT/liquidation.jsonl",
+      "rows": 51,
+      "sha256": "fba8d1ea0aa7f14d16fa9bf5253d1ba8d848424b874538486fecfd829e16ddf9"
+    },
+    {
+      "bytes": 15111,
+      "path": "um/NATGASUSDT/liquidation.jsonl",
+      "rows": 15,
+      "sha256": "ba135e8dee7b655f1a0780c03541754ed9de4856c1d6dd40ca9c8f5b15fa4eb4"
+    },
+    {
+      "bytes": 12062,
+      "path": "um/NBISUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "704eacdf972110576aab4fdb553e8eed66f59f7b38cdbd22483beb87d8ae5f32"
+    },
+    {
+      "bytes": 9937,
+      "path": "um/NEARUSDC/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "ca7d57eb31cc68996b3bf099abd94f2893f03102bdff19a977bfd457a7001e8c"
+    },
+    {
+      "bytes": 538942,
+      "path": "um/NEARUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "e056fdc89c6392a713caab3a61d0b78d25669d1c94050682101feae809d3f419"
+    },
+    {
+      "bytes": 1306990,
+      "path": "um/NEARUSDT/klines_15m.jsonl",
+      "rows": 552,
+      "sha256": "6f37f100ba64ccb0286b22b8b9af5c1e599103cf04b8ea86dab6f568ec129817"
+    },
+    {
+      "bytes": 302166,
+      "path": "um/NEARUSDT/liquidation.jsonl",
+      "rows": 304,
+      "sha256": "f6b31fa6cd163579d924ba06e8eb7c0931b598bf80ca9de87d0136ccf9190dd2"
+    },
+    {
+      "bytes": 531340,
+      "path": "um/NEARUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "5e97dc00073c3757ad1b1a470984e10459dba9544a98da8bbb1f896bd80a50e6"
+    },
+    {
+      "bytes": 570647,
+      "path": "um/NEARUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "55704e6850e336feeef48b8f1fdc72c924ebbfff8ffb0e1aa99497ac5ae585cc"
+    },
+    {
+      "bytes": 1424715,
+      "path": "um/NEARUSDT/premium_klines_15m.jsonl",
+      "rows": 594,
+      "sha256": "681f79ba5d87389ea9d2c31f2a2dfab5a7637d52fbe55b295425181c43e0389e"
+    },
+    {
+      "bytes": 67154,
+      "path": "um/NEIROUSDT/liquidation.jsonl",
+      "rows": 66,
+      "sha256": "a12fe79318829f45ae72048d690d948afecf785d8553e28bac187fcaf4c3a04b"
+    },
+    {
+      "bytes": 997,
+      "path": "um/NEOUSDC/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "ba50d45a5ef0b97b6f357f3103fed54bbccf28161777497ec65d22d1360451c6"
+    },
+    {
+      "bytes": 20914,
+      "path": "um/NEOUSDT/liquidation.jsonl",
+      "rows": 21,
+      "sha256": "08bedc60d44ef738371f76750783eab6c0fe1fedae19c16ac13bbdc80c2283c6"
+    },
+    {
+      "bytes": 3006,
+      "path": "um/NETUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "f396dbf61f860d6f0a96abacdb69addf4309782d42e3b2f64d9e4e848ffa91dc"
+    },
+    {
+      "bytes": 3003,
+      "path": "um/NEWTUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "091440433ead9bf507c798d8ca3a1eb52a9c770430a2585590478810e5b21b4c"
+    },
+    {
+      "bytes": 3008,
+      "path": "um/NFLXUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "fd4f7dbea3131bad48182bfc68433d294ae7f4d9b386206371fa63c03f6fcaab"
+    },
+    {
+      "bytes": 66506,
+      "path": "um/NIGHTUSDT/liquidation.jsonl",
+      "rows": 66,
+      "sha256": "ead9a758d01109d94d1736711b83d0fcc257a188e95e2d50792a5a209bc7271a"
+    },
+    {
+      "bytes": 68292,
+      "path": "um/NILUSDT/liquidation.jsonl",
+      "rows": 68,
+      "sha256": "fee645372b97b609598bacfbaa3f39e0762eeb39241da836487dfc58528e9132"
+    },
+    {
+      "bytes": 11977,
+      "path": "um/NMRUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "ad16bf491100f1e53e6f14ed3a9609dd7d7f31bd89edad7a03f49e8bacd85233"
+    },
+    {
+      "bytes": 144614,
+      "path": "um/NOMUSDT/liquidation.jsonl",
+      "rows": 144,
+      "sha256": "61b265f1748db2dc09f7422d2dea3aa8ed9f8442651859978fee66ccb188cdd3"
+    },
+    {
+      "bytes": 44288,
+      "path": "um/NOTUSDT/liquidation.jsonl",
+      "rows": 44,
+      "sha256": "b9a046e6879b2e911f162ff4b044514344c84c5c900e487a17d555af1674f361"
+    },
+    {
+      "bytes": 541029,
+      "path": "um/NVDAUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "b1d59b9a8295a71347a91bc49ceee0ac14109d4a8c6b8001fead3be1001ffc64"
+    },
+    {
+      "bytes": 1319222,
+      "path": "um/NVDAUSDT/klines_15m.jsonl",
+      "rows": 552,
+      "sha256": "b4d7ccedc56da3462d0bd08c922d3836c7c6e7959ed42eeeb9eacbe55fe2c88c"
+    },
+    {
+      "bytes": 51223,
+      "path": "um/NVDAUSDT/liquidation.jsonl",
+      "rows": 51,
+      "sha256": "610f49405312398bc0e715b5abe62565fb81979b0b568d32c03b19d7a81dbd76"
+    },
+    {
+      "bytes": 531599,
+      "path": "um/NVDAUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "cd470568d722825ebcf792ad0562a5e5362569dd4f5553880e06f3455f8e9b99"
+    },
+    {
+      "bytes": 573419,
+      "path": "um/NVDAUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "fdc661bb16b9a6c06597b1b06b90a39b90ca80977b68d82c572db25a771526a6"
+    },
+    {
+      "bytes": 1387805,
+      "path": "um/NVDAUSDT/premium_klines_15m.jsonl",
+      "rows": 579,
+      "sha256": "9d32f4d8cca9964514c7714266c34d9bb79b64327f3d068113d1e68fa3da55ff"
+    },
+    {
+      "bytes": 14028,
+      "path": "um/NVDLUSDT/liquidation.jsonl",
+      "rows": 14,
+      "sha256": "bfa9477c5a1188336480866121d2d1170461cd56611614497d55ba0e1d381ce8"
+    },
+    {
+      "bytes": 2002,
+      "path": "um/NXPCUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "e36ff319b3e0966b26c43cfba2f80422c76d56f90f88ff3f89a61ebaf76d7ddf"
+    },
+    {
+      "bytes": 6010,
+      "path": "um/OGNUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "3cfcf9174ae51b1b0c1894d15c69f85abf6a32fb8d3a1ff822fa1e5089ebf486"
+    },
+    {
+      "bytes": 9959,
+      "path": "um/OGUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "5fc082a7f7c73c089c6b664678b750c6b290e6292fcc730aa7b25a07f1aa61c5"
+    },
+    {
+      "bytes": 143221,
+      "path": "um/ONDOUSDT/liquidation.jsonl",
+      "rows": 142,
+      "sha256": "12b14030d20ed4ac6da5f8977d4a328328f2a7abf6f3a01e9b071e055977938e"
+    },
+    {
+      "bytes": 5016,
+      "path": "um/ONDSUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "8423787592578c9ef28cfb08cb367cec7c1c7f0ff2e0b25cb74004562b24d47a"
+    },
+    {
+      "bytes": 33177,
+      "path": "um/ONEUSDT/liquidation.jsonl",
+      "rows": 33,
+      "sha256": "9d4413f4e87dc4f9b3abf034ecaa706ce99ed4914568236e62cdd52c84ab1fd8"
+    },
+    {
+      "bytes": 539064,
+      "path": "um/ONGUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "687796e6690553153df240b523bb2faeca742d469447bf6e63ddc44db6e5a322"
+    },
+    {
+      "bytes": 1314177,
+      "path": "um/ONGUSDT/klines_15m.jsonl",
+      "rows": 551,
+      "sha256": "e1c44665ac516da77868cb15d75683a9d1d10d36e6c88bbb3667f05acee920ea"
+    },
+    {
+      "bytes": 322907,
+      "path": "um/ONGUSDT/liquidation.jsonl",
+      "rows": 323,
+      "sha256": "7417a1d47afe24c27e6de6f34335958797e1d553b12fd95a0e6cab93d57cf355"
+    },
+    {
+      "bytes": 530245,
+      "path": "um/ONGUSDT/open_interest.jsonl",
+      "rows": 275,
+      "sha256": "15092c89edebb1392f3a7590809596dd689b94f0f9a93ef073311e1536d6b08f"
+    },
+    {
+      "bytes": 569706,
+      "path": "um/ONGUSDT/premium.jsonl",
+      "rows": 275,
+      "sha256": "9b8bd352e1162cdb3775d1b576acccf3268c941e31242c12e1d64b559dc71284"
+    },
+    {
+      "bytes": 1399360,
+      "path": "um/ONGUSDT/premium_klines_15m.jsonl",
+      "rows": 584,
+      "sha256": "4a480bb10c652fb4c41400a1c5f5d14e289e518057d0880da5685c1d325104a8"
+    },
+    {
+      "bytes": 31086,
+      "path": "um/ONTUSDT/liquidation.jsonl",
+      "rows": 31,
+      "sha256": "445162db2ed1a896ff7d81b6cba584940cb6fec4f8716ca993c67f60b47890d3"
+    },
+    {
+      "bytes": 39798,
+      "path": "um/ONUSDT/liquidation.jsonl",
+      "rows": 40,
+      "sha256": "eafe2c1ff8ecbc22bc6c327fb2f81f4f92d46903674b1ea06a02fadf0f894723"
+    },
+    {
+      "bytes": 21247,
+      "path": "um/OPENAIUSDT/liquidation.jsonl",
+      "rows": 21,
+      "sha256": "e7cde60c1bda5d266b1906957e186b3ee124777d0898c992d32110f760357791"
+    },
+    {
+      "bytes": 44155,
+      "path": "um/OPENUSDT/liquidation.jsonl",
+      "rows": 44,
+      "sha256": "46f9d2413dce9f6ff1307099ae2194ff20d133ea7d5040a2c23f2d3e71a34132"
+    },
+    {
+      "bytes": 17971,
+      "path": "um/OPGUSDT/liquidation.jsonl",
+      "rows": 18,
+      "sha256": "bb11e8d98ec67b7e05428eb792c6e3fe8d0fd89b7882cc88b921d771f068167b"
+    },
+    {
+      "bytes": 29022,
+      "path": "um/OPNUSDT/liquidation.jsonl",
+      "rows": 29,
+      "sha256": "514486ffd7feb25d44c68a3c34fd16c7f81b898b920b769bb76dcc488e663323"
+    },
+    {
+      "bytes": 119416,
+      "path": "um/OPUSDT/liquidation.jsonl",
+      "rows": 119,
+      "sha256": "9faf9b81af38f169f68c4604fbb9e44a7395153cb4d1b55cd1192d7844cf3dd9"
+    },
+    {
+      "bytes": 123589,
+      "path": "um/ORCAUSDT/liquidation.jsonl",
+      "rows": 123,
+      "sha256": "35822e9638280d2c7ecaf3a219dced3252a66c6d47b9cf8864b0c56f91fa025a"
+    },
+    {
+      "bytes": 4019,
+      "path": "um/ORCLUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "9223362dedbac08fb285e77c6305ed51ea1d97841e5e23e3d213307e92c9a2d3"
+    },
+    {
+      "bytes": 11084,
+      "path": "um/ORDERUSDT/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "fd763cb9114d62547ff96f99070739232770291da472ddcd44ca139ea5e0a80a"
+    },
+    {
+      "bytes": 10039,
+      "path": "um/ORDIUSDC/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "2fc1d7b4935eed9d4b30e1a86404efc59acb5218bcb2264ef9686835101bf350"
+    },
+    {
+      "bytes": 58161,
+      "path": "um/ORDIUSDT/liquidation.jsonl",
+      "rows": 58,
+      "sha256": "007de11624a1ee2245c3568ae7311d06e3e29040db2fcff6428e8d96045c7229"
+    },
+    {
+      "bytes": 10887,
+      "path": "um/OUSDT/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "81f3321cecb408c45236b886bea07c074cd4e71da5bab52d90dc416f096bce3c"
+    },
+    {
+      "bytes": 9046,
+      "path": "um/PANWUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "1a4d047a1f13d50bd8f2a5b835edebb5cf205ddb1b6e4264b35aebcde3f04b7b"
+    },
+    {
+      "bytes": 24180,
+      "path": "um/PARTIUSDT/liquidation.jsonl",
+      "rows": 24,
+      "sha256": "a82b395f1ead2bc97b8ea641da6c3b052c5c10a66106e8fad8edab8a931d483f"
+    },
+    {
+      "bytes": 71520,
+      "path": "um/PAXGUSDT/liquidation.jsonl",
+      "rows": 71,
+      "sha256": "2337c10e28b43bd0a61d6190191e8f6ddb08bd85354b24ffcb13baa11aff14aa"
+    },
+    {
+      "bytes": 1001,
+      "path": "um/PAYPUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "6c2c3891cd645a04eacee1271da29e8cc79d134941972b86dabc03a32dcc3617"
+    },
+    {
+      "bytes": 5999,
+      "path": "um/PDDUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "522396ee69f0ed2fe5a613410ae6b311e5eeaa60c35aedace537dc44762599d4"
+    },
+    {
+      "bytes": 70423,
+      "path": "um/PENDLEUSDT/liquidation.jsonl",
+      "rows": 70,
+      "sha256": "ec891768d5b18f3765678115b7202c6c2ee8c5ea48ae2fc74629f6e0db8b7142"
+    },
+    {
+      "bytes": 17202,
+      "path": "um/PENGUUSDC/liquidation.jsonl",
+      "rows": 17,
+      "sha256": "57bec54ca662553c0d6fffbb8ab47dca815f5a285e0883b82943052403b7f3af"
+    },
+    {
+      "bytes": 145402,
+      "path": "um/PENGUUSDT/liquidation.jsonl",
+      "rows": 144,
+      "sha256": "9d214a043b86685fae836bb250811e0944ae69d29901be5f2b6b6161f9784ce1"
+    },
+    {
+      "bytes": 65783,
+      "path": "um/PEOPLEUSDT/liquidation.jsonl",
+      "rows": 65,
+      "sha256": "3c859a70674e54165510733ba5e39164a3b69fd923d8c31a5ae8ae93343c80d9"
+    },
+    {
+      "bytes": 19124,
+      "path": "um/PHAROSUSDT/liquidation.jsonl",
+      "rows": 19,
+      "sha256": "b9eb81e1c2ddfbd9cb45d720e95ba3b909ac541f95ee4a40ff640c652e525715"
+    },
+    {
+      "bytes": 12024,
+      "path": "um/PHAUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "3367d3a8dba967d23cd78d930ca23b4584689fdbb572e8bd0806057a8c3ef31c"
+    },
+    {
+      "bytes": 70767,
+      "path": "um/PIEVERSEUSDT/liquidation.jsonl",
+      "rows": 70,
+      "sha256": "ee75505cb7a143e8954df7f6ab01e34ac821664164efa0e13916676817f26ecc"
+    },
+    {
+      "bytes": 52574,
+      "path": "um/PIPPINUSDT/liquidation.jsonl",
+      "rows": 52,
+      "sha256": "a3e16818f906e395263bbe11ab91516953e6ca0af13b0496e0895e9ca41da254"
+    },
+    {
+      "bytes": 9082,
+      "path": "um/PIXELUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "f3d937d1627cafd91e592b5d34646895d9c5e25f36d2140433451d4fde745e35"
+    },
+    {
+      "bytes": 27082,
+      "path": "um/PLAYUSDT/liquidation.jsonl",
+      "rows": 27,
+      "sha256": "ddcfcfee52a561d767277a120937cfa34558b8ced1775515c49b7af54c46bcdb"
+    },
+    {
+      "bytes": 21089,
+      "path": "um/PLTRUSDT/liquidation.jsonl",
+      "rows": 21,
+      "sha256": "c6f4168c2c96793a7db6c07efc5bb7be5504d746118655b09e7d56ee43ec7185"
+    },
+    {
+      "bytes": 20173,
+      "path": "um/PLUMEUSDT/liquidation.jsonl",
+      "rows": 20,
+      "sha256": "930bf5114191175e1928ffb2151c2684b1fb1ddc6051851db167fa490c8faf39"
+    },
+    {
+      "bytes": 7035,
+      "path": "um/PNUTUSDC/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "e40cfe09eec100fee6578226db25c7e5bb5f96f6c997e8415c69f68b9f5c2e0b"
+    },
+    {
+      "bytes": 29102,
+      "path": "um/PNUTUSDT/liquidation.jsonl",
+      "rows": 29,
+      "sha256": "111a61ba51b6b80a7b83ba3ab58df95b172b98079c5cea1110ce804da50cb87f"
+    },
+    {
+      "bytes": 58997,
+      "path": "um/POLUSDT/liquidation.jsonl",
+      "rows": 59,
+      "sha256": "f5acacca58a68fe53330f0adb2190053b2dadfac7a4b0b317bdd6c83243024cb"
+    },
+    {
+      "bytes": 7052,
+      "path": "um/POLYXUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "9413d805e26d5a9c786273346b5b7e18eda49313d7b5609748819e1d2bc5d2fb"
+    },
+    {
+      "bytes": 119022,
+      "path": "um/PONSUSDT/liquidation.jsonl",
+      "rows": 119,
+      "sha256": "8c505bcd5ecd7ba7ad34c597015712fbd2a60cb8f5f3012ee55d0eeb4c24cf81"
+    },
+    {
+      "bytes": 14135,
+      "path": "um/POPCATUSDT/liquidation.jsonl",
+      "rows": 14,
+      "sha256": "d4b9de51aee24d3d3fa23508f57dd86377b32bb774c2441c22c92482de8402c3"
+    },
+    {
+      "bytes": 1011,
+      "path": "um/POPMARTUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "b08d3df008b863540ccae7e8ff387f78d0b8fac0d6e8c28f0b4679d158b56820"
+    },
+    {
+      "bytes": 72125,
+      "path": "um/PORTALUSDT/liquidation.jsonl",
+      "rows": 71,
+      "sha256": "fd62451a7de1c732a1a4da7e8151d2ee4d45f161f8b8b8c78bc2d0f14bf9569d"
+    },
+    {
+      "bytes": 44237,
+      "path": "um/POWERUSDT/liquidation.jsonl",
+      "rows": 44,
+      "sha256": "0590469ee92f03f2ab67ae25b09c8d36f0e9e54fa11d5df0e0b73af0239dcc2e"
+    },
+    {
+      "bytes": 5014,
+      "path": "um/POWRUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "2fd89fb27be5f6ebfcd0681be506845e0a4465bf996310f90f446c96625db109"
+    },
+    {
+      "bytes": 44935,
+      "path": "um/PRLUSDT/liquidation.jsonl",
+      "rows": 45,
+      "sha256": "3c353919dac4f6fbe98ca572735bb2e3d83dbe4a79f624ad5b8b3165e40352fd"
+    },
+    {
+      "bytes": 8074,
+      "path": "um/PROMPTUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "bfda30eeeb84bd343bce12abeb65135b287a34a94d62e1d6e557c6f7b2864c81"
+    },
+    {
+      "bytes": 540411,
+      "path": "um/PROMUSDT/book_ticker.jsonl",
+      "rows": 275,
+      "sha256": "9a7cf0d477c6b53c9af8c6333534bab0cff543b8d001c910f20fd14b2c110c5a"
+    },
+    {
+      "bytes": 1317726,
+      "path": "um/PROMUSDT/klines_15m.jsonl",
+      "rows": 551,
+      "sha256": "07ebbfae8c13d405f9c897d5c0f3877db5a79a886cc272c41d118e03552381a4"
+    },
+    {
+      "bytes": 608455,
+      "path": "um/PROMUSDT/liquidation.jsonl",
+      "rows": 606,
+      "sha256": "f33ae026607ea2e72b4b5f6c023a634af1e3aad0e221fd4836d731944a5a5e50"
+    },
+    {
+      "bytes": 529690,
+      "path": "um/PROMUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "65fdcbb88e0c85d3e6722d18c5d8a96503011711e70b2a87d9c5af47cf0579b1"
+    },
+    {
+      "bytes": 568319,
+      "path": "um/PROMUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "5e43e53cb44f13ee827d58be60111b0dca718aeee1bd530e59d8dba982eac036"
+    },
+    {
+      "bytes": 1390171,
+      "path": "um/PROMUSDT/premium_klines_15m.jsonl",
+      "rows": 580,
+      "sha256": "b454d9f9be3bf6b3d913b58b486abf9e0655c65029f6b62aa5f88801214ccbd8"
+    },
+    {
+      "bytes": 4031,
+      "path": "um/PROVEUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "e18fc5d2500b6a666b21eba91b7aaca0245d7e63265da4713dd6b66f8af1ad93"
+    },
+    {
+      "bytes": 51210,
+      "path": "um/PTBUSDT/liquidation.jsonl",
+      "rows": 51,
+      "sha256": "022c3e856d0ddb99317b07bfeeeae36c3e23b846828fd0af4c32ad9a6c6c15f2"
+    },
+    {
+      "bytes": 10131,
+      "path": "um/PUMPBTCUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "678e9a334a09c71cb584e75629b013df69c5e1344d4217c40b105f614fdb72f2"
+    },
+    {
+      "bytes": 539599,
+      "path": "um/PUMPUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "b5d4430a8f9f953c6eb699bc908cfe3859a6fee9712c90d89d1acc7f203e5352"
+    },
+    {
+      "bytes": 1312248,
+      "path": "um/PUMPUSDT/klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "b4dbf4fc73be16897460194ec179e7ac9a2b5a6fb704d9acb75070b253f1d6f4"
+    },
+    {
+      "bytes": 311421,
+      "path": "um/PUMPUSDT/liquidation.jsonl",
+      "rows": 309,
+      "sha256": "4994c947154c646bf4941ee45b95f9b574c0af8929296ed5900ff130c9152da3"
+    },
+    {
+      "bytes": 530243,
+      "path": "um/PUMPUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "bbcd5fe5e914a440c76b33e30e43119581ec54e58e1513569eb86952604bfeff"
+    },
+    {
+      "bytes": 568347,
+      "path": "um/PUMPUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "c6f289b86612dd80be54136e7399dca424d2c516061c855a5b71004f3efc0a4f"
+    },
+    {
+      "bytes": 1369578,
+      "path": "um/PUMPUSDT/premium_klines_15m.jsonl",
+      "rows": 571,
+      "sha256": "bd02d224ab2cba6074a829d82527861e597834fee62dedbd73d22e2cf0eaf780"
+    },
+    {
+      "bytes": 4030,
+      "path": "um/PUNDIXUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "da795931047151f52ed4118752123a0a863d81263b1f8769e1e89af1d046bc75"
+    },
+    {
+      "bytes": 150534,
+      "path": "um/PYTHUSDT/liquidation.jsonl",
+      "rows": 150,
+      "sha256": "f43d05fac742204290ca46d558a8cc98fa7cdb79dad14663d853ecfe087fcc40"
+    },
+    {
+      "bytes": 12984,
+      "path": "um/QNTUSDT/liquidation.jsonl",
+      "rows": 13,
+      "sha256": "067bdd06e9357d825955392d197be5a4d63ae1e49b5f7abc1c52bdca17a9f19a"
+    },
+    {
+      "bytes": 2006,
+      "path": "um/QNTXUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "8d0576d7e36607e5e8105635e05b45bc270ed90e90d68813475865a68e80e4b2"
+    },
+    {
+      "bytes": 537837,
+      "path": "um/QQQUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "f70105b5605401b45b3473d1c52ed64f055c1f20a6033161fb617ecd45670413"
+    },
+    {
+      "bytes": 1310818,
+      "path": "um/QQQUSDT/klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "19a1f877443afd0a0de36ea64338b1a7360594e19461137c04ee91597cc45392"
+    },
+    {
+      "bytes": 8016,
+      "path": "um/QQQUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "d8b30008c3a332523645bf7a45a294d745b8e7071da76090a08f8f6a27e4f274"
+    },
+    {
+      "bytes": 528320,
+      "path": "um/QQQUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "0c179c63a885f269531b384e2db45fe4167137daf9e711bf0a2bacc4c1a73b2c"
+    },
+    {
+      "bytes": 570235,
+      "path": "um/QQQUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "d16ca6d2b1ffb12c821d133869e142ca1f3a7fb3d5810a0df22586b3604c3dae"
+    },
+    {
+      "bytes": 1368052,
+      "path": "um/QQQUSDT/premium_klines_15m.jsonl",
+      "rows": 572,
+      "sha256": "e3fbb89340aaa1df1f57324ee25a657a14be726a84d929a19803a9b5d1521959"
+    },
+    {
+      "bytes": 16066,
+      "path": "um/QTUMUSDT/liquidation.jsonl",
+      "rows": 16,
+      "sha256": "e2ed439e7b28f47f83cde1f0b89f5fd3fa8176922281b5850567ec3559d9e518"
+    },
+    {
+      "bytes": 134178,
+      "path": "um/QUSDT/liquidation.jsonl",
+      "rows": 135,
+      "sha256": "b6a229f9606a904386e4d4a8188caadc0553470bbb3a7e1631f1cbb2ba6f40fa"
+    },
+    {
+      "bytes": 9997,
+      "path": "um/RAMUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "0151e0ea7c59b81bd7951218d0d0ec449e5b58e8a08aeeaebfcb3fa63b229f6d"
+    },
+    {
+      "bytes": 6027,
+      "path": "um/RAREUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "60e7f05316bf43e53ef18b991f2fdf5ae5fd2b53a4af9d6ed9db8b7270869613"
+    },
+    {
+      "bytes": 56074,
+      "path": "um/RAVEUSDT/liquidation.jsonl",
+      "rows": 56,
+      "sha256": "05446616ef82001a0c962606a631c4a70e2707b7ad7aaa97c58278d05d892a8b"
+    },
+    {
+      "bytes": 240724,
+      "path": "um/RAYSOLUSDT/liquidation.jsonl",
+      "rows": 238,
+      "sha256": "efa2af91b9c9be19e5665a4e803868355d706a211324dec85a04c8ab48106658"
+    },
+    {
+      "bytes": 3011,
+      "path": "um/RDDTUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "2f2b147a029d2b81df35dd3498c4ed3d687655263b096f68c30c8fda6236ced7"
+    },
+    {
+      "bytes": 56557,
+      "path": "um/RECALLUSDT/liquidation.jsonl",
+      "rows": 56,
+      "sha256": "2e4ccae3cbff1cfe771fca4dbb9af3696b12aec9f1c9b7d596246bf6ad56af5f"
+    },
+    {
+      "bytes": 45983,
+      "path": "um/REDUSDT/liquidation.jsonl",
+      "rows": 46,
+      "sha256": "d673d69e4099e1a0ab3d259b0fe6409214baba209ae8554d3e627c7e6c173a04"
+    },
+    {
+      "bytes": 41506,
+      "path": "um/RENDERUSDT/liquidation.jsonl",
+      "rows": 41,
+      "sha256": "cf8d9a03d800aa6b0ec3bee9167322412a603c1656320779f3ef35f0e3d36a21"
+    },
+    {
+      "bytes": 4039,
+      "path": "um/RESOLVUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "4ac9b160ba3d2c1ab1b79e18f079b95615656203415aeba59cff3178e3b35f54"
+    },
+    {
+      "bytes": 62712,
+      "path": "um/REUSDT/liquidation.jsonl",
+      "rows": 63,
+      "sha256": "bc3eee52034b1be3c814434c1162467f66c6f1ce9c528b40a270c8aabf0725c8"
+    },
+    {
+      "bytes": 19079,
+      "path": "um/REZUSDT/liquidation.jsonl",
+      "rows": 19,
+      "sha256": "47cad9279435fe4427400c8cbe9aed45fdeb6a97be99f7f72dec90578e6652ae"
+    },
+    {
+      "bytes": 47007,
+      "path": "um/RIFUSDT/liquidation.jsonl",
+      "rows": 47,
+      "sha256": "a43e2e86f698e5c02d64a03c0a7aee6396c2fb042509f8e6b3bea1889781b9cc"
+    },
+    {
+      "bytes": 218473,
+      "path": "um/RIVERUSDT/liquidation.jsonl",
+      "rows": 217,
+      "sha256": "ee81519b041363276acde2531b894974b6e16f745f2730012f5e5d463508d275"
+    },
+    {
+      "bytes": 3008,
+      "path": "um/RKLBUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "50ece1e84bbd6726cc020da5dfe2b6f6b7ed29739e1eecd9d6f38618a32898dd"
+    },
+    {
+      "bytes": 10966,
+      "path": "um/RLCUSDT/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "91c6292934ec721875a1c27882767532bd3521cd32d9de27bcdec9fc4c46e093"
+    },
+    {
+      "bytes": 145894,
+      "path": "um/ROBOUSDT/liquidation.jsonl",
+      "rows": 145,
+      "sha256": "52d2ce15ffbb79b90bb99c1bb762d3e0692c66961a89b20be55ba5d89f39303b"
+    },
+    {
+      "bytes": 5056,
+      "path": "um/RONINUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "99c018e43f2e8a8b3f614b1ff761cbb7e719af5562a9ba81de3d27b219245362"
+    },
+    {
+      "bytes": 56380,
+      "path": "um/ROSEUSDT/liquidation.jsonl",
+      "rows": 56,
+      "sha256": "b722a6a0cf30c4bdd45dbbb1d5d896ffbaffdcdc4fddfd5db38fc0a81575f04d"
+    },
+    {
+      "bytes": 8016,
+      "path": "um/RPLUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "81931da0dedb103f538c114b4c1074aefa0f16cb00d830b4cd258f30a3ef5129"
+    },
+    {
+      "bytes": 15063,
+      "path": "um/RSRUSDT/liquidation.jsonl",
+      "rows": 15,
+      "sha256": "97fbc75302f3d3083581da8c07efd45960fa4c65a4ee1e150d9daf51a62d9d19"
+    },
+    {
+      "bytes": 32805,
+      "path": "um/RUNEUSDT/liquidation.jsonl",
+      "rows": 33,
+      "sha256": "57dd7cc1fea9d9d99da02465ba678ee10c718c4cc7a77d2ef002c145cc47440d"
+    },
+    {
+      "bytes": 19055,
+      "path": "um/RVNUSDT/liquidation.jsonl",
+      "rows": 19,
+      "sha256": "9dc496796193e48a0694183b043aa5a3abb046480f2d2cce2e8b4241ed6d62e6"
+    },
+    {
+      "bytes": 44117,
+      "path": "um/SAFEUSDT/liquidation.jsonl",
+      "rows": 44,
+      "sha256": "a2e890b057f11378ef9ed460c1ae587a4a43e1a03b6a798ad5b2dbbe3bf621ff"
+    },
+    {
+      "bytes": 16171,
+      "path": "um/SAGAUSDT/liquidation.jsonl",
+      "rows": 16,
+      "sha256": "cb1b37ea83534e28e9849bd561708155e3968b85d00c2e96a926044977ba1cc1"
+    },
+    {
+      "bytes": 28282,
+      "path": "um/SAHARAUSDT/liquidation.jsonl",
+      "rows": 28,
+      "sha256": "fbcdc48676ef2d4665257d80c6974efc8e00f7851212ea5e4a3f79ddce5ffed7"
+    },
+    {
+      "bytes": 4080,
+      "path": "um/SAMSUNGEMUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "fb8809d80bc9c29bb0c6999136694579049caff6d3affdc914777b33fc6d28e1"
+    },
+    {
+      "bytes": 542107,
+      "path": "um/SAMSUNGUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "1b95932cb735cc43cdb49dcff31273e575f3f155d58b6a5507bc21a700f68a8c"
+    },
+    {
+      "bytes": 1316568,
+      "path": "um/SAMSUNGUSDT/klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "56c655e541041e52b3d8319f3318939a8ba29a74bab2b46cbba2ecb47d68f1b6"
+    },
+    {
+      "bytes": 10137,
+      "path": "um/SAMSUNGUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "5205a64b34387cb7e40d47b11c04cc7d39aabe33363fc0890354c9e24d16582b"
+    },
+    {
+      "bytes": 532978,
+      "path": "um/SAMSUNGUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "aa43916189266a2f406395521852fd875abde45c8737c732197f0357238ce963"
+    },
+    {
+      "bytes": 574631,
+      "path": "um/SAMSUNGUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "89d44ac599eef3e1cb7ab1b5381644f1e5df56023e9fdcacd3c3b93cdd19a34a"
+    },
+    {
+      "bytes": 1365847,
+      "path": "um/SAMSUNGUSDT/premium_klines_15m.jsonl",
+      "rows": 567,
+      "sha256": "a0f9f83bab10255ae323f3d4aa9351df1376fe67904b96cda42806acabce3d1c"
+    },
+    {
+      "bytes": 55026,
+      "path": "um/SANDUSDT/liquidation.jsonl",
+      "rows": 55,
+      "sha256": "fbcccd372e6f356b23da90592a201c13110ed29445fe5a996a1bc31467b386a1"
+    },
+    {
+      "bytes": 3048,
+      "path": "um/SANTOSUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "6e073aa8b2979bd756f38f79ec592053cd992895db3543ef24f4c01c9fc06b39"
+    },
+    {
+      "bytes": 12106,
+      "path": "um/SAPIENUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "f21e166f31f5e02c66be09ca0bffa15a9cf0041f287ab38d2095662b489ed882"
+    },
+    {
+      "bytes": 12995,
+      "path": "um/SCRUSDT/liquidation.jsonl",
+      "rows": 13,
+      "sha256": "37bf2e6e99361b4db7f874b5eb46b5195ad696c2b84d61e4c96be6417fa10698"
+    },
+    {
+      "bytes": 58092,
+      "path": "um/SEIUSDT/liquidation.jsonl",
+      "rows": 58,
+      "sha256": "54aa68ac973b5e8b8db4dce6e97e0b013123e28ec458189d802bd08d3a2dad90"
+    },
+    {
+      "bytes": 13070,
+      "path": "um/SENTUSDT/liquidation.jsonl",
+      "rows": 13,
+      "sha256": "6bc03e1b6fbc7dcdfe277428ca77fe15fd274b87335361453d89723717d60213"
+    },
+    {
+      "bytes": 8923,
+      "path": "um/SFPUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "fec295f19c8227fa2ffe699a35b8af937916c8b15a3952ad915259aad0c0f366"
+    },
+    {
+      "bytes": 8055,
+      "path": "um/SHELLUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "85fbc2a4014c355c1231b67b28ffaaaf65106a2872eecbe19d771e71bf1d1fd3"
+    },
+    {
+      "bytes": 56319,
+      "path": "um/SIGNUSDT/liquidation.jsonl",
+      "rows": 56,
+      "sha256": "0e30a208fac1d1f156002517bb08147caf6e4ebffdb74e412a98840e4d953182"
+    },
+    {
+      "bytes": 63424,
+      "path": "um/SIRENUSDT/liquidation.jsonl",
+      "rows": 63,
+      "sha256": "ca83ed3be19c50020cb6cff13ad2bd46b68e5dc84e7463025b6d422d77e0b08c"
+    },
+    {
+      "bytes": 14025,
+      "path": "um/SKDDUSDT/liquidation.jsonl",
+      "rows": 14,
+      "sha256": "23bd141a69108cb121585c5e3e8b9adadbf53b0ef9dd9760436891aeda56118d"
+    },
+    {
+      "bytes": 542349,
+      "path": "um/SKHYNIXUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "d30fa78d99f8f8c3c1b5a3821c959580fb6ee325c59d475608656c19504bb944"
+    },
+    {
+      "bytes": 1325328,
+      "path": "um/SKHYNIXUSDT/klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "a1adc9d5e1b1b33fb30a2e2fee829abfc6be2c0192eee613b0cbd6ffdc79bb7f"
+    },
+    {
+      "bytes": 236660,
+      "path": "um/SKHYNIXUSDT/liquidation.jsonl",
+      "rows": 233,
+      "sha256": "c896d5fea822b2bc1e9c07398a8f487860aad23c76f14ae041fea21a82f03518"
+    },
+    {
+      "bytes": 532986,
+      "path": "um/SKHYNIXUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "8f100a4c86cc8029d464fc1f4b908eb0ea9957da1b341f605a51e467a12df377"
+    },
+    {
+      "bytes": 575456,
+      "path": "um/SKHYNIXUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "cfaf0c523273f7a7fa63ff5bbbfb757d3eb562e1c2ccc35883bba59f7fc544c9"
+    },
+    {
+      "bytes": 1346625,
+      "path": "um/SKHYNIXUSDT/premium_klines_15m.jsonl",
+      "rows": 559,
+      "sha256": "c2f700291147044cc5c51d7f5c5aea6477edb0aa92de0dbf76c3cfc9b1931474"
+    },
+    {
+      "bytes": 539018,
+      "path": "um/SKHYUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "d35ecc53268423875e6714078a1464fbb6bd6d1d2728f56443b9298b73abeb33"
+    },
+    {
+      "bytes": 1310722,
+      "path": "um/SKHYUSDT/klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "4f21a67a2f1dc54035b97d5426244a1c2238a8bfd29b6a99187f45e487768065"
+    },
+    {
+      "bytes": 90477,
+      "path": "um/SKHYUSDT/liquidation.jsonl",
+      "rows": 90,
+      "sha256": "b37241c296bcab7ed0f5d12e148508ed33105128be0b9fc9de2f948c4072c5e7"
+    },
+    {
+      "bytes": 529699,
+      "path": "um/SKHYUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "07039aa9b8fb2f6c348af00ac7b31059ca85f97915db810d25b2f3c98d0ae4fa"
+    },
+    {
+      "bytes": 571377,
+      "path": "um/SKHYUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "669e9b2bd0541a2a9d8526f5164321479cf8d9376363dca326500d471a04845d"
+    },
+    {
+      "bytes": 1345250,
+      "path": "um/SKHYUSDT/premium_klines_15m.jsonl",
+      "rows": 561,
+      "sha256": "0372d9b8b86270a6ba5fcfc1cbe4a73e5a983e72f6ea753a12d57d77ad6dbcc7"
+    },
+    {
+      "bytes": 9042,
+      "path": "um/SKLUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "1cf19d4fc7966e25f12db28fd349b71f648f884f96c82f355f0df8a474071527"
+    },
+    {
+      "bytes": 506674,
+      "path": "um/SKRUSDT/liquidation.jsonl",
+      "rows": 506,
+      "sha256": "90b8a5778cdcb649672015db6f54b72ae58f278a1c8c4e274edad5b1f75144bc"
+    },
+    {
+      "bytes": 12026,
+      "path": "um/SKUUUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "98fbd6ed5d6e1738136db10a6207e68409fd4b7fd4c2861d91d917f00f682f06"
+    },
+    {
+      "bytes": 40200,
+      "path": "um/SKYAIUSDT/liquidation.jsonl",
+      "rows": 40,
+      "sha256": "ba03d04a689e0566185334d2b2ae8e3f54a9d289c2ef48b2371e9badbb1d8403"
+    },
+    {
+      "bytes": 21997,
+      "path": "um/SKYUSDT/liquidation.jsonl",
+      "rows": 22,
+      "sha256": "5d83e06abdb3a7c16adfb0acd00b925d85191fda1db31867a493dd9f6db55262"
+    },
+    {
+      "bytes": 9055,
+      "path": "um/SLPUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "6f9099cc5ff5c867973fe188c73400a888faec1ecce0c7e6026ca45f6905a38a"
+    },
+    {
+      "bytes": 15993,
+      "path": "um/SLXUSDT/liquidation.jsonl",
+      "rows": 16,
+      "sha256": "840ab8263494c48bdba3674e19ccafaa8349c920c1e355ea8be675b85f204658"
+    },
+    {
+      "bytes": 1003,
+      "path": "um/SMCIUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "6968f0b4ffa4a1a6114fcdf7be09a40175eac6cb0c6e2c44f1009eb280a51d2b"
+    },
+    {
+      "bytes": 539034,
+      "path": "um/SNDKUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "ac5600896ed2ca6226a46ea4c0ea9cd93cab962e4963e7a8c964a78d1d449848"
+    },
+    {
+      "bytes": 1314052,
+      "path": "um/SNDKUSDT/klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "892260a83e0a104c3bbfecee367de84b2d00aadd4502615d50488394f37ec0c4"
+    },
+    {
+      "bytes": 687243,
+      "path": "um/SNDKUSDT/liquidation.jsonl",
+      "rows": 683,
+      "sha256": "b4b93560348564a939075b80c64b46bd635bcf0aa03ef85afb8c46f2e3ba97fb"
+    },
+    {
+      "bytes": 529675,
+      "path": "um/SNDKUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "ef562c873e2944510af19318659d62f707f608796d48a9cef7a8d767667b3351"
+    },
+    {
+      "bytes": 572158,
+      "path": "um/SNDKUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "18b0433e803760bbaa9a67b286dfa3e5788853efdf2e37503e3e48d976574275"
+    },
+    {
+      "bytes": 1332608,
+      "path": "um/SNDKUSDT/premium_klines_15m.jsonl",
+      "rows": 556,
+      "sha256": "d8379a0ec6c799c7d859052f2a0019824aa271f082cc8b15ca6d1218c0203b4d"
+    },
+    {
+      "bytes": 25094,
+      "path": "um/SNOWUSDT/liquidation.jsonl",
+      "rows": 25,
+      "sha256": "42b725b5423b6b2d8e8ee71d12763bc97139373d9499d18d6467d059d07eb330"
+    },
+    {
+      "bytes": 18050,
+      "path": "um/SNXUSDT/liquidation.jsonl",
+      "rows": 18,
+      "sha256": "699e22efcaad122e0a858f18de210580989300defa36211e409c99b93c1fa48f"
+    },
+    {
+      "bytes": 539487,
+      "path": "um/SNXXUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "d068e429a7e099dca3476600d5e23c81d3a8c4bd53e9b1ed1b3892115100a460"
+    },
+    {
+      "bytes": 1311198,
+      "path": "um/SNXXUSDT/klines_15m.jsonl",
+      "rows": 549,
+      "sha256": "cd1a9018f714304bd9a4bdb924e02b8acc1e45df5b99e701a655af68cc24a9ee"
+    },
+    {
+      "bytes": 128490,
+      "path": "um/SNXXUSDT/liquidation.jsonl",
+      "rows": 128,
+      "sha256": "bb98b6159ef48ee4b837803acaa5fd49afd8b04cd481a3cda5a401f441e7b25f"
+    },
+    {
+      "bytes": 529949,
+      "path": "um/SNXXUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "c955a9901c1e7a699edae78b795acbb0fdf31fc4f41c6815f9c0f0cb6746e994"
+    },
+    {
+      "bytes": 570527,
+      "path": "um/SNXXUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "3b79588ffb4931952d9fe7a8d69968cff7f1223447502a30be2cfd677d2f8cb8"
+    },
+    {
+      "bytes": 1332546,
+      "path": "um/SNXXUSDT/premium_klines_15m.jsonl",
+      "rows": 556,
+      "sha256": "c53628d5df280a4a85d433707d7beda07ce97a7c15f6f584a13dbfdef5143078"
+    },
+    {
+      "bytes": 2005,
+      "path": "um/SOFIUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "76062848446801cbac984b3803224867c132ec3808b826d60bb9506fe061887a"
+    },
+    {
+      "bytes": 153981,
+      "path": "um/SOLUSDC/liquidation.jsonl",
+      "rows": 154,
+      "sha256": "d70e5659cbe87f99db8413602ee09bd8306fdad09c13917453863ba4dc209800"
+    },
+    {
+      "bytes": 537967,
+      "path": "um/SOLUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "25f6ea64786587329a8173ac32a78c820c5bf7d42003fd8d42bfc7cfe80c8bd9"
+    },
+    {
+      "bytes": 1306394,
+      "path": "um/SOLUSDT/klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "37953b46ed51f09c93a8f8c65661c77e8c2e8c6926072738a6b6fde423e4caf6"
+    },
+    {
+      "bytes": 1065348,
+      "path": "um/SOLUSDT/liquidation.jsonl",
+      "rows": 1065,
+      "sha256": "66e51727181b78c34eba7e024ba92928c1a1ef25d0987ca0d1c7db13e43a204d"
+    },
+    {
+      "bytes": 528868,
+      "path": "um/SOLUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "2241d75dd4f705a2b3c74dd5d0229195b7ae26d0cc1ced1ebb0d6ca3e7983e96"
+    },
+    {
+      "bytes": 568763,
+      "path": "um/SOLUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "faaa4d6fff27f580d56077112337274dd2c36a687f3ef8dc70130adaee73a65c"
+    },
+    {
+      "bytes": 1317715,
+      "path": "um/SOLUSDT/premium_klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "a7d6e62b1bfdac95fcc501fedcab899e02ae711bc8b71fe9fb0d041845dc490f"
+    },
+    {
+      "bytes": 129792,
+      "path": "um/SOLVUSDT/liquidation.jsonl",
+      "rows": 129,
+      "sha256": "106fa78f8cfb71bcbccd06a5944b0136c585c3536a8f532dcae322e68e9b6745"
+    },
+    {
+      "bytes": 38070,
+      "path": "um/SOMIUSDT/liquidation.jsonl",
+      "rows": 38,
+      "sha256": "eaa22c05baa3339702af7841e599c48a864cd2811fe2b42efc7a8916ec26d15d"
+    },
+    {
+      "bytes": 4054,
+      "path": "um/SONICUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "786d518ee29382f2618c89cd80bba6e3a444e6a56172eaa944d5df0e83f6e9a9"
+    },
+    {
+      "bytes": 2010,
+      "path": "um/SONYUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "c7bc3b536224a0ecfc1e9997be21512bc6fcebb8d4940f41f294650732aa21bf"
+    },
+    {
+      "bytes": 12022,
+      "path": "um/SOONUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "860fe87bac4049e8397bad12bceb57842db34a576c3f6c9d9aff4bb9b9cacee9"
+    },
+    {
+      "bytes": 263808,
+      "path": "um/SOPHUSDT/liquidation.jsonl",
+      "rows": 262,
+      "sha256": "5c750797eeaa049de057b19e225d6bce058d2a95c3472610ccbc91e46b6a8859"
+    },
+    {
+      "bytes": 539062,
+      "path": "um/SOXLUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "4680d0b9f68d85d3d24c75506246a41ee36a7ed968519987915f3d153f439c17"
+    },
+    {
+      "bytes": 1314299,
+      "path": "um/SOXLUSDT/klines_15m.jsonl",
+      "rows": 549,
+      "sha256": "838236b486183aecf10d01f709543453447337e2a736d6b5d9fd1ac5a0af04ed"
+    },
+    {
+      "bytes": 181051,
+      "path": "um/SOXLUSDT/liquidation.jsonl",
+      "rows": 180,
+      "sha256": "1719c5c6712af2f6db35cd56eee31d2f484d44170792f8cd99f8819845762df8"
+    },
+    {
+      "bytes": 529968,
+      "path": "um/SOXLUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "521eafef18ca9fb3233bd6c5589a7dc32f3b6a14366037d3f2a4ad8dea29add1"
+    },
+    {
+      "bytes": 571355,
+      "path": "um/SOXLUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "dabc0c71552e9897cc8c0fe5b7dccc97cfd969509862719396e541b45a28cc93"
+    },
+    {
+      "bytes": 1323184,
+      "path": "um/SOXLUSDT/premium_klines_15m.jsonl",
+      "rows": 552,
+      "sha256": "81b21c3c4215820b6b7cabc2210267b8a7606a5850beaed6121c0e5262d2cf78"
+    },
+    {
+      "bytes": 538732,
+      "path": "um/SOXSUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "d2f263bd55bafc1f706a5a646b3bbef172d1a1955cedffb5b3cd3a7e6a325c8e"
+    },
+    {
+      "bytes": 1307816,
+      "path": "um/SOXSUSDT/klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "2a0965668f75df758cf018eb76d34120fe181d55c797afa8099d6a47300c06f9"
+    },
+    {
+      "bytes": 29083,
+      "path": "um/SOXSUSDT/liquidation.jsonl",
+      "rows": 29,
+      "sha256": "142742fab813af731fc25f5d3dbc55b114861e7cd57f6eff41a662b5f8873c2e"
+    },
+    {
+      "bytes": 529687,
+      "path": "um/SOXSUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "092008477f8e881db097b9586e4168be43054ddb8b16df9233f851585a7f2994"
+    },
+    {
+      "bytes": 570539,
+      "path": "um/SOXSUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "d3a0d212186bd9ffee694e681ada0b8f518d77d76e2ea60c8d8acc32c7e18bc4"
+    },
+    {
+      "bytes": 1318288,
+      "path": "um/SOXSUSDT/premium_klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "2a76ad8a36dd2439da634352ece334547de5ba0a139cb4b8653a80e00340feb2"
+    },
+    {
+      "bytes": 12107,
+      "path": "um/SPACEUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "f4555778dae1812f3b41f501c00d5f4ea5129da33478915181714fe72ebf822c"
+    },
+    {
+      "bytes": 5021,
+      "path": "um/SPCXUSD1/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "175bb2019435cb7e7a25205bf9330de96847131d2d1d9c60a4d6fee7322d1aab"
+    },
+    {
+      "bytes": 539286,
+      "path": "um/SPCXUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "6121f8e8dc14703e9e9eaba6351e50d03e7524c7464237408c449bdd14cf93c0"
+    },
+    {
+      "bytes": 1310895,
+      "path": "um/SPCXUSDT/klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "e5141bc105e422963ef66905d6405ad41b2fd92b134c973eaf489c346d65fc1f"
+    },
+    {
+      "bytes": 276401,
+      "path": "um/SPCXUSDT/liquidation.jsonl",
+      "rows": 275,
+      "sha256": "41f473bf4de7ef7b1de1a5b2c4a216a734359b81bfc685f0c5cf73f898d24387"
+    },
+    {
+      "bytes": 529959,
+      "path": "um/SPCXUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "29d792b3d6deaa05344e5d196e6e285d3ac296c22b7d0551f639efc1d364c2be"
+    },
+    {
+      "bytes": 571411,
+      "path": "um/SPCXUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "e006b749ed57ffb71f301e84d13d57659ba319e5a785fb4ab0a34eb82757ee6e"
+    },
+    {
+      "bytes": 1319433,
+      "path": "um/SPCXUSDT/premium_klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "4c65dc8da895f9983d6de5faa45ef03d44a07e86e4141829b8e03ecf3e549558"
+    },
+    {
+      "bytes": 14204,
+      "path": "um/SPELLUSDT/liquidation.jsonl",
+      "rows": 14,
+      "sha256": "bd55e3ae75a4d8a24d2968c5381b1fbc3895adce74a7ef3bc88237e1e9e195c9"
+    },
+    {
+      "bytes": 70191,
+      "path": "um/SPKUSDT/liquidation.jsonl",
+      "rows": 70,
+      "sha256": "047270f9e082d5d69212ad1309b52bea99955c053c575eecac0ac7f673d92b15"
+    },
+    {
+      "bytes": 6094,
+      "path": "um/SPORTFUNUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "b031fbdfcf533aa9f24094db8952123811f20d8e806bc9c59ba2c77fbd2108f6"
+    },
+    {
+      "bytes": 97783,
+      "path": "um/SPXUSDT/liquidation.jsonl",
+      "rows": 98,
+      "sha256": "dc7330ae1d29c0a304cf05efbf35dacd47633a8d42a647aeed66b5c31ae16d23"
+    },
+    {
+      "bytes": 4006,
+      "path": "um/SPYUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "498a0eda8cc29ed1e20940b8e6d7bf826f25955cf8e4214cfeedfe7580504bed"
+    },
+    {
+      "bytes": 5992,
+      "path": "um/SQDUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "0a6b4450f0ad0882ae8a35688817f268f3034dad3ad892bca93ed297bd630018"
+    },
+    {
+      "bytes": 7025,
+      "path": "um/SQQQUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "27e94f7d11e22b3a9c28fce2865d33d928b2b62a14c0bc1652a345a749c3b3d0"
+    },
+    {
+      "bytes": 25049,
+      "path": "um/SSVUSDT/liquidation.jsonl",
+      "rows": 25,
+      "sha256": "c066a71d6074611847f9e69c455ed407ad4e6998af389a91c986e887210a6d86"
+    },
+    {
+      "bytes": 12112,
+      "path": "um/STABLEUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "72825864511ea3ca25175f6b2906256107c2ea2796c8d23ef9c767e98ac10fc8"
+    },
+    {
+      "bytes": 87160,
+      "path": "um/STARUSDT/liquidation.jsonl",
+      "rows": 87,
+      "sha256": "346bd5e3c9922b4fd5acf474261e3b404592b510fa873b7f430d4fc6f8f7ce59"
+    },
+    {
+      "bytes": 18108,
+      "path": "um/STBLUSDT/liquidation.jsonl",
+      "rows": 18,
+      "sha256": "f1259f04f7ed66affda6e3720743cdf7245f411431fa11facbb58110cd3e6f7b"
+    },
+    {
+      "bytes": 5018,
+      "path": "um/STEEMUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "c6276e7128117d252c085722e88d6bd66901fca5722af5ea5b7a228c3fd4b644"
+    },
+    {
+      "bytes": 5005,
+      "path": "um/STGUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "bb9e97271373d9fbbb26c1c0ab8a033244c086e95728c222327ff2e805aa6824"
+    },
+    {
+      "bytes": 7990,
+      "path": "um/STOUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "7513a7d27c380de1dd6a38bb08b2a993b569bf3878ddfaf008ff09f4f1e6d049"
+    },
+    {
+      "bytes": 1001,
+      "path": "um/STRCUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "a29d0e1cf38152c292c2fad2b8f6fd27d02273f458e68b04d0f641f8db6cbf35"
+    },
+    {
+      "bytes": 55597,
+      "path": "um/STRKUSDT/liquidation.jsonl",
+      "rows": 55,
+      "sha256": "0ae2e4bc9cdb94feea9f114f1a3fb3f64b68b785123ee0c1abfa5e940b0c06e5"
+    },
+    {
+      "bytes": 96831,
+      "path": "um/STXUSDT/liquidation.jsonl",
+      "rows": 97,
+      "sha256": "de6bd8bc1c4a143858124b6c8c34e36e1ee56a678f647475a2ac7ad1287965c7"
+    },
+    {
+      "bytes": 2009,
+      "path": "um/STXXUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "e8f6157c9fdf1b51a06679b19d1bb98f258cf5675f7ebcc9b7ff8d33bd889be4"
+    },
+    {
+      "bytes": 27042,
+      "path": "um/SUIUSDC/liquidation.jsonl",
+      "rows": 27,
+      "sha256": "c2e0791b22e0df9f71e16b58c20899997622edd025e8a475e25839f4dd146ccd"
+    },
+    {
+      "bytes": 538084,
+      "path": "um/SUIUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "c80a563deb9dbfe335d67b883b3dcff1312d1afe3c51567363e4078464f426e3"
+    },
+    {
+      "bytes": 1307624,
+      "path": "um/SUIUSDT/klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "a071353acc7d6690a37379b7cac86935453327a335e734b137cb24826f3c8c88"
+    },
+    {
+      "bytes": 384920,
+      "path": "um/SUIUSDT/liquidation.jsonl",
+      "rows": 384,
+      "sha256": "e8cdd9bfacedf183fe9b74acf66df11d68b91dd29103342a1bb59eee7213408e"
+    },
+    {
+      "bytes": 529133,
+      "path": "um/SUIUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "2bced593370aaff232a6fb4b9b877eb191b3c51b9826a53b997c6a38e87d6957"
+    },
+    {
+      "bytes": 567392,
+      "path": "um/SUIUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "a42d33a9e066ae04584e2ef0c1dc65b3401282d13a9999a7a838ad4dbcdd944d"
+    },
+    {
+      "bytes": 1314904,
+      "path": "um/SUIUSDT/premium_klines_15m.jsonl",
+      "rows": 549,
+      "sha256": "d749475685d848959305b0c9298fb2dab3124a91075b7eecbcf1df93a8eb5214"
+    },
+    {
+      "bytes": 8006,
+      "path": "um/SUNUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "c7711b9a89ef497c1b2b12e4c87bc20cb2b9b87eab1e548304336ed11c7c7d94"
+    },
+    {
+      "bytes": 14077,
+      "path": "um/SUPERUSDT/liquidation.jsonl",
+      "rows": 14,
+      "sha256": "4ae1562d97c5ee5685f2562a304d5b3e73bbe7b6fa6ca37f838684c2bf9b3f26"
+    },
+    {
+      "bytes": 47807,
+      "path": "um/SUSDT/liquidation.jsonl",
+      "rows": 48,
+      "sha256": "42fdafab053accc0def436d6d5cb3f3bc3d428db4200ec4645d6f7dfeb1a7573"
+    },
+    {
+      "bytes": 64933,
+      "path": "um/SUSHIUSDT/liquidation.jsonl",
+      "rows": 65,
+      "sha256": "0774309266c7b3a5d57af37c499611a265027631ce7474cd64eebbb2f8154e79"
+    },
+    {
+      "bytes": 9109,
+      "path": "um/SWARMSUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "7e20401d6f4adcd5059da84bb99b35dcdc29ea5232d43733140f66b11eb874ad"
+    },
+    {
+      "bytes": 6007,
+      "path": "um/SXTUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "5c55864f73785e0490240f6adcc4a9b839b80accd1bebeee403645a3c0eab5b7"
+    },
+    {
+      "bytes": 24998,
+      "path": "um/SYNUSDT/liquidation.jsonl",
+      "rows": 25,
+      "sha256": "1fcf33c401744c1fceceb5a326e8231daeadb8e85ebde00391ea38bb8587239c"
+    },
+    {
+      "bytes": 59232,
+      "path": "um/SYRUPUSDT/liquidation.jsonl",
+      "rows": 59,
+      "sha256": "9249d95023baffc06cb70bf98aeb4440ccc7353b02f895939925d09df1936e99"
+    },
+    {
+      "bytes": 130525,
+      "path": "um/TACUSDT/liquidation.jsonl",
+      "rows": 130,
+      "sha256": "566dec52bfb0fdd43b848b2995475d428c347954585f26aecb21a6284b1c5b5d"
+    },
+    {
+      "bytes": 54293,
+      "path": "um/TAGUSDT/liquidation.jsonl",
+      "rows": 54,
+      "sha256": "002c3ad76cface6b7680805718bc4fac2e2392d3f6d141de991f36b7afbe0d20"
+    },
+    {
+      "bytes": 12038,
+      "path": "um/TAIKOUSDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "b7eb0c1f400431dd947c518630a30f83bc788020b233e1fddc2aa65a16c9bd3d"
+    },
+    {
+      "bytes": 41086,
+      "path": "um/TAKEUSDT/liquidation.jsonl",
+      "rows": 41,
+      "sha256": "0d99a8187192f6dd2e24e46d0ed8a78ec5c4ff3a85b008210a469a11e0778740"
+    },
+    {
+      "bytes": 225710,
+      "path": "um/TAOUSDT/liquidation.jsonl",
+      "rows": 226,
+      "sha256": "e9a6fdfc9a898443878477158e3f225f7c1ce937d5ad3970be780d01a791863d"
+    },
+    {
+      "bytes": 1991,
+      "path": "um/TAUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "8184440fb404430396bb3e7e84d8ec104657d167a43d4a42629b6e3f3a3c7b21"
+    },
+    {
+      "bytes": 3013,
+      "path": "um/TEAMUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "dc597a721b6cb0a34b38a7afe7082bd24290f75482cbbd3348578ec31ec95bf3"
+    },
+    {
+      "bytes": 4996,
+      "path": "um/TEMUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "bdb98ae1a1e2cc0a6c642d48efb0486e3da57f96a9acb637ec3d5b871584edd7"
+    },
+    {
+      "bytes": 3034,
+      "path": "um/TENCENTUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "b07adb3a34b5d3e5a7db02a0ab11843008aeeaee16836a81c43b892763cb536b"
+    },
+    {
+      "bytes": 1001,
+      "path": "um/TERUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "179ae33c83f2a7869f96fcfdda71a51a264ae4fbf1908d875c93b0dcb482eae7"
+    },
+    {
+      "bytes": 17084,
+      "path": "um/THETAUSDT/liquidation.jsonl",
+      "rows": 17,
+      "sha256": "1e3a7dde7b46b525d2d1891fd8200fbe19e064f4b3090c525134e14fbe8fcb8c"
+    },
+    {
+      "bytes": 9049,
+      "path": "um/THEUSDT/liquidation.jsonl",
+      "rows": 9,
+      "sha256": "bfcf4fd32da6f200dfb0e4ca2a6eb4d155315c2ab30813662dfff5015d1077d4"
+    },
+    {
+      "bytes": 5992,
+      "path": "um/TIAUSDC/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "e11b4ff4ca8ac969762ff104bafe3f77e4bc3b64d24b645903b52add4183f9ea"
+    },
+    {
+      "bytes": 97846,
+      "path": "um/TIAUSDT/liquidation.jsonl",
+      "rows": 98,
+      "sha256": "4480a02b4477fef56dac16f81eb680c939f13569c9974381878cb51d72625d40"
+    },
+    {
+      "bytes": 52283,
+      "path": "um/TLMUSDT/liquidation.jsonl",
+      "rows": 52,
+      "sha256": "c7670b771622a71b65a7fd33aeabc2fdd5d5b8b7f824a63964b8c2af23795d64"
+    },
+    {
+      "bytes": 26255,
+      "path": "um/TNSRUSDT/liquidation.jsonl",
+      "rows": 26,
+      "sha256": "a0b9814fcb56bbc0d89f9227a661823c52b8e90c60572d61e46df659bb0e884c"
+    },
+    {
+      "bytes": 25335,
+      "path": "um/TOSHIUSDT/liquidation.jsonl",
+      "rows": 25,
+      "sha256": "b9d9611dba75deb06371ec810302373ad679bd0008c5d75982b150f5bbf51e42"
+    },
+    {
+      "bytes": 17150,
+      "path": "um/TOWNSUSDT/liquidation.jsonl",
+      "rows": 17,
+      "sha256": "7fb66105560d2c62b859b3db111a218035ac46f69c8c9f34693e6dc40d029130"
+    },
+    {
+      "bytes": 5029,
+      "path": "um/TQQQUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "dd9ea12ba711d61535054e07028f10c99820e58c06664a8fe0e909e44dc5e0d1"
+    },
+    {
+      "bytes": 165451,
+      "path": "um/TRADOORUSDT/liquidation.jsonl",
+      "rows": 164,
+      "sha256": "1942f340c5f137f2aaf6844471e4d5dff1456d904927f893aebfdc04c97686dc"
+    },
+    {
+      "bytes": 36806,
+      "path": "um/TRBUSDT/liquidation.jsonl",
+      "rows": 37,
+      "sha256": "68a787f9361e203bdaa2025c71f200c6c13da61c6bf00968ff805bb0d05dc0b5"
+    },
+    {
+      "bytes": 6014,
+      "path": "um/TREEUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "d096fb7d8d3aa569cd5e957f842d37d8690580d4bf7818166cbf24a88b805944"
+    },
+    {
+      "bytes": 462904,
+      "path": "um/TRIAUSDT/liquidation.jsonl",
+      "rows": 460,
+      "sha256": "89e362a25d813d819a0347b5820891c876277fa2f5b1248d60306cb25ba975de"
+    },
+    {
+      "bytes": 17167,
+      "path": "um/TRUMPUSDC/liquidation.jsonl",
+      "rows": 17,
+      "sha256": "09b7dc31b7cfcc26cc15dcc4a841f6640a3fbe961b3fe0b14b30c4303fae173a"
+    },
+    {
+      "bytes": 540766,
+      "path": "um/TRUMPUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "25b46b9e28aff7a91077a678e6ac4d4b85c68ca1b5b12131b90e3962cb012d6a"
+    },
+    {
+      "bytes": 1312981,
+      "path": "um/TRUMPUSDT/klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "31cb916965616a37de0ebbd9e37f767d418741701c1b024c978d105e3c62d036"
+    },
+    {
+      "bytes": 519306,
+      "path": "um/TRUMPUSDT/liquidation.jsonl",
+      "rows": 514,
+      "sha256": "311d23d95e3b32d82c3f3e9c14cd7a2b6f3277cadae84a33187294cae414fe02"
+    },
+    {
+      "bytes": 531343,
+      "path": "um/TRUMPUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "b6741bb1b0467387c03f14359aa72159bad0a49aad1cae6724e43fb2b1a0e7ec"
+    },
+    {
+      "bytes": 569684,
+      "path": "um/TRUMPUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "c26af4bfce8b71d7867f10b92d5d444a4a8c36db81b5ef3fce0296ac60dffc95"
+    },
+    {
+      "bytes": 1321714,
+      "path": "um/TRUMPUSDT/premium_klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "db653bf7c974753b857a7686e5c398b2ca02a6e68a0c1e50197bfd59e310275f"
+    },
+    {
+      "bytes": 998,
+      "path": "um/TRUSTUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "d6bc2238d0937865c0cfd22dacbb69b6e58ed648408c7331bedc3101a84a86c6"
+    },
+    {
+      "bytes": 7073,
+      "path": "um/TRUTHUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "311957ce91c8754ae2b8d6044d3b9db4248379681cc0a132fba3a0c57d093d06"
+    },
+    {
+      "bytes": 66564,
+      "path": "um/TRXUSDT/liquidation.jsonl",
+      "rows": 67,
+      "sha256": "b2d5ba03bddcc238f57225d619a6d25504960fc516a94e76791aeed1e268b705"
+    },
+    {
+      "bytes": 39160,
+      "path": "um/TSLAUSDT/liquidation.jsonl",
+      "rows": 39,
+      "sha256": "4ce3d2e2715cf44743611dd4389e4b9301d8f1643b2dd25a3b398206507be066"
+    },
+    {
+      "bytes": 21039,
+      "path": "um/TSLLUSDT/liquidation.jsonl",
+      "rows": 21,
+      "sha256": "2ad1b46c51b8c7596eea9718a7399996f03cbee27dfa9b358e26d6dffa6e9f70"
+    },
+    {
+      "bytes": 7010,
+      "path": "um/TSMUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "4e38630525e98c18ffedea1640a3d78ce797b9128a17e0d299afcc46246736df"
+    },
+    {
+      "bytes": 101127,
+      "path": "um/TSTUSDT/liquidation.jsonl",
+      "rows": 101,
+      "sha256": "ac927de3c002fec5d78d558bfeef0deff606d4c0522bee317c9540932607ef07"
+    },
+    {
+      "bytes": 2007,
+      "path": "um/TTWOUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "aa16d482d5e4f99c51d428e22ed862c12b58da90ec076a681fc5078f6a5fcc21"
+    },
+    {
+      "bytes": 29349,
+      "path": "um/TURBOUSDT/liquidation.jsonl",
+      "rows": 29,
+      "sha256": "42aa97fb09a5ab4e0aaaa5e801896c236a2b3249eae096830b9081bb63acc8de"
+    },
+    {
+      "bytes": 1011,
+      "path": "um/TURTLEUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "b46869fe82679221e89f404e3ea6e0b5f1de100940f7136f0aef38d813d16cb0"
+    },
+    {
+      "bytes": 1716068,
+      "path": "um/TUSDT/liquidation.jsonl",
+      "rows": 1719,
+      "sha256": "732eec1ee7c09af0830447bc48e397fb93da4ed663f5fd5c5c7fa6ff464d3d17"
+    },
+    {
+      "bytes": 537734,
+      "path": "um/TUTUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "2b3fd08d89846d244d398781fbe2512bdc2f308c54ecb1cd30b3c8a22e5e9c1f"
+    },
+    {
+      "bytes": 1307391,
+      "path": "um/TUTUSDT/klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "79aa659b485cf1998104fcf0faf16a709dc1bb17617c7c65c1bdd46d47f39e64"
+    },
+    {
+      "bytes": 360456,
+      "path": "um/TUTUSDT/liquidation.jsonl",
+      "rows": 360,
+      "sha256": "24507d90378133e8aaacc8c43f45200c1de13827619c84371c6627426d17ead0"
+    },
+    {
+      "bytes": 528594,
+      "path": "um/TUTUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "95478faad10ed7afe48c0fe159cc53ead6f779ce19f1a7a8300de06b9abae718"
+    },
+    {
+      "bytes": 567576,
+      "path": "um/TUTUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "64128c73e3ddbe22872516df9b61f4dc7cc3493cd178f216d530d99ff16e0dab"
+    },
+    {
+      "bytes": 1319771,
+      "path": "um/TUTUSDT/premium_klines_15m.jsonl",
+      "rows": 551,
+      "sha256": "b608af26d17bbfd7da2be49bc430d6fb9fd3a5c77e28063bb7ba8ace30582522"
+    },
+    {
+      "bytes": 79573,
+      "path": "um/TWTUSDT/liquidation.jsonl",
+      "rows": 80,
+      "sha256": "83d65beca61ddd7db23a3427201cbe93cc9a3f2f3610d30dd8b5ef08b2f7a1e7"
+    },
+    {
+      "bytes": 1002,
+      "path": "um/TXNUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "d9ed0ac06dfbf9caf4430dac3ef950faec1523e13d28ba48ddd2b7e4e84f8478"
+    },
+    {
+      "bytes": 2997,
+      "path": "um/TZAUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "9907ce2b0b1c1169f5725d76c862ff1bc598ec49721631e6fb9cead7e7244205"
+    },
+    {
+      "bytes": 2086438,
+      "path": "um/UAIUSDT/liquidation.jsonl",
+      "rows": 2091,
+      "sha256": "589f7921363226b9ac9ac4eb4b113b2aad39c5c96f73881fccc18ea916810ec8"
+    },
+    {
+      "bytes": 3008,
+      "path": "um/UBERUSDT/liquidation.jsonl",
+      "rows": 3,
+      "sha256": "dff17aa5da58c740421a16f0faeaeeba371698e0a021a175c5a55587e62c4864"
+    },
+    {
+      "bytes": 84578,
+      "path": "um/UBUSDT/liquidation.jsonl",
+      "rows": 85,
+      "sha256": "b7c01e139ea925a15c4efc4701e0fea22aa7476981a27107855c4b2fa88154b8"
+    },
+    {
+      "bytes": 7978,
+      "path": "um/UMAUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "6b755708946888e0979236ab0dc7e51cd63d81c7e298bc3dcd4b474dfae891ef"
+    },
+    {
+      "bytes": 40454,
+      "path": "um/UNITREEUSDT/liquidation.jsonl",
+      "rows": 40,
+      "sha256": "e777ef8e42cecd720a25c4f44333100578ae985199419c3bed79a46bb83ba326"
+    },
+    {
+      "bytes": 21747,
+      "path": "um/UNIUSDC/liquidation.jsonl",
+      "rows": 22,
+      "sha256": "6201f1731518ade76418c34d540c4f8fc7b94266900609ab7047703054fc706c"
+    },
+    {
+      "bytes": 535180,
+      "path": "um/UNIUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "da23d5f5d8fc2cc5d7166aa659a4f4bfc76f58a772a8717ff01d894e167fd4fb"
+    },
+    {
+      "bytes": 1295560,
+      "path": "um/UNIUSDT/klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "036b4376def39eb01941c25dc630aff9138371fcfbf985e3f61022d70570247d"
+    },
+    {
+      "bytes": 421687,
+      "path": "um/UNIUSDT/liquidation.jsonl",
+      "rows": 426,
+      "sha256": "63c48e2a2f462994a7336f793b1ee701f389c6f658aa7a304eebd78931cb91a6"
+    },
+    {
+      "bytes": 528345,
+      "path": "um/UNIUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "0adb10ef4811961f02ab0043165454c05811f5652d81e830463a03dda6a4dc1d"
+    },
+    {
+      "bytes": 567288,
+      "path": "um/UNIUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "265e1f7bdad979904ef93076685db6307ae064ef8622b8aef185eadeb9c4ae67"
+    },
+    {
+      "bytes": 1317103,
+      "path": "um/UNIUSDT/premium_klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "99db4f9509586dc71e5a3d2d006310a1650be5351537732acf63a34f9c2e7ed1"
+    },
+    {
+      "bytes": 1002,
+      "path": "um/URNMUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "caeca1a4591491f761b5d078e2520f0108f2cbcd257991ef4235e36202c28489"
+    },
+    {
+      "bytes": 2007,
+      "path": "um/USARUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "994b1bbb5ac95a7cb64b51dc681a6e99981a0c0c0f83a30c7656e7a224d68059"
+    },
+    {
+      "bytes": 3991,
+      "path": "um/USDCUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "8fc2498b4415c198e4973447e8cd2e8d053d5b054fdd153283daed65b5d86ecd"
+    },
+    {
+      "bytes": 3582594,
+      "path": "um/USELESSUSDT/liquidation.jsonl",
+      "rows": 3543,
+      "sha256": "3f61d15e4ecd728a481b37696188bd29e1685862a5b235ff9a2e88702df44474"
+    },
+    {
+      "bytes": 7044,
+      "path": "um/USTCUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "abfee71a9b13809e151f918371954ce3c102b54f58410167c846aab6742eeed9"
+    },
+    {
+      "bytes": 19174,
+      "path": "um/USUALUSDT/liquidation.jsonl",
+      "rows": 19,
+      "sha256": "c7724b2473449df09519982c4927053265a2bccd5e303763cf79238c463d1ee0"
+    },
+    {
+      "bytes": 20948,
+      "path": "um/USUSDT/liquidation.jsonl",
+      "rows": 21,
+      "sha256": "f6dc12245e970881888079ec820b81faa988d61216a44fbb4dafad1b369b68a3"
+    },
+    {
+      "bytes": 5030,
+      "path": "um/UVXYUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "bcd28773abd71765ec3fb9b4c6024872f90612d6ad5402def84e93c9f9914a10"
+    },
+    {
+      "bytes": 20154,
+      "path": "um/VANAUSDT/liquidation.jsonl",
+      "rows": 20,
+      "sha256": "df85dd9ea5fbc1a7bf51457d0f323a030080cb61522a4f990bcc6c2f7e2d5371"
+    },
+    {
+      "bytes": 20370,
+      "path": "um/VELODROMEUSDT/liquidation.jsonl",
+      "rows": 20,
+      "sha256": "f56a332bd688bd71137fe690513bb02012e0dc9f10a717a772338b347550c39d"
+    },
+    {
+      "bytes": 194569,
+      "path": "um/VELVETUSDT/liquidation.jsonl",
+      "rows": 193,
+      "sha256": "d5ae87fc2496bc701d449d1c66b0a34ee0f92e69d83296dbc80b4e5b1c5073b5"
+    },
+    {
+      "bytes": 58066,
+      "path": "um/VETUSDT/liquidation.jsonl",
+      "rows": 58,
+      "sha256": "0fc9462bbf5011699d1a8e70466b4c8b50fc64bda161055f54ea1fd87acfa894"
+    },
+    {
+      "bytes": 43715,
+      "path": "um/VIRTUALUSDT/liquidation.jsonl",
+      "rows": 43,
+      "sha256": "04ea83f629d1a7da84d223a6bd2d65d45d87836491cb229a133e73e3b9b8f656"
+    },
+    {
+      "bytes": 1002,
+      "path": "um/VRTUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "455e6fc7ee06b60b184cdf382eb485df656fbbcb219db8dc809583b887d288ad"
+    },
+    {
+      "bytes": 2005,
+      "path": "um/VSTUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "e197b7e6a8b7a64334685bb294bf35c8f1666f911e0bce6d1f164296d8f6cfdc"
+    },
+    {
+      "bytes": 6049,
+      "path": "um/VTHOUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "b4970dc2e68017eb5d9849cc0b52c6f95b686d7dbf2e1f7fa6d66aa643f44f4c"
+    },
+    {
+      "bytes": 995,
+      "path": "um/VUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "589477baeba1adec3d5177d3e8d2e4da3bb68dd7b849af60c03890f87869e229"
+    },
+    {
+      "bytes": 66114,
+      "path": "um/VVVUSDT/liquidation.jsonl",
+      "rows": 66,
+      "sha256": "ed2855fffbb467274878f7f00a08437a6e5a30bb931cafb93207de86ec77abfb"
+    },
+    {
+      "bytes": 14026,
+      "path": "um/WALUSDT/liquidation.jsonl",
+      "rows": 14,
+      "sha256": "6a29d4fd182a0ed916ccc56435cd75e6e91bd62645380c4b438463810e8c38e8"
+    },
+    {
+      "bytes": 11065,
+      "path": "um/WAXPUSDT/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "f23e893354018500eac35980e704142c036d46f6d9cdd69cfdfb060223d59ab1"
+    },
+    {
+      "bytes": 8010,
+      "path": "um/WCTUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "3327ebb568ddd445a3a4203c7237c9f9e29becc42f5bf3a60634343f68c0754c"
+    },
+    {
+      "bytes": 4004,
+      "path": "um/WDCUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "e8c2c41c73170b112f79fc108e8d22fcc420ed3e1b5791012b7a649365a52d2b"
+    },
+    {
+      "bytes": 996,
+      "path": "um/WENUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "3603060a0dccc6917f69e7be5814f8defe64853a439de26ae8489725c219dc53"
+    },
+    {
+      "bytes": 3994,
+      "path": "um/WETUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "128e6b5f53eb27c3ebb6c1de86826adb35d1dc44d59d33d808b5ce571b3c5f6b"
+    },
+    {
+      "bytes": 5030,
+      "path": "um/WIFUSDC/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "c194fe222865e1f17fe164ce20f278ad9e3da68f288ae2b298fe4593e2ecbce5"
+    },
+    {
+      "bytes": 86426,
+      "path": "um/WIFUSDT/liquidation.jsonl",
+      "rows": 86,
+      "sha256": "5cdec5f82eceb617cbd0c60348c735b90d6feb0ef6f648798a4ef415aa663582"
+    },
+    {
+      "bytes": 26129,
+      "path": "um/WLDUSDC/liquidation.jsonl",
+      "rows": 26,
+      "sha256": "2497d6896ef27b4d09110709adb7106b16ca1a9a451e2e45a3635fe6d595b6b5"
+    },
+    {
+      "bytes": 537684,
+      "path": "um/WLDUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "75a2551013d00499e0fc31009b10a24e8fb45e3f6c89b2bad34c7d5c1bb409a9"
+    },
+    {
+      "bytes": 1307797,
+      "path": "um/WLDUSDT/klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "4a2baab18bd8b18e09c5f3558cc368365ab1394394b21dd915839ff372e23898"
+    },
+    {
+      "bytes": 397564,
+      "path": "um/WLDUSDT/liquidation.jsonl",
+      "rows": 398,
+      "sha256": "7f32eab3abcae8a0dcb9d2208f74cd896b16f42a127483db740a41e118560565"
+    },
+    {
+      "bytes": 528593,
+      "path": "um/WLDUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "3644dcc80fa6f602b3825c506945ce607d62313aa9001638041c2a1bea89735e"
+    },
+    {
+      "bytes": 567309,
+      "path": "um/WLDUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "ab9304e4e391455d524229c0e0393c24c43aa11b50f8a81fe2d58238aee5058e"
+    },
+    {
+      "bytes": 1317140,
+      "path": "um/WLDUSDT/premium_klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "88c0cdd4dcdea686941bde5a63f6f8ddf60aa5e5c5080791d068932a539ea97d"
+    },
+    {
+      "bytes": 5010,
+      "path": "um/WLFIUSDC/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "ce507b4d52fd0efd612326c773ce4c0c1eb0975cb9a8399d2293eda2039cba68"
+    },
+    {
+      "bytes": 31122,
+      "path": "um/WLFIUSDT/liquidation.jsonl",
+      "rows": 31,
+      "sha256": "371a59de0ad7acf1f126fc02c8aacb2cc7efe74f5b40fdeb7bfd37c312a88508"
+    },
+    {
+      "bytes": 2000,
+      "path": "um/WMTUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "08d046311b8069f089a1cb4a39d3b19fd7e3247d2c0e2bd2d95808e4c58f2ae7"
+    },
+    {
+      "bytes": 18972,
+      "path": "um/WOOUSDT/liquidation.jsonl",
+      "rows": 19,
+      "sha256": "4530ed00d86af4f1688c2048098a70cce08033ce91e9ff73e3842cb5d66a60fe"
+    },
+    {
+      "bytes": 22067,
+      "path": "um/WUSDT/liquidation.jsonl",
+      "rows": 22,
+      "sha256": "815f9d65eca006ceaf6f9e9c4259134d29b38f9e2a721c4a5932b3b9fd3b365c"
+    },
+    {
+      "bytes": 538275,
+      "path": "um/XAGUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "d08326d1c92b999f9046761e0bdb6ddfc76061d686c37a99ed3153ae87cdc29e"
+    },
+    {
+      "bytes": 1304721,
+      "path": "um/XAGUSDT/klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "83872d804b3396df229fdacda555b128bc225842451722ff793cbffc441feb09"
+    },
+    {
+      "bytes": 156368,
+      "path": "um/XAGUSDT/liquidation.jsonl",
+      "rows": 156,
+      "sha256": "45267204fdbcb2d20203bbb3f720742325d87fe4fbcf032edf4b999d11fa5fc5"
+    },
+    {
+      "bytes": 529144,
+      "path": "um/XAGUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "451b3d50f82746b539c43b0532e8c293c31d0f1a09f794c4178a819456566ea5"
+    },
+    {
+      "bytes": 569442,
+      "path": "um/XAGUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "1e6fd8420ccdb68437b8f44377f8f08af901d5aea52e836ccfd3188223427468"
+    },
+    {
+      "bytes": 1315352,
+      "path": "um/XAGUSDT/premium_klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "c57fbfa4b9e4ea9e39792e34c5962cc4c549cac823028f4d1bc18addb1c2f854"
+    },
+    {
+      "bytes": 7023,
+      "path": "um/XAIUSDT/liquidation.jsonl",
+      "rows": 7,
+      "sha256": "ce4fdcf227a7f95c352d71f152604c113bc6e8cc3e64bef8bf0739270b6e5ee0"
+    },
+    {
+      "bytes": 281286,
+      "path": "um/XANUSDT/liquidation.jsonl",
+      "rows": 281,
+      "sha256": "7f110b97a561c3db1c67448af60bad94de0ba32a089c57ee03ec3853edcea60e"
+    },
+    {
+      "bytes": 68232,
+      "path": "um/XAUTUSDT/liquidation.jsonl",
+      "rows": 68,
+      "sha256": "306265d0e30ef13c61caf904052e94ffdf14694a79b9745b8af2a9d0c4db62b6"
+    },
+    {
+      "bytes": 537253,
+      "path": "um/XAUUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "7c5bed58bca9b84f2918a33a742bf7ea84b68831114f4693219a9c45ff6adf34"
+    },
+    {
+      "bytes": 1302294,
+      "path": "um/XAUUSDT/klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "b61c23a1604d9aafbdf2552b3b51090ca3fd5d80860a77d6b4e907e4f4fa10b9"
+    },
+    {
+      "bytes": 646106,
+      "path": "um/XAUUSDT/liquidation.jsonl",
+      "rows": 646,
+      "sha256": "a9a3ce4aec854e3ace93f4920a86786ff077bdfc5f3d0be56b330dcba25abe37"
+    },
+    {
+      "bytes": 528708,
+      "path": "um/XAUUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "b3123fd1659ad96462db476a676798327a5b8d1ee3eb6ba048919a06a08cc26d"
+    },
+    {
+      "bytes": 571056,
+      "path": "um/XAUUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "81dbc226049a8ba80a429069162fade8ec2eacd405f00bf8483c1380352dd984"
+    },
+    {
+      "bytes": 1310573,
+      "path": "um/XAUUSDT/premium_klines_15m.jsonl",
+      "rows": 548,
+      "sha256": "48336bb1fd2c646e2d90d9a532c60ba9b783b9c9963ea41c0282d2e8faed80b5"
+    },
+    {
+      "bytes": 4002,
+      "path": "um/XBIUSDT/liquidation.jsonl",
+      "rows": 4,
+      "sha256": "85d259c553283ae1b3d36e80f30e37000078b8fc6e9c5e9c9dd7f016a69c2d97"
+    },
+    {
+      "bytes": 1998,
+      "path": "um/XLEUSDT/liquidation.jsonl",
+      "rows": 2,
+      "sha256": "27fae7f6a1077b41ce56a2e0c849dc375af67978b5deb13722f7212ba4ecea6e"
+    },
+    {
+      "bytes": 162240,
+      "path": "um/XLMUSDT/liquidation.jsonl",
+      "rows": 163,
+      "sha256": "f387cd1bfa93c966aaca9d6391f4d70e76a05e825ff68e6dd59b8e3b87ccf800"
+    },
+    {
+      "bytes": 98845,
+      "path": "um/XMRUSDT/liquidation.jsonl",
+      "rows": 99,
+      "sha256": "6228c4af59923c64e7a99beabb8815bcd2ad3061360d3e39e4a32fd6123dc4fc"
+    },
+    {
+      "bytes": 11017,
+      "path": "um/XNYUSDT/liquidation.jsonl",
+      "rows": 11,
+      "sha256": "38d1bdff44d6828a81825ed7c0beeaf92c992011be79960c60c6ea427d904ae0"
+    },
+    {
+      "bytes": 6030,
+      "path": "um/XPDUSDT/liquidation.jsonl",
+      "rows": 6,
+      "sha256": "54ee613860261b541172cbf3c115a563dbab4c9b0896ac695853514115bc001d"
+    },
+    {
+      "bytes": 33280,
+      "path": "um/XPINUSDT/liquidation.jsonl",
+      "rows": 33,
+      "sha256": "db81b61cefdf9f5ec9fd58a645cf66174bb30f70bbb074192d318d0ecea0a03d"
+    },
+    {
+      "bytes": 184949,
+      "path": "um/XPLUSDT/liquidation.jsonl",
+      "rows": 185,
+      "sha256": "17ff44160928783f2838ec0910b675da9679189282d7679958b7ab7af0acb73c"
+    },
+    {
+      "bytes": 13059,
+      "path": "um/XPTUSDT/liquidation.jsonl",
+      "rows": 13,
+      "sha256": "f9b1ea6fe028e5ea7230c2e405fbe9b449417fb5968021fc9fb3c166324ce17d"
+    },
+    {
+      "bytes": 93822,
+      "path": "um/XRPUSDC/liquidation.jsonl",
+      "rows": 94,
+      "sha256": "3a6c0f3f5ac43db2044778c0261494ab0eec17e52dc8a10bb6ec48e8464add79"
+    },
+    {
+      "bytes": 537221,
+      "path": "um/XRPUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "01f2e65db16b6b449bae868a5036c0b08c861cf210f333b79d309525a0ee6d57"
+    },
+    {
+      "bytes": 1303168,
+      "path": "um/XRPUSDT/klines_15m.jsonl",
+      "rows": 549,
+      "sha256": "8dca7e93f7a4d5268378ce5b5acb3fc398c71f0c36c371942492d41762d9b9a1"
+    },
+    {
+      "bytes": 1078102,
+      "path": "um/XRPUSDT/liquidation.jsonl",
+      "rows": 1080,
+      "sha256": "071a391419fb3b9d559035ac6c21bbb5e3a14fb87fee1819ab6f5f022b80d511"
+    },
+    {
+      "bytes": 529130,
+      "path": "um/XRPUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "8d5b82acf5fd441f202d2f55266de9f6c705f9394a5ed9be77da6fba0385ae1e"
+    },
+    {
+      "bytes": 567361,
+      "path": "um/XRPUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "3d94c01ca81230172940e2d85a47b7a56f3437980c325a111f68f9fff7e90197"
+    },
+    {
+      "bytes": 1320002,
+      "path": "um/XRPUSDT/premium_klines_15m.jsonl",
+      "rows": 551,
+      "sha256": "f816006b4c0e72008dd862ad4e1ec0724b83e103788ecc087558bd2d02f943e6"
+    },
+    {
+      "bytes": 23046,
+      "path": "um/XTZUSDT/liquidation.jsonl",
+      "rows": 23,
+      "sha256": "979869b5b1fedf2235edd4984f9352551c49fa33f1a4e29f8cd0261b66623bcd"
+    },
+    {
+      "bytes": 90353,
+      "path": "um/XVGUSDT/liquidation.jsonl",
+      "rows": 90,
+      "sha256": "a33954e74d2d1d0b570c69ef241e622146979bd0a664983cb6acfd8b37c634f5"
+    },
+    {
+      "bytes": 5000,
+      "path": "um/XVSUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "68d3b72628ee26657a93e104c46d0bf1cac39a6c959043730148e2996e9b7c04"
+    },
+    {
+      "bytes": 9955,
+      "path": "um/YBUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "2914175c289bf9dec5247e79d230be58777e2ad9039b25d3b48061a9aa189f93"
+    },
+    {
+      "bytes": 9987,
+      "path": "um/YFIUSDT/liquidation.jsonl",
+      "rows": 10,
+      "sha256": "a7b8cc83d086bf459b6f7ddff354cb00fbc76324ab3f7d18c70246d5aa61c3c5"
+    },
+    {
+      "bytes": 16025,
+      "path": "um/YGGUSDT/liquidation.jsonl",
+      "rows": 16,
+      "sha256": "0ecd84de6109f4209708452fcbda9e285b2ef16be854fdb58d3ff110758b9325"
+    },
+    {
+      "bytes": 107360,
+      "path": "um/ZAMAUSDT/liquidation.jsonl",
+      "rows": 107,
+      "sha256": "d1de3e788209a799a5fe3c10358f90eb3f445b268be7f6a45fecae651bdb34e8"
+    },
+    {
+      "bytes": 25001,
+      "path": "um/ZBTUSDT/liquidation.jsonl",
+      "rows": 25,
+      "sha256": "64b3a9b2401266ce351f57b39732b5e41f2e47b61e470d063b21ae6694159917"
+    },
+    {
+      "bytes": 179763,
+      "path": "um/ZECUSDC/liquidation.jsonl",
+      "rows": 180,
+      "sha256": "99139a4b9b25cf796076d2781e161f136cb451d75dd26f79a168770eaa59c4c7"
+    },
+    {
+      "bytes": 536639,
+      "path": "um/ZECUSDT/book_ticker.jsonl",
+      "rows": 274,
+      "sha256": "7ab168c1099a37160c918e425414e4eb6cfa4a7b05a023339087e67401516800"
+    },
+    {
+      "bytes": 1304240,
+      "path": "um/ZECUSDT/klines_15m.jsonl",
+      "rows": 549,
+      "sha256": "fe6e6b348fe204376d2e164ef3f0e5256e0f131ffa2c4be120798b78dd3a7a68"
+    },
+    {
+      "bytes": 1620575,
+      "path": "um/ZECUSDT/liquidation.jsonl",
+      "rows": 1622,
+      "sha256": "a0bc7d37c0370bb0111e4265e5b57edac6d330caea7e8897c2038776a0107fa1"
+    },
+    {
+      "bytes": 528867,
+      "path": "um/ZECUSDT/open_interest.jsonl",
+      "rows": 274,
+      "sha256": "77ba1da2fc51ddbf5843a2fdf141fe7a385188a94db2885898abc464223f73a0"
+    },
+    {
+      "bytes": 569484,
+      "path": "um/ZECUSDT/premium.jsonl",
+      "rows": 274,
+      "sha256": "eeceaa11a0b2752a4c03d9f3f15cb3ecde630ad7e4e399ef37958b9699480804"
+    },
+    {
+      "bytes": 1317283,
+      "path": "um/ZECUSDT/premium_klines_15m.jsonl",
+      "rows": 550,
+      "sha256": "a2c5a0ff8c1d0f724afd033622aabc205c7d6f5725608cdc60ed8742b5ad81bc"
+    },
+    {
+      "bytes": 352321,
+      "path": "um/ZENUSDT/liquidation.jsonl",
+      "rows": 355,
+      "sha256": "067c8984ef99bc48193e3ab0310b6c6036ac92971972c7c6b8de108a7ecf84df"
+    },
+    {
+      "bytes": 8090,
+      "path": "um/ZEREBROUSDT/liquidation.jsonl",
+      "rows": 8,
+      "sha256": "7e21f59949050d195627ae1a4a305da9e20e91b3994d79602281f44fafb37d96"
+    },
+    {
+      "bytes": 89185,
+      "path": "um/ZESTUSDT/liquidation.jsonl",
+      "rows": 89,
+      "sha256": "5b3876b3a69f0018502c23c953d8d0e2be6fbcf247133661d7a8a997fb64b841"
+    },
+    {
+      "bytes": 13018,
+      "path": "um/ZETAUSDT/liquidation.jsonl",
+      "rows": 13,
+      "sha256": "39f54bf30cdd0ede6f104983ad4980385e044aeb01d54a5114b01e90cb18958f"
+    },
+    {
+      "bytes": 18156,
+      "path": "um/ZHIPUUSDT/liquidation.jsonl",
+      "rows": 18,
+      "sha256": "1389038fadf74be86333e3a4d25013b4e91c1111d808e0c388cdead976f7f7ac"
+    },
+    {
+      "bytes": 39501,
+      "path": "um/ZHONGJIUSDT/liquidation.jsonl",
+      "rows": 39,
+      "sha256": "d80c50d33773d9cbd04c91eefa0df81719e10f1da17d603ede2b6773d078f4cd"
+    },
+    {
+      "bytes": 18062,
+      "path": "um/ZILUSDT/liquidation.jsonl",
+      "rows": 18,
+      "sha256": "e3ce6f43c1fde825ec7a2b31990497b1b393f6495380fa2fc96e3560f977c1ac"
+    },
+    {
+      "bytes": 97036,
+      "path": "um/ZKCUSDT/liquidation.jsonl",
+      "rows": 97,
+      "sha256": "de01c33510815cf1ef82d86103ed4c71feb56b292b760efcafe2b5336fed94d5"
+    },
+    {
+      "bytes": 85027,
+      "path": "um/ZKPUSDT/liquidation.jsonl",
+      "rows": 85,
+      "sha256": "dee3f28fb84b6e534e87fb04d213b1b005f6bdf5a000183b5a21f51b31aa40cf"
+    },
+    {
+      "bytes": 41957,
+      "path": "um/ZKUSDT/liquidation.jsonl",
+      "rows": 42,
+      "sha256": "74497ef417644c926a0ff6006b5a6c22e40cd7a708706ab4560c9a07dbe42846"
+    },
+    {
+      "bytes": 997,
+      "path": "um/ZMUSDT/liquidation.jsonl",
+      "rows": 1,
+      "sha256": "3b2606297a5154ef290c262f6291a1c3f43d65298330f157a06d16bfa751feb0"
+    },
+    {
+      "bytes": 211121,
+      "path": "um/ZORAUSDT/liquidation.jsonl",
+      "rows": 210,
+      "sha256": "43535c9fb24f1263820c735dcf47e5bd82f92d33590f2e15274f3a8728d2ddc4"
+    },
+    {
+      "bytes": 73190,
+      "path": "um/ZROUSDT/liquidation.jsonl",
+      "rows": 73,
+      "sha256": "22e14ffa7b95868b6ee56d923dece7c726f386f59705a0b9369b2a81931e5f28"
+    },
+    {
+      "bytes": 15958,
+      "path": "um/ZRXUSDT/liquidation.jsonl",
+      "rows": 16,
+      "sha256": "57ebb6530493f617f2cdb6e526134b3dea1a19760ec8911be9d411df1fc99649"
+    },
+    {
+      "bytes": 4992,
+      "path": "um/ZSUSDT/liquidation.jsonl",
+      "rows": 5,
+      "sha256": "d847736ea8a2e743ea65243b7da764eb2c18e9568733b37eaeca02b905912718"
+    },
+    {
+      "bytes": 12526,
+      "path": "um/哈基米USDT/liquidation.jsonl",
+      "rows": 12,
+      "sha256": "2d3a7d688c77451f1bd1c14f0707f3eae8ccac70606e0ec0d7f2cf0f745e9aaf"
+    },
+    {
+      "bytes": 34968,
+      "path": "um/币安人生USDT/liquidation.jsonl",
+      "rows": 33,
+      "sha256": "7224cf1e8b92b85871469338e16f27f3852e10b0102cf72c6092bd0292217e47"
+    },
+    {
+      "bytes": 81192,
+      "path": "um/我踏马来了USDT/liquidation.jsonl",
+      "rows": 75,
+      "sha256": "26fd43f24f7a6df4586ea94f361a42ef0e82a3585298db30259e5fac47265ea4"
+    },
+    {
+      "bytes": 700393,
+      "path": "um/牛来USDT/liquidation.jsonl",
+      "rows": 682,
+      "sha256": "18ed8df0b2f231bcfb1ea5dbe3f2807a6ed413fec9cbf732d63c9adc16e3bee8"
+    },
+    {
+      "bytes": 560488,
+      "path": "um/龙虾USDT/liquidation.jsonl",
+      "rows": 546,
+      "sha256": "93a6b3dcf154362a77fba35ff17be2358579d9182a284d4d4b990d858015739a"
+    }
+  ],
+  "final_holdout": "UNTOUCHED",
+  "implementation_commit": "4937ccf",
+  "launch_manifest": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_MANIFEST_2026-09.json",
+  "launch_manifest_sha256": "cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659",
+  "launch_seal": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_SEAL_RECEIPT.json",
+  "launch_seal_sha256": "ab83232d90e800bf8178c6f3d22138382fb102b9d14213e12a798c0f2c68ad85",
+  "launch_seal_status": "SEALED",
+  "manifest_chain": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8\\raw_v1\\manifest_chain.jsonl",
+  "manifest_created_at": "2026-09-08T00:45:27.500456+00:00",
+  "manifest_id": "20260908T004527Z",
+  "manifest_sha256": "ffd6ff3ffe550c8a121df659f58f133503c86fbaa1a7ca2e59c7d1307a02d35d",
+  "outcomes_accessed": false,
+  "prefix_only": true,
+  "previous_manifest_sha256": "821a4cd54fa134d057ec4920d718428a31fb590ce9d5cdbabe6e5ac3e5c33842",
+  "raw_data_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8\\raw_v1",
+  "raw_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8",
+  "raw_v8_mutated": false,
+  "record_type": "R3_FORCEORDER_V3_CUTOFF_RECEIPT",
+  "status": "FROZEN",
+  "total_bytes": 291195868,
+  "total_rows": 169552
+}

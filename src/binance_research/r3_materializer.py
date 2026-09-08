@@ -9,6 +9,14 @@ from typing import Any, Iterable
 
 import pandas as pd
 
+FORCEORDER_V3_COLUMNS = (
+    "identity_key", "market_type", "event_symbol", "pair_symbol", "subtype",
+    "event_time", "order_trade_time", "forced_side", "source_available_time",
+    "executable_open", "continuity_state", "h03_status", "h04_status",
+    "signed_observed_notional", "raw_payload_sha256", "canonical_payload_sha256",
+    "v3_status", "v3_invalid_reason",
+)
+
 GAP_STATES = frozenset({"COMPLETE", "RESTART_GAP", "POLL_GAP", "SOURCE_TIME_UNAVAILABLE", "SEQUENCE_GAP", "SCHEMA_ERROR", "RATE_LIMIT_GAP", "CLOCK_UNCERTAINTY_GAP"})
 
 
@@ -104,3 +112,53 @@ def reject_nonfinite(value: Any) -> float:
     if not math.isfinite(parsed):
         raise ValueError("nonfinite feature value")
     return parsed
+
+
+def materialize_forceorder_v3_metadata(
+    envelopes: Iterable[dict[str, Any]], *,
+    complete_bar_opens: Iterable[Any] = (),
+) -> pd.DataFrame:
+    """Normalize constructed ForceOrder V3 envelopes without outcome fields.
+
+    This adapter is intentionally independent of forward-return materializers:
+    it emits identity, timing, continuity, and signed-pressure metadata only.
+    Invalid envelopes remain visible with their deterministic reason.
+    """
+    from decimal import Decimal
+    from ops.r3.r3_forceorder_identity_v3 import (
+        ForceOrderIdentityV3Error,
+        validate_forceorder_envelope_v3,
+    )
+
+    rows: list[dict[str, Any]] = []
+    complete = tuple(complete_bar_opens)
+    for envelope in envelopes:
+        try:
+            record = validate_forceorder_envelope_v3(envelope, complete_bar_opens=complete)
+        except ForceOrderIdentityV3Error as exc:
+            rows.append({"v3_status": "INVALID", "v3_invalid_reason": exc.reason})
+            continue
+        identity = record.identity_tuple
+        base = Decimal(identity[14]) * Decimal(identity[12] or identity[11])
+        signed = base if identity[7] == "SELL" else -base
+        rows.append({
+            "identity_key": record.identity_key,
+            "market_type": record.market_type,
+            "event_symbol": record.event_symbol,
+            "pair_symbol": record.pair_symbol,
+            "subtype": record.subtype,
+            "event_time": record.identity_tuple[4],
+            "order_trade_time": record.identity_tuple[5],
+            "forced_side": record.identity_tuple[7],
+            "source_available_time": record.source_available_time,
+            "executable_open": record.executable_open,
+            "continuity_state": record.continuity_state,
+            "h03_status": record.h03_status,
+            "h04_status": record.h04_status,
+            "signed_observed_notional": format(signed, "f"),
+            "raw_payload_sha256": record.raw_payload_sha256,
+            "canonical_payload_sha256": record.canonical_payload_sha256,
+            "v3_status": "VALID",
+            "v3_invalid_reason": None,
+        })
+    return pd.DataFrame(rows, columns=FORCEORDER_V3_COLUMNS)
