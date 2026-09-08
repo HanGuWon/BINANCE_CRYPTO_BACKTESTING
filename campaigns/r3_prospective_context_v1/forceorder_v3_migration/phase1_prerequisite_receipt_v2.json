@@ -1,0 +1,108 @@
+{
+  "record_type": "R3_FORCEORDER_V3_MIGRATION_P1_PREREQUISITE_RECEIPT",
+  "generated_at_utc": "2026-09-08T00:27:59.6700033Z",
+  "canonical": {
+    "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트",
+    "branch": "research/r2b-restricted-derivatives-v1",
+    "head": "a6e159d3b516f109c9b865520ea941969f5ea492",
+    "expected_head": "a6e159d3b516f109c9b865520ea941969f5ea492",
+    "tracked_scientific_scope_status": "clean",
+    "preexisting_untracked_evidence_preserved": true,
+    "canonical_untouched": true
+  },
+  "audit_branch": {
+    "worktree": "C:\\Users\\user\\.codex\\worktrees\\sol-audit-repair-v1",
+    "branch": "codex/sol-audit-repair-v1",
+    "local_head": "672ee0bda2668314f4f29d7d91a6867e2cb77a96",
+    "remote_head": "672ee0bda2668314f4f29d7d91a6867e2cb77a96",
+    "remote_verified": true,
+    "pushed_without_force": true,
+    "merged_into_canonical": false,
+    "metadata_tests": "16 passed in 1.59s",
+    "contract_verifier": "R3_FORCEORDER_V3_CHECK=PASS",
+    "outcome_blind": true
+  },
+  "migration": {
+    "worktree": "C:\\Users\\user\\.codex\\worktrees\\r3-forceorder-v3-migration-v1",
+    "branch": "codex/r3-forceorder-v3-migration-v1",
+    "base_commit": "a6e159d3b516f109c9b865520ea941969f5ea492",
+    "head": "a6e159d3b516f109c9b865520ea941969f5ea492",
+    "created_from_verified_canonical": true
+  },
+  "live_v8": {
+    "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8",
+    "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+    "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+    "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+    "manifest_sha256": "cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659",
+    "seal_sha256": "ab83232d90e800bf8178c6f3d22138382fb102b9d14213e12a798c0f2c68ad85",
+    "roster_sha256": "bb05514dfc78cfca3b736488b1454f4cb022da0110e2cbf69f53c505f543ea79",
+    "seal_status": "SEALED",
+    "manifest_chain_verification": true,
+    "outcomes_accessed": false,
+    "collector_guardian_unchanged": true,
+    "collector_lock_pid": "183660",
+    "writer_count": 1,
+    "duplicate_writers": [],
+    "processes": [
+      {
+        "ProcessId": 175272,
+        "ParentProcessId": 159728,
+        "Name": "pwsh.exe",
+        "CommandLine": "\"C:\\Users\\user\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\ops\\r3\\run_r3_v8_guardian.ps1\" -Persistent -PollSeconds 300"
+      },
+      {
+        "ProcessId": 185608,
+        "ParentProcessId": 175272,
+        "Name": "python.exe",
+        "CommandLine": "\"C:\\Users\\user\\AppData\\Roaming\\uv\\python\\cpython-3.11-windows-x86_64-none\\python.exe\" -m ops.r3.r3_v8_guardian --persistent --poll-seconds 300"
+      },
+      {
+        "ProcessId": 41476,
+        "ParentProcessId": 185608,
+        "Name": "powershell.exe",
+        "CommandLine": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\ops\\r3\\launch_r3_v8_resume.ps1\" -AuthorizationReceipt \"C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\guardian\\child_authorizations\\R3_V8_GUARDIAN_CHILD_20260907T111952531532Z_6f32e09e-0e54-46ab-a590-dc9c177a296b.json\""
+      },
+      {
+        "ProcessId": 183660,
+        "ParentProcessId": 41476,
+        "Name": "python.exe",
+        "CommandLine": "\"C:\\Users\\user\\AppData\\Roaming\\uv\\python\\cpython-3.11-windows-x86_64-none\\python.exe\" \"C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\scripts\\run_r3_prospective_collector.py\" --mode SCIENTIFIC --persistent --root D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8 --roster-artifact \"C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\rosters\\2026-09.json\" --launch-manifest D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_MANIFEST_2026-09.json"
+      },
+      {
+        "ProcessId": 171092,
+        "ParentProcessId": 125188,
+        "Name": "pwsh.exe",
+        "CommandLine": "\"C:\\Users\\user\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" -Command \"try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}\n$ErrorActionPreference=\\\"Stop\\\"; $canonical=\\\"C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\\"; $migration=\\\"C:\\Users\\user\\.codex\\worktrees\\r3-forceorder-v3-migration-v1\\\"; $base=\\\"a6e159d3b516f109c9b865520ea941969f5ea492\\\"; $audit=\\\"672ee0bda2668314f4f29d7d91a6867e2cb77a96\\\"; $liveRoot=\\\"D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8\\\"; $manifest=\\\"D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_MANIFEST_2026-09.json\\\"; $seal=\\\"D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_SEAL_RECEIPT.json\\\"; $roster=\\\"$canonical\\campaigns\\r3_prospective_context_v1\\rosters\\2026-09.json\\\"; $procs=@(Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match \\\"r3_v8_guardian|run_r3_v8_guardian|run_r3_prospective_collector\\\" } | Select-Object ProcessId,ParentProcessId,Name,CommandLine); $lock=\\\"$liveRoot\\control\\collector.lock\\\"; $lockPid=if(Test-Path $lock){(Get-Content -Raw $lock).Trim()}else{$null}; $classification=\\\"$migration\\devlog\\_plan\\260907_forceorder-v3-migration\\path_classification.json\\\"; $receipt=[ordered]@{record_type=\\\"R3_FORCEORDER_V3_MIGRATION_P1_PREREQUISITE_RECEIPT\\\";generated_at_utc=(Get-Date).ToUniversalTime().ToString(\\\"o\\\");canonical=[ordered]@{path=$canonical;branch=\\\"research/r2b-restricted-derivatives-v1\\\";head=$base;expected_head=$base;tracked_scientific_scope_status=\\\"clean\\\";preexisting_untracked_evidence_preserved=$true;canonical_untouched=$true};audit_branch=[ordered]@{worktree=\\\"C:\\Users\\user\\.codex\\worktrees\\sol-audit-repair-v1\\\";branch=\\\"codex/sol-audit-repair-v1\\\";local_head=$audit;remote_head=$audit;remote_verified=$true;pushed_without_force=$true;merged_into_canonical=$false;metadata_tests=\\\"16 passed in 1.59s\\\";contract_verifier=\\\"R3_FORCEORDER_V3_CHECK=PASS\\\";outcome_blind=$true};migration=[ordered]@{worktree=$migration;branch=\\\"codex/r3-forceorder-v3-migration-v1\\\";base_commit=$base;head=$base;created_from_verified_canonical=$true};live_v8=[ordered]@{root=$liveRoot;implementation_commit=\\\"ecebc49dff41eeec33af62c2c85a75c5a0bd2922\\\";source_tree_sha256=\\\"b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688\\\";registry_sha256=\\\"c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a\\\";manifest_sha256=\\\"cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659\\\";seal_sha256=\\\"ab83232d90e800bf8178c6f3d22138382fb102b9d14213e12a798c0f2c68ad85\\\";roster_sha256=\\\"bb05514dfc78cf3b736488b1454f4cb022da0110e2cbf69f53c505f543ea79\\\";seal_status=\\\"SEALED\\\";manifest_chain_verification=$true;outcomes_accessed=$false;collector_guardian_unchanged=$true;collector_lock_pid=$lockPid;writer_count=1;duplicate_writers=@();processes=$procs;watchdog_state=\\\"YELLOW\\\";watchdog_reason=\\\"reported_source_or_restart_gap\\\";cycle_count=238;expected_cycle_count=509;missing_cycle_count=271;latest_cycle=\\\"cycle-20260908T002001174175Z\\\";latest_health_pid=183660;disk_state=\\\"GREEN\\\";free_disk_bytes=130084982784};diff_classification=[ordered]@{path=$classification;file_count=106;transplant_after_review=8;evidence_only=20;exclude=78;merge_allowed=$false;sha256=(Get-FileHash -Algorithm SHA256 $classification).Hash.ToLowerInvariant()};policy=[ordered]@{raw_v8_mutated=$false;v1_v2_artifacts_preserved=$true;outcomes_accessed=$false;final_holdout=\\\"UNTOUCHED\\\";r2b2=\\\"NOT_ACCESSED\\\";live_transition=\\\"NOT_EXECUTED\\\";outcome_run=\\\"NOT_STARTED\\\"}}; $target=\\\"$migration\\campaigns\\r3_prospective_context_v1\\forceorder_v3_migration\\phase1_prerequisite_receipt.json\\\"; $receipt|ConvertTo-Json -Depth 12|Set-Content -LiteralPath $target -Encoding utf8; Write-Output (Get-FileHash -Algorithm SHA256 $target).Hash.ToLowerInvariant()\""
+      }
+    ],
+    "watchdog_state": "YELLOW",
+    "watchdog_reason": "reported_source_or_restart_gap",
+    "cycle_count": 238,
+    "expected_cycle_count": 509,
+    "missing_cycle_count": 271,
+    "latest_cycle": "cycle-20260908T002001174175Z",
+    "latest_health_pid": 183660,
+    "disk_state": "GREEN",
+    "free_disk_bytes": 130084982784
+  },
+  "diff_classification": {
+    "path": "C:\\Users\\user\\.codex\\worktrees\\r3-forceorder-v3-migration-v1\\devlog\\_plan\\260907_forceorder-v3-migration\\path_classification.json",
+    "file_count": 106,
+    "transplant_after_review": 8,
+    "evidence_only": 20,
+    "exclude": 78,
+    "merge_allowed": false,
+    "sha256": "fe76b7f161fa9b3c18a2ce9fee30c58028d196ae3b70cbedd7c717c0a0b357a2"
+  },
+  "policy": {
+    "raw_v8_mutated": false,
+    "v1_v2_artifacts_preserved": true,
+    "outcomes_accessed": false,
+    "final_holdout": "UNTOUCHED",
+    "r2b2": "NOT_ACCESSED",
+    "live_transition": "NOT_EXECUTED",
+    "outcome_run": "NOT_STARTED"
+  },
+  "supersedes": "phase1_prerequisite_receipt.json"
+}

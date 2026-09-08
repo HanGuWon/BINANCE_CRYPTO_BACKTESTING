@@ -1,0 +1,651 @@
+{
+  "record_type": "R3_FORCEORDER_V3_AUDIT_DIFF_CLASSIFICATION",
+  "generated_at_utc": "2026-09-08T00:26:58.3726237Z",
+  "base_commit": "a6e159d3b516f109c9b865520ea941969f5ea492",
+  "audit_commit": "672ee0bda2668314f4f29d7d91a6867e2cb77a96",
+  "merge_allowed": false,
+  "file_count": 106,
+  "classification_counts": {
+    "TRANSPLANT_AFTER_REVIEW": 8,
+    "EXCLUDE": 78,
+    "EVIDENCE_ONLY": 20
+  },
+  "files": [
+    {
+      "status": "A",
+      "path": "campaigns/r3_prospective_context_v1/R3_FORCEORDER_IDENTITY_AMENDMENT_V3.md",
+      "classification": "TRANSPLANT_AFTER_REVIEW",
+      "reason": "candidate V3 parser/collector/inventory logic; transplant only the reviewed symbols"
+    },
+    {
+      "status": "M",
+      "path": "campaigns/r3_prospective_context_v1/R3_PROTOCOL.md",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "A",
+      "path": "campaigns/r3_prospective_context_v1/R3_SOURCE_DEPENDENCY_MATRIX_V3_FORCEORDER.json",
+      "classification": "TRANSPLANT_AFTER_REVIEW",
+      "reason": "candidate V3 parser/collector/inventory logic; transplant only the reviewed symbols"
+    },
+    {
+      "status": "M",
+      "path": "campaigns/r3_prospective_context_v1/campaign_spec.toml",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "campaigns/r3_prospective_context_v1/metrics_contract.md",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "campaigns/r3_prospective_context_v1/multiple_testing_plan.md",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_PROSPECTIVE_OPERATIONS_RUNBOOK_V1.md",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_DAILY_OPERATIONS_RECEIPTS.jsonl",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "D",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_FORCEORDER_V3_MIGRATION_CONTINUATION_20260907.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_FORCEORDER_V3_MIGRATION_CONTINUATION_20260907_V2.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_GUARDIAN_SYNTHETIC_QUALIFICATION_20260907_V1.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_OUTAGE_AND_RECOVERY_20260907.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_OUTAGE_AND_RECOVERY_20260907_V2.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_OUTAGE_AND_RECOVERY_20260907_V3.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_RECOVERY_ACCOUNTING_GUARDIAN_CLOSEOUT_20260907.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_STANDING_RECOVERY_AUTHORIZATION_20260907.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_WP5_FIREWALL_RECEIPT_20260907.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_WP5_FIREWALL_RECEIPT_20260907_V2.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_WP5_FIREWALL_RECEIPT_20260907_V3.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_WP5_FIREWALL_RECEIPT_20260907_V4.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_WP5_FIREWALL_RECEIPT_20260907_V5.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_WP5_FIREWALL_RECEIPT_20260907_V6.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "campaigns/r3_prospective_context_v1/operations/R3_V8_WP5_FIREWALL_RECEIPT_20260907_V7.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "A",
+      "path": "campaigns/r3_prospective_context_v1/operations/SOL_AUDIT_WP3_PROVENANCE_INDEX_20260905.json",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "A",
+      "path": "campaigns/r3_prospective_context_v1/operations/SOL_AUDIT_WP4_FULL_PYTEST_RECEIPT_20260905_RUN1.json",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "A",
+      "path": "campaigns/r3_prospective_context_v1/operations/SOL_AUDIT_WP4_FULL_PYTEST_RECEIPT_20260905_RUN2.json",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "A",
+      "path": "campaigns/r3_prospective_context_v1/operations/SOL_AUDIT_WP4_RECEIPT_SUPERSESSION_20260905.json",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "M",
+      "path": "campaigns/r3_prospective_context_v1/promotion_policy.md",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "D",
+      "path": "devlog/_plan/260905_sol-audit-independent-attestation-20260905/166_wp2_implementation_closeout.md",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "devlog/_plan/260905_sol-audit-independent-attestation-20260905/169_wp2_closeout.md",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "devlog/_plan/260905_sol-audit-independent-attestation-20260905/178_wp5_outage_firewall_plan.md",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "devlog/_plan/260905_sol-audit-independent-attestation-20260905/179_wp6_recovery_accounting_guardian_roadmap.md",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "devlog/_plan/260905_sol-audit-independent-attestation-20260905/180_wp6_live_guardian_closeout_20260907.json",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "A",
+      "path": "devlog/_plan/260905_sol-audit-repair/000_plan.md",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "A",
+      "path": "devlog/_plan/260905_sol-audit-repair/010_forceorder_provenance.md",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "A",
+      "path": "devlog/_plan/260905_sol-audit-repair/015_forceorder_v3_schema.md",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "A",
+      "path": "devlog/_plan/260905_sol-audit-repair/020_sol_core_repairs.md",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "A",
+      "path": "devlog/_plan/260905_sol-audit-repair/030_sol_provenance_ops.md",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "A",
+      "path": "devlog/_plan/260905_sol-audit-repair/040_qualification_closeout.md",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "D",
+      "path": "devlog/_plan/260907_r3-v8-wp6-closeout-20260907/000_plan.md",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "devlog/_plan/260907_r3-v8-wp6-closeout-20260907/010_phase1.md",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "devlog/_plan/260907_r3-v8-wp6-closeout-20260907/020_phase2.md",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "devlog/_plan/260907_r3-v8-wp6-closeout-20260907/030_phase3.md",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "devlog/_plan/260907_r3-v8-wp6-closeout-20260907/040_phase4.md",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "devlog/_plan/260907_r3-v8-wp6-closeout-20260907/050_phase5.md",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "A",
+      "path": "docs/REPRODUCIBLE_RUNTIME.md",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "M",
+      "path": "ops/r3/R3-Prospective-Scientific-v8.xml",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "ops/r3/README.md",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "ops/r3/build_r3_evidence_inventory.py",
+      "classification": "TRANSPLANT_AFTER_REVIEW",
+      "reason": "candidate V3 parser/collector/inventory logic; transplant only the reviewed symbols"
+    },
+    {
+      "status": "M",
+      "path": "ops/r3/check_r3_evaluation_readiness.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "A",
+      "path": "ops/r3/compare_sol_audit_qualification.py",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "M",
+      "path": "ops/r3/install_r3_v8_startup.ps1",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "ops/r3/launch_r3_v8_resume.ps1",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "D",
+      "path": "ops/r3/qualify_r3_v8_guardian.py",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "A",
+      "path": "ops/r3/r3_forceorder_identity_v3.py",
+      "classification": "TRANSPLANT_AFTER_REVIEW",
+      "reason": "candidate V3 parser/collector/inventory logic; transplant only the reviewed symbols"
+    },
+    {
+      "status": "M",
+      "path": "ops/r3/r3_ops.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "D",
+      "path": "ops/r3/r3_v8_authorization.py",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "ops/r3/r3_v8_guardian.py",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "ops/r3/r3_wp3_observe.py",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "M",
+      "path": "ops/r3/register_r3_v8_task.ps1",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "D",
+      "path": "ops/r3/run_r3_v8_guardian.ps1",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "M",
+      "path": "ops/r3/tests/test_evaluation_readiness.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "A",
+      "path": "ops/r3/tests/test_forceorder_v3_contract.py",
+      "classification": "TRANSPLANT_AFTER_REVIEW",
+      "reason": "candidate V3 parser/collector/inventory logic; transplant only the reviewed symbols"
+    },
+    {
+      "status": "D",
+      "path": "ops/r3/tests/test_guardian.py",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "ops/r3/tests/test_guardian_qualification_receipt.py",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "M",
+      "path": "ops/r3/tests/test_inventory_accounting_v2.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "ops/r3/tests/test_operations_layer.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "A",
+      "path": "ops/r3/tests/test_sol_audit_wp3_provenance.py",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "A",
+      "path": "ops/r3/tests/test_sol_audit_wp4_guards.py",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "D",
+      "path": "ops/r3/tests/test_v8_authorization.py",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "A",
+      "path": "ops/r3/tests/test_wp2_readiness_contract.py",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "D",
+      "path": "ops/r3/tests/test_wp6_accounting.py",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "ops/r3/tests/test_wp6_closeout.py",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "A",
+      "path": "ops/r3/verify_r3_forceorder_v3_contract.py",
+      "classification": "TRANSPLANT_AFTER_REVIEW",
+      "reason": "candidate V3 parser/collector/inventory logic; transplant only the reviewed symbols"
+    },
+    {
+      "status": "M",
+      "path": "ops/r3/verify_r3_inventory_contract.py",
+      "classification": "TRANSPLANT_AFTER_REVIEW",
+      "reason": "candidate V3 parser/collector/inventory logic; transplant only the reviewed symbols"
+    },
+    {
+      "status": "D",
+      "path": "ops/r3/verify_r3_v8_guardian_receipt.py",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "ops/r3/verify_r3_v8_wp5_firewall.py",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "D",
+      "path": "ops/r3/verify_r3_v8_wp5_firewall_v7.py",
+      "classification": "EXCLUDE",
+      "reason": "deletion from audit branch; never transplant"
+    },
+    {
+      "status": "A",
+      "path": "ops/r3/verify_sol_audit_live_guard.py",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "A",
+      "path": "ops/r3/verify_sol_audit_qualification_allowlist.py",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "M",
+      "path": "pyproject.toml",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "A",
+      "path": "reports/SOL_AUDIT_REPAIR_FINAL.md",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "A",
+      "path": "reports/SOL_AUDIT_WP0_FORCEORDER_PROVENANCE.md",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "A",
+      "path": "reports/SOL_AUDIT_WP3_PROVENANCE_RECONCILIATION.md",
+      "classification": "EVIDENCE_ONLY",
+      "reason": "audit evidence or unrelated repair; retain as provenance, do not merge"
+    },
+    {
+      "status": "M",
+      "path": "scripts/acquire_r2b_premium_history.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "scripts/aggregate_r2a2.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "scripts/audit_r2b_premium_coverage.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "src/binance_research/backtest.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "src/binance_research/cli.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "src/binance_research/collector.py",
+      "classification": "TRANSPLANT_AFTER_REVIEW",
+      "reason": "candidate V3 parser/collector/inventory logic; transplant only the reviewed symbols"
+    },
+    {
+      "status": "M",
+      "path": "src/binance_research/features.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "src/binance_research/provenance.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "src/binance_research/registry.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "src/binance_research/reporting.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "src/binance_research/splits.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "src/binance_research/statistics.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "tests/test_backtest.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "tests/test_cli.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "tests/test_r16_semantics.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "tests/test_r171_verification.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "tests/test_r2a2_aggregation.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "tests/test_r2b_checkpoint_verifier.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "A",
+      "path": "tests/test_r2b_premium_audit_contract.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "tests/test_r3_forward_ranking.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "M",
+      "path": "tests/test_splits_statistics.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    },
+    {
+      "status": "A",
+      "path": "tests/test_wp3_immutable_outputs.py",
+      "classification": "EXCLUDE",
+      "reason": "unrelated broad change, live V8/runtime policy, or historical scientific source"
+    }
+  ]
+}

@@ -18,7 +18,7 @@ import sys
 from collections import Counter, defaultdict
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Iterable, Literal, Mapping, Sequence
 
 try:
     from ops.r3.r3_forceorder_identity import (
@@ -27,12 +27,18 @@ try:
         deduplicate_forceorders,
         validate_forceorder_envelope,
     )
+    from ops.r3.r3_forceorder_identity_v3 import (
+        deduplicate_forceorders_v3,
+    )
 except ModuleNotFoundError:  # pragma: no cover - direct script invocation
     from r3_forceorder_identity import (  # type: ignore[no-redef]
         ForceOrderIdentityError,
         ValidatedForceOrder,
         deduplicate_forceorders,
         validate_forceorder_envelope,
+    )
+    from r3_forceorder_identity_v3 import (  # type: ignore[no-redef]
+        deduplicate_forceorders_v3,
     )
 
 
@@ -83,6 +89,32 @@ PER_H_TEMPORAL_MINIMA = {
 
 class InventoryError(RuntimeError):
     """Fail-closed metadata inventory error."""
+
+
+def build_forceorder_metadata(
+    envelopes: Iterable[Mapping[str, Any]], *,
+    identity_version: Literal["v2", "v3"] = "v2",
+    complete_bar_opens: Iterable[datetime] = (),
+) -> dict[str, Any]:
+    """Build metadata-only ForceOrder accounting with an explicit version.
+
+    Existing callers retain the immutable V2 default.  V3 is opt-in and is
+    used only by constructed-fixture verifiers; no active root is read here.
+    """
+    materialized = list(envelopes)
+    if identity_version == "v2":
+        receipt = deduplicate_forceorders(materialized, complete_bar_opens=complete_bar_opens)
+    elif identity_version == "v3":
+        receipt = deduplicate_forceorders_v3(materialized, complete_bar_opens=complete_bar_opens)
+    else:
+        raise InventoryError(f"unknown forceOrder identity version: {identity_version}")
+    metadata = receipt.as_dict()
+    metadata["identity_key_version"] = f"forceorder:{identity_version}"
+    metadata["representative_count"] = len(receipt.representatives)
+    if identity_version == "v3":
+        market_counts: Counter[str] = Counter(record.market_type for record in receipt.representatives)
+        metadata["representative_market_counts"] = dict(sorted(market_counts.items()))
+    return metadata
 
 
 def _reject_token(text: str, *, context: str) -> None:

@@ -1,0 +1,111 @@
+{
+  "record_type": "R3_FORCEORDER_V3_MIGRATION_P1_AUDIT",
+  "status": "FAIL",
+  "generated_at_utc": "2026-09-08T00:29:58.1076353Z",
+  "checks": {
+    "canonical_head": true,
+    "canonical_branch": true,
+    "canonical_tracked_scientific_clean": true,
+    "audit_local_head": true,
+    "audit_remote_head": true,
+    "migration_head": true,
+    "migration_branch": true,
+    "classification_complete": true,
+    "collector_alive": true,
+    "guardian_alive": true,
+    "live_writer_count_one": true,
+    "chain_pass": true,
+    "seal_status_sealed": true,
+    "outcomes_accessed": false,
+    "raw_v8_mutated": false,
+    "canonical_untouched": true,
+    "audit_branch_merged": false
+  },
+  "canonical": {
+    "head": "a6e159d3b516f109c9b865520ea941969f5ea492",
+    "branch": "research/r2b-restricted-derivatives-v1",
+    "tracked_scope_status": "clean"
+  },
+  "audit_branch": {
+    "local_head": "672ee0bda2668314f4f29d7d91a6867e2cb77a96",
+    "remote_head": "672ee0bda2668314f4f29d7d91a6867e2cb77a96",
+    "remote_verified": true,
+    "tests": "16 passed",
+    "contract_verifier": "PASS"
+  },
+  "migration": {
+    "worktree": "C:\\Users\\user\\.codex\\worktrees\\r3-forceorder-v3-migration-v1",
+    "branch": "codex/r3-forceorder-v3-migration-v1",
+    "head": "a6e159d3b516f109c9b865520ea941969f5ea492",
+    "base": "a6e159d3b516f109c9b865520ea941969f5ea492"
+  },
+  "live": {
+    "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8",
+    "lock_pid": "183660",
+    "collector_pid": 183660,
+    "guardian_pid": 175272,
+    "processes": [
+      {
+        "ProcessId": 175272,
+        "ParentProcessId": 159728,
+        "Name": "pwsh.exe",
+        "CommandLine": "\"C:\\Users\\user\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\ops\\r3\\run_r3_v8_guardian.ps1\" -Persistent -PollSeconds 300"
+      },
+      {
+        "ProcessId": 185608,
+        "ParentProcessId": 175272,
+        "Name": "python.exe",
+        "CommandLine": "\"C:\\Users\\user\\AppData\\Roaming\\uv\\python\\cpython-3.11-windows-x86_64-none\\python.exe\" -m ops.r3.r3_v8_guardian --persistent --poll-seconds 300"
+      },
+      {
+        "ProcessId": 41476,
+        "ParentProcessId": 185608,
+        "Name": "powershell.exe",
+        "CommandLine": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\ops\\r3\\launch_r3_v8_resume.ps1\" -AuthorizationReceipt \"C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\guardian\\child_authorizations\\R3_V8_GUARDIAN_CHILD_20260907T111952531532Z_6f32e09e-0e54-46ab-a590-dc9c177a296b.json\""
+      },
+      {
+        "ProcessId": 183660,
+        "ParentProcessId": 41476,
+        "Name": "python.exe",
+        "CommandLine": "\"C:\\Users\\user\\AppData\\Roaming\\uv\\python\\cpython-3.11-windows-x86_64-none\\python.exe\" \"C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\scripts\\run_r3_prospective_collector.py\" --mode SCIENTIFIC --persistent --root D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8 --roster-artifact \"C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\rosters\\2026-09.json\" --launch-manifest D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_PROSPECTIVE_LAUNCH_MANIFEST_2026-09.json"
+      }
+    ],
+    "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+    "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+    "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+    "manifest_sha256": "cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659",
+    "seal_sha256": "ab83232d90e800bf8178c6f3d22138382fb102b9d14213e12a798c0f2c68ad85",
+    "seal_status": "SEALED",
+    "manifest_chain_verification": true,
+    "outcomes_accessed": false,
+    "watchdog_state": "YELLOW",
+    "watchdog_reason": "reported_source_or_restart_gap",
+    "cycle_count": 238,
+    "missing_cycle_count": 271
+  },
+  "classification": {
+    "path": "C:\\Users\\user\\.codex\\worktrees\\r3-forceorder-v3-migration-v1\\devlog\\_plan\\260907_forceorder-v3-migration\\path_classification.json",
+    "sha256": "fe76b7f161fa9b3c18a2ce9fee30c58028d196ae3b70cbedd7c717c0a0b357a2",
+    "file_count": 106,
+    "counts": {
+      "TRANSPLANT_AFTER_REVIEW": 8,
+      "EXCLUDE": 78,
+      "EVIDENCE_ONLY": 20
+    },
+    "merge_allowed": false
+  },
+  "source_receipt": {
+    "v2_path": "C:\\Users\\user\\.codex\\worktrees\\r3-forceorder-v3-migration-v1\\campaigns\\r3_prospective_context_v1\\forceorder_v3_migration\\phase1_prerequisite_receipt.json",
+    "v2_sha256": "d1781ad06e41b2f7b8fc0e524cf16c8ae9398153af7c7a61f981d71e42f63ae0",
+    "corrected_path": "C:\\Users\\user\\.codex\\worktrees\\r3-forceorder-v3-migration-v1\\campaigns\\r3_prospective_context_v1\\forceorder_v3_migration\\phase1_prerequisite_receipt_v2.json",
+    "corrected_sha256": "a5765f977ad016b839c7ce924453e5da5519e943e63565613ac351b6f953814a"
+  },
+  "policy": {
+    "raw_v8_mutated": false,
+    "v1_v2_preserved": true,
+    "final_holdout": "UNTOUCHED",
+    "r2b2": "NOT_ACCESSED",
+    "outcome_run": "NOT_STARTED",
+    "live_transition": "NOT_EXECUTED"
+  }
+}

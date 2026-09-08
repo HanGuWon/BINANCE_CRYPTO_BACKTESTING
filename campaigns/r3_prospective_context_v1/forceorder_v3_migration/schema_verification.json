@@ -1,0 +1,16 @@
+{
+  "active_root_accessed": false,
+  "final_holdout_accessed": false,
+  "fixture_counts": {
+    "cm_official": 1,
+    "collision_members": 2,
+    "contradictions": 3,
+    "legacy_nested": 1,
+    "replay": 1,
+    "um_official": 1
+  },
+  "matrix": "R3_SOURCE_DEPENDENCY_MATRIX_V3_FORCEORDER.json",
+  "parser_collector_inventory_agreement": true,
+  "performance_values_accessed": false,
+  "status": "PASS"
+}
