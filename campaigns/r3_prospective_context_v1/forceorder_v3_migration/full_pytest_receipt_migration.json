@@ -1,0 +1,17 @@
+{
+  "record_type": "R3_FORCEORDER_V3_FULL_PYTEST_RECEIPT",
+  "command": "python -m pytest -q",
+  "cwd": "C:\\Users\\user\\.codex\\worktrees\\r3-forceorder-v3-migration-v1",
+  "exit_code": 0,
+  "final_summary": "331 passed, 1 warning in 157.19s (0:02:37)",
+  "captured_output": "........................................................................ [ 21%]\r\n........................................................................ [ 43%]\r\n........................................................................ [ 65%]\r\n........................................................................ [ 87%]\r\n...........................................                              [100%]\r\n============================== warnings summary ===============================\r\ntests/test_r16_semantics.py::test_cohort_breadth_denominator_excludes_unselected_and_warmup\r\n  C:\\Users\\user\\.codex\\worktrees\\r3-forceorder-v3-migration-v1\\src\\binance_research\\features.py:328: UserWarning: Converting to PeriodArray/Index representation will drop timezone information.\r\n    frame[\"universe_month\"] = frame[timestamp_column].dt.to_period(\"M\").astype(str)\r\n\r\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\r\n331 passed, 1 warning in 157.19s (0:02:37)\r\n",
+  "implementation_commit": "5a3941b8098b166bf9f4d7fb1cd970bc0dbd966b",
+  "source_tree_sha256": "7d253432bd99704e6c4f1ee7ecd688f96ccf6a5c77c926e31d3f44048b95cc9d",
+  "source_dirty": false,
+  "scientific_scope_status": "clean",
+  "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+  "recorded_at_utc": "2026-09-08T01:55:46.5612662Z",
+  "outcomes_accessed": false,
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_ACCESSED"
+}
