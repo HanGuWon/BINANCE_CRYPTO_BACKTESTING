@@ -1,0 +1,66 @@
+{
+  "classification": {
+    "collision_envelope_count": 3,
+    "duplicate_envelope_count": 0,
+    "invalid_envelope_count": 8,
+    "unique_event_count": 5
+  },
+  "compared_fields": [
+    "identity_key",
+    "market_type",
+    "event_symbol",
+    "pair_symbol",
+    "subtype",
+    "event_time_ms",
+    "order_trade_time_ms",
+    "trade_id",
+    "forced_side",
+    "position_side",
+    "source_event_time_ms",
+    "source_available_time",
+    "executable_open",
+    "continuity_state",
+    "h03_status",
+    "h04_status",
+    "signed_observed_notional",
+    "raw_payload_sha256",
+    "canonical_payload_sha256",
+    "identity_tuple_sha256",
+    "causal_eligibility",
+    "v3_status",
+    "v3_invalid_reason",
+    "v2_status"
+  ],
+  "final_holdout": "UNTOUCHED",
+  "fixture_count": 16,
+  "fixture_set_sha256": "b4ae507ecc92ee5b7b4159f81dd7312af25fe4ee0d1ce7003aa17b4f9f74ab47",
+  "forced_side_counts": {
+    "BUY": 1,
+    "SELL": 7
+  },
+  "future_append_invariant": true,
+  "invalid_count": 8,
+  "market_counts": {
+    "cm": 1,
+    "um": 7
+  },
+  "optimized_and_reference_identical": true,
+  "outcome_blind": true,
+  "outcomes_accessed": false,
+  "raw_v8_mutated": false,
+  "record_type": "R3_FORCEORDER_V3_QUALIFICATION_RECEIPT",
+  "status": "PASS",
+  "strict_boundary_equality_rejected": true,
+  "v2_status_counts": {
+    "INVALID:ENDPOINT_INVALID": 2,
+    "INVALID:MARKET_TYPE_NOT_UM": 1,
+    "INVALID:PAYLOAD_SCHEMA_INVALID": 11,
+    "INVALID:ps_ENUM_INVALID": 1,
+    "VALID": 1
+  },
+  "v3_status_counts": {
+    "INVALID": 8,
+    "VALID": 8
+  },
+  "valid_count": 8
+}

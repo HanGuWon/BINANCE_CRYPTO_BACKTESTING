@@ -139,12 +139,13 @@ def verify_replay(cutoff_path: Path, derived_root: Path) -> dict[str, Any]:
                 raise ReplayVerificationError(f"signed pressure parity mismatch at line {line_number}")
             available = row.get("source_available_time")
             executable = row.get("executable_open")
-            if available is not None and executable is not None:
-                from datetime import datetime
-                left = datetime.fromisoformat(str(available).replace("Z", "+00:00"))
-                right = datetime.fromisoformat(str(executable).replace("Z", "+00:00"))
-                if not left < right:
-                    raise ReplayVerificationError(f"strict availability violation at line {line_number}")
+            if available is None or executable is None:
+                raise ReplayVerificationError(f"missing source availability at line {line_number}")
+            from datetime import datetime
+            left = datetime.fromisoformat(str(available).replace("Z", "+00:00"))
+            right = datetime.fromisoformat(str(executable).replace("Z", "+00:00"))
+            if not left < right:
+                raise ReplayVerificationError(f"strict availability violation at line {line_number}")
     unique = duplicate = collision = 0
     collision_keys: list[str] = []
     for key in sorted(groups):

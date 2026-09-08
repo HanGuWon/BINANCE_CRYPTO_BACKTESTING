@@ -1,0 +1,27 @@
+{
+  "continuity_counts": {
+    "COMPLETE": 69720
+  },
+  "derived_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\derived_forceorder_v3_v1_clean",
+  "derived_tree_sha256_excluding_manifest": "66cea9008cc39e9da178a1dd828ab0763f2ffc8b8746669b4fa58e553364022c",
+  "distinct_valid_identity_tuple_count": 69720,
+  "final_holdout": "UNTOUCHED",
+  "forced_side_counts": {
+    "BUY": 33752,
+    "SELL": 35968
+  },
+  "market_counts": {
+    "cm": 446,
+    "um": 69274
+  },
+  "metadata_sha256": "98f1ce069b0b0e7499b5d64b3087266b6b606631532b92812c0ef6c630924b3b",
+  "outcome_blind": true,
+  "outcomes_accessed": false,
+  "record_type": "R3_FORCEORDER_V3_DERIVED_INVENTORY",
+  "replay_manifest_sha256": "11f7e1d505373944750d53873c54da39d96f97d405918e1f205e85e58870e951",
+  "row_count": 69720,
+  "status": "PASS",
+  "status_counts": {
+    "VALID": 69720
+  }
+}

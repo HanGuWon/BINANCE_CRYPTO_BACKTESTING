@@ -1,0 +1,55 @@
+{
+  "compared_fields": [
+    "identity_key",
+    "market_type",
+    "event_symbol",
+    "pair_symbol",
+    "subtype",
+    "event_time_ms",
+    "order_trade_time_ms",
+    "trade_id",
+    "forced_side",
+    "position_side",
+    "source_event_time_ms",
+    "source_available_time",
+    "executable_open",
+    "continuity_state",
+    "h03_status",
+    "h04_status",
+    "signed_observed_notional",
+    "raw_payload_sha256",
+    "canonical_payload_sha256",
+    "identity_tuple_sha256",
+    "v3_status",
+    "v3_invalid_reason"
+  ],
+  "final_holdout": "UNTOUCHED",
+  "fixture_count": 10,
+  "fixture_set_sha256": "132f0916ad2e35a42ad1505d8ca2a08526b404dd8b367bc9860e162fe6fe4605",
+  "forced_side_counts": {
+    "BUY": 1,
+    "SELL": 6
+  },
+  "invalid_count": 3,
+  "market_counts": {
+    "cm": 1,
+    "um": 6
+  },
+  "optimized_and_reference_identical": true,
+  "outcome_blind": true,
+  "outcomes_accessed": false,
+  "raw_v8_mutated": false,
+  "record_type": "R3_FORCEORDER_V3_QUALIFICATION_RECEIPT",
+  "status": "PASS",
+  "v2_status_counts": {
+    "INVALID:MARKET_TYPE_NOT_UM": 1,
+    "INVALID:PAYLOAD_SCHEMA_INVALID": 7,
+    "INVALID:ps_ENUM_INVALID": 1,
+    "VALID": 1
+  },
+  "v3_status_counts": {
+    "INVALID": 3,
+    "VALID": 7
+  },
+  "valid_count": 7
+}

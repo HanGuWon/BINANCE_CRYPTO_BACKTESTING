@@ -11,10 +11,11 @@ import pandas as pd
 
 FORCEORDER_V3_COLUMNS = (
     "identity_key", "market_type", "event_symbol", "pair_symbol", "subtype",
-    "event_time", "order_trade_time", "forced_side", "source_available_time",
+    "event_time_ms", "order_trade_time_ms", "trade_id", "forced_side",
+    "position_side", "source_event_time_ms", "source_available_time",
     "executable_open", "continuity_state", "h03_status", "h04_status",
     "signed_observed_notional", "raw_payload_sha256", "canonical_payload_sha256",
-    "v3_status", "v3_invalid_reason",
+    "identity_tuple_sha256", "causal_eligibility", "v3_status", "v3_invalid_reason",
 )
 
 GAP_STATES = frozenset({"COMPLETE", "RESTART_GAP", "POLL_GAP", "SOURCE_TIME_UNAVAILABLE", "SEQUENCE_GAP", "SCHEMA_ERROR", "RATE_LIMIT_GAP", "CLOCK_UNCERTAINTY_GAP"})
@@ -136,7 +137,9 @@ def materialize_forceorder_v3_metadata(
         try:
             record = validate_forceorder_envelope_v3(envelope, complete_bar_opens=complete)
         except ForceOrderIdentityV3Error as exc:
-            rows.append({"v3_status": "INVALID", "v3_invalid_reason": exc.reason})
+            invalid = {column: None for column in FORCEORDER_V3_COLUMNS}
+            invalid.update({"causal_eligibility": "INELIGIBLE_SCHEMA", "v3_status": "INVALID", "v3_invalid_reason": exc.reason})
+            rows.append(invalid)
             continue
         identity = record.identity_tuple
         base = Decimal(identity[14]) * Decimal(identity[12] or identity[11])
@@ -147,9 +150,12 @@ def materialize_forceorder_v3_metadata(
             "event_symbol": record.event_symbol,
             "pair_symbol": record.pair_symbol,
             "subtype": record.subtype,
-            "event_time": record.identity_tuple[4],
-            "order_trade_time": record.identity_tuple[5],
+            "event_time_ms": record.identity_tuple[4],
+            "order_trade_time_ms": record.identity_tuple[5],
+            "trade_id": record.identity_tuple[6],
             "forced_side": record.identity_tuple[7],
+            "position_side": None,
+            "source_event_time_ms": record.identity_tuple[4],
             "source_available_time": record.source_available_time,
             "executable_open": record.executable_open,
             "continuity_state": record.continuity_state,
@@ -158,6 +164,14 @@ def materialize_forceorder_v3_metadata(
             "signed_observed_notional": format(signed, "f"),
             "raw_payload_sha256": record.raw_payload_sha256,
             "canonical_payload_sha256": record.canonical_payload_sha256,
+            "identity_tuple_sha256": hashlib.sha256(record.identity_json.encode("utf-8")).hexdigest(),
+            "causal_eligibility": (
+                "ELIGIBLE"
+                if record.source_available_time is not None
+                and record.executable_open is not None
+                and record.source_available_time < record.executable_open
+                else "INELIGIBLE_SOURCE_TIME"
+            ),
             "v3_status": "VALID",
             "v3_invalid_reason": None,
         })
