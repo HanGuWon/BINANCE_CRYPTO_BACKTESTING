@@ -1,0 +1,24 @@
+{
+  "record_type": "R3_V8_EXTERNAL_SUPERVISOR_INSTALLATION",
+  "date": "2026-09-09",
+  "task_name": "R3-v8-Guardian-Supervisor",
+  "registered": true,
+  "task_state": "Ready",
+  "next_run_time": "2026-09-09T14:48:23+09:00",
+  "cadence_minutes": 5,
+  "multiple_instances": "IgnoreNew",
+  "principal": {
+    "logon_type": "Interactive",
+    "user": "user",
+    "run_level": "Limited",
+    "credentials_supplied": false
+  },
+  "action": {
+    "working_directory": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트",
+    "execute": "C:\\Users\\user\\AppData\\Roaming\\uv\\python\\cpython-3.11-windows-x86_64-none\\python.exe",
+    "arguments": "\"C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\ops\\r3\\ensure_r3_v8_guardian.py\" --once"
+  },
+  "startup_disposition": "TASK_SCHEDULER_REGISTERED",
+  "registration_attempts": 1,
+  "permission_blocker": false
+}

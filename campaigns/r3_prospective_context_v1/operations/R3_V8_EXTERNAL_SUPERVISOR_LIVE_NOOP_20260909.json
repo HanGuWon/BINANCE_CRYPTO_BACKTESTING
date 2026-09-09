@@ -1,0 +1,40 @@
+{
+  "after": {
+    "chain_ok": true,
+    "collector_lock_sha256": "d62aa071753abc1b76937018a396e372eabf03e40786373bb320cd6a6be9fb61",
+    "collector_pid": 44596,
+    "disk_state": "GREEN",
+    "guardian_lock_sha256": "e473b7760a71e4a65c6635c034db965ecb2732820f2b4806e81de11853606001",
+    "guardian_pids": [
+      41488
+    ],
+    "seal_ok": true
+  },
+  "before": {
+    "chain_ok": true,
+    "collector_lock_sha256": "d62aa071753abc1b76937018a396e372eabf03e40786373bb320cd6a6be9fb61",
+    "collector_pid": 44596,
+    "disk_state": "GREEN",
+    "guardian_lock_sha256": "e473b7760a71e4a65c6635c034db965ecb2732820f2b4806e81de11853606001",
+    "guardian_pids": [
+      41488
+    ],
+    "seal_ok": true
+  },
+  "child_authorization_created": false,
+  "collector_launch_attempted": false,
+  "date": "2026-09-09",
+  "decision": {
+    "collector_pid": 44596,
+    "decision": "NO_ACTION_LIVE",
+    "guardian_pid": 41488,
+    "reasons": []
+  },
+  "final_holdout": "UNTOUCHED",
+  "outcomes_accessed": false,
+  "raw_high_water": "NOT_PRESENT",
+  "record_type": "R3_V8_EXTERNAL_SUPERVISOR_LIVE_NOOP",
+  "scientific_data_mutated": false,
+  "unchanged_locks": true,
+  "unchanged_processes": true
+}

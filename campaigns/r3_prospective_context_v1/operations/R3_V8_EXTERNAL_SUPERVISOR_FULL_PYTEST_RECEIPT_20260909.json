@@ -1,0 +1,13 @@
+{
+  "record_type": "R3_V8_EXTERNAL_SUPERVISOR_FULL_PYTEST_RECEIPT",
+  "date": "2026-09-09",
+  "command": "python -m pytest -q",
+  "exit_code": 0,
+  "summary": "331 passed, 1 warning in 183.45s (0:03:03)",
+  "implementation_sha": "d561f83bec728de3e2d2c45678d074108e0bd092",
+  "scientific_source_status": "clean",
+  "final_holdout": "UNTOUCHED",
+  "outcomes_accessed": false,
+  "r2b2": "NOT_ACCESSED",
+  "batch_002": "NOT_STARTED"
+}
