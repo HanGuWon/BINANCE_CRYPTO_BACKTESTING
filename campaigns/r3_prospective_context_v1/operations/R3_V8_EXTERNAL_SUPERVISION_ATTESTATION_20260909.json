@@ -1,0 +1,52 @@
+{
+  "record_type": "R3_V8_EXTERNAL_SUPERVISION_ATTESTATION",
+  "date": "2026-09-09",
+  "canonical_head": "4b64ccb471df68d9e3bc9fda5f8f641380ea6e04",
+  "branch": "research/r2b-restricted-derivatives-v1",
+  "scientific_code_changed": false,
+  "scientific_source_status": "clean",
+  "legacy_startup": {
+    "retired_sha256": "8de1954a78215963529669098b2306dcd9796d323b6c5e739d9eed1c7c653c47",
+    "exists": false,
+    "path": "C:\\Users\\user\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\R3-Prospective-Scientific-v8.lnk",
+    "retired_path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\retired_startup\\R3-Prospective-Scientific-v8.lnk.retired-20260909",
+    "retired_without_process_stop": true
+  },
+  "authoritative_external_guardian_recovery": {
+    "effective_count": 1,
+    "other_r3_guardian_tasks": 0,
+    "direct_startup_launcher_active": false,
+    "startup_shortcut_active": false,
+    "authority": "Task Scheduler:R3-v8-Guardian-Supervisor"
+  },
+  "scheduler": {
+    "state": "Ready",
+    "action_arguments": "\"C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\ops\\r3\\ensure_r3_v8_guardian.py\" --once",
+    "cadence": "PT5M",
+    "principal_logon_type": "Interactive",
+    "last_task_result": 0,
+    "registration_attempts": 1,
+    "multiple_instances": "IgnoreNew",
+    "credentials_supplied": false,
+    "principal_run_level": "Limited",
+    "task_name": "R3-v8-Guardian-Supervisor",
+    "last_run_time": "2026-09-09T17:21:15+09:00",
+    "action_execute": "C:\\Users\\user\\AppData\\Local\\hermes\\hermes-agent\\venv\\Scripts\\python.exe"
+  },
+  "scheduled_supervisor_run": {
+    "batch_002": "NOT_STARTED",
+    "october_transition": "NOT_STARTED",
+    "guardian_pid": 41488,
+    "collector_launch_attempted": false,
+    "backfill": "NOT_STARTED",
+    "receipt_path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\external_supervisor\\R3_V8_EXTERNAL_SUPERVISOR_20260909T082116084577Z_7c0e6c77833f4d90b12d6bc589e2b855.json",
+    "r2b2": "NOT_ACCESSED",
+    "child_authorization_created": false,
+    "outcomes_accessed": false,
+    "scientific_data_mutated": false,
+    "collector_pid": 44596,
+    "final_holdout": "UNTOUCHED",
+    "decision": "NO_ACTION_LIVE"
+  },
+  "guardian_collector_left_running": true
+}

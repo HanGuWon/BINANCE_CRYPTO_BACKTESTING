@@ -4,7 +4,7 @@ param([switch]$ValidateOnly)
 $ErrorActionPreference = 'Stop'
 $TaskName = 'R3-v8-Guardian-Supervisor'
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
-$Python = 'C:\Users\user\AppData\Roaming\uv\python\cpython-3.11-windows-x86_64-none\python.exe'
+$Python = 'C:\Users\user\AppData\Local\hermes\hermes-agent\venv\Scripts\python.exe'
 $Supervisor = Join-Path $RepoRoot 'ops\r3\ensure_r3_v8_guardian.py'
 $ActionArgs = ('"{0}" --once' -f $Supervisor)
 $Trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) -RepetitionInterval (New-TimeSpan -Minutes 5) -RepetitionDuration (New-TimeSpan -Days 3650)
