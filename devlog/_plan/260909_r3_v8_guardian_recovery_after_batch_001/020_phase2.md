@@ -27,3 +27,7 @@ WP2–WP5. Verify the sealed identity and standing policy before any launch, rec
 
 No recovery action is permitted until evidence is exact and locks are classified. A live or unknown writer/guardian, duplicate, identity mismatch, or RED disk is a hard block.
 
+
+## Path correction discovered during WP3
+
+The earlier WP2 evidence names `scientific_raw_v8\control\R3_V8_GUARDIAN.lock` as the guardian-lock path. The executable contract resolves `r3_ops.V8_CONTROL_ROOT` to `launch_control\2026-09-production-v8`, so the authoritative guardian lock is `D:\BINANCE_CRYPTO_BACKTESTING_DATA\r3_prospective_context_v1\launch_control\2026-09-production-v8\R3_V8_GUARDIAN.lock`. WP3 rechecked both paths, preserved the actual stale launch-control lock, and records the earlier raw-control claim as a superseded path observation rather than silently rewriting the WP2 artifact.

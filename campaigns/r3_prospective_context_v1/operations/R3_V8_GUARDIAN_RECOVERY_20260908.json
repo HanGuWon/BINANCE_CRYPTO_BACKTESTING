@@ -1,0 +1,129 @@
+{
+  "record_type": "R3_V8_GUARDIAN_RECOVERY",
+  "recorded_at_utc": "2026-09-09T01:25:41.6048511Z",
+  "episode_id": "R3-V8-OUTAGE-20260908-AFTER-BATCH-001",
+  "phase": "WP6-WP9",
+  "status": "RECOVERED_WP3_FUTURE_OBSERVATION_PENDING",
+  "recovery_boundary_utc": "2026-09-09T01:19:09.595915Z",
+  "recovery_mode": "EXISTING_SEALED_V8_ONLY",
+  "no_replay_or_backfill": true,
+  "sealed_identity": {
+    "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+    "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+    "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+    "manifest_sha256": "cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659",
+    "seal_sha256": "ab83232d90e800bf8178c6f3d22138382fb102b9d14213e12a798c0f2c68ad85",
+    "roster_sha256": "bb05514dfc78cfca3b736488b1454f4cb022da0110e2cbf69f53c505f543ea79",
+    "root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8"
+  },
+  "standing_policy": {
+    "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_STANDING_RECOVERY_AUTHORIZATION_20260907.json",
+    "sha256": "6a23cf36e00b15ed5e5a46f1273052e946699a8e21a32b56588c4ae4f82e1e7c",
+    "expires_at_utc": "2026-10-01T00:00:00Z",
+    "mode": "EXISTING_SEALED_V8_ONLY"
+  },
+  "preflight": {
+    "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\guardian\\preflight\\R3_V8_GUARDIAN_PREFLIGHT_20260909T011910503433Z_6414388c8f1c4d8182cacf3cca726f04.json",
+    "sha256": "bc6fd3d85d7421d55244ac659bd2d1936b6bca162d2bd96853a250d13957be47",
+    "exit_code": 0,
+    "writer_count_before": 0,
+    "exact_identity": true
+  },
+  "stale_lock_disposition": {
+    "collector": {
+      "original_path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8\\control\\collector.lock",
+      "content": "183660",
+      "owner_pid": 183660,
+      "pid_alive": false,
+      "original_last_write_utc": "2026-09-07T11:20:29.6283327Z",
+      "sha256": "7246deb8ad6f6cb60f8eb470bcc74481ebce6fff4bcbe996d9dbac2dbccfb88c",
+      "archive_path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\guardian\\R3_V8_STALE_COLLECTOR_LOCK_20260909.txt",
+      "source_removed_after_copy_verify": true
+    },
+    "guardian": {
+      "original_path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_V8_GUARDIAN.lock",
+      "content": "185608:46c3672ed49c423da7d878d95aee410b",
+      "owner_pid": 185608,
+      "pid_alive": false,
+      "original_last_write_utc": "2026-09-07T08:42:03.7559478Z",
+      "sha256": "9d684dffec4931d2f7dd1bd3d8a1e7c017499d53d06667f1ef9f6e38d26da46d",
+      "archive_path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\guardian\\R3_V8_STALE_GUARDIAN_LOCK_20260909.txt",
+      "source_removed_after_copy_verify": true
+    },
+    "path_correction": "Executable guardian lock is launch_control\\2026-09-production-v8, not scientific_raw_v8\\control; the prior WP2 path claim remains preserved as superseded evidence."
+  },
+  "first_guardian_attempt": {
+    "started_at_utc": "2026-09-09T01:16:31.4459303Z",
+    "receipt_path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\guardian\\R3_V8_GUARDIAN_ATTEMPT_20260909T011632300412Z_ed4b931efd66422b8c28ef2bc97e954e.json",
+    "receipt_sha256": "7d1d6c7d242624d380ddfbfc04387296bf21e899426725b1340b590e8a8a5af6",
+    "decision": "BLOCKED_GUARDIAN_LOCK_COLLISION",
+    "reason": "GUARDIAN_LOCK_STALE_OR_MALFORMED",
+    "no_data_mutation": true
+  },
+  "guardian_process": {
+    "wrapper_pid": 10372,
+    "python_pid": 41488,
+    "start_command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ops\\r3\\run_r3_v8_guardian.ps1 -Persistent -PollSeconds 300",
+    "guardian_lock_path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_V8_GUARDIAN.lock",
+    "guardian_lock_content": "41488:02b77cf079db43288e48dbdb4185443a",
+    "guardian_lock_sha256": "e473b7760a71e4a65c6635c034db965ecb2732820f2b4806e81de11853606001",
+    "count": 1,
+    "alive_at_utc": "2026-09-09T01:20:53.2651983Z"
+  },
+  "child_authorization": {
+    "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\guardian\\child_authorizations\\R3_V8_GUARDIAN_CHILD_20260909T011910503433Z_800281ce-7fa1-4245-84f7-874b4ade8656.json",
+    "sha256": "ecc105bcae755b9f0d840823cb763390fdbfe82667941e38ec8c55b33600bbfe",
+    "authorization_id": "800281ce-7fa1-4245-84f7-874b4ade8656",
+    "issued_at_utc": "2026-09-09T01:19:10.503433Z",
+    "consumed_at_utc": "2026-09-09T01:19:26.210960Z",
+    "expires_at_utc": "2026-09-09T01:29:10.503433Z",
+    "preflight_exit_code": 0,
+    "single_use": true,
+    "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+    "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+    "policy_sha256": "6a23cf36e00b15ed5e5a46f1273052e946699a8e21a32b56588c4ae4f82e1e7c"
+  },
+  "collector_process": {
+    "python_pid": 44596,
+    "parent_pid": 46740,
+    "start_command": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ops\\r3\\launch_r3_v8_resume.ps1 -AuthorizationReceipt <child authorization>",
+    "collector_lock_path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8\\control\\collector.lock",
+    "collector_lock_content": "44596",
+    "lock_sha256": "UNAVAILABLE_WHILE_HELD",
+    "authorized_writer_count": 1,
+    "duplicate_writers": [],
+    "alive_at_utc": "2026-09-09T01:20:53.2651983Z",
+    "future_only": true
+  },
+  "current_watch": {
+    "observed_at_utc": "2026-09-09T01:20:53.2651983Z",
+    "exit_code": 2,
+    "state": "RED",
+    "cycle_count": 300,
+    "expected_cycle_count": 571,
+    "missing_cycle_count": 271,
+    "reasons": [
+      "one_or_more_expected_cycles_late",
+      "multiple_expected_cycles_missing",
+      "reported_source_or_restart_gap"
+    ],
+    "manifest_chain_verification": true,
+    "launch_seal_status": "SEALED"
+  },
+  "proof": {
+    "guardian_count": 1,
+    "collector_writer_count": 1,
+    "duplicate_guardians": [],
+    "duplicate_collectors": [],
+    "batch_001_mutated": false,
+    "raw_root_mutated": false,
+    "high_water_mutated": false,
+    "backfill": false,
+    "batch_002": "NOT_STARTED",
+    "outcomes_accessed": false,
+    "final_holdout": "UNTOUCHED",
+    "r2b2": "NOT_ACCESSED",
+    "forceorder_v3_migration": "NOT_STARTED"
+  },
+  "next_gate": "WP4 requires two genuinely future cycles and a non-RED identity/chain/seal postcheck; no outcome or holdout access permitted"
+}

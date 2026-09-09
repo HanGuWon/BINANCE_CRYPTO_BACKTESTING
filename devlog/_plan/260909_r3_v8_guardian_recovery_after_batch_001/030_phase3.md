@@ -13,7 +13,7 @@ WP6–WP9. Use the standing recovery architecture to start exactly one canonical
 ## Recovery sequence and activation conditions
 
 1. Confirm WP2 exact identity, no live guardian, no live collector, no unknown lock owner, and a valid non-expired standing policy.
-2. If the guardian lock is stale, preserve its original bytes and metadata and archive/copy it only through an explicitly authorized, hash-recorded disposition. If it is active, malformed, or uncertain, stop; do not launch a second guardian.
+2. Resolve the guardian lock from `r3_ops.V8_CONTROL_ROOT` (the launch-control root, not the scientific raw root). If it is stale, preserve its original bytes and metadata and archive/copy it only through an explicitly authorized, hash-recorded disposition. If it is active, malformed, or uncertain, stop; do not launch a second guardian.
 3. Launch exactly one canonical process: `& .\ops\r3\run_r3_v8_guardian.ps1 -Persistent -PollSeconds 300`. Do not call the collector directly.
 4. Verify guardian count is exactly one and its lock is alive. When its snapshot has `authorized_writer_count == 0`, the guardian should run `detect -> verify -> preflight -> child authorization -> consume -> authorized launcher -> verify`.
 5. Verify one child authorization is consumed exactly once, preflight passes, and one collector writer owns `scientific_raw_v8\control\collector.lock`. A race, duplicate, identity drift, or preflight failure must fail closed.
