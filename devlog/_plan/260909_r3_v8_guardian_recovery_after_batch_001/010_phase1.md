@@ -20,7 +20,7 @@ WP0–WP1 only. Establish that the repository, D: raw root, launch-control root,
 
 - `Test-Path` for repository, raw root, launch-control root, manifest, seal, and roster: exit `0` for each required path; receipt reads each path directly.
 - `Get-CimInstance Win32_OperatingSystem`, `Get-Date -AsUTC`, `Get-TimeZone`, and `Get-Volume`: exit `0`; disk must not be RED.
-- `python ops\r3\r3_ops.py watch --exact-v8`: exit `0`; the JSON is retained as a fresh RED/YELLOW/GREEN observation and is not relabeled as PASS.
+- `python ops\r3\r3_ops.py watch --exact-v8`: retain the JSON and exact exit (`2` for the current RED state; `0` only for non-RED); it is an observation and is never relabeled as PASS.
 
 ## Acceptance
 

@@ -45,7 +45,7 @@ These commands were run before this plan was written and are real commands that 
 - `& .\ops\r3\run_r3_v8_guardian.ps1 -ValidateOnly` — exit `0`; directly reads the guardian wrapper, canonical Python path, standing policy path, and repository root. It validates the launch contract, not live liveness.
 - `& .\ops\r3\launch_r3_v8_resume.ps1 -PreflightOnly` — exit `0`; directly reads the D-backed raw root, roster, launch manifest, launch seal, and exact-v8 identity. It may report zero writers; that is not a failure of the preflight contract.
 - `python ops\r3\r3_ops.py --help` — exit `0`; exposes `watch`, `preflight`, and `verify-resume-authorization` commands.
-- `python ops\r3\r3_ops.py watch --exact-v8` — read-only watchdog; its current result is `RED`, so this is an early-warning observation and not a passing recovery gate.
+- `python ops\r3\r3_ops.py watch --exact-v8` — read-only watchdog; its current result is `RED` with process exit `2`, so this is an early-warning observation and not a passing recovery gate. A non-RED state is the only case expected to exit `0`.
 
 ## Global change map
 

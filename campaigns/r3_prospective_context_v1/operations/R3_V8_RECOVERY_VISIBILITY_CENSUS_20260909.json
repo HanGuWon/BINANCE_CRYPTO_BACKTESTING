@@ -1,0 +1,37 @@
+{
+  "record_type": "R3_V8_RECOVERY_VISIBILITY_CENSUS",
+  "recorded_at_utc": "2026-09-09T00:52:28.5066480Z",
+  "local_time": "2026-09-09T09:52:28.5089857+09:00",
+  "timezone": "Korea Standard Time",
+  "repository": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트",
+  "branch": "research/r2b-restricted-derivatives-v1",
+  "paths": {
+    "repository": true,
+    "raw_root": true,
+    "launch_control_root": true,
+    "manifest": true,
+    "seal": true,
+    "roster": true
+  },
+  "process_census": {
+    "query": "Get-CimInstance Win32_Process with self/census command excluded",
+    "process_table_count": 437,
+    "matching_rows": [],
+    "guardian_count": 0,
+    "collector_count": 0,
+    "collector_writer_count": 0,
+    "duplicate_guardians": [],
+    "duplicate_collectors": []
+  },
+  "disk": {
+    "drive": "D",
+    "size_bytes": 512093057024,
+    "free_bytes": 129590255616,
+    "health": "Healthy"
+  },
+  "os_boot_time": "2026-09-08T16:24:39.5+09:00",
+  "outcomes_accessed": false,
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_ACCESSED",
+  "batch_002": "NOT_STARTED"
+}

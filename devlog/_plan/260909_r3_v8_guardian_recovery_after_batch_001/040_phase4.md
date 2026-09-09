@@ -18,7 +18,7 @@ WP10–WP11. Observe at least two genuinely new cycles strictly after recovery. 
 
 ## Verification
 
-- Run the exact-v8 watchdog after each cycle and once after the second; exit `0` with `collector=1`, `guardian=1`, both locks alive, duplicates empty, chain PASS, seal SEALED, disk not RED, and unchanged source/registry identities.
+- Run the exact-v8 watchdog after each cycle and once after the second; require a non-RED result (exit `0`) with `collector=1`, `guardian=1`, both locks alive, duplicates empty, chain PASS, seal SEALED, disk not RED, and unchanged source/registry identities.
 - Compare cycle IDs and timestamps against the pre-recovery receipt using an independent script; no returns, PnL, hit rate, or performance fields are read.
 
 ## Acceptance
