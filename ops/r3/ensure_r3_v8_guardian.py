@@ -150,7 +150,11 @@ def collect_state(
     policy_error: str | None = None
     try:
         loader = policy_loader or r3_v8_authorization.load_standing_policy
-        policy = dict(loader(now=current))
+        loaded_policy = dict(loader(now=current))
+        policy = dict(loaded_policy.get("policy") or loaded_policy)
+        loaded_sha = loaded_policy.get("policy_sha256")
+        if loaded_sha is not None and str(loaded_sha) != EXPECTED_POLICY:
+            raise ValueError("standing policy SHA does not match the sealed policy")
     except Exception as exc:
         policy = None
         policy_error = f"{type(exc).__name__}:{exc}"
@@ -187,6 +191,7 @@ def collect_state(
         "identity_summary": _identity_summary(identity),
         "identity_error": identity_error,
         "policy": policy,
+        "policy_sha256": (loaded_sha if "loaded_sha" in locals() else None),
         "policy_error": policy_error,
         "watchdog": watchdog,
         "chain_ok": bool(watchdog.get("manifest_chain_verification")),
