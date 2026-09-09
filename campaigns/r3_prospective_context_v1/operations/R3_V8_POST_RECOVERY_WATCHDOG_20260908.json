@@ -1,0 +1,101 @@
+{
+  "record_type": "R3_V8_POST_RECOVERY_WATCHDOG",
+  "recorded_at_utc": "2026-09-09T01:46:35.974665Z",
+  "recovery_boundary_utc": "2026-09-09T01:19:09.595915Z",
+  "status": "PASS_WITH_PRESERVED_HISTORICAL_GAP",
+  "qualifying_cycles": [
+    {
+      "cycle_id": "cycle-20260909T013003041992Z",
+      "target_bar_open": "2026-09-09T01:15:00Z",
+      "target_bar_close": "2026-09-09T01:30:00Z",
+      "scheduled_collection_time": "2026-09-09T01:30:05Z",
+      "actual_collection_start": "2026-09-09T01:30:03.041992Z",
+      "cycle_completed_at": "2026-09-09T01:30:48.185338Z",
+      "eligible_next_execution_time": "2026-09-09T01:45:00Z",
+      "clock_calibration_id": "cal-30447c7e2ae038437d50882d",
+      "strictly_after_recovery": true
+    },
+    {
+      "cycle_id": "cycle-20260909T014503037378Z",
+      "target_bar_open": "2026-09-09T01:30:00Z",
+      "target_bar_close": "2026-09-09T01:45:00Z",
+      "scheduled_collection_time": "2026-09-09T01:45:05Z",
+      "actual_collection_start": "2026-09-09T01:45:03.037378Z",
+      "cycle_completed_at": "2026-09-09T01:45:27.908392Z",
+      "eligible_next_execution_time": "2026-09-09T02:00:00Z",
+      "clock_calibration_id": "cal-1640fa4cebb4b2f6a1662762",
+      "strictly_after_recovery": true
+    }
+  ],
+  "postcheck": {
+    "watch_command": "uv-python ops\\r3\\r3_ops.py watch --exact-v8",
+    "exit_code": 0,
+    "state": "YELLOW",
+    "reasons": [
+      "reported_source_or_restart_gap"
+    ],
+    "cycle_count": 302,
+    "expected_cycle_count": 645,
+    "missing_cycle_count": 343,
+    "manifest_chain_verification": true,
+    "launch_seal_verification": true,
+    "seal_status": "SEALED",
+    "disk_state": "GREEN",
+    "free_disk_bytes": 129614573568,
+    "identity": {
+      "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+      "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+      "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+      "manifest_sha256": "cce8d0341c0a8374b419ebcb0f89d55f30b2f85e746ae730b4b5e9dea7683659",
+      "seal_sha256": "ab83232d90e800bf8178c6f3d22138382fb102b9d14213e12a798c0f2c68ad85",
+      "roster_sha256": "bb05514dfc78cfca3b736488b1454f4cb022da0110e2cbf69f53c505f543ea79",
+      "scientific_scope_status": "clean",
+      "outcomes_accessed": false
+    },
+    "latest_health_manifest_sha256": "a74740961777f18f15441cb7a039c41551d735223c6e3907abb9cd8843c2cd7c",
+    "latest_health_timestamp": "2026-09-09T01:45:36.293410Z",
+    "latest_health_pid": 44596
+  },
+  "live_processes": {
+    "guardian_count": 1,
+    "guardian_pid": 41488,
+    "guardian_parent_pid": 10372,
+    "collector_writer_count": 1,
+    "collector_pid": 44596,
+    "collector_parent_pid": 46740,
+    "duplicate_guardians": [],
+    "duplicate_collectors": [],
+    "guardian_lock_path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\launch_control\\2026-09-production-v8\\R3_V8_GUARDIAN.lock",
+    "guardian_lock_sha256": "e473b7760a71e4a65c6635c034db965ecb2732820f2b4806e81de11853606001",
+    "collector_lock_path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8\\control\\collector.lock",
+    "collector_lock_content": "44596",
+    "collector_lock_sha256": "UNAVAILABLE_WHILE_HELD",
+    "both_locks_alive": true
+  },
+  "gap_accounting": {
+    "pre_recovery_cycle_id": "cycle-20260908T071504498269Z",
+    "pre_recovery_eligible_next": "2026-09-08T07:30:00Z",
+    "historical_missing_intervals_preserved": true,
+    "post_recovery_cycles_not_backfill": true,
+    "expected_missing_count_grew_only_with_wall_clock": true
+  },
+  "firewall": {
+    "outcomes_accessed": false,
+    "returns_or_pnl_read": false,
+    "final_holdout": "UNTOUCHED",
+    "r2b2": "NOT_ACCESSED",
+    "batch_001_mutated": false,
+    "batch_002": "NOT_STARTED",
+    "backfill": false,
+    "new_scientific_root": false
+  },
+  "acceptance": {
+    "two_future_cycles": true,
+    "non_red_watchdog_exit": true,
+    "guardian_and_writer_live": true,
+    "identity_unchanged": true,
+    "chain_pass": true,
+    "seal_sealed": true,
+    "disk_not_red": true
+  }
+}
