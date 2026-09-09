@@ -1,0 +1,17 @@
+{
+  "record_type": "R3_V8_GUARDIAN_LOCK_DISPOSITION",
+  "recorded_at_utc": "2026-09-09T01:02:57.0961036Z",
+  "path": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8\\control\\R3_V8_GUARDIAN.lock",
+  "exists": false,
+  "original_content": null,
+  "original_pid": null,
+  "pid_alive": false,
+  "timestamp": null,
+  "disposition": "ABSENT_NO_EVIDENCE_TO_REMOVE",
+  "bytes_deleted": false,
+  "historical_lock_evidence_destroyed": false,
+  "launch_blocked_until_wp3": true,
+  "outcomes_accessed": false,
+  "final_holdout": "UNTOUCHED",
+  "r2b2": "NOT_ACCESSED"
+}
