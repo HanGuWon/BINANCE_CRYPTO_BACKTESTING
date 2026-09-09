@@ -1,0 +1,154 @@
+{
+  "record_type": "R3_FORCEORDER_V3_INCREMENTAL_BATCH_FINAL_SUPERSESSION",
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-09T02:23:42.0640910Z",
+  "status": "SUPERSEDES_PRIOR_BLOCKED_POSTCHECK",
+  "final_state": "R3_V8_COLLECTION_RECOVERED_GUARDIAN_SUPERVISION_HARDENING_PENDING",
+  "supersedes": {
+    "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_FORCEORDER_V3_INCREMENTAL_BATCH_CLOSEOUT_20260908.json",
+    "sha256": "43b2b90b160ebb0ff4ad3827b20db639d7573fc839b13272b879be87d63a061e",
+    "prior_final_state": "R3_V3_INCREMENTAL_BATCH_BLOCKED_POSTCHECK",
+    "disposition": "PRESERVED_IMMUTABLE_HISTORICAL_RECORD",
+    "reason": "The prior block was a live postcheck/liveness disposition after Batch 001 verification; it is not a scientific invalidation. This record supersedes only the operational disposition and does not rewrite the prior closeout."
+  },
+  "batch_001_integrity": {
+    "batch_id": "000001_20260908T064504508730Z",
+    "published_root": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\derived_forceorder_v3_incremental_v1",
+    "root_file_count": 8,
+    "batch_manifest_sha256_recorded": "7677b98498d9779152a7c58405353218ef71f5ab79529f7399b11483682aa6c2",
+    "batch_manifest_sha256_current": "7677b98498d9779152a7c58405353218ef71f5ab79529f7399b11483682aa6c2",
+    "batch_manifest_unchanged": true,
+    "derived_metadata_sha256_recorded": "9fe954bf4d5e7ec8dd72fe0ae1c1a2de91dbe368e8e13e614568388499c6807e",
+    "derived_metadata_sha256_current": "9fe954bf4d5e7ec8dd72fe0ae1c1a2de91dbe368e8e13e614568388499c6807e",
+    "derived_metadata_unchanged": true,
+    "high_water_sha256_recorded": "e0dbb8dee1213d962a25310eff8d08b5a7459474d3973cfc8df225bd006e230b",
+    "high_water_sha256_current": "e0dbb8dee1213d962a25310eff8d08b5a7459474d3973cfc8df225bd006e230b",
+    "high_water_unchanged": true,
+    "lineage_file_sha256_recorded": "d1289d993109df5062da1627a6d94916fc757c77792a9abc78cc3b92e9459fe8",
+    "lineage_file_sha256_current": "d1289d993109df5062da1627a6d94916fc757c77792a9abc78cc3b92e9459fe8",
+    "lineage_unchanged": true,
+    "genesis_reference_sha256_recorded": "5b2f57afbba0dedc40095505d03b906770d74657ca948786aa504d03645aaa28",
+    "genesis_reference_sha256_current": "5b2f57afbba0dedc40095505d03b906770d74657ca948786aa504d03645aaa28",
+    "genesis_reference_unchanged": true,
+    "derived_tree_sha256_excluding_manifest_recorded": "4ba4c12e07474546fc19f33c9e9ba66214be96ed1974cbe4afe29324cdaaf83f",
+    "derived_tree_sha256_excluding_manifest_current": "4ba4c12e07474546fc19f33c9e9ba66214be96ed1974cbe4afe29324cdaaf83f",
+    "derived_tree_unchanged": true,
+    "publish_receipt_root_tree_sha256": "4ba4c12e07474546fc19f33c9e9ba66214be96ed1974cbe4afe29324cdaaf83f",
+    "batch_manifest_tree_field_sha256": "4ba4c12e07474546fc19f33c9e9ba66214be96ed1974cbe4afe29324cdaaf83f",
+    "all_immutable_control_hashes_match": true,
+    "batch_001_mutated": false,
+    "raw_v8_mutated": false,
+    "high_water_mutated": false,
+    "backfill": false
+  },
+  "original_scientific_verification": {
+    "final_verify_receipt": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_FORCEORDER_V3_INCREMENTAL_BATCH_000001_FINAL_VERIFY_20260908.json",
+    "final_verify_receipt_sha256": "8ef9f24ece81fba15a99c05a5c0c637623ec6a88f23a67bce5ae4eceab0c9078",
+    "publish_receipt": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_FORCEORDER_V3_INCREMENTAL_BATCH_000001_PUBLISH.json",
+    "publish_receipt_sha256": "b5ff32eaa15ab75d511b15e721da50a96d06d5cd92c3479b49c160577ed60c8a",
+    "status": "PASS",
+    "scientific_disposition": "R3_FORCEORDER_V3_FIRST_REAL_INCREMENTAL_BATCH_VERIFIED",
+    "lineage_disposition": "R3_FORCEORDER_V3_INCREMENTAL_LINEAGE_OPERATIONAL",
+    "counts": {
+      "input_delta_rows": 18512,
+      "input_delta_bytes": 29376082,
+      "input_forceorders": 9645,
+      "output_rows": 9645,
+      "valid_um_primary_scope": 9613,
+      "valid_cm_out_of_primary_scope": 32,
+      "malformed": 0,
+      "unsupported_schema": 0,
+      "duplicate": 0,
+      "collision": 0,
+      "buy": 4382,
+      "sell": 5263,
+      "unexpected_pressure_mismatch": 0
+    },
+    "verifier_implementation_commit": "a70c377a8c24618260c17c6f07496cb007f1fc59",
+    "materializer_implementation_commit": "5594e048a469dd417601fb8878a4293d403aeb73",
+    "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+    "final_holdout": "UNTOUCHED",
+    "outcomes_accessed": false,
+    "r2b2": "NOT_ACCESSED"
+  },
+  "recovery_evidence": {
+    "guardian_recovery_receipt": {
+      "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_GUARDIAN_RECOVERY_20260908.json",
+      "sha256": "98df9a1ab860e349aea67404e44195671ddc008d32247f49e674921e5b147caa",
+      "status": "RECOVERED_WP3_FUTURE_OBSERVATION_PENDING",
+      "recovery_boundary_utc": "2026-09-09T01:19:09.595915Z",
+      "recovery_mode": "EXISTING_SEALED_V8_ONLY",
+      "no_replay_or_backfill": true
+    },
+    "post_recovery_watchdog_receipt": {
+      "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_POST_RECOVERY_WATCHDOG_20260908.json",
+      "sha256": "dc0358c8453370beef19915e8b301908029988f114d7b73694bc4c7605741407",
+      "status": "PASS_WITH_PRESERVED_HISTORICAL_GAP",
+      "recovery_boundary_utc": "2026-09-09T01:19:09.595915Z",
+      "qualifying_cycle_count": 2,
+      "postcheck_exit_code": 0,
+      "postcheck_state": "YELLOW",
+      "manifest_chain": true,
+      "seal": "SEALED",
+      "identity_unchanged": true
+    },
+    "failure_analysis": {
+      "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_GUARDIAN_FAILURE_ANALYSIS_20260908.md",
+      "sha256": "702ff48aa3acd46609474aec082269677a9100afa6cbb9d6cf265e1376111cc3",
+      "primary_cause": "MACHINE_REBOOT",
+      "evidence_class": "OS kernel-power/6008/6005 events bracketed the first missing interval",
+      "no_precise_power_fault_claim": true
+    },
+    "supervision_decision": {
+      "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_EXTERNAL_GUARDIAN_SUPERVISION_DECISION.md",
+      "sha256": "858ec6161ab16182549cd4494f76d238558c4569d80b3e940bd339544100f738",
+      "selected_authority": "EXISTING_PER_USER_STARTUP_SHORTCUT",
+      "task_scheduler_registered": false,
+      "service_registered": false,
+      "supervision_hardening_pending": true
+    },
+    "service_qualification": {
+      "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_SERVICE_QUALIFICATION_RECEIPT.json",
+      "sha256": "b1dfeeaa5069a5328cf9d61c48470afd934b7445d98964cb88ae1d6ec98403e7",
+      "synthetic_expiry_gates_pass": true,
+      "status": "RECORDED_WITH_TASK_SCHEDULER_ABSENT"
+    },
+    "guardian_synthetic_qualification": {
+      "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_V8_GUARDIAN_SYNTHETIC_QUALIFICATION_20260909.json",
+      "sha256": "b880c2c18acd02d921d78e3377dcdec1764612107ea399398502e2e1ae87dfee",
+      "status": "PASS",
+      "passed": 17,
+      "total": 17
+    }
+  },
+  "outcome_firewall": {
+    "firewall_receipt": {
+      "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_FORCEORDER_V3_INCREMENTAL_OUTCOME_FIREWALL_20260908.json",
+      "sha256": "68cbed5097c5d816f870a4d76ec06e08760f7351e0608564383c9e6f8cfe9869",
+      "status": "PASS"
+    },
+    "outcomes_accessed": false,
+    "historical_performance_accessed": false,
+    "returns_or_pnl_read": false,
+    "pnl": "NOT_COMPUTED",
+    "live_transition": "NOT_EXECUTED",
+    "final_holdout": "UNTOUCHED",
+    "r2b2": "NOT_ACCESSED",
+    "october_roster": "NOT_CREATED",
+    "batch_002": "NOT_STARTED",
+    "backfill": false,
+    "no_new_scientific_root": true,
+    "no_outcome_checkpoint": true
+  },
+  "source_and_scope": {
+    "implementation_commit": "ecebc49dff41eeec33af62c2c85a75c5a0bd2922",
+    "source_tree_sha256": "b138931f0d98f4e88aed470c01fce2896e961dc5e0b038dfe196063b73ebc688",
+    "registry_sha256": "c623cb36f92ce86b66941a4d525ef8167b2e7fb44ec001523545c0d860feae9a",
+    "source_scope_status": "clean",
+    "changed_in_this_record": [
+      "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\campaigns\\r3_prospective_context_v1\\operations\\R3_FORCEORDER_V3_INCREMENTAL_BATCH_000001_FINAL_SUPERSESSION_20260908.json"
+    ],
+    "raw_or_processed_data_changed_in_this_record": false
+  },
+  "next_gate": "Keep the recovered sealed-v8 guardian/collector under the selected external supervision design; no Batch 002, outcome, R2B2, backfill, or holdout access is authorized by this record."
+}
