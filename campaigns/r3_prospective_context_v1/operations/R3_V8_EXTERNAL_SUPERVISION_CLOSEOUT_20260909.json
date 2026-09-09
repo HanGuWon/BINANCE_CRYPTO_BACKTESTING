@@ -1,0 +1,61 @@
+{
+  "record_type": "R3_V8_EXTERNAL_SUPERVISION_CLOSEOUT",
+  "date": "2026-09-09",
+  "branch": "research/r2b-restricted-derivatives-v1",
+  "head": "25675d7350920b1369c801699971d27563e9f047",
+  "final_state": "R3_V8_EXTERNAL_GUARDIAN_SUPERVISION_HARDENED",
+  "operational_state": "R3_V8_COLLECTION_OPERATIONALLY_CLOSED_FOR_SEPTEMBER_ACCUMULATION",
+  "guardian": {
+    "status": "LIVE_HEALTHY",
+    "count": 1,
+    "pid": 41488
+  },
+  "collector": {
+    "status": "LIVE_HEALTHY",
+    "count": 1,
+    "pid": 44596
+  },
+  "supervisor": {
+    "effective_authority_count": 1,
+    "sha256": "9ab5703a44b689504c8058f0b4dd147ebea27aeeb820cd1cfad42ebcb7ed5aad",
+    "invocation": "ONE_SHOT",
+    "path": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE 지표용 테스트\\ops\\r3\\ensure_r3_v8_guardian.py",
+    "lock": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\r3_prospective_context_v1\\scientific_raw_v8\\control\\R3_V8_EXTERNAL_SUPERVISOR.lock"
+  },
+  "scheduler": {
+    "task_name": "R3-v8-Guardian-Supervisor",
+    "principal": "Interactive/Limited",
+    "cadence_minutes": 5,
+    "registered": true,
+    "registration_attempts": 1,
+    "credentials_supplied": false,
+    "multiple_instances": "IgnoreNew"
+  },
+  "qualification": {
+    "passed": 20,
+    "cases": 20,
+    "failed": 0,
+    "sha256": "8b10f3af7d54b57ca4ceb940c73e3830f40c68637e4b221fc673a1286048d9e"
+  },
+  "targeted_pytest": "60 passed",
+  "full_pytest": "331 passed, 1 warning",
+  "live_noop": {
+    "seal_ok": true,
+    "unchanged_locks": true,
+    "guardian_pid": 41488,
+    "chain_ok": true,
+    "unchanged_processes": true,
+    "collector_pid": 44596,
+    "decision": "NO_ACTION_LIVE"
+  },
+  "batch_001": "IMMUTABLE",
+  "batch_002": "NOT_STARTED",
+  "outcomes": "NOT_STARTED",
+  "r2b2": "NOT_ACCESSED",
+  "backfill": "NOT_STARTED",
+  "october_transition": "NOT_STARTED",
+  "final_holdout": "UNTOUCHED",
+  "collector_launch_attempted": false,
+  "child_authorization_created": false,
+  "scientific_data_mutated": false
+}
