@@ -1,0 +1,3 @@
+# WP0 — Fresh current-state census
+
+Read-only evidence before implementation: exact guardian and collector writer counts; authoritative launch-control guardian lock and scientific-raw collector lock; wrapper ancestry; manifest chain and SEALED launch; disk; UTC clock; implementation/source/registry/roster identity; standing-policy expiry; Batch 001 and outcome firewall anchors. Use the existing exact-v8 watchdog/identity paths and do not inspect market payloads or outcomes. If live guardian/collector is absent, use the already-qualified recovery procedure first and stop if recovery is unresolved. Produce an append-only census receipt with timestamp, PIDs, lock paths, identity, and no-mutation assertions.
