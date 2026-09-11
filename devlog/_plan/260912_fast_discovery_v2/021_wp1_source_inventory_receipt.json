@@ -1,0 +1,12 @@
+{
+  "final_holdout": "UNTOUCHED",
+  "funding_zip_files": 14125,
+  "measured_at": "2026-09-12T00:00:00+09:00",
+  "classification": "source inventory only; per-feature coverage remains gated",
+  "kline_symbols": 829,
+  "sample_kline": "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\raw\\um\\klines\\1000BONKUSDT\\15m\\1000BONKUSDT-15m-2023-11.zip",
+  "kline_zip_files": 61403,
+  "premium_partitions": 1467,
+  "funding_symbols": 404,
+  "sample_kline_sha256": "0c3a2aa8895861f810122be847197dab42bd8408eab93f6e033d3edba80bc450"
+}
