@@ -4,7 +4,7 @@ from types import SimpleNamespace
 import numpy as np
 import pandas as pd
 import pytest
-from binance_research.forward import append_predictions_write_once, calendar_block_bootstrap, guard_final_holdout_path, holm_adjust, paired_log_loss_difference, prediction_identity, verify_expected_sha256, write_model_artifact
+from binance_research.forward import append_predictions_write_once, calendar_block_bootstrap, guard_final_holdout_path, holm_adjust, paired_log_loss_difference, prediction_identity, verify_expected_sha256, verify_split_manifest, write_model_artifact
 from binance_research.predictability import build_forward_labels, fit_logistic_model
 
 def _rows(n=24):
@@ -87,3 +87,12 @@ def test_sha256_verification_fails_closed(tmp_path: Path):
     assert verify_expected_sha256(artifact, expected, label="artifact") == expected
     with pytest.raises(ValueError, match="SHA256 mismatch"):
         verify_expected_sha256(artifact, "0" * 64, label="artifact")
+
+
+def test_split_manifest_rejects_holdout_intersection(tmp_path: Path):
+    import pandas as pd, json
+    t = pd.Timestamp("2025-01-01T00:00:00Z")
+    manifest = tmp_path / "split.json"
+    manifest.write_text(json.dumps({"final_holdout_times":[t.isoformat()]}), encoding="utf-8")
+    with pytest.raises(PermissionError):
+        verify_split_manifest(manifest, pd.DataFrame({"decision_time":[t]}))

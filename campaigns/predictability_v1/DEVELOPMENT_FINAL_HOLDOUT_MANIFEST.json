@@ -1,0 +1,7 @@
+{
+  "schema": "predictability-v1-split-manifest-v1",
+  "development": "all approved development rows before frozen boundary",
+  "final_holdout": "UNTOUCHED",
+  "final_holdout_times": [],
+  "override": "unavailable"
+}

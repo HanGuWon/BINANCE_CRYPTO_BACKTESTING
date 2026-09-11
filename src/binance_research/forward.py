@@ -93,6 +93,19 @@ def append_jsonl_atomic(path: Path, payload: dict[str, Any]) -> None:
     temporary.write_bytes(existing + line)
     temporary.replace(destination)
 
+def verify_split_manifest(manifest: Path | str, rows: pd.DataFrame, *, time_column: str = "decision_time") -> None:
+    candidate = Path(manifest)
+    try:
+        spec = json.loads(candidate.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError("split manifest is unreadable") from exc
+    holdout = {str(v) for v in spec.get("final_holdout_times", [])}
+    if time_column in rows and holdout:
+        observed = {str(pd.Timestamp(v).isoformat()) for v in pd.to_datetime(rows[time_column], utc=True, errors="coerce").dropna()}
+        overlap = observed & holdout
+        if overlap:
+            raise PermissionError("rows intersect immutable final holdout manifest")
+
 def guard_final_holdout_path(path: Path | str) -> None:
     candidate = Path(path)
     if "final_holdout" in str(candidate).casefold(): raise PermissionError("final-holdout input requires explicit post-freeze authorization")
