@@ -9,7 +9,7 @@ import pandas as pd
 
 from .data import load_kline_archive, normalize_timestamp
 from .features import CORE_FEATURE_SPECS, CoreFeatureEngine, compute_gap_safe_features
-from .forward import append_jsonl_atomic, append_predictions_write_once, guard_final_holdout_path, prediction_identity, write_model_artifact
+from .forward import append_jsonl_atomic, append_predictions_write_once, guard_final_holdout_path, paired_log_loss_difference, prediction_identity, write_model_artifact
 from .predictability import HORIZON_BARS, build_forward_labels, constant_probability, evaluate_walk_forward, fit_logistic_model, mature_training_mask, resolve_horizon_bars, schedule_forward_times
 
 
@@ -188,7 +188,7 @@ def evaluate_forward(args: argparse.Namespace) -> int:
     frame = _load_frame(args.input)
     predictions = pd.read_csv(args.predictions)
     from .predictability import probability_metrics
-    required = {"prediction_id", "decision_time", "probability_up", "market", "symbol", "timeframe", "model_id", "campaign_id", "horizon"}
+    required = {"prediction_id", "decision_time", "b1_probability_up", "b1_plus_i_probability_up", "market", "symbol", "timeframe", "model_id", "campaign_id", "horizon"}
     missing = required - set(predictions.columns)
     if missing:
         raise ValueError(f"prediction store missing immutable fields: {', '.join(sorted(missing))}")
@@ -205,10 +205,14 @@ def evaluate_forward(args: argparse.Namespace) -> int:
         if not (expected_ids.astype(str).to_numpy() == group["prediction_id"].astype(str).to_numpy()).all():
             raise ValueError("prediction identity mismatch")
         group["direction_up"] = group["decision_time"].map(labels)
-        group = group.dropna(subset=["decision_time", "direction_up", "probability_up"])
+        group = group.dropna(subset=["decision_time", "direction_up", "b1_probability_up", "b1_plus_i_probability_up"])
         for feature, feature_group in group.groupby("feature_id"):
-            metrics = probability_metrics(feature_group["direction_up"], feature_group["probability_up"])
-            rows.append({"horizon": horizon_name, "feature_id": feature, "model": str(feature_group["model"].iloc[0]), **metrics})
+            baseline_probabilities = feature_group["b1_probability_up"].to_numpy(dtype=float)
+            model_probabilities = feature_group["b1_plus_i_probability_up"].to_numpy(dtype=float)
+            labels_for_score = feature_group["direction_up"].to_numpy(dtype=float)
+            metrics = probability_metrics(feature_group["direction_up"], model_probabilities, baseline_probabilities=baseline_probabilities)
+            paired = paired_log_loss_difference(labels_for_score, baseline_probabilities, model_probabilities)
+            rows.append({"horizon": horizon_name, "feature_id": feature, "model": str(feature_group["model"].iloc[0]), "delta_log_loss": float(np.mean(paired)), "paired_count": int(len(paired)), **metrics})
     result = pd.DataFrame.from_records(rows)
     _prepare_output(args.output)
     result.to_csv(args.output / "forward_evaluation.csv", index=False)
@@ -256,6 +260,7 @@ def add_predictability_parser(sub: argparse._SubParsersAction) -> None:
     eval_parser.add_argument("--timeframe", choices=("15m", "1h", "4h"), default="15m")
     eval_parser.add_argument("--output", type=Path, required=True)
     eval_parser.set_defaults(handler=evaluate_forward)
+
 
 
 
