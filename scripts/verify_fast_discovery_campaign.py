@@ -1,0 +1,3 @@
+from pathlib import Path
+import hashlib, json, sys
+p=Path(sys.argv[1]); rej=(p/'S0_REJECTIONS.csv').read_text(); summary=json.loads((p/'RECEIPT.json').read_text())['summary']; prov=json.loads((p/'PROVENANCE_MANIFEST.json').read_text()); assert rej.count('HISTORICAL_UNAVAILABLE')==9; assert summary['s0_survivors']==summary['s1_survivors']==summary['s2_finalists']==0 and summary['trade_rows']==0; assert prov['dataset_sha256']=='6eef4e59225cb45c2833452a883249b11f03469298c1ecfb3837c5f4aaa27a7d' and prov['final_holdout']=='UNTOUCHED'; assert not any(x in rej.lower() for x in ('holdout','return','gross','net')); print('campaign verification PASS: 9 HISTORICAL_UNAVAILABLE, zero survivors/trades, provenance and holdout guards valid')
