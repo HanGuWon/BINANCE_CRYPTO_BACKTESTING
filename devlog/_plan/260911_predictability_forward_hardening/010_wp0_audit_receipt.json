@@ -1,0 +1,22 @@
+{
+  "date": "2026-09-11T07:10:28.7336095Z",
+  "branch": "research/predictability-v1",
+  "head_before_audit": "b522842eec189c64cbde309ec8a8c64ee67329f1",
+  "source_files": [
+    "src/binance_research/predictability_cli.py",
+    "src/binance_research/forward.py"
+  ],
+  "outcome_accessed": false,
+  "holdout_accessed": false,
+  "findings": {
+    "prospective_builds_full_labels": "CONFIRMED: predictability_cli.py:145 calls build_forward_labels(enriched,...) before prediction generation",
+    "historical_tail_generation": "CONFIRMED: predictability_cli.py:171 iterates from train_end through all remaining rows",
+    "mutable_prediction_recorded_at": "CONFIRMED: predictability_cli.py:136 assigns Timestamp.now per invocation",
+    "mutable_metadata_counts": "CONFIRMED: predictability_cli.py:174-175 rewrites metadata through _write_json_once with changing prediction_rows",
+    "b1_comparator_unused": "CONFIRMED: evaluate_forward scores probability_up; stored b1_probability_up is not used",
+    "inference_helpers_unwired": "CONFIRMED: holm_adjust and calendar_block_bootstrap have no evaluator call site",
+    "independent_sha_recompute": "GAP: CLI accepts provenance SHA strings; WP8 will add independent recomputation",
+    "manifest_row_holdout_binding": "GAP: guard is path/sidecar based; WP10 will add immutable row/time split manifest"
+  },
+  "verifier_command": "rg -n 'build_forward_labels|prediction_recorded_at|b1_probability_up|calendar_block_bootstrap|holm_adjust|_write_json_once' src/binance_research/predictability_cli.py src/binance_research/forward.py"
+}
