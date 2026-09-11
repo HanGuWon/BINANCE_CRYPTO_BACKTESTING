@@ -127,6 +127,26 @@ def holm_adjust(pvalues: Sequence[float]) -> np.ndarray:
     for rank,index in enumerate(order): running=max(running,(len(values)-rank)*values[index]); adjusted[index]=min(1.0,running)
     return adjusted
 
+def calendar_block_pvalue(values: Sequence[float], timestamps: Sequence[object], *, block_days: int = 1, samples: int = 2000, seed: int = 1729) -> float:
+    """Two-sided empirical p-value from synchronized calendar-block resampling."""
+    if block_days < 1 or samples < 1:
+        raise ValueError("block_days and samples must be positive")
+    clean = pd.DataFrame({"value": values, "timestamp": pd.to_datetime(timestamps, utc=True, errors="coerce")}).dropna()
+    if clean.empty:
+        return np.nan
+    clean["block"] = clean["timestamp"].dt.floor(f"{block_days}D")
+    blocks = [g["value"].to_numpy(dtype=float) for _, g in clean.groupby("block", sort=True)]
+    if not blocks:
+        return np.nan
+    observed = float(clean["value"].mean())
+    centered = [block - observed for block in blocks]
+    rng = np.random.default_rng(seed)
+    draws = np.empty(samples)
+    for i in range(samples):
+        sample = np.concatenate([centered[j] for j in rng.integers(0, len(centered), size=len(centered))])
+        draws[i] = float(sample.mean())
+    return float((1.0 + np.count_nonzero(np.abs(draws) >= abs(observed))) / (samples + 1.0))
+
 def calendar_block_bootstrap(values: Sequence[float], timestamps: Sequence[object], *, block_days: int = 1, samples: int = 1000, seed: int = 1729) -> tuple[float,float]:
     if block_days<1 or samples<1: raise ValueError("block_days and samples must be positive")
     clean=pd.DataFrame({"value":values,"timestamp":pd.to_datetime(timestamps,utc=True,errors="coerce")}).dropna()

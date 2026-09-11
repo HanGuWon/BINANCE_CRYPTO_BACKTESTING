@@ -1,8 +1,23 @@
 {
-  "schema": "predictability-v1-split-manifest-v1",
-  "development": "all approved development rows before frozen boundary",
+  "schema": "predictability-v1-split-manifest-v2",
+  "dataset_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/processed/r2b_restricted_derivatives_v1_repaired_v2_causal3",
+  "dataset_sha256": "6eef4e59225cb45c2833452a883249b11f03469298c1ecfb3837c5f4aaa27a7d",
+  "causal_universe": "monthly point-in-time Top50 cohort",
+  "development_start": "2020-01-01T00:00:00Z",
+  "development_end_exclusive": "2026-09-01T00:00:00Z",
+  "final_holdout_start": "2026-09-01T00:00:00Z",
+  "final_holdout_end_exclusive": "UNSPECIFIED_BY_DESIGN",
+  "markets": [
+    "um"
+  ],
+  "timeframes": [
+    "15m",
+    "1h",
+    "4h"
+  ],
+  "permitted_observations": "development interval only",
   "final_holdout": "UNTOUCHED",
-  "final_holdout_times": [],
   "override": "unavailable",
-  "frozen_before_outcomes": true
+  "frozen_before_outcomes": true,
+  "manifest_sha256": "84c1a3e004fc593d95138afa54fb2af4251239275d071b9183b02ff08a91fd59"
 }
