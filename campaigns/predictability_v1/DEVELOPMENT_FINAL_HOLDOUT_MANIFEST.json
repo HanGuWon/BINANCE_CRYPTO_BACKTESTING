@@ -3,5 +3,6 @@
   "development": "all approved development rows before frozen boundary",
   "final_holdout": "UNTOUCHED",
   "final_holdout_times": [],
-  "override": "unavailable"
+  "override": "unavailable",
+  "frozen_before_outcomes": true
 }
