@@ -80,3 +80,17 @@ def calendar_block_bootstrap(values: Sequence[float], timestamps: Sequence[objec
     rng=np.random.default_rng(seed); draws=np.empty(samples)
     for i in range(samples): draws[i]=np.concatenate([blocks[j] for j in rng.integers(0,len(blocks),size=len(blocks))]).mean()
     return float(np.quantile(draws,.025)),float(np.quantile(draws,.975))
+
+def funding_cashflow(events: pd.DataFrame | Sequence[dict[str, Any]], entry_time: object, exit_time: object, side: str, notional: float = 1.0) -> float:
+    """Deterministic synthetic funding cashflow; positive rate is paid by LONG."""
+    if side not in {"LONG", "SHORT"}: raise ValueError("side must be LONG or SHORT")
+    start, end = pd.Timestamp(entry_time), pd.Timestamp(exit_time)
+    if start.tzinfo is None: start = start.tz_localize("UTC")
+    if end.tzinfo is None: end = end.tz_localize("UTC")
+    frame = events.copy() if isinstance(events, pd.DataFrame) else pd.DataFrame.from_records(events)
+    if frame.empty or "funding_time" not in frame or "funding_rate" not in frame: return 0.0
+    times = pd.to_datetime(frame["funding_time"], utc=True, errors="coerce")
+    rates = pd.to_numeric(frame["funding_rate"], errors="coerce")
+    mask = times.notna() & rates.notna() & (times >= start) & (times < end)
+    sign = -1.0 if side == "LONG" else 1.0
+    return float(sign * rates.loc[mask].sum() * float(notional))

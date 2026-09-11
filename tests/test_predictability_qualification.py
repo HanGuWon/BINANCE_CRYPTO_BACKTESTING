@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from binance_research.predictability import build_forward_labels, resolve_horizon_bars
+from binance_research.forward import funding_cashflow
 
 FIELDS=("decision_time","entry_time","exit_time","future_log_return","direction_up","label_status","eligible")
 
@@ -58,10 +59,26 @@ def test_um_fixture_contains_positive_negative_funding_and_gap():
     assert frame.open_time.diff().gt(pd.Timedelta(hours=1)).any()
 
 
-def test_qualification_receipt_is_reproducible(tmp_path: Path):
-    payload={"matrix":"spot+um x 15m+1h+4h x duration horizons","fields":list(FIELDS),"funding":"positive+negative synthetic UM","gap":"included","outcomes":"NOT_RUN","final_holdout":"UNTOUCHED"}
-    first=json.dumps(payload,sort_keys=True).encode(); second=json.dumps(payload,sort_keys=True).encode(); assert hashlib.sha256(first).hexdigest()==hashlib.sha256(second).hexdigest()
-    path=tmp_path/"qualification_receipt.json"; path.write_bytes(first); assert path.read_bytes()==first
+def test_um_funding_cashflow_signs_and_no_event_cases():
+    frame=_fixture("1h","um"); start=frame.open_time.iloc[10]; end=frame.open_time.iloc[20]
+    events=frame.loc[[12,16], ["open_time"]].rename(columns={"open_time":"funding_time"}).assign(funding_rate=[0.001,-0.0005])
+    assert funding_cashflow(events,start,end,"LONG") == pytest.approx(-0.0005)
+    assert funding_cashflow(events,start,end,"SHORT") == pytest.approx(0.0005)
+    assert funding_cashflow([],start,end,"LONG") == 0.0
+    missing=events.assign(funding_rate=np.nan)
+    assert funding_cashflow(missing,start,end,"LONG") == 0.0
 
 
+def test_qualification_rerun_hashes_actual_reference_results():
+    def digest():
+        payload=[]
+        for market in ("spot","um"):
+            for timeframe in ("15m","1h","4h"):
+                frame=_fixture(timeframe,market)
+                for horizon in ("15m","1h","4h","24h"):
+                    if {"15m":15,"1h":60,"4h":240,"24h":1440}[horizon] < {"15m":15,"1h":60,"4h":240}[timeframe]: continue
+                    labels=build_forward_labels(frame,source_timeframe=timeframe,horizon=horizon)
+                    payload.append(labels.to_json(date_format="iso",orient="split"))
+        return hashlib.sha256("".join(payload).encode()).hexdigest()
+    assert digest() == digest()
 
