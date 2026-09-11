@@ -3,7 +3,7 @@ import argparse, json, sys
 import pandas as pd
 from binance_research.fast_discovery import run_campaign
 
-p=argparse.ArgumentParser(); p.add_argument("--input", type=Path, required=True); p.add_argument("--output", type=Path, required=True); p.add_argument("--timeframe", default="1h"); p.add_argument("--market", default="um"); p.add_argument("--dataset-root", type=Path); p.add_argument("--split-manifest", type=Path)
+p=argparse.ArgumentParser(); p.add_argument("--input", type=Path, required=True); p.add_argument("--output", type=Path, required=True); p.add_argument("--timeframe", default="1h"); p.add_argument("--market", default="um"); p.add_argument("--dataset-root", type=Path, required=True); p.add_argument("--split-manifest", type=Path, required=True)
 a=p.parse_args()
 if a.market != "um": raise SystemExit("Fast Discovery requires --market um")
 if a.dataset_root and a.dataset_root not in a.input.resolve().parents: raise SystemExit("input is outside declared causal dataset root")
