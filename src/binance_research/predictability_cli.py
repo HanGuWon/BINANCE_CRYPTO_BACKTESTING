@@ -8,7 +8,7 @@ import pandas as pd
 
 from .data import load_kline_archive, normalize_timestamp
 from .features import CORE_FEATURE_SPECS, CoreFeatureEngine, compute_gap_safe_features
-from .predictability import HORIZON_BARS, build_forward_labels, evaluate_walk_forward, fit_logistic_model, resolve_horizon_bars
+from .predictability import HORIZON_BARS, build_forward_labels, evaluate_walk_forward, fit_logistic_model, mature_training_mask, resolve_horizon_bars
 
 
 def _load_frame(path: Path) -> pd.DataFrame:
@@ -115,7 +115,10 @@ def record_forward(args: argparse.Namespace) -> int:
         for feature in columns:
             names = ["baseline_return_1", "baseline_volatility_16", feature]
             training = pd.concat([baseline, enriched[[feature]]], axis=1).iloc[:train_end]
-            valid = labels.iloc[:train_end].notna() & label_frame.iloc[:train_end]["eligible"]
+            first_prediction_time = label_frame.iloc[train_end]["decision_time"]
+            if pd.isna(first_prediction_time):
+                raise ValueError("forward recording requires valid decision_time timestamps")
+            valid = mature_training_mask(label_frame.iloc[:train_end], first_prediction_time).set_axis(labels.iloc[:train_end].index)
             try:
                 model = fit_logistic_model(training.loc[valid], labels.iloc[:train_end].loc[valid], names, args.regularization)
             except ValueError:

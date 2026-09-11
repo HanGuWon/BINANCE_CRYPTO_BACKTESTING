@@ -47,7 +47,7 @@ def global_calendar_split(
     validation_boundary = pd.Timestamp(validation_end, tz="UTC")
     if validation_boundary <= train_boundary:
         raise ValueError("validation_end must be after train_end")
-    purge = HORIZON_PURGE_BARS_24H[timeframe]
+    purge = horizon_purge_bars(timeframe, target_hours=24)
     # Calendar boundaries are authoritative; purge is represented as a UTC
     # timestamp mask when the source rows are regular, without percentage-based
     # per-symbol partitions.

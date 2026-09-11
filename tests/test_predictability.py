@@ -130,3 +130,10 @@ def test_split_purge_rejects_non_integral_duration() -> None:
     assert horizon_purge_bars("4h", target_hours=24) == 6
     with pytest.raises(ValueError, match="not divisible"):
         horizon_purge_bars("4h", target_hours=1)
+
+def test_strict_walk_forward_and_direct_label_mapping_fail_closed() -> None:
+    with pytest.raises(ValueError, match="unsupported horizon bar mapping"):
+        build_forward_labels(_bars(12), 2, source_timeframe="15m")
+    without_times = _bars(420).drop(columns=["open_time"])
+    with pytest.raises(ValueError, match="requires open_time"):
+        evaluate_walk_forward(without_times, ["signal"], horizons=["15m"], minimum_train=80, validation_size=40, step_size=40)

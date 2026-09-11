@@ -96,6 +96,13 @@ def build_forward_labels(
         raise ValueError("horizon or horizon_bars is required")
     if horizon_bars < 1:
         raise ValueError("horizon_bars must be positive")
+    supported_bars = {
+        duration // TIMEFRAME_MINUTES[source_timeframe]
+        for duration in HORIZON_MINUTES.values()
+        if duration >= TIMEFRAME_MINUTES[source_timeframe] and duration % TIMEFRAME_MINUTES[source_timeframe] == 0
+    }
+    if horizon_bars not in supported_bars:
+        raise ValueError(f"unsupported horizon bar mapping: {horizon_bars} bars for {source_timeframe}")
     required = {"open", "close"}
     missing = required - set(bars.columns)
     if missing:
@@ -308,6 +315,8 @@ def evaluate_walk_forward(
     regularization: float = 1.0,
     source_timeframe: str = "15m",
 ) -> pd.DataFrame:
+    if "open_time" not in frame:
+        raise ValueError("walk-forward evaluation requires open_time for strict label maturity")
     baseline = _baseline_columns(frame)
     available = [name for name in feature_columns if name in frame]
     rows: list[dict[str, object]] = []
@@ -327,9 +336,8 @@ def evaluate_walk_forward(
             y_validation = labels.iloc[validation_slice]
             first_validation_time = label_frame.iloc[train_end]["decision_time"]
             if pd.isna(first_validation_time):
-                valid_train = y_train.notna()
-            else:
-                valid_train = mature_training_mask(label_frame.iloc[train_slice], first_validation_time).set_axis(y_train.index)
+                raise ValueError("walk-forward evaluation requires valid decision_time timestamps")
+            valid_train = mature_training_mask(label_frame.iloc[train_slice], first_validation_time).set_axis(y_train.index)
             valid_validation = y_validation.notna() & label_frame.iloc[validation_slice]["eligible"].to_numpy(dtype=bool)
             if valid_train.sum() >= 8 and valid_validation.sum() > 0 and y_train[valid_train].nunique() > 1:
                 baseline_probability = constant_probability(y_train[valid_train])
