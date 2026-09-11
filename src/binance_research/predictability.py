@@ -10,12 +10,43 @@ from scipy.optimize import minimize
 from scipy.special import expit
 
 
+TIMEFRAME_MINUTES: dict[str, int] = {
+    "15m": 15,
+    "1h": 60,
+    "4h": 240,
+}
+
+HORIZON_MINUTES: dict[str, int] = {
+    "15m": 15,
+    "1h": 60,
+    "4h": 240,
+    "24h": 1440,
+}
+
+# Backward-compatible 15m mapping. New callers resolve against source timeframe.
 HORIZON_BARS: dict[str, int] = {
     "15m": 1,
     "1h": 4,
     "4h": 16,
     "24h": 96,
 }
+
+
+def resolve_horizon_bars(source_timeframe: str, horizon: str) -> int:
+    """Resolve a duration horizon to native bars without implicit rounding."""
+    try:
+        source_minutes = TIMEFRAME_MINUTES[source_timeframe]
+    except KeyError as exc:
+        raise ValueError(f"unsupported source timeframe: {source_timeframe}") from exc
+    try:
+        horizon_minutes = HORIZON_MINUTES[horizon]
+    except KeyError as exc:
+        raise ValueError(f"unsupported horizon: {horizon}") from exc
+    if horizon_minutes < source_minutes:
+        raise ValueError(f"horizon {horizon} is shorter than source timeframe {source_timeframe}")
+    if horizon_minutes % source_minutes:
+        raise ValueError(f"horizon {horizon} is not divisible by source timeframe {source_timeframe}")
+    return horizon_minutes // source_minutes
 
 
 @dataclass(frozen=True)
@@ -46,8 +77,23 @@ def _finite_rows(frame: pd.DataFrame, columns: Sequence[str], target: pd.Series 
     return mask
 
 
-def build_forward_labels(bars: pd.DataFrame, horizon_bars: int) -> pd.DataFrame:
-    """Build labels from decision-bar close to the next open and later close."""
+def build_forward_labels(
+    bars: pd.DataFrame,
+    horizon_bars: int | None = None,
+    *,
+    source_timeframe: str = "15m",
+    horizon: str | None = None,
+) -> pd.DataFrame:
+    """Build next-open labels with explicit maturity and candle continuity."""
+    if source_timeframe not in TIMEFRAME_MINUTES:
+        raise ValueError(f"unsupported source timeframe: {source_timeframe}")
+    if horizon is not None:
+        resolved = resolve_horizon_bars(source_timeframe, horizon)
+        if horizon_bars is not None and horizon_bars != resolved:
+            raise ValueError("horizon_bars conflicts with duration horizon")
+        horizon_bars = resolved
+    if horizon_bars is None:
+        raise ValueError("horizon or horizon_bars is required")
     if horizon_bars < 1:
         raise ValueError("horizon_bars must be positive")
     required = {"open", "close"}
@@ -60,33 +106,70 @@ def build_forward_labels(bars: pd.DataFrame, horizon_bars: int) -> pd.DataFrame:
     future = np.full(n, np.nan, dtype=float)
     entry_index = np.full(n, -1, dtype=int)
     exit_index = np.full(n, -1, dtype=int)
+    status = np.full(n, "INSUFFICIENT_FUTURE", dtype=object)
+    interval = pd.Timedelta(minutes=TIMEFRAME_MINUTES[source_timeframe])
+    open_times = None
+    if "open_time" in bars:
+        open_times = pd.to_datetime(bars["open_time"], utc=True, errors="coerce").reset_index(drop=True)
+    close_times = None
+    if "close_time" in bars:
+        close_times = pd.to_datetime(bars["close_time"], utc=True, errors="coerce").reset_index(drop=True)
+    decision_times = pd.Series(pd.NaT, index=range(n), dtype="datetime64[ns, UTC]")
+    if open_times is not None:
+        decision_times = close_times.copy() if close_times is not None else open_times + interval
+        if close_times is not None:
+            decision_times = decision_times.where(decision_times.notna(), open_times + interval)
+    entry_times = pd.Series(pd.NaT, index=range(n), dtype="datetime64[ns, UTC]")
+    exit_times = pd.Series(pd.NaT, index=range(n), dtype="datetime64[ns, UTC]")
+    available_times = pd.Series(pd.NaT, index=range(n), dtype="datetime64[ns, UTC]")
     for decision in range(n):
         entry = decision + 1
         exit_bar = decision + horizon_bars
-        if exit_bar >= n or not np.isfinite(opens[entry]) or opens[entry] <= 0 or not np.isfinite(closes[exit_bar]):
+        if exit_bar >= n:
+            continue
+        if open_times is not None:
+            segment = open_times.iloc[decision : exit_bar + 1]
+            if segment.isna().any() or not (segment.diff().iloc[1:] == interval).all():
+                status[decision] = "GAP"
+                continue
+        if not np.isfinite(opens[entry]) or opens[entry] <= 0 or not np.isfinite(closes[exit_bar]) or closes[exit_bar] <= 0:
+            status[decision] = "INVALID_PRICE"
             continue
         future[decision] = np.log(closes[exit_bar] / opens[entry])
         entry_index[decision] = entry
         exit_index[decision] = exit_bar
+        status[decision] = "ELIGIBLE"
+        if open_times is not None:
+            entry_times.iloc[decision] = open_times.iloc[entry]
+            exit_times.iloc[decision] = open_times.iloc[exit_bar]
+            available_times.iloc[decision] = (close_times.iloc[exit_bar] if close_times is not None and pd.notna(close_times.iloc[exit_bar]) else open_times.iloc[exit_bar] + interval)
     direction = np.where(future > 0, 1, np.where(future < 0, 0, np.nan))
-    result = pd.DataFrame(
+    return pd.DataFrame(
         {
             "future_log_return": future,
             "direction_up": direction,
             "entry_index": entry_index,
             "exit_index": exit_index,
+            "label_status": status,
+            "eligible": status == "ELIGIBLE",
+            "decision_time": decision_times.to_numpy(),
+            "entry_time": entry_times.to_numpy(),
+            "exit_time": exit_times.to_numpy(),
+            "label_available_time": available_times.to_numpy(),
         },
         index=bars.index,
     )
-    if "open_time" in bars:
-        times = pd.to_datetime(bars["open_time"], utc=True, errors="coerce").reset_index(drop=True)
-        result["entry_time"] = pd.Series(pd.NaT, index=result.index, dtype="datetime64[ns, UTC]")
-        result["exit_time"] = pd.Series(pd.NaT, index=result.index, dtype="datetime64[ns, UTC]")
-        valid = entry_index >= 0
-        result.loc[valid, "entry_time"] = times.iloc[entry_index[valid]].to_numpy()
-        result.loc[valid, "exit_time"] = times.iloc[exit_index[valid]].to_numpy()
-    return result
 
+
+def mature_training_mask(labels: pd.DataFrame, first_validation_decision_time: object) -> pd.Series:
+    """Return labels eligible and fully observed strictly before validation."""
+    eligible = labels.get("eligible", labels["direction_up"].notna()).astype(bool)
+    if "label_available_time" not in labels:
+        return eligible
+    boundary = pd.Timestamp(first_validation_decision_time)
+    boundary = boundary.tz_localize("UTC") if boundary.tzinfo is None else boundary.tz_convert("UTC")
+    available = pd.to_datetime(labels["label_available_time"], utc=True, errors="coerce")
+    return eligible & available.notna() & (available < boundary)
 
 def fit_logistic_model(
     frame: pd.DataFrame,
@@ -223,14 +306,15 @@ def evaluate_walk_forward(
     validation_size: int = 96,
     step_size: int = 96,
     regularization: float = 1.0,
+    source_timeframe: str = "15m",
 ) -> pd.DataFrame:
     baseline = _baseline_columns(frame)
     available = [name for name in feature_columns if name in frame]
     rows: list[dict[str, object]] = []
     for horizon_name in horizons:
-        if horizon_name not in HORIZON_BARS:
-            raise ValueError(f"unsupported horizon: {horizon_name}")
-        labels = build_forward_labels(frame, HORIZON_BARS[horizon_name])["direction_up"]
+        horizon_bars = resolve_horizon_bars(source_timeframe, horizon_name)
+        label_frame = build_forward_labels(frame, horizon_bars, source_timeframe=source_timeframe, horizon=horizon_name)
+        labels = label_frame["direction_up"]
         fold = 0
         train_end = minimum_train
         while train_end < len(frame):
@@ -241,8 +325,12 @@ def evaluate_walk_forward(
             validation_slice = slice(train_end, validation_end)
             y_train = labels.iloc[train_slice]
             y_validation = labels.iloc[validation_slice]
-            valid_train = y_train.notna()
-            valid_validation = y_validation.notna()
+            first_validation_time = label_frame.iloc[train_end]["decision_time"]
+            if pd.isna(first_validation_time):
+                valid_train = y_train.notna()
+            else:
+                valid_train = mature_training_mask(label_frame.iloc[train_slice], first_validation_time).set_axis(y_train.index)
+            valid_validation = y_validation.notna() & label_frame.iloc[validation_slice]["eligible"].to_numpy(dtype=bool)
             if valid_train.sum() >= 8 and valid_validation.sum() > 0 and y_train[valid_train].nunique() > 1:
                 baseline_probability = constant_probability(y_train[valid_train])
                 baseline_probabilities = np.full(int(valid_validation.sum()), baseline_probability)

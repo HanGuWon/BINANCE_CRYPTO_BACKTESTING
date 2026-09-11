@@ -8,7 +8,7 @@ import pandas as pd
 
 from .data import load_kline_archive, normalize_timestamp
 from .features import CORE_FEATURE_SPECS, CoreFeatureEngine, compute_gap_safe_features
-from .predictability import HORIZON_BARS, build_forward_labels, evaluate_walk_forward, fit_logistic_model
+from .predictability import HORIZON_BARS, build_forward_labels, evaluate_walk_forward, fit_logistic_model, resolve_horizon_bars
 
 
 def _load_frame(path: Path) -> pd.DataFrame:
@@ -72,7 +72,7 @@ def run_development(args: argparse.Namespace) -> int:
     enriched, columns = _feature_frame(frame, args.timeframe)
     if not columns:
         raise ValueError("no registered feature columns are available in the input")
-    results = evaluate_walk_forward(enriched, columns, horizons=tuple(args.horizons), minimum_train=args.minimum_train, validation_size=args.validation_size, step_size=args.step_size, regularization=args.regularization)
+    results = evaluate_walk_forward(enriched, columns, horizons=tuple(args.horizons), minimum_train=args.minimum_train, validation_size=args.validation_size, step_size=args.step_size, regularization=args.regularization, source_timeframe=args.timeframe)
     _prepare_output(args.output)
     results.to_csv(args.output / "predictability_results.csv", index=False)
     metadata = {"status": "completed" if not results.empty else "INSUFFICIENT EVIDENCE", "data_scope": "development_only", "timeframe": args.timeframe, "horizons": list(args.horizons), "feature_count": len(columns), "rows": len(enriched), "regularization": args.regularization, "results_rows": len(results), "final_holdout": "UNTOUCHED"}
@@ -109,11 +109,13 @@ def record_forward(args: argparse.Namespace) -> int:
     baseline["baseline_volatility_16"] = close.pct_change(fill_method=None).rolling(16, min_periods=8).std()
     rows: list[dict[str, object]] = []
     for horizon in args.horizons:
-        labels = build_forward_labels(enriched, HORIZON_BARS[horizon])["direction_up"]
+        horizon_bars = resolve_horizon_bars(args.timeframe, horizon)
+        label_frame = build_forward_labels(enriched, horizon_bars, source_timeframe=args.timeframe, horizon=horizon)
+        labels = label_frame["direction_up"]
         for feature in columns:
             names = ["baseline_return_1", "baseline_volatility_16", feature]
             training = pd.concat([baseline, enriched[[feature]]], axis=1).iloc[:train_end]
-            valid = labels.iloc[:train_end].notna()
+            valid = labels.iloc[:train_end].notna() & label_frame.iloc[:train_end]["eligible"]
             try:
                 model = fit_logistic_model(training.loc[valid], labels.iloc[:train_end].loc[valid], names, args.regularization)
             except ValueError:
@@ -137,7 +139,10 @@ def evaluate_forward(args: argparse.Namespace) -> int:
     from .predictability import probability_metrics
     rows: list[dict[str, object]] = []
     for horizon, group in predictions.groupby("horizon"):
-        labels = build_forward_labels(frame, HORIZON_BARS[str(horizon)])["direction_up"]
+        horizon_name = str(horizon)
+        horizon_bars = resolve_horizon_bars(args.timeframe, horizon_name)
+        label_frame = build_forward_labels(frame, horizon_bars, source_timeframe=args.timeframe, horizon=horizon_name)
+        labels = label_frame["direction_up"]
         group = group.copy()
         group["decision_index"] = pd.to_numeric(group["decision_index"], errors="coerce").astype("Int64")
         group = group.dropna(subset=["decision_index", "probability_up"])
@@ -185,5 +190,6 @@ def add_predictability_parser(sub: argparse._SubParsersAction) -> None:
     eval_parser = children.add_parser("evaluate-forward")
     eval_parser.add_argument("--input", type=Path, required=True)
     eval_parser.add_argument("--predictions", type=Path, required=True)
+    eval_parser.add_argument("--timeframe", choices=("15m", "1h", "4h"), default="15m")
     eval_parser.add_argument("--output", type=Path, required=True)
     eval_parser.set_defaults(handler=evaluate_forward)

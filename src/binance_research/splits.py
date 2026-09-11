@@ -70,16 +70,16 @@ def global_calendar_split(
 
 
 def horizon_purge_bars(timeframe: str, *, target_hours: int = 24) -> int:
-    if target_hours != 24:
-        minutes = {"15m": 15, "1h": 60, "4h": 240}.get(timeframe)
-        if minutes is None:
-            raise ValueError(f"unsupported timeframe: {timeframe}")
-        return int((target_hours * 60) / minutes)
-    try:
-        return HORIZON_PURGE_BARS_24H[timeframe]
-    except KeyError as exc:
-        raise ValueError(f"unsupported timeframe: {timeframe}") from exc
-
+    """Return exact native bars for a duration purge; never round."""
+    source_minutes = {"15m": 15, "1h": 60, "4h": 240}.get(timeframe)
+    if source_minutes is None:
+        raise ValueError(f"unsupported timeframe: {timeframe}")
+    if target_hours <= 0:
+        raise ValueError("target_hours must be positive")
+    target_minutes = target_hours * 60
+    if target_minutes % source_minutes:
+        raise ValueError(f"target horizon {target_hours}h is not divisible by {timeframe}")
+    return target_minutes // source_minutes
 
 def chronological_split(
     frame: pd.DataFrame,
