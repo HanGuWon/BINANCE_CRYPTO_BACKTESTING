@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+  ],
+  "synchronized_calendar_blocks": 2,
+  "gaps_exercised": true,
+  "outcomes": "NOT_RUN",
+  "final_holdout": "UNTOUCHED"
+}
