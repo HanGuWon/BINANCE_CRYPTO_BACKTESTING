@@ -1,0 +1,15 @@
+{
+  "holdout": "UNTOUCHED",
+  "hypotheses": [
+    "donchian_breakout20",
+    "roc6",
+    "rvol20",
+    "vwap_deviation20",
+    "taker_buy_sell_ratio",
+    "cvd_slope6",
+    "bb_bandwidth20",
+    "premium",
+    "premium_zscore90"
+  ],
+  "protocol": "FAST_DISCOVERY_V1"
+}

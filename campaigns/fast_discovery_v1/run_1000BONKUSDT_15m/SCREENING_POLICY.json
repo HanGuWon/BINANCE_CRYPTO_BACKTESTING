@@ -1,0 +1,9 @@
+{
+  "final_holdout": "UNTOUCHED",
+  "majority_positive_folds": true,
+  "minimum_independent_blocks": 2,
+  "policy_id": "FAST_DISCOVERY_S0_S1_S2_V1",
+  "positive_aggregate_delta": true,
+  "top_n": 10,
+  "trade_rows_in_s0": false
+}

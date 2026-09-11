@@ -1,0 +1,10 @@
+feature_id,role,historical_status
+donchian_breakout20,primitive,registered
+roc6,primitive,registered
+rvol20,primitive,registered
+vwap_deviation20,primitive,registered
+taker_buy_sell_ratio,primitive,registered
+cvd_slope6,primitive,registered
+bb_bandwidth20,primitive,registered
+premium,primitive,registered
+premium_zscore90,primitive,registered

@@ -1,0 +1,20 @@
+{
+  "dataset_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/processed/r2b_restricted_derivatives_v1_repaired_v2_causal3",
+  "dataset_sha256": "6eef4e59225cb45c2833452a883249b11f03469298c1ecfb3837c5f4aaa27a7d",
+  "final_holdout": "UNTOUCHED",
+  "input_rows": 3840,
+  "input_sha256": "6a9923908087fa67a027087699b0e6a8b8a246c931a59a8d182b99eeb753d462",
+  "market": "um",
+  "source_columns": [
+    "premium",
+    "premium_zscore90",
+    "segment_id",
+    "symbol",
+    "timeframe",
+    "timestamp"
+  ],
+  "source_sha256": "47a658563bb5d0ee0e950bc38cd08dd0e53a28b0c448f2c177f77b4d79a2680a",
+  "split_manifest": "C:/Users/user/Documents/ChatGPT/BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8/.worktrees/predictability-v1/campaigns/predictability_v1/DEVELOPMENT_FINAL_HOLDOUT_MANIFEST.json",
+  "split_manifest_sha256": "75db5609e5c5d99c888972c46941f698c965d36b6d373b97b4326abca2a45df5",
+  "timeframe": "15m"
+}

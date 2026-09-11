@@ -1,0 +1,5 @@
+combination_id,components,component_count,trigger,regime_filter,participation_modifier
+S1_01,donchian_breakout20|ema20_slope_5|rvol20,3,donchian_breakout20,ema20_slope_5,rvol20
+S1_02,roc6|sig_ema20_50|taker_buy_sell_ratio,3,roc6,sig_ema20_50,taker_buy_sell_ratio
+S1_03,bb_bandwidth20|donchian_breakout20|rvol20,3,bb_bandwidth20,donchian_breakout20,rvol20
+S1_04,premium_zscore90|sig_ema20_50|rvol20,3,premium_zscore90,sig_ema20_50,rvol20

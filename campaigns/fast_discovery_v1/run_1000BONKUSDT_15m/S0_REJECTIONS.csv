@@ -1,0 +1,10 @@
+feature_id,status,reason
+donchian_breakout20,HISTORICAL_UNAVAILABLE,"missing causal label columns: open_time,open,close"
+roc6,HISTORICAL_UNAVAILABLE,"missing causal label columns: open_time,open,close"
+rvol20,HISTORICAL_UNAVAILABLE,"missing causal label columns: open_time,open,close"
+vwap_deviation20,HISTORICAL_UNAVAILABLE,"missing causal label columns: open_time,open,close"
+taker_buy_sell_ratio,HISTORICAL_UNAVAILABLE,"missing causal label columns: open_time,open,close"
+cvd_slope6,HISTORICAL_UNAVAILABLE,"missing causal label columns: open_time,open,close"
+bb_bandwidth20,HISTORICAL_UNAVAILABLE,"missing causal label columns: open_time,open,close"
+premium,HISTORICAL_UNAVAILABLE,"missing causal label columns: open_time,open,close"
+premium_zscore90,HISTORICAL_UNAVAILABLE,"missing causal label columns: open_time,open,close"
