@@ -17,4 +17,5 @@ def test_timestamp_block_fixture(monkeypatch):
     monkeypatch.setattr(fd,"evaluate_walk_forward",fake); one=synthetic(); one["open_time"]=pd.date_range("2024-01-01",periods=len(one),freq="min"); s,_=fd.screen_s0(one,primitives=["premium"]); assert int(s.iloc[0].independent_block_count)==2
 
 def test_cli_requires_root_and_manifest(tmp_path):
-    import subprocess,sys; r=subprocess.run([sys.executable,"scripts/run_fast_discovery.py","--input","x.parquet","--output",str(tmp_path)],capture_output=True,text=True); assert r.returncode!=0 and "required" in r.stderr
+    import subprocess,sys,os; env=dict(os.environ, PYTHONPATH="src"); r=subprocess.run([sys.executable,"scripts/run_fast_discovery.py","--input","x.parquet","--output",str(tmp_path)],capture_output=True,text=True,env=env); assert r.returncode!=0 and "required" in r.stderr
+
