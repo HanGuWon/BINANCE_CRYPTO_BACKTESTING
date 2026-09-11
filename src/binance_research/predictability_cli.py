@@ -9,7 +9,7 @@ import pandas as pd
 
 from .data import load_kline_archive, normalize_timestamp
 from .features import CORE_FEATURE_SPECS, CoreFeatureEngine, compute_gap_safe_features
-from .forward import append_predictions_write_once, guard_final_holdout_path, prediction_identity, write_model_artifact
+from .forward import append_jsonl_atomic, append_predictions_write_once, guard_final_holdout_path, prediction_identity, write_model_artifact
 from .predictability import HORIZON_BARS, build_forward_labels, constant_probability, evaluate_walk_forward, fit_logistic_model, mature_training_mask, resolve_horizon_bars, schedule_forward_times
 
 
@@ -46,7 +46,7 @@ def _prepare_output(path: Path, *, mode: str | None = None) -> None:
         if entries and mode != "prospective":
             raise FileExistsError(f"refusing to overwrite existing output: {path}")
         if mode == "prospective":
-            allowed = {"forward_predictions.csv", "metadata.json", "models"}
+            allowed = {"forward_predictions.csv", "metadata.json", "campaign_metadata.json", "run_receipts.jsonl", "models"}
             unexpected = [entry.name for entry in entries if entry.name not in allowed]
             if unexpected:
                 raise FileExistsError(f"unexpected files in prospective output: {unexpected}")
@@ -173,8 +173,10 @@ def record_forward(args: argparse.Namespace) -> int:
                 rows.append({"prediction_id": prediction_identity(market=args.market, symbol=args.symbol, timeframe=args.timeframe, decision_time=decision_time, horizon=horizon, model_id=model_id, campaign_id=args.campaign_id, model_artifact_sha256=model_shas[model_id], dataset_sha256=args.dataset_sha256, mode=mode, source_tree_sha256=args.source_tree_sha256, feature_registry_sha256=args.feature_registry_sha256, config_sha256=args.config_sha256), "campaign_id": args.campaign_id, "market": args.market, "symbol": args.symbol, "timeframe": args.timeframe, "decision_time": str(decision_time), "feature_time": str(decision_time), "prediction_recorded_at": recorded_at, "next_executable_open": str(schedule["next_executable_open"]), "target_exit_time": str(schedule["target_exit_time"]), "horizon": horizon, "feature_id": feature, "model": "B1+I", "model_id": model_id, "model_artifact_sha256": model_shas[model_id], "mode": mode, "dataset_sha256": args.dataset_sha256, "source_tree_sha256": args.source_tree_sha256, "b0_probability_up": float(b0), "b1_probability_up": float(b1), "b1_plus_i_probability_up": float(b1i), "probability_up": float(b1i)})
     predictions = pd.DataFrame.from_records(rows)
     append_predictions_write_once(args.output / "forward_predictions.csv", predictions, allow_replay=(mode == "prospective"))
-    metadata = {"status": "RECORDED_OUTCOME_BLIND", "mode": mode, "market": args.market, "symbol": args.symbol, "train_end_index": train_end, "prediction_rows": len(predictions), "model_artifact_shas": model_shas, "campaign_id": args.campaign_id, "dataset_sha256": args.dataset_sha256, "source_tree_sha256": args.source_tree_sha256, "feature_registry_sha256": args.feature_registry_sha256, "config_sha256": args.config_sha256, "final_holdout": "UNTOUCHED"}
+    metadata = {"status": "RECORDED_OUTCOME_BLIND", "mode": mode, "market": args.market, "symbol": args.symbol, "train_end_index": train_end, "model_artifact_shas": model_shas, "campaign_id": args.campaign_id, "dataset_sha256": args.dataset_sha256, "source_tree_sha256": args.source_tree_sha256, "feature_registry_sha256": args.feature_registry_sha256, "config_sha256": args.config_sha256, "final_holdout": "UNTOUCHED"}
+    _write_json_once(args.output / "campaign_metadata.json", metadata)
     _write_json_once(args.output / "metadata.json", metadata)
+    append_jsonl_atomic(args.output / "run_receipts.jsonl", {"recorded_at": recorded_at, "mode": mode, "prediction_rows": len(predictions), "high_water_decision_time": str(predictions["decision_time"].max()) if not predictions.empty else None})
     print(json.dumps(metadata, indent=2))
     return 0
 
@@ -254,5 +256,6 @@ def add_predictability_parser(sub: argparse._SubParsersAction) -> None:
     eval_parser.add_argument("--timeframe", choices=("15m", "1h", "4h"), default="15m")
     eval_parser.add_argument("--output", type=Path, required=True)
     eval_parser.set_defaults(handler=evaluate_forward)
+
 
 

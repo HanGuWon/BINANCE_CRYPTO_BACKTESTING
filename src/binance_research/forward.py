@@ -41,7 +41,7 @@ def append_predictions_write_once(path: Path, rows: pd.DataFrame | Sequence[dict
         if overlap and not allow_replay: raise ValueError(f"duplicate prediction_id refused: {sorted(overlap)[0]}")
         for prediction_id in sorted(overlap):
             old = existing[existing["prediction_id"].astype(str) == prediction_id].iloc[0]; new = incoming[ids == prediction_id].iloc[0]
-            common = [column for column in incoming.columns if column in existing.columns]
+            common = [column for column in incoming.columns if column in existing.columns and column != "prediction_recorded_at"]
             if any(str(old[column]) != str(new[column]) for column in common): raise ValueError(f"conflicting prediction_id refused: {prediction_id}")
         incoming = incoming[~ids.isin(overlap)].copy()
         if incoming.empty: return
@@ -49,6 +49,18 @@ def append_predictions_write_once(path: Path, rows: pd.DataFrame | Sequence[dict
     destination.parent.mkdir(parents=True, exist_ok=True); temporary = destination.with_name(destination.name + ".tmp")
     if temporary.exists(): raise FileExistsError(f"stale temporary prediction store exists: {temporary}")
     incoming.to_csv(temporary, index=False); temporary.replace(destination)
+
+def append_jsonl_atomic(path: Path, payload: dict[str, Any]) -> None:
+    """Append a receipt atomically, preserving prior bytes on interruption."""
+    destination = Path(path)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    existing = destination.read_bytes() if destination.exists() else b""
+    line = _canonical_json(payload) + b"\n"
+    temporary = destination.with_name(destination.name + ".tmp")
+    if temporary.exists():
+        raise FileExistsError(f"stale temporary receipt exists: {temporary}")
+    temporary.write_bytes(existing + line)
+    temporary.replace(destination)
 
 def guard_final_holdout_path(path: Path | str) -> None:
     candidate = Path(path)
@@ -94,4 +106,5 @@ def funding_cashflow(events: pd.DataFrame | Sequence[dict[str, Any]], entry_time
     mask = times.notna() & rates.notna() & (times >= start) & (times < end)
     sign = -1.0 if side == "LONG" else 1.0
     return float(sign * rates.loc[mask].sum() * float(notional))
+
 
