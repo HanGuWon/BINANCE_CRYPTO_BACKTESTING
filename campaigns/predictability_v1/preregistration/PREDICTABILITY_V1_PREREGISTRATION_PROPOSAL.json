@@ -1,0 +1,35 @@
+{
+  "campaign_id": "predictability_v1_forward_development",
+  "status": "PROPOSAL_ONLY_HUMAN_APPROVAL_REQUIRED",
+  "markets": [
+    "um"
+  ],
+  "timeframes": [
+    "15m",
+    "1h",
+    "4h"
+  ],
+  "horizons": [
+    "15m",
+    "1h",
+    "4h",
+    "24h"
+  ],
+  "universe": "causal monthly Top50",
+  "models": [
+    "B0",
+    "B1",
+    "B1+I"
+  ],
+  "model_policy": "FROZEN_MODEL_FORWARD_V1",
+  "primary_metric": "paired_delta_log_loss",
+  "inference": "1-day calendar block bootstrap",
+  "multiple_testing": "PREDICTABILITY_V1_PRIMARY_HOLM_V1 alpha=0.05",
+  "split_manifest": "DEVELOPMENT_FINAL_HOLDOUT_MANIFEST.json",
+  "gap_rule": "reset at segment boundaries",
+  "stopping_rule": "no adaptive stopping or threshold tuning",
+  "outcomes": "NOT_STARTED",
+  "final_holdout": "UNTOUCHED",
+  "execution_enabled": false,
+  "proposal_sha256": "fa2f7997258ba2dbb786717bc4498cc26dfcf15c4f5263f05dd51881c76989a9"
+}
