@@ -4,7 +4,7 @@ from types import SimpleNamespace
 import numpy as np
 import pandas as pd
 import pytest
-from binance_research.forward import append_predictions_write_once, calendar_block_bootstrap, guard_final_holdout_path, holm_adjust, paired_log_loss_difference, prediction_identity, write_model_artifact
+from binance_research.forward import append_predictions_write_once, calendar_block_bootstrap, guard_final_holdout_path, holm_adjust, paired_log_loss_difference, prediction_identity, verify_expected_sha256, write_model_artifact
 from binance_research.predictability import build_forward_labels, fit_logistic_model
 
 def _rows(n=24):
@@ -77,3 +77,13 @@ def test_holdout_metadata_guard(tmp_path):
 def test_prediction_identity_separates_shadow_and_prospective_modes():
     kwargs = dict(market="um", symbol="BTCUSDT", timeframe="15m", decision_time="2025-01-01T00:00Z", horizon="15m", model_id="m", campaign_id="c")
     assert prediction_identity(**kwargs, mode="SHADOW_REPLAY_NON_PROSPECTIVE") != prediction_identity(**kwargs, mode="prospective")
+
+
+def test_sha256_verification_fails_closed(tmp_path: Path):
+    artifact = tmp_path / "artifact.bin"
+    artifact.write_bytes(b"stable")
+    import hashlib
+    expected = hashlib.sha256(b"stable").hexdigest()
+    assert verify_expected_sha256(artifact, expected, label="artifact") == expected
+    with pytest.raises(ValueError, match="SHA256 mismatch"):
+        verify_expected_sha256(artifact, "0" * 64, label="artifact")

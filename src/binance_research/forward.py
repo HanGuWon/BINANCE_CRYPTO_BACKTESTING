@@ -10,6 +10,20 @@ import pandas as pd
 def _canonical_json(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
 
+def sha256_file(path: Path | str) -> str:
+    candidate = Path(path)
+    digest = hashlib.sha256()
+    with candidate.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+def verify_expected_sha256(path: Path | str, expected: str | None, *, label: str = "artifact") -> str:
+    actual = sha256_file(path)
+    if expected is not None and actual.casefold() != str(expected).casefold():
+        raise ValueError(f"{label} SHA256 mismatch: expected {expected}, got {actual}")
+    return actual
+
 def prediction_identity(*, market: str, symbol: str, timeframe: str, decision_time: object, horizon: str, model_id: str, campaign_id: str, model_artifact_sha256: str | None = None, dataset_sha256: str | None = None, source_tree_sha256: str | None = None, feature_registry_sha256: str | None = None, config_sha256: str | None = None, mode: str | None = None) -> str:
     timestamp = pd.Timestamp(decision_time)
     if pd.isna(timestamp): raise ValueError("decision_time is required for prediction identity")
