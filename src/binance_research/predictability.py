@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from math import log
-from typing import Iterable, Sequence
+from typing import Any, Iterable, Sequence
 
 import numpy as np
 import pandas as pd
@@ -57,6 +57,12 @@ class LogisticModel:
     means: tuple[float, ...]
     scales: tuple[float, ...]
     regularization: float
+    training_count: int = 0
+    training_cutoff: str | None = None
+    source_timeframe: str | None = None
+    horizon: str | None = None
+    label_contract: str = "UP = future_log_return > 0; NOT_UP = <= 0"
+    regularization_definition: str = "mean_log_loss + 0.5 * lambda * ||coef||^2"
 
     def predict_proba(self, frame: pd.DataFrame) -> np.ndarray:
         if not self.feature_names:
@@ -150,7 +156,9 @@ def build_forward_labels(
             entry_times.iloc[decision] = open_times.iloc[entry]
             exit_times.iloc[decision] = open_times.iloc[exit_bar]
             available_times.iloc[decision] = (close_times.iloc[exit_bar] if close_times is not None and pd.notna(close_times.iloc[exit_bar]) else open_times.iloc[exit_bar] + interval)
-    direction = np.where(future > 0, 1, np.where(future < 0, 0, np.nan))
+    direction = np.full(n, np.nan, dtype=float)
+    finite_future = np.isfinite(future)
+    direction[finite_future] = (future[finite_future] > 0).astype(float)
     return pd.DataFrame(
         {
             "future_log_return": future,
@@ -183,6 +191,10 @@ def fit_logistic_model(
     target: pd.Series,
     feature_names: Iterable[str],
     regularization: float = 1.0,
+    *,
+    training_cutoff: str | None = None,
+    source_timeframe: str | None = None,
+    horizon: str | None = None,
 ) -> LogisticModel:
     names = tuple(feature_names)
     if regularization < 0:
@@ -215,16 +227,16 @@ def fit_logistic_model(
         coefficients = parameters[1:]
         logits = intercept + standardized @ coefficients
         probabilities = expit(logits)
-        loss = -np.sum(labels * np.log(np.clip(probabilities, 1e-12, 1.0)) + (1 - labels) * np.log(np.clip(1 - probabilities, 1e-12, 1.0)))
+        loss = -np.mean(labels * np.log(np.clip(probabilities, 1e-12, 1.0)) + (1 - labels) * np.log(np.clip(1 - probabilities, 1e-12, 1.0)))
         loss += 0.5 * regularization * float(np.dot(coefficients, coefficients))
         error = probabilities - labels
-        gradient = np.concatenate(([error.sum()], standardized.T @ error + regularization * coefficients))
+        gradient = np.concatenate(([error.mean()], standardized.T @ error / len(labels) + regularization * coefficients))
         return float(loss), gradient
 
     result = minimize(lambda p: objective(p), initial, jac=True, method="L-BFGS-B")
     if not result.success or not np.isfinite(result.x).all():
         raise ValueError(f"logistic optimization failed: {result.message}")
-    return LogisticModel(names, tuple(float(v) for v in result.x[1:]), float(result.x[0]), tuple(float(v) for v in means), tuple(float(v) for v in scales), regularization)
+    return LogisticModel(names, tuple(float(v) for v in result.x[1:]), float(result.x[0]), tuple(float(v) for v in means), tuple(float(v) for v in scales), regularization, int(len(labels)), training_cutoff, source_timeframe, horizon)
 
 
 def constant_probability(target: pd.Series) -> float:
