@@ -1,0 +1,15 @@
+{
+  "campaign_id": "predictability_v1_forward_development",
+  "model_policy": "FROZEN_MODEL_FORWARD_V1",
+  "refit_during_evaluation": false,
+  "training_cutoff": "explicit per campaign invocation",
+  "models": [
+    "B0",
+    "B1",
+    "B1+I"
+  ],
+  "features": "CORE_FEATURE_SPECS",
+  "regularization_definition": "mean_log_loss + 0.5 * lambda * ||coef||^2",
+  "final_holdout": "UNTOUCHED",
+  "outcomes": "NOT_RUN"
+}
