@@ -10,11 +10,11 @@ import pandas as pd
 def _canonical_json(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
 
-def prediction_identity(*, market: str, symbol: str, timeframe: str, decision_time: object, horizon: str, model_id: str, campaign_id: str, model_artifact_sha256: str | None = None, dataset_sha256: str | None = None, source_tree_sha256: str | None = None, feature_registry_sha256: str | None = None, config_sha256: str | None = None) -> str:
+def prediction_identity(*, market: str, symbol: str, timeframe: str, decision_time: object, horizon: str, model_id: str, campaign_id: str, model_artifact_sha256: str | None = None, dataset_sha256: str | None = None, source_tree_sha256: str | None = None, feature_registry_sha256: str | None = None, config_sha256: str | None = None, mode: str | None = None) -> str:
     timestamp = pd.Timestamp(decision_time)
     if pd.isna(timestamp): raise ValueError("decision_time is required for prediction identity")
     timestamp = timestamp.tz_localize("UTC") if timestamp.tzinfo is None else timestamp.tz_convert("UTC")
-    payload = {"campaign_id": str(campaign_id), "decision_time": timestamp.isoformat(), "horizon": str(horizon), "market": str(market), "model_id": str(model_id), "symbol": str(symbol), "timeframe": str(timeframe), "model_artifact_sha256": model_artifact_sha256, "dataset_sha256": dataset_sha256, "source_tree_sha256": source_tree_sha256, "feature_registry_sha256": feature_registry_sha256, "config_sha256": config_sha256}
+    payload = {"campaign_id": str(campaign_id), "decision_time": timestamp.isoformat(), "horizon": str(horizon), "market": str(market), "model_id": str(model_id), "symbol": str(symbol), "timeframe": str(timeframe), "model_artifact_sha256": model_artifact_sha256, "dataset_sha256": dataset_sha256, "source_tree_sha256": source_tree_sha256, "feature_registry_sha256": feature_registry_sha256, "config_sha256": config_sha256, "mode": mode}
     return hashlib.sha256(_canonical_json(payload)).hexdigest()
 
 def model_artifact_payload(model: Any, **metadata: Any) -> dict[str, Any]:
@@ -94,3 +94,4 @@ def funding_cashflow(events: pd.DataFrame | Sequence[dict[str, Any]], entry_time
     mask = times.notna() & rates.notna() & (times >= start) & (times < end)
     sign = -1.0 if side == "LONG" else 1.0
     return float(sign * rates.loc[mask].sum() * float(notional))
+

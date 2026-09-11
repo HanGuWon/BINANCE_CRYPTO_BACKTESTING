@@ -73,3 +73,7 @@ def test_holdout_metadata_guard(tmp_path):
     source=tmp_path/"bars.csv"; source.write_text("x\n1\n",encoding="utf-8")
     (tmp_path/"metadata.json").write_text('{"final_holdout": true}',encoding="utf-8")
     with pytest.raises(PermissionError): guard_final_holdout_path(source)
+
+def test_prediction_identity_separates_shadow_and_prospective_modes():
+    kwargs = dict(market="um", symbol="BTCUSDT", timeframe="15m", decision_time="2025-01-01T00:00Z", horizon="15m", model_id="m", campaign_id="c")
+    assert prediction_identity(**kwargs, mode="SHADOW_REPLAY_NON_PROSPECTIVE") != prediction_identity(**kwargs, mode="prospective")

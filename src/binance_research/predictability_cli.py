@@ -125,9 +125,10 @@ def _fit_with_metadata(frame: pd.DataFrame, target: pd.Series, names: list[str],
 def record_forward(args: argparse.Namespace) -> int:
     guard_final_holdout_path(args.input)
     guard_final_holdout_path(args.output)
-    if args.mode not in {"shadow-replay", "prospective"}:
+    mode = "SHADOW_REPLAY_NON_PROSPECTIVE" if args.mode in {"shadow-replay", "SHADOW_REPLAY_NON_PROSPECTIVE"} else args.mode
+    if mode not in {"SHADOW_REPLAY_NON_PROSPECTIVE", "prospective"}:
         raise ValueError("mode must be shadow-replay or prospective")
-    _prepare_output(args.output, mode=args.mode)
+    _prepare_output(args.output, mode=("prospective" if mode == "prospective" else None))
     frame = _load_frame(args.input)
     enriched, columns = _feature_frame(frame, args.timeframe)
     train_end = _resolve_train_end(enriched, args)
@@ -164,15 +165,15 @@ def record_forward(args: argparse.Namespace) -> int:
                 continue
             model_id = f"B1+I:{feature}:{horizon}"
             model_path = args.output / "models" / (model_id.replace(":", "_") + ".json")
-            model_shas[model_id] = write_model_artifact(model_path, model, allow_identical=(args.mode == "prospective"), market=args.market, symbol=args.symbol, timeframe=args.timeframe, horizon=horizon, campaign_id=args.campaign_id, dataset_sha256=args.dataset_sha256, source_tree_sha256=args.source_tree_sha256, feature_registry_sha256=args.feature_registry_sha256, config_sha256=args.config_sha256)
+            model_shas[model_id] = write_model_artifact(model_path, model, allow_identical=(mode == "prospective"), market=args.market, symbol=args.symbol, timeframe=args.timeframe, horizon=horizon, campaign_id=args.campaign_id, dataset_sha256=args.dataset_sha256, source_tree_sha256=args.source_tree_sha256, feature_registry_sha256=args.feature_registry_sha256, config_sha256=args.config_sha256)
             combined_probabilities = model.predict_proba(training.iloc[train_end:])
             for offset, (b0, b1, b1i) in enumerate(zip(np.full(len(combined_probabilities), baseline_probability), base_probabilities, combined_probabilities), start=train_end):
                 schedule = schedule_forward_times(enriched, offset, horizon_bars, source_timeframe=args.timeframe)
                 decision_time = schedule["decision_time"]
-                rows.append({"prediction_id": prediction_identity(market=args.market, symbol=args.symbol, timeframe=args.timeframe, decision_time=decision_time, horizon=horizon, model_id=model_id, campaign_id=args.campaign_id, model_artifact_sha256=model_shas[model_id], dataset_sha256=args.dataset_sha256, source_tree_sha256=args.source_tree_sha256, feature_registry_sha256=args.feature_registry_sha256, config_sha256=args.config_sha256), "campaign_id": args.campaign_id, "market": args.market, "symbol": args.symbol, "timeframe": args.timeframe, "decision_time": str(decision_time), "feature_time": str(decision_time), "prediction_recorded_at": recorded_at, "next_executable_open": str(schedule["next_executable_open"]), "target_exit_time": str(schedule["target_exit_time"]), "horizon": horizon, "feature_id": feature, "model": "B1+I", "model_id": model_id, "model_artifact_sha256": model_shas[model_id], "mode": args.mode, "dataset_sha256": args.dataset_sha256, "source_tree_sha256": args.source_tree_sha256, "b0_probability_up": float(b0), "b1_probability_up": float(b1), "b1_plus_i_probability_up": float(b1i), "probability_up": float(b1i)})
+                rows.append({"prediction_id": prediction_identity(market=args.market, symbol=args.symbol, timeframe=args.timeframe, decision_time=decision_time, horizon=horizon, model_id=model_id, campaign_id=args.campaign_id, model_artifact_sha256=model_shas[model_id], dataset_sha256=args.dataset_sha256, mode=mode, source_tree_sha256=args.source_tree_sha256, feature_registry_sha256=args.feature_registry_sha256, config_sha256=args.config_sha256), "campaign_id": args.campaign_id, "market": args.market, "symbol": args.symbol, "timeframe": args.timeframe, "decision_time": str(decision_time), "feature_time": str(decision_time), "prediction_recorded_at": recorded_at, "next_executable_open": str(schedule["next_executable_open"]), "target_exit_time": str(schedule["target_exit_time"]), "horizon": horizon, "feature_id": feature, "model": "B1+I", "model_id": model_id, "model_artifact_sha256": model_shas[model_id], "mode": mode, "dataset_sha256": args.dataset_sha256, "source_tree_sha256": args.source_tree_sha256, "b0_probability_up": float(b0), "b1_probability_up": float(b1), "b1_plus_i_probability_up": float(b1i), "probability_up": float(b1i)})
     predictions = pd.DataFrame.from_records(rows)
-    append_predictions_write_once(args.output / "forward_predictions.csv", predictions, allow_replay=(args.mode == "prospective"))
-    metadata = {"status": "RECORDED_OUTCOME_BLIND", "mode": args.mode, "market": args.market, "symbol": args.symbol, "train_end_index": train_end, "prediction_rows": len(predictions), "model_artifact_shas": model_shas, "campaign_id": args.campaign_id, "dataset_sha256": args.dataset_sha256, "source_tree_sha256": args.source_tree_sha256, "feature_registry_sha256": args.feature_registry_sha256, "config_sha256": args.config_sha256, "final_holdout": "UNTOUCHED"}
+    append_predictions_write_once(args.output / "forward_predictions.csv", predictions, allow_replay=(mode == "prospective"))
+    metadata = {"status": "RECORDED_OUTCOME_BLIND", "mode": mode, "market": args.market, "symbol": args.symbol, "train_end_index": train_end, "prediction_rows": len(predictions), "model_artifact_shas": model_shas, "campaign_id": args.campaign_id, "dataset_sha256": args.dataset_sha256, "source_tree_sha256": args.source_tree_sha256, "feature_registry_sha256": args.feature_registry_sha256, "config_sha256": args.config_sha256, "final_holdout": "UNTOUCHED"}
     _write_json_once(args.output / "metadata.json", metadata)
     print(json.dumps(metadata, indent=2))
     return 0
@@ -198,7 +199,7 @@ def evaluate_forward(args: argparse.Namespace) -> int:
         labels = pd.Series(label_values, index=pd.to_datetime(label_frame["decision_time"], utc=True, errors="coerce"))
         group = group.copy()
         group["decision_time"] = pd.to_datetime(group["decision_time"], utc=True, errors="coerce")
-        expected_ids = group.apply(lambda row: prediction_identity(market=row["market"], symbol=row["symbol"], timeframe=row["timeframe"], decision_time=row["decision_time"], horizon=horizon_name, model_id=row["model_id"], campaign_id=row["campaign_id"], model_artifact_sha256=row.get("model_artifact_sha256"), dataset_sha256=row.get("dataset_sha256"), source_tree_sha256=row.get("source_tree_sha256"), feature_registry_sha256=row.get("feature_registry_sha256"), config_sha256=row.get("config_sha256")), axis=1)
+        expected_ids = group.apply(lambda row: prediction_identity(market=row["market"], symbol=row["symbol"], timeframe=row["timeframe"], decision_time=row["decision_time"], horizon=horizon_name, model_id=row["model_id"], campaign_id=row["campaign_id"], mode=row.get("mode"), model_artifact_sha256=row.get("model_artifact_sha256"), dataset_sha256=row.get("dataset_sha256"), source_tree_sha256=row.get("source_tree_sha256"), feature_registry_sha256=row.get("feature_registry_sha256"), config_sha256=row.get("config_sha256")), axis=1)
         if not (expected_ids.astype(str).to_numpy() == group["prediction_id"].astype(str).to_numpy()).all():
             raise ValueError("prediction identity mismatch")
         group["direction_up"] = group["decision_time"].map(labels)
@@ -243,7 +244,7 @@ def add_predictability_parser(sub: argparse._SubParsersAction) -> None:
     record_parser.add_argument("--market", choices=("spot", "um", "cm"), default="spot")
     record_parser.add_argument("--symbol", default="UNKNOWN")
     record_parser.add_argument("--campaign-id", default="predictability-v1")
-    record_parser.add_argument("--mode", choices=("shadow-replay", "prospective"), default="shadow-replay")
+    record_parser.add_argument("--mode", choices=("shadow-replay", "SHADOW_REPLAY_NON_PROSPECTIVE", "prospective"), default="shadow-replay")
     for name in ("dataset-sha256", "source-tree-sha256", "feature-registry-sha256", "config-sha256"):
         record_parser.add_argument("--" + name, dest=name.replace("-", "_"))
     record_parser.set_defaults(handler=record_forward)
@@ -253,3 +254,5 @@ def add_predictability_parser(sub: argparse._SubParsersAction) -> None:
     eval_parser.add_argument("--timeframe", choices=("15m", "1h", "4h"), default="15m")
     eval_parser.add_argument("--output", type=Path, required=True)
     eval_parser.set_defaults(handler=evaluate_forward)
+
+
