@@ -1,0 +1,12 @@
+{
+  "s1_evaluations": 0,
+  "s2_trading_replays": 0,
+  "clarification_sha256": "7b232e53866926ebeda274812877b7ea8e19f030900d4ff8cde4cfaecdba997e",
+  "historical_unavailable": 9,
+  "scored_primitives": 0,
+  "registered_primitives": 9,
+  "original_report_sha256": "d660a74024b0bbb528ffbb62432e37731513a0c4150ff04c3614e611852353be",
+  "s0_predictive_tests": 0,
+  "classification": "FAST_DISCOVERY_V1_ENGINEERING_PROBE_NO_PREDICTIVE_RESULT",
+  "final_holdout": "UNTOUCHED"
+}
