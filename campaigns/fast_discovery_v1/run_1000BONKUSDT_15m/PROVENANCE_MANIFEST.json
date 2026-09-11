@@ -2,9 +2,11 @@
   "dataset_root": "D:/BINANCE_CRYPTO_BACKTESTING_DATA/processed/r2b_restricted_derivatives_v1_repaired_v2_causal3",
   "dataset_sha256": "6eef4e59225cb45c2833452a883249b11f03469298c1ecfb3837c5f4aaa27a7d",
   "final_holdout": "UNTOUCHED",
+  "implementation_sha256": "a9f5e0c3063da74498901b65be66648a00f5c1f52618dff3e0e7b1666bc6feee",
   "input_rows": 3840,
   "input_sha256": "6a9923908087fa67a027087699b0e6a8b8a246c931a59a8d182b99eeb753d462",
   "market": "um",
+  "registry_sha256": "35f6a7ff65f29f65bb6ea28e553d57092287717683d6d75eb6a3962a2995441d",
   "source_columns": [
     "premium",
     "premium_zscore90",
