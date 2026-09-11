@@ -34,3 +34,5 @@ def test_evaluator_uses_stored_b1_as_paired_baseline(tmp_path: Path):
     result = pd.read_csv(output / "forward_evaluation.csv")
     assert result.loc[0, "paired_count"] == 1
     assert result.loc[0, "log_loss_improvement"] != 0
+    assert result.loc[0, "independent_block_count"] == 1
+

@@ -9,7 +9,7 @@ import pandas as pd
 
 from .data import load_kline_archive, normalize_timestamp
 from .features import CORE_FEATURE_SPECS, CoreFeatureEngine, compute_gap_safe_features
-from .forward import append_jsonl_atomic, append_predictions_write_once, guard_final_holdout_path, paired_log_loss_difference, prediction_identity, write_model_artifact
+from .forward import append_jsonl_atomic, append_predictions_write_once, calendar_block_bootstrap, guard_final_holdout_path, paired_log_loss_difference, prediction_identity, write_model_artifact
 from .predictability import HORIZON_BARS, build_forward_labels, constant_probability, evaluate_walk_forward, fit_logistic_model, mature_training_mask, resolve_horizon_bars, schedule_forward_times
 
 
@@ -212,7 +212,19 @@ def evaluate_forward(args: argparse.Namespace) -> int:
             labels_for_score = feature_group["direction_up"].to_numpy(dtype=float)
             metrics = probability_metrics(feature_group["direction_up"], model_probabilities, baseline_probabilities=baseline_probabilities)
             paired = paired_log_loss_difference(labels_for_score, baseline_probabilities, model_probabilities)
-            rows.append({"horizon": horizon_name, "feature_id": feature, "model": str(feature_group["model"].iloc[0]), "delta_log_loss": float(np.mean(paired)), "paired_count": int(len(paired)), **metrics})
+            ci_low, ci_high = calendar_block_bootstrap(
+                paired,
+                feature_group["decision_time"],
+                block_days=1,
+                samples=200,
+                seed=1729,
+            )
+            block_count = int(
+                pd.to_datetime(feature_group["decision_time"], utc=True, errors="coerce")
+                .dt.floor("1D")
+                .nunique()
+            )
+            rows.append({"horizon": horizon_name, "feature_id": feature, "model": str(feature_group["model"].iloc[0]), "delta_log_loss": float(np.mean(paired)), "delta_ci_low": ci_low, "delta_ci_high": ci_high, "independent_block_count": block_count, "paired_count": int(len(paired)), **metrics})
     result = pd.DataFrame.from_records(rows)
     _prepare_output(args.output)
     result.to_csv(args.output / "forward_evaluation.csv", index=False)
@@ -260,6 +272,7 @@ def add_predictability_parser(sub: argparse._SubParsersAction) -> None:
     eval_parser.add_argument("--timeframe", choices=("15m", "1h", "4h"), default="15m")
     eval_parser.add_argument("--output", type=Path, required=True)
     eval_parser.set_defaults(handler=evaluate_forward)
+
 
 
 
