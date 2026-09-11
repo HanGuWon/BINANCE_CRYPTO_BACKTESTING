@@ -1,0 +1,1 @@
+import json`np="campaigns/fast_discovery_v1/V1_PROBE_RECEIPT.json"`nd=json.load(open(p))`nassert d["registered_primitives"]==9 and d["historical_unavailable"]==9 and d["scored_primitives"]==0 and d["s0_predictive_tests"]==0 and d["s1_evaluations"]==0 and d["s2_trading_replays"]==0`nprint("WP0 probe verification PASS")
