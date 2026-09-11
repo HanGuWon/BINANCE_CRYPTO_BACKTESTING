@@ -1,0 +1,15 @@
+{
+  "schema": "predictability-v1-provenance-v1",
+  "required_hashes": [
+    "dataset_sha256",
+    "source_tree_sha256",
+    "feature_registry_sha256",
+    "baseline_model_sha256",
+    "config_sha256",
+    "cohort_sha256",
+    "model_artifact_sha256"
+  ],
+  "verification": "independently recompute bytes at command time; mismatch raises before evaluation",
+  "final_holdout": "UNTOUCHED",
+  "outcomes": "NOT_RUN"
+}
