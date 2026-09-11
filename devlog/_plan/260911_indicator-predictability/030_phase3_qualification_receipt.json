@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "mode": "synthetic_slow_reference",
+  "matrix": "Spot+UM x 15m,1h,4h x all duration-valid horizons",
+  "exact_fields": [
+    "decision_time",
+    "entry_time",
+    "exit_time",
+    "future_log_return",
+    "direction_up",
+    "label_status",
+    "eligible"
+  ],
+  "um_funding": [
+    "positive",
+    "negative",
+    "no_event fixture contract"
+  ],
+  "gap_case": true,
+  "tests_passed": 8,
+  "implementation_commit": "f1cda4e1c937637b8b756a8bc31494f094ad57f2",
+  "qualification_test_sha256": "d9e4c0fdfa3e1039fb360a66f21a213d2561dcd9c84cc51742f0e2be37b09672",
+  "final_holdout": "UNTOUCHED",
+  "outcomes": "NOT_RUN",
+  "reproducibility": "deterministic synthetic fixture"
+}
