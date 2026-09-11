@@ -24,5 +24,7 @@
   "qualification_test_sha256": "c721421d1f708a313a322fb09425f408bacaf30e13f4850bc443816de2acad9a",
   "final_holdout": "UNTOUCHED",
   "outcomes": "NOT_RUN",
-  "reproducibility": "actual qualification result hash compared across reruns"
+  "reproducibility": "actual qualification result hash compared across reruns",
+  "code_commit": "a608326a3bda23f4971d4b74c2d1e7e78ab4d047",
+  "receipt_commit": "fda495bfe4ac5867c9cb226ca4f983271a3b8a1e"
 }
