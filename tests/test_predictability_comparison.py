@@ -35,4 +35,6 @@ def test_evaluator_uses_stored_b1_as_paired_baseline(tmp_path: Path):
     assert result.loc[0, "paired_count"] == 1
     assert result.loc[0, "log_loss_improvement"] != 0
     assert result.loc[0, "independent_block_count"] == 1
+    assert "holm_adjusted_p_value" in result.columns
+    assert "holm_reject" in result.columns
 
