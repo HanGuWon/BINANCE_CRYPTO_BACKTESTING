@@ -14,13 +14,15 @@
   "um_funding": [
     "positive",
     "negative",
-    "no_event fixture contract"
+    "no_event",
+    "missing_rate"
   ],
   "gap_case": true,
-  "tests_passed": 8,
-  "implementation_commit": "f1cda4e1c937637b8b756a8bc31494f094ad57f2",
-  "qualification_test_sha256": "d9e4c0fdfa3e1039fb360a66f21a213d2561dcd9c84cc51742f0e2be37b09672",
+  "tests_passed": 9,
+  "test_command": "pytest -q tests/test_predictability_qualification.py -p no:cacheprovider",
+  "implementation_commit": "a608326a3bda23f4971d4b74c2d1e7e78ab4d047",
+  "qualification_test_sha256": "c721421d1f708a313a322fb09425f408bacaf30e13f4850bc443816de2acad9a",
   "final_holdout": "UNTOUCHED",
   "outcomes": "NOT_RUN",
-  "reproducibility": "deterministic synthetic fixture"
+  "reproducibility": "actual qualification result hash compared across reruns"
 }
