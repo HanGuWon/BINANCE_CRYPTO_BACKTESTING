@@ -69,3 +69,15 @@ def test_prospective_recorder_only_builds_labels_in_training_prefix(monkeypatch,
     assert calls == [10]
     assert captured and not captured[0].empty
     assert set(captured[0]["mode"]) == {"prospective"}
+
+def test_schedule_forward_times_uses_current_bar_only():
+    from binance_research.predictability import schedule_forward_times
+
+    bars = _frame(6)
+    bars.loc[5, "close"] = 10**9  # future price must not affect scheduling
+    first = schedule_forward_times(bars, 2, 4, source_timeframe="15m")
+    bars.loc[5, "close"] = -10**9
+    second = schedule_forward_times(bars, 2, 4, source_timeframe="15m")
+    assert first == second
+    assert first["next_executable_open"] == bars.loc[2, "open_time"] + pd.Timedelta(minutes=15)
+    assert first["target_exit_time"] == bars.loc[2, "open_time"] + pd.Timedelta(minutes=60)
