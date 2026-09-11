@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 
 import numpy as np
@@ -9,7 +10,7 @@ import pandas as pd
 
 from .data import load_kline_archive, normalize_timestamp
 from .features import CORE_FEATURE_SPECS, CoreFeatureEngine, compute_gap_safe_features
-from .forward import append_jsonl_atomic, append_predictions_write_once, calendar_block_bootstrap, guard_final_holdout_path, paired_log_loss_difference, prediction_identity, write_model_artifact
+from .forward import append_jsonl_atomic, append_predictions_write_once, calendar_block_bootstrap, guard_final_holdout_path, holm_adjust, paired_log_loss_difference, prediction_identity, write_model_artifact
 from .predictability import HORIZON_BARS, build_forward_labels, constant_probability, evaluate_walk_forward, fit_logistic_model, mature_training_mask, resolve_horizon_bars, schedule_forward_times
 
 
@@ -224,8 +225,17 @@ def evaluate_forward(args: argparse.Namespace) -> int:
                 .dt.floor("1D")
                 .nunique()
             )
-            rows.append({"horizon": horizon_name, "feature_id": feature, "model": str(feature_group["model"].iloc[0]), "delta_log_loss": float(np.mean(paired)), "delta_ci_low": ci_low, "delta_ci_high": ci_high, "independent_block_count": block_count, "paired_count": int(len(paired)), **metrics})
+            n = len(paired)
+            sd = float(np.std(paired, ddof=1)) if n > 1 else 0.0
+            z = abs(float(np.mean(paired))) / (sd / math.sqrt(n)) if n > 1 and sd > 0 else 0.0
+            p_value = math.erfc(z / math.sqrt(2.0)) if n > 1 and sd > 0 else 1.0
+            rows.append({"horizon": horizon_name, "feature_id": feature, "model": str(feature_group["model"].iloc[0]), "delta_log_loss": float(np.mean(paired)), "delta_ci_low": ci_low, "delta_ci_high": ci_high, "independent_block_count": block_count, "paired_count": int(len(paired)), "p_value": p_value, **metrics})
     result = pd.DataFrame.from_records(rows)
+    if not result.empty:
+        adjusted = holm_adjust(result["p_value"].to_numpy(dtype=float))
+        result["holm_adjusted_p_value"] = adjusted
+        result["holm_reject"] = adjusted <= 0.05
+        result["holm_family_id"] = "PREDICTABILITY_V1_PRIMARY_HOLM_V1"
     _prepare_output(args.output)
     result.to_csv(args.output / "forward_evaluation.csv", index=False)
     _write_json_once(args.output / "metadata.json", {"status": "EVALUATED_AFTER_LABEL_COMPLETION", "rows": len(result), "predictions": str(args.predictions), "final_holdout": "UNTOUCHED"})

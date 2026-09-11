@@ -1,0 +1,32 @@
+{
+  "family_id": "PREDICTABILITY_V1_PRIMARY_HOLM_V1",
+  "procedure": "Holm step-down adjusted p-values",
+  "alpha": 0.05,
+  "primary_metric": "paired_delta_log_loss",
+  "members": [
+    {
+      "horizon": "15m",
+      "feature_set": "CORE_FEATURE_SPECS",
+      "model": "B1+I"
+    },
+    {
+      "horizon": "1h",
+      "feature_set": "CORE_FEATURE_SPECS",
+      "model": "B1+I"
+    },
+    {
+      "horizon": "4h",
+      "feature_set": "CORE_FEATURE_SPECS",
+      "model": "B1+I"
+    },
+    {
+      "horizon": "24h",
+      "feature_set": "CORE_FEATURE_SPECS",
+      "model": "B1+I"
+    }
+  ],
+  "family_size_definition": "one member per registered horizon and feature_id evaluated; no post-outcome additions",
+  "frozen_before_outcomes": true,
+  "outcomes": "NOT_RUN",
+  "family_sha256": "8e89af6180faa8071addbc1b9741e972ad70c027299549a14b23b682e11162fd"
+}
