@@ -10,7 +10,7 @@ import pandas as pd
 from .data import load_kline_archive, normalize_timestamp
 from .features import CORE_FEATURE_SPECS, CoreFeatureEngine, compute_gap_safe_features
 from .forward import append_predictions_write_once, guard_final_holdout_path, prediction_identity, write_model_artifact
-from .predictability import HORIZON_BARS, build_forward_labels, constant_probability, evaluate_walk_forward, fit_logistic_model, mature_training_mask, resolve_horizon_bars
+from .predictability import HORIZON_BARS, build_forward_labels, constant_probability, evaluate_walk_forward, fit_logistic_model, mature_training_mask, resolve_horizon_bars, schedule_forward_times
 
 
 def _load_frame(path: Path) -> pd.DataFrame:
@@ -142,12 +142,12 @@ def record_forward(args: argparse.Namespace) -> int:
     model_shas: dict[str, str] = {}
     for horizon in args.horizons:
         horizon_bars = resolve_horizon_bars(args.timeframe, horizon)
-        label_frame = build_forward_labels(enriched, horizon_bars, source_timeframe=args.timeframe, horizon=horizon)
-        labels = label_frame["direction_up"]
-        first_prediction_time = label_frame.iloc[train_end]["decision_time"]
+        training_labels = build_forward_labels(enriched.iloc[:train_end].copy(), horizon_bars, source_timeframe=args.timeframe, horizon=horizon)
+        labels = training_labels["direction_up"]
+        first_prediction_time = schedule_forward_times(enriched, train_end, horizon_bars, source_timeframe=args.timeframe)["decision_time"]
         if pd.isna(first_prediction_time):
             raise ValueError("forward recording requires valid decision_time timestamps")
-        valid = mature_training_mask(label_frame.iloc[:train_end], first_prediction_time).set_axis(labels.iloc[:train_end].index)
+        valid = mature_training_mask(training_labels, first_prediction_time)
         base_names = list(baseline.columns)
         try:
             base_model = _fit_with_metadata(baseline.iloc[:train_end].loc[valid], labels.iloc[:train_end].loc[valid], base_names, args, first_prediction_time, horizon)
@@ -167,8 +167,9 @@ def record_forward(args: argparse.Namespace) -> int:
             model_shas[model_id] = write_model_artifact(model_path, model, allow_identical=(args.mode == "prospective"), market=args.market, symbol=args.symbol, timeframe=args.timeframe, horizon=horizon, campaign_id=args.campaign_id, dataset_sha256=args.dataset_sha256, source_tree_sha256=args.source_tree_sha256, feature_registry_sha256=args.feature_registry_sha256, config_sha256=args.config_sha256)
             combined_probabilities = model.predict_proba(training.iloc[train_end:])
             for offset, (b0, b1, b1i) in enumerate(zip(np.full(len(combined_probabilities), baseline_probability), base_probabilities, combined_probabilities), start=train_end):
-                decision_time = label_frame.loc[offset, "decision_time"]
-                rows.append({"prediction_id": prediction_identity(market=args.market, symbol=args.symbol, timeframe=args.timeframe, decision_time=decision_time, horizon=horizon, model_id=model_id, campaign_id=args.campaign_id, model_artifact_sha256=model_shas[model_id], dataset_sha256=args.dataset_sha256, source_tree_sha256=args.source_tree_sha256, feature_registry_sha256=args.feature_registry_sha256, config_sha256=args.config_sha256), "campaign_id": args.campaign_id, "market": args.market, "symbol": args.symbol, "timeframe": args.timeframe, "decision_time": str(decision_time), "feature_time": str(decision_time), "prediction_recorded_at": recorded_at, "next_executable_open": str(enriched.loc[offset + 1, "open_time"]) if offset + 1 < len(enriched) else "NaT", "target_exit_time": str(label_frame.loc[offset, "exit_time"]), "horizon": horizon, "feature_id": feature, "model": "B1+I", "model_id": model_id, "model_artifact_sha256": model_shas[model_id], "mode": args.mode, "dataset_sha256": args.dataset_sha256, "source_tree_sha256": args.source_tree_sha256, "b0_probability_up": float(b0), "b1_probability_up": float(b1), "b1_plus_i_probability_up": float(b1i), "probability_up": float(b1i)})
+                schedule = schedule_forward_times(enriched, offset, horizon_bars, source_timeframe=args.timeframe)
+                decision_time = schedule["decision_time"]
+                rows.append({"prediction_id": prediction_identity(market=args.market, symbol=args.symbol, timeframe=args.timeframe, decision_time=decision_time, horizon=horizon, model_id=model_id, campaign_id=args.campaign_id, model_artifact_sha256=model_shas[model_id], dataset_sha256=args.dataset_sha256, source_tree_sha256=args.source_tree_sha256, feature_registry_sha256=args.feature_registry_sha256, config_sha256=args.config_sha256), "campaign_id": args.campaign_id, "market": args.market, "symbol": args.symbol, "timeframe": args.timeframe, "decision_time": str(decision_time), "feature_time": str(decision_time), "prediction_recorded_at": recorded_at, "next_executable_open": str(schedule["next_executable_open"]), "target_exit_time": str(schedule["target_exit_time"]), "horizon": horizon, "feature_id": feature, "model": "B1+I", "model_id": model_id, "model_artifact_sha256": model_shas[model_id], "mode": args.mode, "dataset_sha256": args.dataset_sha256, "source_tree_sha256": args.source_tree_sha256, "b0_probability_up": float(b0), "b1_probability_up": float(b1), "b1_plus_i_probability_up": float(b1i), "probability_up": float(b1i)})
     predictions = pd.DataFrame.from_records(rows)
     append_predictions_write_once(args.output / "forward_predictions.csv", predictions, allow_replay=(args.mode == "prospective"))
     metadata = {"status": "RECORDED_OUTCOME_BLIND", "mode": args.mode, "market": args.market, "symbol": args.symbol, "train_end_index": train_end, "prediction_rows": len(predictions), "model_artifact_shas": model_shas, "campaign_id": args.campaign_id, "dataset_sha256": args.dataset_sha256, "source_tree_sha256": args.source_tree_sha256, "feature_registry_sha256": args.feature_registry_sha256, "config_sha256": args.config_sha256, "final_holdout": "UNTOUCHED"}

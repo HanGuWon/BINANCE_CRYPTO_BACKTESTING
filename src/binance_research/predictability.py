@@ -176,6 +176,35 @@ def build_forward_labels(
     )
 
 
+def schedule_forward_times(
+    bars: pd.DataFrame,
+    decision_index: int,
+    horizon_bars: int,
+    *,
+    source_timeframe: str = "15m",
+) -> dict[str, pd.Timestamp]:
+    """Derive next-open and scheduled exit timestamps without reading future prices."""
+    if source_timeframe not in TIMEFRAME_MINUTES:
+        raise ValueError(f"unsupported source timeframe: {source_timeframe}")
+    if horizon_bars < 1:
+        raise ValueError("horizon_bars must be positive")
+    if decision_index < 0 or decision_index >= len(bars):
+        raise IndexError("decision_index outside frame")
+    if "open_time" not in bars:
+        raise ValueError("forward scheduling requires open_time")
+    interval = pd.Timedelta(minutes=TIMEFRAME_MINUTES[source_timeframe])
+    current_open = pd.Timestamp(bars.iloc[decision_index]["open_time"])
+    current_open = current_open.tz_localize("UTC") if current_open.tzinfo is None else current_open.tz_convert("UTC")
+    decision_time = current_open + interval
+    if "close_time" in bars:
+        close_value = pd.Timestamp(bars.iloc[decision_index]["close_time"])
+        if pd.notna(close_value):
+            decision_time = close_value.tz_localize("UTC") if close_value.tzinfo is None else close_value.tz_convert("UTC")
+    return {
+        "decision_time": decision_time,
+        "next_executable_open": current_open + interval,
+        "target_exit_time": current_open + interval * horizon_bars,
+    }
 def mature_training_mask(labels: pd.DataFrame, first_validation_decision_time: object) -> pd.Series:
     """Return labels eligible and fully observed strictly before validation."""
     eligible = labels.get("eligible", labels["direction_up"].notna()).astype(bool)
@@ -384,3 +413,4 @@ def evaluate_walk_forward(
             fold += 1
             train_end += step_size
     return pd.DataFrame.from_records(rows)
+
