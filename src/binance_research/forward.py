@@ -43,6 +43,23 @@ def write_model_artifact(path: Path, model: Any, *, allow_identical: bool = Fals
         raise FileExistsError(f"refusing to overwrite model artifact: {destination}")
     destination.write_bytes(payload); return digest
 
+def verify_model_artifact(path: Path | str, expected_sha256: str, *, expected_metadata: dict[str, Any] | None = None) -> dict[str, Any]:
+    candidate = Path(path)
+    actual = verify_expected_sha256(candidate, expected_sha256, label="model artifact")
+    try:
+        payload = json.loads(candidate.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError("model artifact is not valid JSON") from exc
+    if payload.get("artifact_schema") != "predictability-v1-model-v1":
+        raise ValueError("model artifact schema mismatch")
+    if expected_metadata:
+        metadata = payload.get("metadata", {})
+        for key, value in expected_metadata.items():
+            if metadata.get(key) != value:
+                raise ValueError(f"model artifact metadata mismatch for {key}")
+    payload["_sha256"] = actual
+    return payload
+
 def append_predictions_write_once(path: Path, rows: pd.DataFrame | Sequence[dict[str, Any]], *, allow_replay: bool = False) -> None:
     incoming = rows.copy() if isinstance(rows, pd.DataFrame) else pd.DataFrame.from_records(rows)
     if "prediction_id" not in incoming.columns: raise ValueError("prediction_id is required for write-once predictions")
