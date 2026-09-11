@@ -83,3 +83,16 @@ splits/walk-forward, redundancy diagnostics, bootstrap/Deflated-Sharpe diagnosti
 forward snapshots, append-only artifacts, and integrity/causality tests. Exhaustive
 catalog expansion, CPCV/PBO, model combinations, and production-language signal
 ports remain deliberately gated until standalone OOS evidence exists.
+
+
+## Predictability campaign
+
+The `predictability` CLI evaluates the registered causal features on USDT futures-style OHLCV data at 15-minute, 1-hour, 4-hour, and 24-hour horizons. It reports probability quality and incremental log-loss improvement against baselines; observed up-rate is not prediction accuracy.
+
+```powershell
+$env:PYTHONPATH="src"
+python -m binance_research predictability audit --input data/processed/panel.csv --timeframe 15m
+python -m binance_research predictability run-development --input data/processed/panel.csv --output artifacts/predictability-development --timeframe 15m
+```
+
+Development artifacts never access the final holdout. Forward predictions are stored without realized labels using `record-forward`; labels are joined only by the explicit `evaluate-forward` command.

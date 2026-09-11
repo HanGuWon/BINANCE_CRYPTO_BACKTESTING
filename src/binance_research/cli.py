@@ -16,6 +16,7 @@ from .collector import AppendOnlyEventStore, ForwardCollector
 from .data import ArchiveRequest, BinanceArchiveClient, dataset_hash, load_kline_archive, normalize_timestamp, validate_klines
 from .experiments import fit_quantile_model, predictive_study
 from .features import CORE_FEATURE_SPECS, CoreFeatureEngine, compute_gap_safe_features, preregistered_rule_variants
+from .predictability_cli import add_predictability_parser
 from .registry import ExperimentRecord, ExperimentRegistry, code_hash
 from .regimes import classify_regimes, fit_regime_thresholds
 from .reporting import ArtifactWriter
@@ -208,6 +209,7 @@ def build_parser() -> argparse.ArgumentParser:
     collect = sub.add_parser("collect"); collect.add_argument("--symbol", required=True); collect.add_argument("--output", type=Path, default=Path("data/raw/forward")); collect.set_defaults(handler=collect_snapshot)
     liquidations = sub.add_parser("collect-liquidations"); liquidations.add_argument("--symbol", default="ALL"); liquidations.add_argument("--seconds", type=float, default=60.0); liquidations.add_argument("--output", type=Path, default=Path("data/raw/forward")); liquidations.set_defaults(handler=collect_liquidations)
     synthetic = sub.add_parser("generate-synthetic"); synthetic.add_argument("--rows", type=int, default=1000); synthetic.add_argument("--timeframe", choices=TIMEFRAME_MINUTES, default="1h"); synthetic.add_argument("--seed", type=int, default=1729); synthetic.add_argument("--output", type=Path, required=True); synthetic.set_defaults(handler=generate_synthetic)
+    add_predictability_parser(sub)
     return parser
 
 def main(argv: list[str] | None = None) -> int:
