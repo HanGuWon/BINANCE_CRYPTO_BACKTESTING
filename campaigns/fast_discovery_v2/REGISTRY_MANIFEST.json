@@ -1,0 +1,7 @@
+{
+  "feature_count": 9,
+  "holdout": "UNTOUCHED",
+  "protocol": "FAST_DISCOVERY_V2",
+  "registry": "FEATURE_REGISTRY.csv",
+  "registry_sha256": "0c59ae2e602fd36be5de2541f7ba13b411df314c639678d3d34929e2f6801f33"
+}

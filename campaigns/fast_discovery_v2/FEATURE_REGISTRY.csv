@@ -1,0 +1,10 @@
+feature_id,kind,equation,polarity,threshold,state,signal_values,warmup,gap_reset,outcome_use
+donchian_breakout20,directional,+1 if close > prior_high20; -1 if close < prior_low20; 0 otherwise; NaN during warmup,continuation,sign-boundary,state,+1/0/-1/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+roc6,directional,sign(roc6); zero remains 0; NaN remains NaN,continuation,sign-boundary,state,+1/0/-1/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+vwap_deviation20,directional,-sign(vwap_deviation20); zero remains 0; NaN remains NaN,reversion,sign-boundary,state,+1/0/-1/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+taker_buy_sell_ratio,directional,sign(taker_buy_sell_ratio - 1); zero remains 0; NaN remains NaN,buy-pressure,sign-boundary,state,+1/0/-1/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+cvd_slope6,directional,sign(cvd_slope6); zero remains 0; NaN remains NaN,continuation,sign-boundary,state,+1/0/-1/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+rvol20,continuous,rvol20 unchanged,none,NONE,continuous-value,continuous/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+bb_bandwidth20,continuous,bb_bandwidth20 unchanged,none,NONE,continuous-value,continuous/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+premium,continuous,premium unchanged; no polarity selected in S0,none,NONE,continuous-value,continuous/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+premium_zscore90,continuous,premium_zscore90 unchanged; no threshold or polarity selected in S0,none,NONE,continuous-value,continuous/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS

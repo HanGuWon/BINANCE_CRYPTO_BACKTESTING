@@ -1,0 +1,15 @@
+schema_version = 1
+campaign_id = "FAST_DISCOVERY_V2"
+status = "PREREGISTERED_DEVELOPMENT_ONLY"
+objective = "Outcome-blind multi-symbol causal screening of registered S0 primitives"
+markets = ["spot", "um"]
+timeframes = ["15m", "1h", "4h"]
+universe = "monthly prior-completed-volume Top50 per market"
+source_available_rule = "source_available_time < next_executable_open_time"
+bar_availability = "native close for 15m; maximum constituent close for derived 1h/4h"
+execution = "not applicable in S0; no trade rows"
+calendar_blocks = "UTC calendar-day blocks; observed blocks only; minimum 2"
+final_holdout = "UNTOUCHED"
+outcome_access = "PROHIBITED"
+registry = "FEATURE_REGISTRY.csv"
+registry_manifest = "REGISTRY_MANIFEST.json"
