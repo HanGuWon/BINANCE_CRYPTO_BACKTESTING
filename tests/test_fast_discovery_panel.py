@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pandas as pd
+from zipfile import ZipFile
 import pytest
 
 from binance_research.fast_discovery_panel import assemble_causal_panel
@@ -113,3 +114,16 @@ def test_symbol_keyed_context_cannot_cross_contaminate_symbols() -> None:
     panel = assemble_causal_panel(bars, membership, market="um", timeframe="15m", premium=premium)
     assert set(panel.loc[panel.symbol == "AAAUSDT", "premium"]) == {0.1}
     assert set(panel.loc[panel.symbol == "BBBUSDT", "premium"]) == {0.9}
+
+
+def test_local_loader_reads_verified_archives_and_preserves_gaps(tmp_path) -> None:
+    archive_dir = tmp_path / "um" / "klines" / "AAAUSDT" / "15m"
+    archive_dir.mkdir(parents=True)
+    payload = "1704067200000,100,101,99,100.5,10,1704068099999,1000,1,5,500,0\n1704069000000,101,102,100,101.5,11,1704069899999,1111,1,6,606,0\n"
+    with ZipFile(archive_dir / "AAAUSDT-15m-2024-01.zip", "w") as archive:
+        archive.writestr("AAAUSDT-15m-2024-01.csv", payload)
+    from binance_research.fast_discovery_panel import load_local_kline_bars
+    frame = load_local_kline_bars(tmp_path, market="um", symbol="AAAUSDT", timeframe="15m")
+    assert len(frame) == 2
+    assert frame["open_time"].is_monotonic_increasing
+    assert frame["open_time"].diff().iloc[-1] == pd.Timedelta(minutes=30)

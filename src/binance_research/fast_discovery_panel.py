@@ -6,10 +6,11 @@ not score predictors, create trades, or access a holdout partition.
 from __future__ import annotations
 
 import hashlib
+from pathlib import Path
 
 import pandas as pd
 
-from .data import INTERVAL_MS
+from .data import DataIntegrityError, INTERVAL_MS, deduplicate_klines, load_kline_archive, validate_klines
 
 _BASE_COLUMNS = {"open_time", "close_time", "open", "high", "low", "close", "volume", "symbol"}
 
@@ -100,6 +101,28 @@ def _strict_context_join(panel: pd.DataFrame, source: pd.DataFrame, name: str) -
     return _join_one_group(panel.copy(), right, value_columns, name).sort_values("__row_id")
 
 
+
+
+def load_local_kline_bars(raw_root: str | Path, *, market: str, symbol: str, timeframe: str) -> pd.DataFrame:
+    """Load and validate all immutable local kline archives for one symbol."""
+    if market not in {"spot", "um"}:
+        raise ValueError("market must be spot or um")
+    if timeframe not in INTERVAL_MS:
+        raise ValueError(f"unsupported timeframe: {timeframe}")
+    root = Path(raw_root) / market / "klines" / str(symbol) / timeframe
+    archives = sorted(root.glob("*.zip"))
+    if not archives:
+        raise FileNotFoundError(f"no kline archives found under {root}")
+    frames: list[pd.DataFrame] = []
+    for archive in archives:
+        frame = load_kline_archive(archive)
+        errors = [issue for issue in validate_klines(frame, timeframe) if issue.severity == "ERROR"]
+        if errors:
+            raise DataIntegrityError(f"invalid kline archive {archive}: {errors[0].code}")
+        frame["symbol"] = str(symbol)
+        frames.append(frame)
+    return deduplicate_klines(pd.concat(frames, ignore_index=True))
+
 def assemble_causal_panel(
     bars: pd.DataFrame,
     membership: pd.DataFrame,
@@ -162,4 +185,6 @@ def assemble_causal_panel(
     panel.attrs["holdout_status"] = "UNTOUCHED"
     panel.attrs["cohort_source_sha256"] = ",".join(sorted(panel["cohort_source_sha256"].astype(str).unique()))
     return panel
+
+
 
