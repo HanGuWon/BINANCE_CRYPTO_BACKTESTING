@@ -13,6 +13,11 @@ from binance_research.fast_discovery import DEFAULT_PRIMITIVES, screen_s0
 from binance_research.features import CoreFeatureEngine
 
 
+def _horizons(timeframe: str) -> tuple[str, ...]:
+    valid = {"15m": ("1h", "4h", "24h"), "1h": ("1h", "4h", "24h"), "4h": ("4h", "24h")}
+    return valid[timeframe]
+
+
 def load_window(raw_root: Path, symbols: list[str], timeframe: str, months: list[str]) -> tuple[pd.DataFrame, list[str]]:
     frames: list[pd.DataFrame] = []
     archives: list[str] = []
@@ -41,7 +46,7 @@ def run(*, raw_root: Path, output: Path, symbols: list[str], timeframe: str, mon
     for symbol, group in bars.groupby("symbol", sort=True):
         features = engine.compute(group.reset_index(drop=True))
         enriched = pd.concat([group.reset_index(drop=True), features], axis=1)
-        scored, dropped = screen_s0(enriched, timeframe=timeframe, horizons=("1h", "4h", "24h"), primitives=DEFAULT_PRIMITIVES, minimum_train=256, validation_size=128, step_size=128, market="um")
+        scored, dropped = screen_s0(enriched, timeframe=timeframe, horizons=_horizons(timeframe), primitives=DEFAULT_PRIMITIVES, minimum_train=256, validation_size=128, step_size=128, market="um")
         if not scored.empty:
             scored.insert(0, "symbol", symbol)
             results.append(scored)
@@ -66,3 +71,4 @@ if __name__ == "__main__":
     parser.add_argument("--months", nargs="+", default=["2023-11", "2023-12", "2024-01", "2024-02"])
     args = parser.parse_args()
     print(json.dumps(run(raw_root=args.raw_root, output=args.output, symbols=args.symbols, timeframe=args.timeframe, months=args.months), sort_keys=True))
+

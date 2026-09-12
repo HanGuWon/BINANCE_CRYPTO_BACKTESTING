@@ -1,0 +1,14 @@
+symbol,feature_id,status,reason,aggregate_delta_log_loss,positive_fold_fraction,independent_block_count,fold_count
+1000BONKUSDT,premium,HISTORICAL_UNAVAILABLE,feature column absent,,,,
+1000BONKUSDT,premium_zscore90,REJECTED,no valid causal folds,,,,
+1000BONKUSDT,donchian_breakout20,SCREENED,failed frozen S0 safety gates,-0.0035831898854084554,0.3333333333333333,3.0,3.0
+1000BONKUSDT,rvol20,SCREENED,failed frozen S0 safety gates,-0.0033077163054737735,0.5,3.0,3.0
+1000BONKUSDT,vwap_deviation20,SCREENED,failed frozen S0 safety gates,-0.0032321541555773528,0.3333333333333333,3.0,3.0
+1000BONKUSDT,taker_buy_sell_ratio,SCREENED,failed frozen S0 safety gates,-0.000758612215437604,0.3333333333333333,3.0,3.0
+1000BONKUSDT,bb_bandwidth20,SCREENED,failed frozen S0 safety gates,-0.0034970486657363575,0.16666666666666666,3.0,3.0
+1000FLOKIUSDT,premium,HISTORICAL_UNAVAILABLE,feature column absent,,,,
+1000FLOKIUSDT,premium_zscore90,REJECTED,no valid causal folds,,,,
+1000FLOKIUSDT,donchian_breakout20,SCREENED,failed frozen S0 safety gates,-0.006319172137297176,0.5,3.0,3.0
+1000FLOKIUSDT,rvol20,SCREENED,failed frozen S0 safety gates,-0.005240013876875745,0.16666666666666666,3.0,3.0
+1000FLOKIUSDT,vwap_deviation20,SCREENED,failed frozen S0 safety gates,-0.0070803287668712205,0.16666666666666666,3.0,3.0
+1000FLOKIUSDT,bb_bandwidth20,SCREENED,failed frozen S0 safety gates,-0.006067229173139381,0.0,3.0,3.0
