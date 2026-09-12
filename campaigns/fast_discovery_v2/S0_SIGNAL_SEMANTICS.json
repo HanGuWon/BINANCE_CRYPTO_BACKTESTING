@@ -1,0 +1,16 @@
+{
+  "version": "FAST_DISCOVERY_S0_V2",
+  "outcome_blind": true,
+  "holdout": "UNTOUCHED",
+  "rules": {
+    "donchian_breakout20": {"kind": "directional", "equation": "+1 if close > prior_high20; -1 if close < prior_low20; 0 otherwise; NaN during warmup", "polarity": "continuation"},
+    "roc6": {"kind": "directional", "equation": "sign(roc6); zero remains 0; NaN remains NaN", "polarity": "continuation"},
+    "vwap_deviation20": {"kind": "directional", "equation": "-sign(vwap_deviation20); zero remains 0; NaN remains NaN", "polarity": "reversion"},
+    "taker_buy_sell_ratio": {"kind": "directional", "equation": "sign(taker_buy_sell_ratio - 1); zero remains 0; NaN remains NaN", "polarity": "buy-pressure"},
+    "cvd_slope6": {"kind": "directional", "equation": "sign(cvd_slope6); zero remains 0; NaN remains NaN", "polarity": "continuation"},
+    "rvol20": {"kind": "continuous", "equation": "rvol20 unchanged", "polarity": "none"},
+    "bb_bandwidth20": {"kind": "continuous", "equation": "bb_bandwidth20 unchanged", "polarity": "none"},
+    "premium": {"kind": "continuous", "equation": "premium unchanged; no polarity selected in S0", "polarity": "none"},
+    "premium_zscore90": {"kind": "continuous", "equation": "premium_zscore90 unchanged; no threshold or polarity selected in S0", "polarity": "none"}
+  }
+}
