@@ -1,0 +1,15 @@
+symbol,feature_id,status,reason,aggregate_delta_log_loss,positive_fold_fraction,independent_block_count,fold_count
+1000BONKUSDT,premium,HISTORICAL_UNAVAILABLE,feature column absent,,,,
+1000BONKUSDT,premium_zscore90,REJECTED,no valid causal folds,,,,
+1000BONKUSDT,donchian_breakout20,SCREENED,failed frozen S0 safety gates,-0.0017478291480377017,0.5482233502538071,66.0,66.0
+1000BONKUSDT,roc6,SCREENED,failed frozen S0 safety gates,-0.0006207264566556671,0.5939086294416244,66.0,66.0
+1000BONKUSDT,rvol20,SCREENED,failed frozen S0 safety gates,-0.001740275187978105,0.5329949238578681,66.0,66.0
+1000BONKUSDT,vwap_deviation20,SCREENED,failed frozen S0 safety gates,-0.0015567701507899158,0.6091370558375635,66.0,66.0
+1000BONKUSDT,taker_buy_sell_ratio,SCREENED,failed frozen S0 safety gates,-0.00042319084433681476,0.5076142131979695,66.0,66.0
+1000BONKUSDT,cvd_slope6,SCREENED,failed frozen S0 safety gates,-0.00031175128430532714,0.5989847715736041,66.0,66.0
+1000BONKUSDT,bb_bandwidth20,SCREENED,failed frozen S0 safety gates,-0.00136022152488967,0.4619289340101523,66.0,66.0
+1000FLOKIUSDT,premium,HISTORICAL_UNAVAILABLE,feature column absent,,,,
+1000FLOKIUSDT,premium_zscore90,REJECTED,no valid causal folds,,,,
+1000FLOKIUSDT,rvol20,SCREENED,failed frozen S0 safety gates,0.0012059492231233087,0.4720812182741117,66.0,66.0
+1000FLOKIUSDT,taker_buy_sell_ratio,SCREENED,failed frozen S0 safety gates,0.0017679187222391641,0.4517766497461929,66.0,66.0
+1000FLOKIUSDT,bb_bandwidth20,SCREENED,failed frozen S0 safety gates,-0.0008676938640158224,0.4619289340101523,66.0,66.0
