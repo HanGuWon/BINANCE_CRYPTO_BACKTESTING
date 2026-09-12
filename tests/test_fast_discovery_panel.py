@@ -127,3 +127,17 @@ def test_local_loader_reads_verified_archives_and_preserves_gaps(tmp_path) -> No
     assert len(frame) == 2
     assert frame["open_time"].is_monotonic_increasing
     assert frame["open_time"].diff().iloc[-1] == pd.Timedelta(minutes=30)
+
+
+def test_multi_symbol_archive_entrypoint_uses_only_selected_cohort(tmp_path) -> None:
+    payload = "1704067200000,100,101,99,100.5,10,1704068099999,1000,1,5,500,0\n"
+    for symbol in ("AAAUSDT", "BBBUSDT"):
+        archive_dir = tmp_path / "um" / "klines" / symbol / "15m"
+        archive_dir.mkdir(parents=True)
+        with ZipFile(archive_dir / f"{symbol}-15m-2024-01.zip", "w") as archive:
+            archive.writestr(f"{symbol}-15m-2024-01.csv", payload)
+    membership = pd.concat([_membership(), _membership().assign(symbol="BBBUSDT", selected_top50=False)], ignore_index=True)
+    from binance_research.fast_discovery_panel import assemble_causal_panel_from_archives
+    panel = assemble_causal_panel_from_archives(tmp_path, membership, market="um", timeframe="15m")
+    assert set(panel.symbol) == {"AAAUSDT"}
+    assert panel.attrs["symbol_count"] == 1

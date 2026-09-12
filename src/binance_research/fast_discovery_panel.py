@@ -123,6 +123,33 @@ def load_local_kline_bars(raw_root: str | Path, *, market: str, symbol: str, tim
         frames.append(frame)
     return deduplicate_klines(pd.concat(frames, ignore_index=True))
 
+
+
+def assemble_causal_panel_from_archives(
+    raw_root: str | Path,
+    membership: pd.DataFrame,
+    *,
+    market: str,
+    timeframe: str,
+    symbols: list[str] | None = None,
+    holdout_start: str | pd.Timestamp | None = None,
+) -> pd.DataFrame:
+    """Load verified local archives and assemble a multi-symbol causal panel."""
+    cohort = _validate_membership(membership)
+    eligible = cohort.loc[(cohort["market"] == market) & cohort["selected_top50"], "symbol"].drop_duplicates().sort_values().tolist()
+    selected = sorted({str(symbol) for symbol in (symbols if symbols is not None else eligible)})
+    if not selected:
+        raise ValueError("no selected Top50 symbols available for archive assembly")
+    frames = []
+    for symbol in selected:
+        bars = load_local_kline_bars(raw_root, market=market, symbol=symbol, timeframe=timeframe)
+        frames.append(assemble_causal_panel(bars, cohort, market=market, timeframe=timeframe, holdout_start=holdout_start))
+    panel = pd.concat(frames, ignore_index=True)
+    panel.attrs["source_sha256"] = _source_hash(panel)
+    panel.attrs["symbol_count"] = len(selected)
+    panel.attrs["holdout_status"] = "UNTOUCHED"
+    return panel
+
 def assemble_causal_panel(
     bars: pd.DataFrame,
     membership: pd.DataFrame,
