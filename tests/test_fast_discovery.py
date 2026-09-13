@@ -36,3 +36,19 @@ def test_provenance_manifest_pins_computed_source_and_artifact_identity(tmp_path
     assert isinstance(manifest["scientific_source_clean"], bool)
     assert len(manifest["combination_registry_sha256"]) == 64
     assert len(manifest["screening_policy_sha256"]) == 64
+
+
+def test_provenance_mismatch_fails_closed(monkeypatch):
+    monkeypatch.setattr(fd, "_source_identity", lambda: {"implementation_commit": "a" * 40, "source_tree_sha256": "b" * 64, "scientific_source_clean": True})
+    manifest = {"implementation_commit": "c" * 40, "source_tree_sha256": "b" * 64}
+    import pytest
+    with pytest.raises(ValueError, match="implementation_commit"):
+        fd.verify_source_identity(manifest)
+
+
+def test_dirty_provenance_fails_closed(monkeypatch):
+    monkeypatch.setattr(fd, "_source_identity", lambda: {"implementation_commit": "a" * 40, "source_tree_sha256": "b" * 64, "scientific_source_clean": False})
+    manifest = {"implementation_commit": "a" * 40, "source_tree_sha256": "b" * 64}
+    import pytest
+    with pytest.raises(ValueError, match="dirty"):
+        fd.verify_source_identity(manifest)

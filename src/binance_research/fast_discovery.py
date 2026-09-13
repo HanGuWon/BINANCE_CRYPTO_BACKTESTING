@@ -309,6 +309,19 @@ def _source_identity() -> dict[str, object]:
     except (OSError, subprocess.CalledProcessError):
         commit, status = "UNKNOWN", "IDENTITY_UNAVAILABLE"
     return {"implementation_commit": commit, "scientific_source_clean": not bool(status.strip()), "source_tree_sha256": digest.hexdigest()}
+def verify_source_identity(manifest: dict[str, object], *, expected_commit: str | None = None, expected_source_tree_sha256: str | None = None) -> dict[str, object]:
+    """Fail closed when a provenance manifest does not match the live source."""
+    actual = _source_identity()
+    if not actual["scientific_source_clean"]:
+        raise ValueError("scientific source tree is dirty")
+    for key in ("implementation_commit", "source_tree_sha256"):
+        if manifest.get(key) != actual.get(key):
+            raise ValueError(f"provenance mismatch: {key}")
+    if expected_commit is not None and actual["implementation_commit"] != expected_commit:
+        raise ValueError("provenance mismatch: expected implementation commit")
+    if expected_source_tree_sha256 is not None and actual["source_tree_sha256"] != expected_source_tree_sha256:
+        raise ValueError("provenance mismatch: expected source-tree hash")
+    return actual
 def run_campaign(frame: pd.DataFrame, output: Path, *, timeframe: str = "1h", market: str = "um", split_manifest: dict | None = None) -> dict[str, int]:
     output.mkdir(parents=True, exist_ok=True); cache = FeatureCache(); complete_results, rejected, cache = screen_s0_complete(frame, timeframe=timeframe, horizons=("1h", "4h", "24h"), cache=cache, market=market)
     complete_results, s0_survivors = _apply_cap(complete_results, status="S0_SURVIVOR", metric="aggregate_paired_delta_log_loss", id_column="feature_id", cap=S0_MAX_SURVIVORS)
