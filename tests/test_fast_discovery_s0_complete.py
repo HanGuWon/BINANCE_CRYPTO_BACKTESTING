@@ -47,3 +47,17 @@ def test_complete_s0_keeps_every_candidate_horizon_and_separates_blocks(monkeypa
     assert len(rejected) == 4
     assert cache.misses == 1
 
+
+
+def test_complete_s0_reports_partial_coverage_facts(monkeypatch) -> None:
+    monkeypatch.setattr(fd, "evaluate_walk_forward", _evaluation)
+    frame = _frame()
+    frame.loc[[1, 3, 5], "premium"] = np.nan
+    complete, _, _ = fd.screen_s0_complete(frame, horizons=("1h",), primitives=("premium",), minimum_train=8, validation_size=8, step_size=8, require_multi_symbol=False)
+    row = complete.iloc[0]
+    assert row.valid_rows == 93
+    assert row.valid_symbols == 1
+    assert row.valid_months == 1
+    assert row.coverage_fraction == pytest.approx(93 / 96)
+    assert row.first_observed_time == frame.open_time.iloc[0].isoformat()
+    assert row.last_observed_time == frame.open_time.iloc[-1].isoformat()

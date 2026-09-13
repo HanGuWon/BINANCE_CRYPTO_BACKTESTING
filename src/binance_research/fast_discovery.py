@@ -67,6 +67,22 @@ def screen_s0(frame: pd.DataFrame, *, timeframe: str = "1h", horizons: Iterable[
     rejected.extend(scored[scored["status"].eq("SCREENED")].query("status != 'SURVIVOR'").assign(reason="failed frozen S0 safety gates").to_dict("records"))
     return scored[scored["status"].eq("SURVIVOR")].copy(), pd.DataFrame(rejected)
 
+def _coverage_fields(frame: pd.DataFrame, valid_mask: pd.Series) -> dict[str, object]:
+    """Return explicit source-coverage facts for one feature, including partial data."""
+    mask = valid_mask.reindex(frame.index, fill_value=False).astype(bool)
+    valid_rows = int(mask.sum())
+    times = pd.to_datetime(frame.loc[mask, "open_time"], utc=True, errors="coerce") if "open_time" in frame else pd.Series(dtype="datetime64[ns, UTC]")
+    times = times.dropna()
+    symbols = frame.loc[mask, "symbol"].astype(str).nunique() if "symbol" in frame else 0
+    months = times.dt.strftime("%Y-%m").nunique() if len(times) else 0
+    return {
+        "first_observed_time": times.min().isoformat() if len(times) else None,
+        "last_observed_time": times.max().isoformat() if len(times) else None,
+        "valid_rows": valid_rows,
+        "valid_symbols": int(symbols),
+        "valid_months": int(months),
+        "coverage_fraction": float(valid_rows / len(frame)) if len(frame) else 0.0,
+    }
 def screen_s0_complete(
     frame: pd.DataFrame,
     *,
@@ -97,11 +113,15 @@ def screen_s0_complete(
     symbol_series = frame.get("symbol", pd.Series("UNKNOWN", index=frame.index)).astype(str)
     for feature_id in primitive_ids:
         availability = "HISTORICAL_AVAILABLE" if feature_id in frame and pd.to_numeric(frame[feature_id], errors="coerce").notna().any() else "HISTORICAL_PARTIAL"
+        coverage_mask = pd.to_numeric(frame[feature_id], errors="coerce").notna() if feature_id in frame else pd.Series(False, index=frame.index)
+        if missing_labels: coverage_mask = pd.Series(False, index=frame.index)
+        coverage_fields = _coverage_fields(frame, coverage_mask)
         if missing_labels:
             availability = "HISTORICAL_UNAVAILABLE"
         if feature_id not in frame or missing_labels:
             for horizon in horizon_ids:
                 row = {"feature_id": feature_id, "timeframe": timeframe, "horizon": horizon, "availability_status": "HISTORICAL_UNAVAILABLE", "eligible_observations": 0, "valid_symbols": 0, "valid_temporal_folds": 0, "independent_calendar_block_count": 0, "aggregate_paired_delta_log_loss": np.nan, "positive_fold_fraction": np.nan, "symbol_concentration": np.nan, "brier_improvement": np.nan, "status": "HISTORICAL_UNAVAILABLE", "rejection_reason": "missing causal columns: " + ",".join(missing_labels or [feature_id])}
+                row.update(coverage_fields)
                 rows.append(row); rejected.append(row.copy())
             continue
         source_hash = _source_hash(frame)
@@ -140,6 +160,7 @@ def screen_s0_complete(
                 if require_multi_symbol and "validation_calendar_blocks" in evaluation.columns and np.isfinite(concentration) and concentration > 0.8: reasons.append("excessive single-symbol concentration")
                 status = "S0_SURVIVOR" if not reasons else "S0_REJECTED"
                 row = {"feature_id": feature_id, "timeframe": timeframe, "horizon": horizon, "availability_status": availability, "eligible_observations": int(pd.to_numeric(subset["validation_rows"], errors="coerce").sum()), "valid_symbols": valid_symbols, "valid_temporal_folds": int(subset["fold"].nunique()), "independent_calendar_block_count": block_count, "aggregate_paired_delta_log_loss": aggregate, "positive_fold_fraction": positive, "symbol_concentration": concentration, "brier_improvement": brier, "status": status, "rejection_reason": "; ".join(reasons)}
+            row.update(coverage_fields)
             rows.append(row)
             if row["status"] != "S0_SURVIVOR": rejected.append(row.copy())
     complete = pd.DataFrame(rows)
