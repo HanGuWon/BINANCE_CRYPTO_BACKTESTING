@@ -11,6 +11,8 @@ DEFAULT_PRIMITIVES = ("donchian_breakout20", "roc6", "rvol20", "vwap_deviation20
 S1_COMBINATIONS = (("donchian_breakout20", "ema20_slope_5", "rvol20"), ("roc6", "sig_ema20_50", "taker_buy_sell_ratio"), ("bb_bandwidth20", "donchian_breakout20", "rvol20"), ("premium_zscore90", "sig_ema20_50", "rvol20"))
 S1_ROLES = ("TRIGGER", "REGIME_FILTER", "PARTICIPATION")
 S1_ROLE_GRAMMAR = "TRIGGER AND REGIME_FILTER AND PARTICIPATION"
+S1_MAX_COMBINATIONS = 4
+S1_MAX_COMPONENTS = 3
 
 class FeatureCache:
     def __init__(self) -> None:
@@ -207,6 +209,10 @@ def screen_s0_panel(
     return complete, rejected, cache
 
 def build_s1_registry() -> pd.DataFrame:
+    if len(S1_COMBINATIONS) > S1_MAX_COMBINATIONS:
+        raise ValueError("S1 registry exceeds frozen combination cap")
+    if any(len(combo) > S1_MAX_COMPONENTS for combo in S1_COMBINATIONS):
+        raise ValueError("S1 registry exceeds frozen component cap")
     return pd.DataFrame([{"combination_id": f"S1_{i+1:02d}", "components": "|".join(c), "component_count": len(c), "trigger": c[0], "regime_filter": c[1], "participation_modifier": c[2], "role_grammar": S1_ROLE_GRAMMAR} for i, c in enumerate(S1_COMBINATIONS)])
 
 def compose_role_aware_signal(frame: pd.DataFrame, *, trigger: str, regime_filter: str, participation: str) -> pd.Series:
@@ -259,7 +265,7 @@ def run_campaign(frame: pd.DataFrame, output: Path, *, timeframe: str = "1h", ma
     primitive_results = complete_results.copy(); primitive_results.to_csv(output / "S0_PRIMITIVE_RESULTS.csv", index=False); s0_survivors.to_csv(output / "S0_SURVIVORS.csv", index=False); rejected.to_csv(output / "S0_REJECTIONS.csv", index=False)
     pd.DataFrame([{"feature_id": f, "role": "primitive", "historical_status": "registered"} for f in DEFAULT_PRIMITIVES]).to_csv(output / "FEATURE_REGISTRY.csv", index=False)
     build_s1_registry().to_csv(output / "COMBINATION_REGISTRY.csv", index=False)
-    policy = {"policy_id": "FAST_DISCOVERY_S0_S1_S2_V1", "positive_aggregate_delta": True, "majority_positive_folds": True, "minimum_independent_blocks": 2, "top_n": 10, "trade_rows_in_s0": False, "final_holdout": "UNTOUCHED"}
+    policy = {"policy_id": "FAST_DISCOVERY_S0_S1_S2_V1", "positive_aggregate_delta": True, "majority_positive_folds": True, "minimum_independent_blocks": 2, "top_n": 10, "s1_max_combinations": S1_MAX_COMBINATIONS, "s1_max_components": S1_MAX_COMPONENTS, "role_grammar": S1_ROLE_GRAMMAR, "trade_rows_in_s0": False, "final_holdout": "UNTOUCHED"}
     (output / "SCREENING_POLICY.json").write_text(json.dumps(policy, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     s1_results = _evaluate_s1(frame, s0_survivors, timeframe=timeframe) if not s0_survivors.empty else pd.DataFrame(columns=["combination_id", "status", "reason"])
     s1_results.to_csv(output / "S1_COMBINATION_RESULTS.csv", index=False); s1_results[s1_results.get("status", pd.Series(dtype=str)).eq("SURVIVOR")].to_csv(output / "S1_SURVIVORS.csv", index=False)

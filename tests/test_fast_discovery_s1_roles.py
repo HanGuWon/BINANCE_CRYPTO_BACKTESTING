@@ -75,5 +75,8 @@ def test_registry_declares_frozen_role_grammar() -> None:
     registry = fd.build_s1_registry()
     assert list(registry["role_grammar"].unique()) == [fd.S1_ROLE_GRAMMAR]
     assert set(registry["trigger"]) == {combo[0] for combo in fd.S1_COMBINATIONS}
+    assert len(registry) == fd.S1_MAX_COMBINATIONS
+    assert int(registry["component_count"].max()) <= fd.S1_MAX_COMPONENTS
+
 
 
