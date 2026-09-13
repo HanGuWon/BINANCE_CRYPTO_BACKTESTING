@@ -26,3 +26,13 @@ def test_rerun_artifacts_are_deterministic(monkeypatch,tmp_path):
 def test_required_manifests_written(tmp_path):
     fd.run_campaign(pd.DataFrame({"premium":[0.1]}),tmp_path)
     for name in ("FAST_DISCOVERY_PROTOCOL.md","PREREGISTRATION.json","SPLIT_MANIFEST.json","PROVENANCE_MANIFEST.json","SCREENING_POLICY.json"): assert (tmp_path/name).exists()
+
+def test_provenance_manifest_pins_computed_source_and_artifact_identity(tmp_path):
+    import json
+    fd.run_campaign(_frame(), tmp_path)
+    manifest = json.loads((tmp_path / "PROVENANCE_MANIFEST.json").read_text(encoding="utf-8"))
+    assert len(manifest["implementation_commit"]) == 40
+    assert len(manifest["source_tree_sha256"]) == 64
+    assert isinstance(manifest["scientific_source_clean"], bool)
+    assert len(manifest["combination_registry_sha256"]) == 64
+    assert len(manifest["screening_policy_sha256"]) == 64

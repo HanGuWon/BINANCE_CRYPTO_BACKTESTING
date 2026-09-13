@@ -1,6 +1,6 @@
 """Outcome-blind Fast Discovery funnel with deterministic cached screening."""
 from __future__ import annotations
-import hashlib, json
+import hashlib, json, subprocess
 from pathlib import Path
 from typing import Callable, Iterable
 import numpy as np
@@ -295,6 +295,20 @@ def _apply_cap(frame: pd.DataFrame, *, status: str, metric: str, id_column: str,
     result.loc[result[id_column].astype(str).isin(set(excluded[id_column].astype(str))), "status"] = status + "_CAP_EXCLUDED"
     return result, result[result["status"].eq(status)].copy()
 
+def _source_identity() -> dict[str, object]:
+    """Compute implementation identity; never substitute a trusted constant."""
+    root = Path(__file__).resolve().parents[2]
+    digest = hashlib.sha256()
+    for path in sorted(Path(__file__).resolve().parent.rglob("*.py")):
+        digest.update(path.relative_to(root).as_posix().encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+    try:
+        commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
+        status = subprocess.check_output(["git", "status", "--porcelain=v1", "--untracked-files=all", "--", "src", "tests", "configs", "campaigns"], cwd=root, text=True)
+    except (OSError, subprocess.CalledProcessError):
+        commit, status = "UNKNOWN", "IDENTITY_UNAVAILABLE"
+    return {"implementation_commit": commit, "scientific_source_clean": not bool(status.strip()), "source_tree_sha256": digest.hexdigest()}
 def run_campaign(frame: pd.DataFrame, output: Path, *, timeframe: str = "1h", market: str = "um", split_manifest: dict | None = None) -> dict[str, int]:
     output.mkdir(parents=True, exist_ok=True); cache = FeatureCache(); complete_results, rejected, cache = screen_s0_complete(frame, timeframe=timeframe, horizons=("1h", "4h", "24h"), cache=cache, market=market)
     complete_results, s0_survivors = _apply_cap(complete_results, status="S0_SURVIVOR", metric="aggregate_paired_delta_log_loss", id_column="feature_id", cap=S0_MAX_SURVIVORS)
@@ -311,7 +325,7 @@ def run_campaign(frame: pd.DataFrame, output: Path, *, timeframe: str = "1h", ma
     finalists.insert(0, "candidate_id", finalists.get("combination_id", pd.Series(dtype=str))); finalists["trade_rows"] = 0; finalists.to_csv(output / "S2_FINALIST_RESULTS.csv", index=False)
     if split_manifest is None: split_manifest = {"split_id": "development-only", "final_holdout": "UNTOUCHED", "final_holdout_times": []}
     (output / "SPLIT_MANIFEST.json").write_text(json.dumps(split_manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    provenance = {"market": market, "timeframe": timeframe, "input_rows": int(len(frame)), "source_columns": sorted(frame.columns.tolist()), "source_sha256": _source_hash(frame)}
+    provenance = {"market": market, "timeframe": timeframe, "input_rows": int(len(frame)), "source_columns": sorted(frame.columns.tolist()), "source_sha256": _source_hash(frame), **_source_identity(), "combination_registry_sha256": hashlib.sha256(build_s1_registry().to_csv(index=False).encode("utf-8")).hexdigest(), "screening_policy_sha256": hashlib.sha256((output / "SCREENING_POLICY.json").read_bytes()).hexdigest()}
     (output / "PROVENANCE_MANIFEST.json").write_text(json.dumps(provenance, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (output / "FAST_DISCOVERY_PROTOCOL.md").write_text("# Fast Discovery V1\nDevelopment-only, outcome-blind S0/S1/S2 screening. S0 emits aggregate rows only; no trade rows are materialized.\n", encoding="utf-8")
     (output / "PREREGISTRATION.json").write_text(json.dumps({"protocol": "FAST_DISCOVERY_V1", "hypotheses": list(DEFAULT_PRIMITIVES), "holdout": "UNTOUCHED"}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
