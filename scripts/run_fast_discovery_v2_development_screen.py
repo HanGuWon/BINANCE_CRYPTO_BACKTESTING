@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -67,22 +68,34 @@ def attach_causal_membership(bars: pd.DataFrame, universe_path: Path, *, market:
     frame["market"] = str(market)
     return frame, excluded, digest
 def run(*, raw_root: Path, output: Path, symbols: list[str], timeframe: str, months: list[str], universe_path: Path) -> dict[str, object]:
+    timings: dict[str, float] = {}
+    started = time.perf_counter()
+    phase = time.perf_counter()
     bars, archives = load_window(raw_root, symbols, timeframe, months)
+    timings["source_discovery_seconds"] = time.perf_counter() - phase
+    phase = time.perf_counter()
     bars, excluded_non_top50_rows, cohort_sha256 = attach_causal_membership(bars, universe_path, market="um")
+    timings["panel_assembly_seconds"] = time.perf_counter() - phase
+    phase = time.perf_counter()
     engine = CoreFeatureEngine()
     enriched_parts: list[pd.DataFrame] = []
     for _, group in bars.groupby("symbol", sort=True):
         features = engine.compute(group.reset_index(drop=True))
         enriched_parts.append(pd.concat([group.reset_index(drop=True), features], axis=1))
     enriched = pd.concat(enriched_parts, ignore_index=True)
-    complete, dropped, _ = screen_s0_panel(enriched, timeframe=timeframe, horizons=_horizons(timeframe), primitives=DEFAULT_PRIMITIVES, minimum_train=256, validation_size=128, step_size=128, market="um")
+    timings["feature_computation_seconds"] = time.perf_counter() - phase
+    phase = time.perf_counter()
+    complete, dropped, cache = screen_s0_panel(enriched, timeframe=timeframe, horizons=_horizons(timeframe), primitives=DEFAULT_PRIMITIVES, minimum_train=256, validation_size=128, step_size=128, market="um")
+    timings["s0_scoring_seconds"] = time.perf_counter() - phase
+    timings["cache_reuse_seconds"] = timings["s0_scoring_seconds"]
+    timings["total_seconds"] = time.perf_counter() - started
     results = complete
     rejected = dropped
     output.mkdir(parents=True, exist_ok=True)
     results.to_csv(output / "S0_DEVELOPMENT_RESULTS.csv", index=False)
     rejected.to_csv(output / "S0_DEVELOPMENT_REJECTIONS.csv", index=False)
     archive_hash = hashlib.sha256("\n".join(archives).encode()).hexdigest()
-    receipt = {"protocol": "FAST_DISCOVERY_V2", "scope": "DEVELOPMENT_ONLY", "market": "um", "timeframe": timeframe, "symbols": symbols, "months": months, "rows": int(len(bars)), "excluded_non_top50_rows": excluded_non_top50_rows, "cohort_source": str(universe_path), "cohort_sha256": cohort_sha256, "archives": archives, "archive_list_sha256": archive_hash, "primitives": list(DEFAULT_PRIMITIVES), "horizons": list(_horizons(timeframe)), "trade_rows": 0, "final_holdout": "UNTOUCHED", "r3_outcomes": "NOT_ACCESSED"}
+    receipt = {"protocol": "FAST_DISCOVERY_V2", "scope": "DEVELOPMENT_ONLY", "market": "um", "timeframe": timeframe, "symbols": symbols, "months": months, "rows": int(len(bars)), "excluded_non_top50_rows": excluded_non_top50_rows, "cohort_source": str(universe_path), "cohort_sha256": cohort_sha256, "archives": archives, "archive_list_sha256": archive_hash, "primitives": list(DEFAULT_PRIMITIVES), "horizons": list(_horizons(timeframe)), "trade_rows": 0, "final_holdout": "UNTOUCHED", "r3_outcomes": "NOT_ACCESSED", "benchmark": {**timings, "s1_scoring_seconds": 0.0, "s2_replay_seconds": 0.0, "s1_status": "NOT_RUN", "s2_status": "NOT_RUN", "cache_hits": int(cache.hits), "cache_misses": int(cache.misses), "rows_scored": int(len(results)), "symbols_loaded": int(bars["symbol"].nunique()), "months_loaded": int(bars["universe_month"].nunique())}}
     (output / "DEVELOPMENT_SCREEN_RECEIPT.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return receipt
 
