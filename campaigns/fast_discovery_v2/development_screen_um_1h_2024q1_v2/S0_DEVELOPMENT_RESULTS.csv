@@ -1,0 +1,28 @@
+feature_id,timeframe,horizon,availability_status,eligible_observations,valid_symbols,valid_temporal_folds,independent_calendar_block_count,aggregate_paired_delta_log_loss,positive_fold_fraction,symbol_concentration,brier_improvement,status,rejection_reason
+donchian_breakout20,1h,1h,HISTORICAL_AVAILABLE,3806,2,30,160,-0.0013239026971938388,0.23333333333333334,0.5,-0.0006559979224863824,S0_REJECTED,non-positive aggregate paired delta log-loss; not positive in a majority of valid folds
+donchian_breakout20,1h,4h,HISTORICAL_AVAILABLE,3800,2,30,160,5.5216294730686676e-05,0.5666666666666667,0.5,2.6639970003718604e-05,S0_SURVIVOR,
+donchian_breakout20,1h,24h,HISTORICAL_AVAILABLE,3760,2,30,158,0.007064062287381945,0.6333333333333333,0.5,0.003402233633072522,S0_SURVIVOR,
+roc6,1h,1h,HISTORICAL_AVAILABLE,3806,2,30,160,-0.0004253686667680704,0.36666666666666664,0.5,-0.00020622088691212755,S0_REJECTED,non-positive aggregate paired delta log-loss; not positive in a majority of valid folds
+roc6,1h,4h,HISTORICAL_AVAILABLE,3800,2,30,160,-4.5326352653603676e-06,0.5333333333333333,0.5,-5.200327110303308e-06,S0_REJECTED,non-positive aggregate paired delta log-loss
+roc6,1h,24h,HISTORICAL_AVAILABLE,3760,2,30,158,0.006216990101682351,0.6333333333333333,0.5,0.003010786058118777,S0_SURVIVOR,
+rvol20,1h,1h,HISTORICAL_AVAILABLE,3806,2,30,160,-0.001830209471630151,0.2,0.5,-0.0009085107824296603,S0_REJECTED,non-positive aggregate paired delta log-loss; not positive in a majority of valid folds
+rvol20,1h,4h,HISTORICAL_AVAILABLE,3800,2,30,160,0.0005631115596534175,0.7,0.5,0.00028030725288771265,S0_SURVIVOR,
+rvol20,1h,24h,HISTORICAL_AVAILABLE,3760,2,30,158,0.007116916259305513,0.7,0.5,0.0034250140938752484,S0_SURVIVOR,
+vwap_deviation20,1h,1h,HISTORICAL_AVAILABLE,3806,2,30,160,-0.0010045612457831607,0.26666666666666666,0.5,-0.0005024658660442457,S0_REJECTED,non-positive aggregate paired delta log-loss; not positive in a majority of valid folds
+vwap_deviation20,1h,4h,HISTORICAL_AVAILABLE,3800,2,30,160,0.00044712996253267373,0.6666666666666666,0.5,0.00022016300465587207,S0_SURVIVOR,
+vwap_deviation20,1h,24h,HISTORICAL_AVAILABLE,3760,2,30,158,0.005365250769859908,0.6,0.5,0.0026040915109202217,S0_SURVIVOR,
+taker_buy_sell_ratio,1h,1h,HISTORICAL_AVAILABLE,3806,2,30,160,-0.0011078456260292136,0.36666666666666664,0.5,-0.0005485673993260349,S0_REJECTED,non-positive aggregate paired delta log-loss; not positive in a majority of valid folds
+taker_buy_sell_ratio,1h,4h,HISTORICAL_AVAILABLE,3800,2,30,160,-0.0004120483287553285,0.43333333333333335,0.5,-0.00020529207239120827,S0_REJECTED,non-positive aggregate paired delta log-loss; not positive in a majority of valid folds
+taker_buy_sell_ratio,1h,24h,HISTORICAL_AVAILABLE,3760,2,30,158,0.007735962378874343,0.4666666666666667,0.5,0.003727767640925453,S0_REJECTED,not positive in a majority of valid folds
+cvd_slope6,1h,1h,HISTORICAL_AVAILABLE,3806,2,30,160,-0.0007813989417599107,0.36666666666666664,0.5,-0.000385378574472936,S0_REJECTED,non-positive aggregate paired delta log-loss; not positive in a majority of valid folds
+cvd_slope6,1h,4h,HISTORICAL_AVAILABLE,3800,2,30,160,0.00063955963672964,0.6,0.5,0.0003182156812487596,S0_SURVIVOR,
+cvd_slope6,1h,24h,HISTORICAL_AVAILABLE,3760,2,30,158,0.007279328384784522,0.5333333333333333,0.5,0.0035103255059070267,S0_SURVIVOR,
+bb_bandwidth20,1h,1h,HISTORICAL_AVAILABLE,3806,2,30,160,-0.0016147341797289158,0.23333333333333334,0.5,-0.0008008424646978272,S0_REJECTED,non-positive aggregate paired delta log-loss; not positive in a majority of valid folds
+bb_bandwidth20,1h,4h,HISTORICAL_AVAILABLE,3800,2,30,160,-9.10461768109568e-05,0.6,0.5,-4.5524741125137666e-05,S0_REJECTED,non-positive aggregate paired delta log-loss
+bb_bandwidth20,1h,24h,HISTORICAL_AVAILABLE,3760,2,30,158,0.0001733791967275522,0.5,0.5,8.313488304356093e-05,S0_REJECTED,not positive in a majority of valid folds
+premium,1h,1h,HISTORICAL_UNAVAILABLE,0,0,0,0,,,,,HISTORICAL_UNAVAILABLE,unavailable for every symbol
+premium,1h,4h,HISTORICAL_UNAVAILABLE,0,0,0,0,,,,,HISTORICAL_UNAVAILABLE,unavailable for every symbol
+premium,1h,24h,HISTORICAL_UNAVAILABLE,0,0,0,0,,,,,HISTORICAL_UNAVAILABLE,unavailable for every symbol
+premium_zscore90,1h,1h,HISTORICAL_AVAILABLE,0,0,0,0,,,,,S0_REJECTED,non-positive aggregate paired delta log-loss; not positive in a majority of valid folds; fewer than two independent calendar blocks; insufficient multi-symbol coverage
+premium_zscore90,1h,4h,HISTORICAL_AVAILABLE,0,0,0,0,,,,,S0_REJECTED,non-positive aggregate paired delta log-loss; not positive in a majority of valid folds; fewer than two independent calendar blocks; insufficient multi-symbol coverage
+premium_zscore90,1h,24h,HISTORICAL_AVAILABLE,0,0,0,0,,,,,S0_REJECTED,non-positive aggregate paired delta log-loss; not positive in a majority of valid folds; fewer than two independent calendar blocks; insufficient multi-symbol coverage
