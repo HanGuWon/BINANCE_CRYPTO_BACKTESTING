@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 
 from binance_research.data import deduplicate_klines, load_kline_archive, validate_klines
-from binance_research.fast_discovery import DEFAULT_PRIMITIVES, screen_s0
+from binance_research.fast_discovery import DEFAULT_PRIMITIVES, screen_s0_panel
 from binance_research.features import CoreFeatureEngine
 
 
@@ -41,23 +41,19 @@ def load_window(raw_root: Path, symbols: list[str], timeframe: str, months: list
 def run(*, raw_root: Path, output: Path, symbols: list[str], timeframe: str, months: list[str]) -> dict[str, object]:
     bars, archives = load_window(raw_root, symbols, timeframe, months)
     engine = CoreFeatureEngine()
-    results: list[pd.DataFrame] = []
-    rejected: list[pd.DataFrame] = []
-    for symbol, group in bars.groupby("symbol", sort=True):
+    enriched_parts: list[pd.DataFrame] = []
+    for _, group in bars.groupby("symbol", sort=True):
         features = engine.compute(group.reset_index(drop=True))
-        enriched = pd.concat([group.reset_index(drop=True), features], axis=1)
-        scored, dropped = screen_s0(enriched, timeframe=timeframe, horizons=_horizons(timeframe), primitives=DEFAULT_PRIMITIVES, minimum_train=256, validation_size=128, step_size=128, market="um")
-        if not scored.empty:
-            scored.insert(0, "symbol", symbol)
-            results.append(scored)
-        if not dropped.empty:
-            dropped.insert(0, "symbol", symbol)
-            rejected.append(dropped)
+        enriched_parts.append(pd.concat([group.reset_index(drop=True), features], axis=1))
+    enriched = pd.concat(enriched_parts, ignore_index=True)
+    complete, dropped, _ = screen_s0_panel(enriched, timeframe=timeframe, horizons=_horizons(timeframe), primitives=DEFAULT_PRIMITIVES, minimum_train=256, validation_size=128, step_size=128, market="um")
+    results = complete
+    rejected = dropped
     output.mkdir(parents=True, exist_ok=True)
-    pd.concat(results, ignore_index=True).to_csv(output / "S0_DEVELOPMENT_RESULTS.csv", index=False) if results else pd.DataFrame().to_csv(output / "S0_DEVELOPMENT_RESULTS.csv", index=False)
-    pd.concat(rejected, ignore_index=True).to_csv(output / "S0_DEVELOPMENT_REJECTIONS.csv", index=False) if rejected else pd.DataFrame().to_csv(output / "S0_DEVELOPMENT_REJECTIONS.csv", index=False)
+    results.to_csv(output / "S0_DEVELOPMENT_RESULTS.csv", index=False)
+    rejected.to_csv(output / "S0_DEVELOPMENT_REJECTIONS.csv", index=False)
     archive_hash = hashlib.sha256("\n".join(archives).encode()).hexdigest()
-    receipt = {"protocol": "FAST_DISCOVERY_V2", "scope": "DEVELOPMENT_ONLY", "market": "um", "timeframe": timeframe, "symbols": symbols, "months": months, "rows": int(len(bars)), "archives": archives, "archive_list_sha256": archive_hash, "primitives": list(DEFAULT_PRIMITIVES), "trade_rows": 0, "final_holdout": "UNTOUCHED", "r3_outcomes": "NOT_ACCESSED"}
+    receipt = {"protocol": "FAST_DISCOVERY_V2", "scope": "DEVELOPMENT_ONLY", "market": "um", "timeframe": timeframe, "symbols": symbols, "months": months, "rows": int(len(bars)), "archives": archives, "archive_list_sha256": archive_hash, "primitives": list(DEFAULT_PRIMITIVES), "horizons": list(_horizons(timeframe)), "trade_rows": 0, "final_holdout": "UNTOUCHED", "r3_outcomes": "NOT_ACCESSED"}
     (output / "DEVELOPMENT_SCREEN_RECEIPT.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return receipt
 
@@ -71,4 +67,7 @@ if __name__ == "__main__":
     parser.add_argument("--months", nargs="+", default=["2023-11", "2023-12", "2024-01", "2024-02"])
     args = parser.parse_args()
     print(json.dumps(run(raw_root=args.raw_root, output=args.output, symbols=args.symbols, timeframe=args.timeframe, months=args.months), sort_keys=True))
+
+
+
 

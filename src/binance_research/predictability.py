@@ -9,6 +9,8 @@ import pandas as pd
 from scipy.optimize import minimize
 from scipy.special import expit
 
+from .fast_discovery_blocks import calendar_block_ids, independent_calendar_block_count
+
 
 TIMEFRAME_MINUTES: dict[str, int] = {
     "15m": 15,
@@ -394,10 +396,14 @@ def evaluate_walk_forward(
                 combined_validation = pd.concat([base_frame_validation, frame.loc[frame.index[validation_slice], available].loc[valid_validation]], axis=1)
                 def add_result(model_name: str, probabilities: np.ndarray, comparator: np.ndarray) -> None:
                     metrics = probability_metrics(validation_labels, probabilities, comparator)
-                    current_loss = -np.log(np.clip(probabilities, 1e-12, 1 - 1e-12)) * validation_labels.to_numpy() - np.log(np.clip(1 - probabilities, 1e-12, 1 - 1e-12)) * (1 - validation_labels.to_numpy())
-                    comparator_loss = -np.log(np.clip(comparator, 1e-12, 1 - 1e-12)) * validation_labels.to_numpy() - np.log(np.clip(1 - comparator, 1e-12, 1 - 1e-12)) * (1 - validation_labels.to_numpy())
+                    values = validation_labels.to_numpy(dtype=float)
+                    current_loss = -np.log(np.clip(probabilities, 1e-12, 1 - 1e-12)) * values - np.log(np.clip(1 - probabilities, 1e-12, 1 - 1e-12)) * (1 - values)
+                    comparator_loss = -np.log(np.clip(comparator, 1e-12, 1 - 1e-12)) * values - np.log(np.clip(1 - comparator, 1e-12, 1 - 1e-12)) * (1 - values)
+                    metrics["brier_improvement"] = float(np.mean((comparator - values) ** 2) - np.mean((probabilities - values) ** 2))
                     ci_low, ci_high = block_bootstrap_mean_ci(comparator_loss - current_loss)
-                    rows.append({"horizon": horizon_name, "fold": fold, "model": model_name, "train_rows": int(valid_train.sum()), "validation_rows": int(valid_validation.sum()), "ci_low_log_loss_improvement": ci_low, "ci_high_log_loss_improvement": ci_high, **metrics})
+                    validation_times = label_frame.iloc[validation_slice].loc[valid_validation]["decision_time"]
+                    block_labels = calendar_block_ids(validation_times)
+                    rows.append({"horizon": horizon_name, "fold": fold, "model": model_name, "train_rows": int(valid_train.sum()), "validation_rows": int(valid_validation.sum()), "validation_start_time": validation_times.min().isoformat(), "validation_end_time": validation_times.max().isoformat(), "validation_calendar_blocks": "|".join(sorted(block_labels.astype(str).unique())), "independent_calendar_block_count": independent_calendar_block_count(validation_times), "ci_low_log_loss_improvement": ci_low, "ci_high_log_loss_improvement": ci_high, **metrics})
                 add_result("B0", baseline_probabilities, baseline_probabilities)
                 add_result("B1", base_probabilities, baseline_probabilities)
                 model_specs: list[tuple[str, Sequence[str], pd.DataFrame, pd.DataFrame, np.ndarray]] = [("B1+I", base_names + available, combined_train, combined_validation, base_probabilities)]
@@ -413,4 +419,7 @@ def evaluate_walk_forward(
             fold += 1
             train_end += step_size
     return pd.DataFrame.from_records(rows)
+
+
+
 

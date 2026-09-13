@@ -63,6 +63,147 @@ def screen_s0(frame: pd.DataFrame, *, timeframe: str = "1h", horizons: Iterable[
     rejected.extend(scored[scored["status"].eq("SCREENED")].query("status != 'SURVIVOR'").assign(reason="failed frozen S0 safety gates").to_dict("records"))
     return scored[scored["status"].eq("SURVIVOR")].copy(), pd.DataFrame(rejected)
 
+def screen_s0_complete(
+    frame: pd.DataFrame,
+    *,
+    timeframe: str = "1h",
+    horizons: Iterable[str] = ("1h", "4h", "24h"),
+    primitives: Iterable[str] = DEFAULT_PRIMITIVES,
+    minimum_train: int = 64,
+    validation_size: int = 32,
+    step_size: int = 32,
+    cache: FeatureCache | None = None,
+    market: str = "um",
+    require_multi_symbol: bool = True,
+) -> tuple[pd.DataFrame, pd.DataFrame, FeatureCache]:
+    """Return one complete aggregate row per primitive and horizon.
+
+    Unlike the legacy ``screen_s0`` API, candidates never disappear: unavailable
+    and evaluated-but-rejected rows are retained in the complete results table.
+    Calendar-block counts use timestamp labels emitted by ``evaluate_walk_forward``;
+    fold-ID fallback is accepted only for test doubles that predate that metadata.
+    """
+    primitive_ids = tuple(primitives)
+    horizon_ids = tuple(horizons)
+    cache = cache or FeatureCache()
+    required = {"open_time", "open", "close"}
+    rows: list[dict[str, object]] = []
+    rejected: list[dict[str, object]] = []
+    missing_labels = sorted(required - set(frame.columns))
+    symbol_series = frame.get("symbol", pd.Series("UNKNOWN", index=frame.index)).astype(str)
+    for feature_id in primitive_ids:
+        availability = "HISTORICAL_AVAILABLE" if feature_id in frame and pd.to_numeric(frame[feature_id], errors="coerce").notna().any() else "HISTORICAL_PARTIAL"
+        if missing_labels:
+            availability = "HISTORICAL_UNAVAILABLE"
+        if feature_id not in frame or missing_labels:
+            for horizon in horizon_ids:
+                row = {"feature_id": feature_id, "timeframe": timeframe, "horizon": horizon, "availability_status": "HISTORICAL_UNAVAILABLE", "eligible_observations": 0, "valid_symbols": 0, "valid_temporal_folds": 0, "independent_calendar_block_count": 0, "aggregate_paired_delta_log_loss": np.nan, "positive_fold_fraction": np.nan, "symbol_concentration": np.nan, "brier_improvement": np.nan, "status": "HISTORICAL_UNAVAILABLE", "rejection_reason": "missing causal columns: " + ",".join(missing_labels or [feature_id])}
+                rows.append(row); rejected.append(row.copy())
+            continue
+        source_hash = _source_hash(frame)
+        key = canonical_cache_key(market, timeframe, str(symbol_series.iloc[0]), str(frame.get("segment_id", pd.Series(["UNKNOWN"])).iloc[0]), feature_id, "raw", source_hash)
+        values = cache.get(key, lambda f=feature_id: pd.to_numeric(frame[f], errors="coerce"))
+        work = frame.copy(); work[feature_id] = values
+        evaluation = evaluate_walk_forward(work, [feature_id], horizons=horizon_ids, minimum_train=minimum_train, validation_size=validation_size, step_size=step_size, source_timeframe=timeframe)
+        if not evaluation.empty and "horizon" not in evaluation:
+            evaluation = evaluation.assign(horizon=horizon_ids[0])
+        evaluation = evaluation[evaluation["model"].eq("I:" + feature_id)] if not evaluation.empty else evaluation
+        finite = values.notna()
+        valid_symbols = int(symbol_series.loc[finite].nunique())
+        counts = symbol_series.loc[finite].value_counts(normalize=True)
+        concentration = float(counts.max()) if not counts.empty else np.nan
+        for horizon in horizon_ids:
+            subset = evaluation[evaluation["horizon"].eq(horizon)] if not evaluation.empty else evaluation
+            if subset.empty:
+                row = {"feature_id": feature_id, "timeframe": timeframe, "horizon": horizon, "availability_status": availability, "eligible_observations": 0, "valid_symbols": valid_symbols, "valid_temporal_folds": 0, "independent_calendar_block_count": 0, "aggregate_paired_delta_log_loss": np.nan, "positive_fold_fraction": np.nan, "symbol_concentration": concentration, "brier_improvement": np.nan, "status": "S0_REJECTED", "rejection_reason": "no valid causal folds"}
+            else:
+                deltas = pd.to_numeric(subset["log_loss_improvement"], errors="coerce").dropna()
+                blocks: set[str] = set()
+                if "validation_calendar_blocks" in subset:
+                    for value in subset["validation_calendar_blocks"].dropna().astype(str):
+                        blocks.update(token for token in value.split("|") if token)
+                    block_count = len(blocks)
+                else:
+                    block_count = int(pd.to_numeric(subset["fold"], errors="coerce").dropna().nunique())
+                aggregate = float(deltas.mean()) if not deltas.empty else np.nan
+                positive = float((deltas > 0).mean()) if not deltas.empty else np.nan
+                brier = float(pd.to_numeric(subset.get("brier_improvement", pd.Series(dtype=float)), errors="coerce").mean()) if "brier_improvement" in subset else np.nan
+                reasons: list[str] = []
+                if not np.isfinite(aggregate) or aggregate <= 0: reasons.append("non-positive aggregate paired delta log-loss")
+                if not np.isfinite(positive) or positive <= 0.5: reasons.append("not positive in a majority of valid folds")
+                if block_count < 2: reasons.append("fewer than two independent calendar blocks")
+                if require_multi_symbol and "validation_calendar_blocks" in evaluation.columns and valid_symbols < 2: reasons.append("insufficient multi-symbol coverage")
+                if require_multi_symbol and "validation_calendar_blocks" in evaluation.columns and np.isfinite(concentration) and concentration > 0.8: reasons.append("excessive single-symbol concentration")
+                status = "S0_SURVIVOR" if not reasons else "S0_REJECTED"
+                row = {"feature_id": feature_id, "timeframe": timeframe, "horizon": horizon, "availability_status": availability, "eligible_observations": int(pd.to_numeric(subset["validation_rows"], errors="coerce").sum()), "valid_symbols": valid_symbols, "valid_temporal_folds": int(subset["fold"].nunique()), "independent_calendar_block_count": block_count, "aggregate_paired_delta_log_loss": aggregate, "positive_fold_fraction": positive, "symbol_concentration": concentration, "brier_improvement": brier, "status": status, "rejection_reason": "; ".join(reasons)}
+            rows.append(row)
+            if row["status"] != "S0_SURVIVOR": rejected.append(row.copy())
+    complete = pd.DataFrame(rows)
+    return complete, pd.DataFrame(rejected), cache
+
+def screen_s0_panel(
+    frame: pd.DataFrame,
+    *,
+    timeframe: str = "1h",
+    horizons: Iterable[str] = ("1h", "4h", "24h"),
+    primitives: Iterable[str] = DEFAULT_PRIMITIVES,
+    minimum_train: int = 64,
+    validation_size: int = 32,
+    step_size: int = 32,
+    cache: FeatureCache | None = None,
+    market: str = "um",
+    require_multi_symbol: bool = True,
+) -> tuple[pd.DataFrame, pd.DataFrame, FeatureCache]:
+    """Evaluate each symbol independently, then aggregate complete S0 rows."""
+    if "symbol" not in frame:
+        raise ValueError("panel S0 evaluation requires symbol")
+    cache = cache or FeatureCache()
+    per_symbol: list[pd.DataFrame] = []
+    rejected_parts: list[pd.DataFrame] = []
+    for symbol, group in frame.groupby("symbol", sort=True):
+        complete, _, cache = screen_s0_complete(group.reset_index(drop=True), timeframe=timeframe, horizons=horizons, primitives=primitives, minimum_train=minimum_train, validation_size=validation_size, step_size=step_size, cache=cache, market=market, require_multi_symbol=False)
+        complete.insert(0, "_symbol", str(symbol))
+        per_symbol.append(complete)
+    if not per_symbol:
+        return pd.DataFrame(), pd.DataFrame(), cache
+    detail = pd.concat(per_symbol, ignore_index=True)
+    rows: list[dict[str, object]] = []
+    for (feature_id, horizon), group in detail.groupby(["feature_id", "horizon"], sort=False):
+        available = group[group["status"].ne("HISTORICAL_UNAVAILABLE")]
+        if available.empty:
+            row = group.iloc[0].drop(labels=["_symbol"]).to_dict()
+            row.update({"timeframe": timeframe, "valid_symbols": 0, "status": "HISTORICAL_UNAVAILABLE", "rejection_reason": "unavailable for every symbol"})
+            rows.append(row)
+            continue
+        valid = available[available["valid_temporal_folds"].gt(0)]
+        weights = pd.to_numeric(valid["eligible_observations"], errors="coerce").fillna(0.0)
+        total_weight = float(weights.sum())
+        aggregate = float((pd.to_numeric(valid["aggregate_paired_delta_log_loss"], errors="coerce").fillna(0.0) * weights).sum() / total_weight) if total_weight else np.nan
+        positive = float((pd.to_numeric(valid["positive_fold_fraction"], errors="coerce").fillna(0.0) * pd.to_numeric(valid["valid_temporal_folds"], errors="coerce").fillna(0.0)).sum() / pd.to_numeric(valid["valid_temporal_folds"], errors="coerce").sum()) if not valid.empty and pd.to_numeric(valid["valid_temporal_folds"], errors="coerce").sum() else np.nan
+        brier = float((pd.to_numeric(valid["brier_improvement"], errors="coerce").fillna(0.0) * weights).sum() / total_weight) if total_weight else np.nan
+        blocks: set[str] = set()
+        block_values = []
+        for value in valid.get("independent_calendar_block_count", pd.Series(dtype=float)):
+            if pd.notna(value):
+                block_values.append(int(value))
+        if "validation_calendar_blocks" in valid:
+            for value in valid["validation_calendar_blocks"].dropna().astype(str):
+                blocks.update(token for token in value.split("|") if token)
+        block_count = len(blocks) if blocks else int(sum(block_values))
+        valid_symbols = int(valid["_symbol"].nunique())
+        concentration = float(weights.max() / total_weight) if total_weight else np.nan
+        reasons: list[str] = []
+        if not np.isfinite(aggregate) or aggregate <= 0: reasons.append("non-positive aggregate paired delta log-loss")
+        if not np.isfinite(positive) or positive <= 0.5: reasons.append("not positive in a majority of valid folds")
+        if block_count < 2: reasons.append("fewer than two independent calendar blocks")
+        if valid_symbols < 2: reasons.append("insufficient multi-symbol coverage")
+        if np.isfinite(concentration) and concentration > 0.8: reasons.append("excessive single-symbol concentration")
+        status = "S0_SURVIVOR" if not reasons else "S0_REJECTED"
+        rows.append({"feature_id": feature_id, "timeframe": timeframe, "horizon": horizon, "availability_status": "HISTORICAL_AVAILABLE", "eligible_observations": int(total_weight), "valid_symbols": valid_symbols, "valid_temporal_folds": int(pd.to_numeric(valid["valid_temporal_folds"], errors="coerce").sum()) if not valid.empty else 0, "independent_calendar_block_count": block_count, "aggregate_paired_delta_log_loss": aggregate, "positive_fold_fraction": positive, "symbol_concentration": concentration, "brier_improvement": brier, "status": status, "rejection_reason": "; ".join(reasons)})
+    complete = pd.DataFrame(rows)
+    rejected = complete[complete["status"].ne("S0_SURVIVOR")].copy()
+    return complete, rejected, cache
+
 def build_s1_registry() -> pd.DataFrame:
     return pd.DataFrame([{"combination_id": f"S1_{i+1:02d}", "components": "|".join(c), "component_count": len(c), "trigger": c[0], "regime_filter": c[1], "participation_modifier": c[2]} for i, c in enumerate(S1_COMBINATIONS)])
 
@@ -80,8 +221,9 @@ def _evaluate_s1(frame: pd.DataFrame, s0: pd.DataFrame, *, timeframe: str) -> pd
     return pd.DataFrame(rows)
 
 def run_campaign(frame: pd.DataFrame, output: Path, *, timeframe: str = "1h", market: str = "um", split_manifest: dict | None = None) -> dict[str, int]:
-    output.mkdir(parents=True, exist_ok=True); cache = FeatureCache(); s0_survivors, rejected = screen_s0(frame, timeframe=timeframe, cache=cache, market=market)
-    primitive_results = s0_survivors.copy(); primitive_results.to_csv(output / "S0_PRIMITIVE_RESULTS.csv", index=False); s0_survivors.to_csv(output / "S0_SURVIVORS.csv", index=False); rejected.to_csv(output / "S0_REJECTIONS.csv", index=False)
+    output.mkdir(parents=True, exist_ok=True); cache = FeatureCache(); complete_results, rejected, cache = screen_s0_complete(frame, timeframe=timeframe, horizons=("1h", "4h", "24h"), cache=cache, market=market)
+    s0_survivors = complete_results[complete_results["status"].eq("S0_SURVIVOR")].copy()
+    primitive_results = complete_results.copy(); primitive_results.to_csv(output / "S0_PRIMITIVE_RESULTS.csv", index=False); s0_survivors.to_csv(output / "S0_SURVIVORS.csv", index=False); rejected.to_csv(output / "S0_REJECTIONS.csv", index=False)
     pd.DataFrame([{"feature_id": f, "role": "primitive", "historical_status": "registered"} for f in DEFAULT_PRIMITIVES]).to_csv(output / "FEATURE_REGISTRY.csv", index=False)
     build_s1_registry().to_csv(output / "COMBINATION_REGISTRY.csv", index=False)
     policy = {"policy_id": "FAST_DISCOVERY_S0_S1_S2_V1", "positive_aggregate_delta": True, "majority_positive_folds": True, "minimum_independent_blocks": 2, "top_n": 10, "trade_rows_in_s0": False, "final_holdout": "UNTOUCHED"}
@@ -99,3 +241,13 @@ def run_campaign(frame: pd.DataFrame, output: Path, *, timeframe: str = "1h", ma
     (output / "BENCHMARK_REPORT.md").write_text(json.dumps({"rows_read": len(frame), "cache_hits": cache.hits, "cache_misses": cache.misses, "development_only": True}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (output / "FINAL_REPORT.md").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n" + ("NO CANDIDATES SURVIVED\n" if not finalists.shape[0] else "SHORTLIST GENERATED; NO TRADE ROWS\n"), encoding="utf-8")
     return summary
+
+
+
+
+
+
+
+
+
+
