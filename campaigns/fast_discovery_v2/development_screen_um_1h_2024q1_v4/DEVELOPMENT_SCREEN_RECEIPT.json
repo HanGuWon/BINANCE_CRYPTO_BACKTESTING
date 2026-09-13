@@ -1,0 +1,64 @@
+{
+  "archive_list_sha256": "3a6adb9f6c1cb8da2ea490d5997f85cc75c42ce38acc3b096f24bcd569556414",
+  "archives": [
+    "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\raw\\um\\klines\\1000BONKUSDT\\1h\\1000BONKUSDT-1h-2024-02.zip",
+    "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\raw\\um\\klines\\1000BONKUSDT\\1h\\1000BONKUSDT-1h-2024-03.zip",
+    "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\raw\\um\\klines\\1000BONKUSDT\\1h\\1000BONKUSDT-1h-2024-04.zip",
+    "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\raw\\um\\klines\\1000FLOKIUSDT\\1h\\1000FLOKIUSDT-1h-2024-02.zip",
+    "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\raw\\um\\klines\\1000FLOKIUSDT\\1h\\1000FLOKIUSDT-1h-2024-03.zip",
+    "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\raw\\um\\klines\\1000FLOKIUSDT\\1h\\1000FLOKIUSDT-1h-2024-04.zip"
+  ],
+  "benchmark": {
+    "cache_hits": 0,
+    "cache_misses": 16,
+    "cache_reuse_seconds": 185.16820999997435,
+    "feature_computation_seconds": 0.23553750000428408,
+    "months_loaded": 3,
+    "panel_assembly_seconds": 0.42103249998763204,
+    "rows_scored": 27,
+    "s0_scoring_seconds": 185.16820999997435,
+    "s1_scoring_seconds": 0.0,
+    "s1_status": "NOT_RUN",
+    "s2_replay_seconds": 0.0,
+    "s2_status": "NOT_RUN",
+    "source_discovery_seconds": 0.5256446999846958,
+    "symbols_loaded": 2,
+    "total_seconds": 186.35043639998185
+  },
+  "cohort_sha256": "f82e7132967b87615e58e870eaed6dfc98ece7175121b21a95d5c664f8b94ff4",
+  "cohort_source": "campaigns\\r1_gap_safe_cohort_v1\\universe_monthly.csv",
+  "excluded_non_top50_rows": 1440,
+  "final_holdout": "UNTOUCHED",
+  "horizons": [
+    "1h",
+    "4h",
+    "24h"
+  ],
+  "market": "um",
+  "months": [
+    "2024-02",
+    "2024-03",
+    "2024-04"
+  ],
+  "primitives": [
+    "donchian_breakout20",
+    "roc6",
+    "rvol20",
+    "vwap_deviation20",
+    "taker_buy_sell_ratio",
+    "cvd_slope6",
+    "bb_bandwidth20",
+    "premium",
+    "premium_zscore90"
+  ],
+  "protocol": "FAST_DISCOVERY_V2",
+  "r3_outcomes": "NOT_ACCESSED",
+  "rows": 2880,
+  "scope": "DEVELOPMENT_ONLY",
+  "symbols": [
+    "1000BONKUSDT",
+    "1000FLOKIUSDT"
+  ],
+  "timeframe": "1h",
+  "trade_rows": 0
+}
