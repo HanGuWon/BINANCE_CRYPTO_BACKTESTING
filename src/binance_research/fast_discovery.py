@@ -9,6 +9,8 @@ from .predictability import evaluate_walk_forward
 
 DEFAULT_PRIMITIVES = ("donchian_breakout20", "roc6", "rvol20", "vwap_deviation20", "taker_buy_sell_ratio", "cvd_slope6", "bb_bandwidth20", "premium", "premium_zscore90")
 S1_COMBINATIONS = (("donchian_breakout20", "ema20_slope_5", "rvol20"), ("roc6", "sig_ema20_50", "taker_buy_sell_ratio"), ("bb_bandwidth20", "donchian_breakout20", "rvol20"), ("premium_zscore90", "sig_ema20_50", "rvol20"))
+S1_ROLES = ("TRIGGER", "REGIME_FILTER", "PARTICIPATION")
+S1_ROLE_GRAMMAR = "TRIGGER AND REGIME_FILTER AND PARTICIPATION"
 
 class FeatureCache:
     def __init__(self) -> None:
@@ -205,19 +207,50 @@ def screen_s0_panel(
     return complete, rejected, cache
 
 def build_s1_registry() -> pd.DataFrame:
-    return pd.DataFrame([{"combination_id": f"S1_{i+1:02d}", "components": "|".join(c), "component_count": len(c), "trigger": c[0], "regime_filter": c[1], "participation_modifier": c[2]} for i, c in enumerate(S1_COMBINATIONS)])
+    return pd.DataFrame([{"combination_id": f"S1_{i+1:02d}", "components": "|".join(c), "component_count": len(c), "trigger": c[0], "regime_filter": c[1], "participation_modifier": c[2], "role_grammar": S1_ROLE_GRAMMAR} for i, c in enumerate(S1_COMBINATIONS)])
+
+def compose_role_aware_signal(frame: pd.DataFrame, *, trigger: str, regime_filter: str, participation: str) -> pd.Series:
+    """Compose S1 without averaging unlike-scaled components.
+
+    The trigger keeps its native value. The regime filter gates on a finite,
+    non-zero state; participation confirms with RVOL >= 1 or a positive
+    directional/ratio value. Failure yields an explicit zero.
+    """
+    required = {trigger, regime_filter, participation}
+    if missing := required - set(frame.columns):
+        raise ValueError(f"S1 role components missing: {', '.join(sorted(missing))}")
+    trigger_values = pd.to_numeric(frame[trigger], errors="coerce")
+    regime_values = pd.to_numeric(frame[regime_filter], errors="coerce")
+    participation_values = pd.to_numeric(frame[participation], errors="coerce")
+    trigger_sign = np.sign(trigger_values)
+    regime_ok = regime_values.notna() & regime_values.ne(0)
+    directional_trigger = trigger_values.abs().eq(1.0)
+    regime_ok &= (~directional_trigger) | regime_values.mul(trigger_sign).gt(0)
+    if participation == "rvol20":
+        participation_ok = participation_values.ge(1.0)
+    elif "ratio" in participation:
+        participation_ok = participation_values.notna() & participation_values.ne(1.0)
+        participation_ok &= (~directional_trigger) | ((trigger_sign.gt(0) & participation_values.gt(1.0)) | (trigger_sign.lt(0) & participation_values.lt(1.0)))
+    else:
+        participation_ok = participation_values.notna() & participation_values.gt(0)
+    confirmed = trigger_values.notna() & regime_ok & participation_ok
+    return trigger_values.where(confirmed, 0.0)
 
 def _evaluate_s1(frame: pd.DataFrame, s0: pd.DataFrame, *, timeframe: str) -> pd.DataFrame:
     rows: list[dict[str, object]] = []
     for i, combo in enumerate(S1_COMBINATIONS, 1):
-        if not all(f in frame.columns for f in combo) or not s0["feature_id"].isin(combo).any():
-            rows.append({"combination_id": f"S1_{i:02d}", "status": "REJECTED", "reason": "component unavailable or not an S0 survivor"}); continue
-        name = f"S1_{i:02d}_signal"; values = frame[list(combo)].apply(pd.to_numeric, errors="coerce").mean(axis=1); work = frame.copy(); work[name] = values
+        trigger, regime_filter, participation = combo
+        trigger_gate = not s0.empty and s0["feature_id"].eq(trigger).any() and s0.loc[s0["feature_id"].eq(trigger), "status"].isin(("SURVIVOR", "S0_SURVIVOR")).any()
+        coverage_ok = all(f in frame.columns and pd.to_numeric(frame[f], errors="coerce").notna().any() for f in combo)
+        if not coverage_ok or not trigger_gate:
+            reason = "component unavailable or incomplete coverage" if not coverage_ok else "primary trigger is not an S0 survivor"
+            rows.append({"combination_id": f"S1_{i:02d}", "status": "REJECTED", "reason": reason, "role_grammar": S1_ROLE_GRAMMAR}); continue
+        name = f"S1_{i:02d}_signal"; values = compose_role_aware_signal(frame, trigger=trigger, regime_filter=regime_filter, participation=participation); work = frame.copy(); work[name] = values
         result = evaluate_walk_forward(work, [name], horizons=("1h", "4h", "24h"), minimum_train=64, validation_size=32, step_size=32, source_timeframe=timeframe)
         result = result[result["model"].eq("I:" + name)] if not result.empty else result
-        if result.empty: rows.append({"combination_id": f"S1_{i:02d}", "status": "REJECTED", "reason": "no valid causal folds"}); continue
+        if result.empty: rows.append({"combination_id": f"S1_{i:02d}", "status": "REJECTED", "reason": "no valid causal folds", "role_grammar": S1_ROLE_GRAMMAR}); continue
         delta = pd.to_numeric(result["log_loss_improvement"], errors="coerce").dropna()
-        rows.append({"combination_id": f"S1_{i:02d}", "status": "SURVIVOR" if float(delta.mean()) > 0 else "REJECTED", "aggregate_delta_log_loss": float(delta.mean()), "independent_block_count": _independent_blocks(result), "trade_rows": 0})
+        rows.append({"combination_id": f"S1_{i:02d}", "status": "SURVIVOR" if float(delta.mean()) > 0 else "REJECTED", "aggregate_delta_log_loss": float(delta.mean()), "independent_block_count": _independent_blocks(result), "trade_rows": 0, "role_grammar": S1_ROLE_GRAMMAR})
     return pd.DataFrame(rows)
 
 def run_campaign(frame: pd.DataFrame, output: Path, *, timeframe: str = "1h", market: str = "um", split_manifest: dict | None = None) -> dict[str, int]:
@@ -241,13 +274,4 @@ def run_campaign(frame: pd.DataFrame, output: Path, *, timeframe: str = "1h", ma
     (output / "BENCHMARK_REPORT.md").write_text(json.dumps({"rows_read": len(frame), "cache_hits": cache.hits, "cache_misses": cache.misses, "development_only": True}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (output / "FINAL_REPORT.md").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n" + ("NO CANDIDATES SURVIVED\n" if not finalists.shape[0] else "SHORTLIST GENERATED; NO TRADE ROWS\n"), encoding="utf-8")
     return summary
-
-
-
-
-
-
-
-
-
 
