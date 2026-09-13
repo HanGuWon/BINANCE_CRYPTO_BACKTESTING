@@ -1,0 +1,3 @@
+# WP25 — Execution versus attestation provenance reconciliation
+
+The v3 screen processes executed immediately after the causal-membership fix at source commit `4c357a6`. The attestation utility was committed afterward at `754bf49`. An independent Git diff confirms no `src/binance_research` files changed between those commits; the only intervening source-tree addition was the attestation utility itself. Therefore the screen's scientific implementation is pinned to `4c357a6`, while `754bf49` identifies the receipt generator. The attestation JSONs are retained unchanged; this reconciliation is append-only.
