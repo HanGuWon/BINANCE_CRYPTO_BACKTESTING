@@ -80,3 +80,11 @@ def test_registry_declares_frozen_role_grammar() -> None:
 
 
 
+
+
+def test_promotion_cap_excludes_without_padding() -> None:
+    frame = pd.DataFrame({"candidate_id": ["c3", "c1", "c2"], "status": ["SURVIVOR"] * 3, "score": [0.1, 0.3, 0.2]})
+    capped, survivors = fd._apply_cap(frame, status="SURVIVOR", metric="score", id_column="candidate_id", cap=2)
+    assert list(survivors.candidate_id) == ["c1", "c2"]
+    assert capped.loc[capped.candidate_id.eq("c3"), "status"].item() == "SURVIVOR_CAP_EXCLUDED"
+    assert len(survivors) == 2

@@ -13,6 +13,9 @@ S1_ROLES = ("TRIGGER", "REGIME_FILTER", "PARTICIPATION")
 S1_ROLE_GRAMMAR = "TRIGGER AND REGIME_FILTER AND PARTICIPATION"
 S1_MAX_COMBINATIONS = 4
 S1_MAX_COMPONENTS = 3
+S0_MAX_SURVIVORS = 12
+S1_MAX_SURVIVORS = 6
+S2_MAX_FINALISTS = 3
 
 class FeatureCache:
     def __init__(self) -> None:
@@ -280,24 +283,39 @@ def _evaluate_s1(frame: pd.DataFrame, s0: pd.DataFrame, *, timeframe: str) -> pd
         rows.append({"combination_id": f"S1_{i:02d}", "status": "SURVIVOR" if float(delta.mean()) > 0 else "REJECTED", "aggregate_delta_log_loss": float(delta.mean()), "independent_block_count": _independent_blocks(result), "trade_rows": 0, "role_grammar": S1_ROLE_GRAMMAR})
     return pd.DataFrame(rows)
 
+def _apply_cap(frame: pd.DataFrame, *, status: str, metric: str, id_column: str, cap: int) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Keep at most ``cap`` candidates by preregistered metric, never pad."""
+    result = frame.copy()
+    eligible = result[result["status"].eq(status)].copy()
+    if len(eligible) <= cap:
+        return result, eligible
+    ranked = eligible.sort_values([metric, id_column], ascending=[False, True], kind="mergesort")
+    keep = set(ranked.head(cap)[id_column].astype(str))
+    excluded = result[ result["status"].eq(status) & ~result[id_column].astype(str).isin(keep)].copy()
+    result.loc[result[id_column].astype(str).isin(set(excluded[id_column].astype(str))), "status"] = status + "_CAP_EXCLUDED"
+    return result, result[result["status"].eq(status)].copy()
+
 def run_campaign(frame: pd.DataFrame, output: Path, *, timeframe: str = "1h", market: str = "um", split_manifest: dict | None = None) -> dict[str, int]:
     output.mkdir(parents=True, exist_ok=True); cache = FeatureCache(); complete_results, rejected, cache = screen_s0_complete(frame, timeframe=timeframe, horizons=("1h", "4h", "24h"), cache=cache, market=market)
-    s0_survivors = complete_results[complete_results["status"].eq("S0_SURVIVOR")].copy()
+    complete_results, s0_survivors = _apply_cap(complete_results, status="S0_SURVIVOR", metric="aggregate_paired_delta_log_loss", id_column="feature_id", cap=S0_MAX_SURVIVORS)
+    rejected = pd.concat([rejected, complete_results[complete_results["status"].eq("S0_SURVIVOR_CAP_EXCLUDED")]], ignore_index=True)
     primitive_results = complete_results.copy(); primitive_results.to_csv(output / "S0_PRIMITIVE_RESULTS.csv", index=False); s0_survivors.to_csv(output / "S0_SURVIVORS.csv", index=False); rejected.to_csv(output / "S0_REJECTIONS.csv", index=False)
     pd.DataFrame([{"feature_id": f, "role": "primitive", "historical_status": "registered"} for f in DEFAULT_PRIMITIVES]).to_csv(output / "FEATURE_REGISTRY.csv", index=False)
     build_s1_registry().to_csv(output / "COMBINATION_REGISTRY.csv", index=False)
-    policy = {"policy_id": "FAST_DISCOVERY_S0_S1_S2_V1", "positive_aggregate_delta": True, "majority_positive_folds": True, "minimum_independent_blocks": 2, "top_n": 10, "s1_max_combinations": S1_MAX_COMBINATIONS, "s1_max_components": S1_MAX_COMPONENTS, "role_grammar": S1_ROLE_GRAMMAR, "trade_rows_in_s0": False, "final_holdout": "UNTOUCHED"}
+    policy = {"policy_id": "FAST_DISCOVERY_S0_S1_S2_V1", "positive_aggregate_delta": True, "majority_positive_folds": True, "minimum_independent_blocks": 2, "top_n": 10, "s1_max_combinations": S1_MAX_COMBINATIONS, "s1_max_components": S1_MAX_COMPONENTS, "s0_max_survivors": S0_MAX_SURVIVORS, "s1_max_survivors": S1_MAX_SURVIVORS, "s2_max_finalists": S2_MAX_FINALISTS, "role_grammar": S1_ROLE_GRAMMAR, "trade_rows_in_s0": False, "final_holdout": "UNTOUCHED"}
     (output / "SCREENING_POLICY.json").write_text(json.dumps(policy, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     s1_results = _evaluate_s1(frame, s0_survivors, timeframe=timeframe) if not s0_survivors.empty else pd.DataFrame(columns=["combination_id", "status", "reason"])
-    s1_results.to_csv(output / "S1_COMBINATION_RESULTS.csv", index=False); s1_results[s1_results.get("status", pd.Series(dtype=str)).eq("SURVIVOR")].to_csv(output / "S1_SURVIVORS.csv", index=False)
-    finalists = s1_results[s1_results.get("status", pd.Series(dtype=str)).eq("SURVIVOR")].copy(); finalists.insert(0, "candidate_id", finalists.get("combination_id", pd.Series(dtype=str))); finalists["trade_rows"] = 0; finalists.to_csv(output / "S2_FINALIST_RESULTS.csv", index=False)
+    s1_results, s1_survivors = _apply_cap(s1_results, status="SURVIVOR", metric="aggregate_delta_log_loss", id_column="combination_id", cap=S1_MAX_SURVIVORS)
+    s1_results.to_csv(output / "S1_COMBINATION_RESULTS.csv", index=False); s1_survivors.to_csv(output / "S1_SURVIVORS.csv", index=False)
+    _, finalists = _apply_cap(s1_survivors, status="SURVIVOR", metric="aggregate_delta_log_loss", id_column="combination_id", cap=S2_MAX_FINALISTS)
+    finalists.insert(0, "candidate_id", finalists.get("combination_id", pd.Series(dtype=str))); finalists["trade_rows"] = 0; finalists.to_csv(output / "S2_FINALIST_RESULTS.csv", index=False)
     if split_manifest is None: split_manifest = {"split_id": "development-only", "final_holdout": "UNTOUCHED", "final_holdout_times": []}
     (output / "SPLIT_MANIFEST.json").write_text(json.dumps(split_manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     provenance = {"market": market, "timeframe": timeframe, "input_rows": int(len(frame)), "source_columns": sorted(frame.columns.tolist()), "source_sha256": _source_hash(frame)}
     (output / "PROVENANCE_MANIFEST.json").write_text(json.dumps(provenance, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (output / "FAST_DISCOVERY_PROTOCOL.md").write_text("# Fast Discovery V1\nDevelopment-only, outcome-blind S0/S1/S2 screening. S0 emits aggregate rows only; no trade rows are materialized.\n", encoding="utf-8")
     (output / "PREREGISTRATION.json").write_text(json.dumps({"protocol": "FAST_DISCOVERY_V1", "hypotheses": list(DEFAULT_PRIMITIVES), "holdout": "UNTOUCHED"}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    summary = {"s0_candidates": len(DEFAULT_PRIMITIVES), "s0_survivors": int(len(s0_survivors)), "s1_combinations": len(S1_COMBINATIONS), "s1_survivors": int(len(finalists)), "s2_finalists": int(len(finalists)), "cache_hits": cache.hits, "cache_misses": cache.misses, "trade_rows": 0}
+    summary = {"s0_candidates": len(DEFAULT_PRIMITIVES), "s0_survivors": int(len(s0_survivors)), "s1_combinations": len(S1_COMBINATIONS), "s1_survivors": int(len(s1_survivors)), "s2_finalists": int(len(finalists)), "cache_hits": cache.hits, "cache_misses": cache.misses, "trade_rows": 0}
     (output / "BENCHMARK_REPORT.md").write_text(json.dumps({"rows_read": len(frame), "cache_hits": cache.hits, "cache_misses": cache.misses, "development_only": True}, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     (output / "FINAL_REPORT.md").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n" + ("NO CANDIDATES SURVIVED\n" if not finalists.shape[0] else "SHORTLIST GENERATED; NO TRADE ROWS\n"), encoding="utf-8")
     return summary
