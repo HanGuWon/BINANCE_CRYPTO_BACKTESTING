@@ -1,0 +1,14 @@
+feature_id,kind,equation,polarity,threshold,state,signal_values,warmup,gap_reset,outcome_use
+donchian_breakout20,directional,+1 if close > prior_high20; -1 if close < prior_low20; 0 otherwise; NaN during warmup,continuation,sign-boundary,state,+1/0/-1/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+roc6,directional,sign(roc6); zero remains 0; NaN remains NaN,continuation,sign-boundary,state,+1/0/-1/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+vwap_deviation20,directional,-sign(vwap_deviation20); zero remains 0; NaN remains NaN,reversion,sign-boundary,state,+1/0/-1/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+taker_buy_sell_ratio,directional,sign(taker_buy_sell_ratio - 1); zero remains 0; NaN remains NaN,buy-pressure,sign-boundary,state,+1/0/-1/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+cvd_slope6,directional,sign(cvd_slope6); zero remains 0; NaN remains NaN,continuation,sign-boundary,state,+1/0/-1/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+rvol20,continuous,rvol20 unchanged,none,NONE,continuous-value,continuous/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+bb_bandwidth20,continuous,bb_bandwidth20 unchanged,none,NONE,continuous-value,continuous/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+premium,continuous,premium unchanged; no polarity selected in S0,none,NONE,continuous-value,continuous/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+premium_zscore90,continuous,premium_zscore90 unchanged; no threshold or polarity selected in S0,none,NONE,continuous-value,continuous/NaN,feature-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+relative_strength_24h,continuous,symbol_return_24h - BTC_return_24h; trailing within symbol segment,none,NONE,continuous-value,continuous/NaN,lookback-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+relative_strength_rank,continuous,percentile rank of relative_strength_24h among selected Top50 at same market/time,none,NONE,continuous-value,continuous/NaN,lookback-defined; NaN preserved,segment-local,NO_OUTCOME_ACCESS
+btc_regime,context,sign(close / trailing EMA200 - 1) with fixed +/-0.005 bands; NaN during warmup,none,fixed 0.005 context band,context-state,+1/0/-1/NaN,EMA200; NaN preserved,benchmark-contiguous,NO_OUTCOME_ACCESS
+top50_breadth,context,mean(selected Top50 close > trailing EMA50) at same market/time,none,NONE,context-value,continuous/NaN,EMA50 per segment; NaN preserved,segment-local,NO_OUTCOME_ACCESS

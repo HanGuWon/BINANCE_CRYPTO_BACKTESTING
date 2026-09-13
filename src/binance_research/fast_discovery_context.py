@@ -48,3 +48,50 @@ def build_relative_strength(panel: pd.DataFrame, benchmark: pd.DataFrame, *, loo
     result.attrs["context"] = "BTC-relative trailing return and contemporaneous selected Top50 rank"
     result.attrs["holdout_status"] = "UNTOUCHED"
     return result
+
+
+def build_btc_regime(benchmark: pd.DataFrame, *, ema_span: int = 200, threshold: float = 0.005) -> pd.DataFrame:
+    """Build a trailing BTC regime context series (+1/0/-1; no trade signal)."""
+    if ema_span < 1 or threshold < 0:
+        raise ValueError("ema_span must be positive and threshold non-negative")
+    required = {"open_time", "close"}
+    if missing := required - set(benchmark.columns):
+        raise ValueError(f"benchmark missing BTC regime columns: {', '.join(sorted(missing))}")
+    result = benchmark.copy()
+    result["open_time"] = pd.to_datetime(result["open_time"], utc=True, errors="raise")
+    result["close"] = pd.to_numeric(result["close"], errors="coerce")
+    if result["open_time"].duplicated().any():
+        raise ValueError("benchmark open_time must be unique")
+    ema = result["close"].ewm(span=ema_span, adjust=False, min_periods=ema_span).mean()
+    distance = result["close"].div(ema) - 1.0
+    result["btc_regime"] = pd.Series(0.0, index=result.index)
+    result.loc[distance > threshold, "btc_regime"] = 1.0
+    result.loc[distance < -threshold, "btc_regime"] = -1.0
+    result.loc[ema.isna(), "btc_regime"] = pd.NA
+    result.attrs["role"] = "CONTEXT_OR_REGIME_FILTER"
+    result.attrs["holdout_status"] = "UNTOUCHED"
+    return result
+
+
+def build_top50_breadth(panel: pd.DataFrame, *, ema_span: int = 50) -> pd.DataFrame:
+    """Compute contemporaneous selected-Top50 breadth as a context series."""
+    if ema_span < 1:
+        raise ValueError("ema_span must be positive")
+    required = {"open_time", "symbol", "segment_id", "close", "selected_top50", "market"}
+    if missing := required - set(panel.columns):
+        raise ValueError(f"panel missing breadth columns: {', '.join(sorted(missing))}")
+    result = panel.copy()
+    result["open_time"] = pd.to_datetime(result["open_time"], utc=True, errors="raise")
+    result["close"] = pd.to_numeric(result["close"], errors="coerce")
+    result["symbol"] = result["symbol"].astype(str)
+    result["market"] = result["market"].astype(str)
+    result["selected_top50"] = result["selected_top50"].astype(bool)
+    result["_ema"] = result.groupby(["symbol", "segment_id"], sort=False)["close"].transform(lambda values: values.ewm(span=ema_span, adjust=False, min_periods=ema_span).mean())
+    result["_above_ema"] = (result["close"] > result["_ema"]).where(result["_ema"].notna())
+    selected = result[result["selected_top50"] & result["_above_ema"].notna()]
+    breadth = selected.groupby(["market", "open_time"], sort=False)["_above_ema"].mean().rename("top50_breadth")
+    result = result.merge(breadth, left_on=["market", "open_time"], right_index=True, how="left")
+    result = result.drop(columns=["_ema", "_above_ema"])
+    result.attrs["role"] = "CONTEXT_OR_REGIME_FILTER"
+    result.attrs["holdout_status"] = "UNTOUCHED"
+    return result

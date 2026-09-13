@@ -1,0 +1,8 @@
+{
+  "feature_count": 13,
+  "holdout": "UNTOUCHED",
+  "reason": "WP13 BTC regime and selected-Top50 breadth context amendment",
+  "registry": "FEATURE_REGISTRY_V3.csv",
+  "registry_sha256": "c92dc50f8529554b82cbd0d732c41891945d0c3babcf89df5ea034a1cd68038e",
+  "supersedes": "FEATURE_REGISTRY_V2.csv"
+}
