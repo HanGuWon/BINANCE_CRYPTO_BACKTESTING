@@ -1,0 +1,9 @@
+schema_version = 1
+campaign_id = "FAST_DISCOVERY_V2_AMENDMENT_001"
+status = "PREREGISTERED_DEVELOPMENT_ONLY"
+registry = "FEATURE_REGISTRY_V2.csv"
+registry_manifest = "REGISTRY_MANIFEST_V2.json"
+hypothesis_count = 11
+amendment = "PREREGISTRATION_AMENDMENT_001.md"
+final_holdout = "UNTOUCHED"
+outcome_access = "DEVELOPMENT_ONLY"

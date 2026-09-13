@@ -1,0 +1,8 @@
+{
+  "feature_count": 11,
+  "holdout": "UNTOUCHED",
+  "reason": "WP12 causal relative-strength context amendment",
+  "registry": "FEATURE_REGISTRY_V2.csv",
+  "registry_sha256": "3f490965fd9e0519c96a7b724936232a595a777722eb6242ac763f7c9410e5ff",
+  "supersedes": "FEATURE_REGISTRY.csv"
+}
