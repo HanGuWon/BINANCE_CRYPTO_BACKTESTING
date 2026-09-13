@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-09-13T04:34:00.1250712Z",
+  "status": "WP1_PREDECESSOR_REVERIFIED_IN_ISOLATED_WORKTREE",
+  "branch": "research/fast-discovery-v2",
+  "head": "78a91b3beab3e92b2368c731d2c82bb768204d16",
+  "predecessor_wp1_commit": "f5419cac4b593f1c6c27ffd700ce7a3a9e9bf1e0",
+  "predecessor_is_ancestor": true,
+  "wp0_clarification_sha256": "7b232e53866926ebeda274812877b7ea8e19f030900d4ff8cde4cfaecdba997e",
+  "wp1_inventory_receipt_sha256": "cab3763c1e26e225acc25a919832f458d70d167eed1bf1fd1993817c5d83b309",
+  "measured_inventory": {
+    "um_kline_archives": 61403,
+    "kline_symbols": 829,
+    "funding_archives": 14125,
+    "funding_symbols": 404,
+    "causal_premium_partitions": 1467
+  },
+  "scientific_source_clean": true,
+  "source_tree_sha256": "a71abbdd396fc348510a2f722e54aaec154d1a8e795248cf3fc8fb352d8f92db",
+  "native_cxc_status": "B_wp1_stale_binding_to_canonical_checkout",
+  "scientific_disposition": "WP1_COMPLETE_NO_SCIENTIFIC_BLOCKER",
+  "final_holdout": "UNTOUCHED",
+  "historical_outcomes": "NOT_RUN"
+}
