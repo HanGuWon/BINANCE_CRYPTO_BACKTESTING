@@ -120,3 +120,58 @@ def premium_feature_metadata(*, timeframe: str, coverage: str = "PARTIAL") -> di
         "coverage": coverage,
         "timeframe": timeframe,
     }
+
+
+def crossed_funding_events_fast(
+    positions: pd.DataFrame,
+    funding_events: pd.DataFrame,
+    *,
+    entry_column: str = "entry_timestamp",
+    exit_column: str = "exit_timestamp",
+    side_column: str = "side",
+    rate_column: str = "funding_rate",
+) -> pd.DataFrame:
+    """Exact searchsorted/cumulative-sum replay of :func:`crossed_funding_events`.
+
+    Event inclusion is identical: timestamps strictly after entry and at or
+    before exit. NaN rates contribute zero but still count as crossed events,
+    matching the slow reference. The function is intentionally opt-in so the
+    slow implementation remains the qualification oracle.
+    """
+    required_positions = {entry_column, exit_column, side_column}
+    required_events = {"timestamp", rate_column}
+    if (missing := required_positions - set(positions.columns)):
+        raise ValueError(f"missing position columns: {', '.join(sorted(missing))}")
+    if (missing := required_events - set(funding_events.columns)):
+        raise ValueError(f"missing funding columns: {', '.join(sorted(missing))}")
+    events = funding_events.copy()
+    events["timestamp"] = pd.to_datetime(events["timestamp"], utc=True)
+    events[rate_column] = pd.to_numeric(events[rate_column], errors="coerce")
+    if events["timestamp"].duplicated().any() or not events["timestamp"].is_monotonic_increasing:
+        raise ValueError("funding events must be unique and increasing")
+    event_times = events["timestamp"].to_numpy(dtype="datetime64[ns]")
+    event_rates = np.nan_to_num(events[rate_column].to_numpy(dtype=float), nan=0.0)
+    cumulative = np.concatenate(([0.0], np.cumsum(event_rates, dtype=float)))
+    rows: list[dict[str, object]] = []
+    for position_id, position in positions.iterrows():
+        entry = pd.to_datetime(position[entry_column], utc=True)
+        exit_ = pd.to_datetime(position[exit_column], utc=True)
+        if pd.isna(entry) or pd.isna(exit_) or exit_ <= entry:
+            raise ValueError("position intervals must have exit after entry")
+        side = float(position[side_column])
+        entry_np = entry.to_datetime64()
+        exit_np = exit_.to_datetime64()
+        lo = int(np.searchsorted(event_times, entry_np, side="right"))
+        hi = int(np.searchsorted(event_times, exit_np, side="right"))
+        count = max(0, hi - lo)
+        rate_sum = float(cumulative[hi] - cumulative[lo])
+        crossed_times = events["timestamp"].iloc[lo:hi]
+        rows.append({
+            "position_id": position_id,
+            "crossed_event_count": count,
+            "funding_rate_sum": rate_sum,
+            "funding_cashflow_return": -side * rate_sum,
+            "first_crossed_event": crossed_times.min() if count else pd.NaT,
+            "last_crossed_event": crossed_times.max() if count else pd.NaT,
+        })
+    return pd.DataFrame(rows)
