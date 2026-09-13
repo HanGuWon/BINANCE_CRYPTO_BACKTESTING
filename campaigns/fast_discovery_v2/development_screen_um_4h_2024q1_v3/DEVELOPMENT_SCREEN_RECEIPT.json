@@ -1,0 +1,46 @@
+{
+  "archive_list_sha256": "81ce0a186c5153158e3770f6da8847aae38b28ec70eee955fb5af5f5b9c8b205",
+  "archives": [
+    "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\raw\\um\\klines\\1000BONKUSDT\\4h\\1000BONKUSDT-4h-2024-02.zip",
+    "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\raw\\um\\klines\\1000BONKUSDT\\4h\\1000BONKUSDT-4h-2024-03.zip",
+    "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\raw\\um\\klines\\1000BONKUSDT\\4h\\1000BONKUSDT-4h-2024-04.zip",
+    "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\raw\\um\\klines\\1000FLOKIUSDT\\4h\\1000FLOKIUSDT-4h-2024-02.zip",
+    "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\raw\\um\\klines\\1000FLOKIUSDT\\4h\\1000FLOKIUSDT-4h-2024-03.zip",
+    "D:\\BINANCE_CRYPTO_BACKTESTING_DATA\\raw\\um\\klines\\1000FLOKIUSDT\\4h\\1000FLOKIUSDT-4h-2024-04.zip"
+  ],
+  "cohort_sha256": "f82e7132967b87615e58e870eaed6dfc98ece7175121b21a95d5c664f8b94ff4",
+  "cohort_source": "campaigns\\r1_gap_safe_cohort_v1\\universe_monthly.csv",
+  "excluded_non_top50_rows": 360,
+  "final_holdout": "UNTOUCHED",
+  "horizons": [
+    "4h",
+    "24h"
+  ],
+  "market": "um",
+  "months": [
+    "2024-02",
+    "2024-03",
+    "2024-04"
+  ],
+  "primitives": [
+    "donchian_breakout20",
+    "roc6",
+    "rvol20",
+    "vwap_deviation20",
+    "taker_buy_sell_ratio",
+    "cvd_slope6",
+    "bb_bandwidth20",
+    "premium",
+    "premium_zscore90"
+  ],
+  "protocol": "FAST_DISCOVERY_V2",
+  "r3_outcomes": "NOT_ACCESSED",
+  "rows": 720,
+  "scope": "DEVELOPMENT_ONLY",
+  "symbols": [
+    "1000BONKUSDT",
+    "1000FLOKIUSDT"
+  ],
+  "timeframe": "4h",
+  "trade_rows": 0
+}

@@ -1,0 +1,19 @@
+{
+  "excluded_non_top50_rows": 360,
+  "final_holdout": "UNTOUCHED",
+  "historical_r2b_outcomes": "NOT_RUN",
+  "implementation_commit": "754bf49c7d20dd6efbf88517513fff8d5d53aed3",
+  "protocol": "FAST_DISCOVERY_V2",
+  "r3_outcomes": "NOT_ACCESSED",
+  "receipt_sha256": "f28b71f8ab7420838e6ec7fd9992c9c716e1c538a6924e43a80a1d8e6c6f71bb",
+  "rejection_rows": 18,
+  "rejections_sha256": "315a31ec12412eb8037b864d0476acbb1623dd3f02f6cebe7feafac45065612c",
+  "result_rows": 18,
+  "results_sha256": "315a31ec12412eb8037b864d0476acbb1623dd3f02f6cebe7feafac45065612c",
+  "rows": 720,
+  "scientific_source_clean": true,
+  "scope": "DEVELOPMENT_ONLY",
+  "screen_root": "C:\\Users\\user\\Documents\\ChatGPT\\BINANCE \uc9c0\ud45c\uc6a9 \ud14c\uc2a4\ud2b8\\.worktrees\\fast-discovery-v2\\campaigns\\fast_discovery_v2\\development_screen_um_4h_2024q1_v3",
+  "source_tree_sha256": "a71abbdd396fc348510a2f722e54aaec154d1a8e795248cf3fc8fb352d8f92db",
+  "trade_rows": 0
+}
