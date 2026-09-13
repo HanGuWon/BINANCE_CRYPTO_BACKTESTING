@@ -1,0 +1,19 @@
+{
+  "timestamp": "2026-09-13T13:30:27.0475725+09:00",
+  "command": "PYTHONPATH=src python -m pytest -q",
+  "exit_code": 1,
+  "summary": "458 passed, 2 failed, 1 warning in 297.43s",
+  "passed": 458,
+  "failed": 2,
+  "warnings": 1,
+  "implementation_commit": "a1b22eb8d3f93fe13f97988f3b541702bb8e589a",
+  "source_tree_sha256": "a71abbdd396fc348510a2f722e54aaec154d1a8e795248cf3fc8fb352d8f92db",
+  "scientific_source_clean": true,
+  "failure_disposition": [
+    "tests/test_r171_verification.py::test_campaign_artifacts_are_consistent: missing selected_15m_summary.json, selected_1h_summary.json, selected_4h_summary.json",
+    "tests/test_r3_forward_ranking.py::test_precomputed_control_is_explicitly_non_scientific: missing campaigns/r1_final_panel_v1/universe_monthly.csv"
+  ],
+  "scope": "Fast Discovery V2 development-only verification; no historical R2B/R3 outcomes",
+  "final_holdout": "UNTOUCHED"
+}
+
