@@ -103,9 +103,9 @@
   ],
   "replication_registry_sha256": "972e46b2cf6783afa4cdb3602acafb1ca1f39ff661b2cb294a748d828fece056",
   "source_identity": {
-    "implementation_commit": "25909b39c69f382e9780fcda7d9b4bcd790f49a3",
+    "implementation_commit": "3ffcdedb131356df168ab99c2bb861ad934a90d2",
     "scientific_source_clean": true,
-    "source_tree_sha256": "a71abbdd396fc348510a2f722e54aaec154d1a8e795248cf3fc8fb352d8f92db"
+    "source_tree_sha256": "235e67ec407c5cb885916ad95b51a1d5705d99ea31185e4288b6085a7d2304f3"
   },
   "split_manifest_sha256": "358536735a17a9da34a38f0eba7c84f10578e9219d7172b26d4785b96022c72c",
   "status": "PREREGISTERED_DEVELOPMENT_ONLY",
@@ -134,5 +134,7 @@
   "v3_feature_registry": "campaigns/fast_discovery_v2/FEATURE_REGISTRY_V3.csv",
   "v3_feature_registry_sha256": "c92dc50f8529554b82cbd0d732c41891945d0c3babcf89df5ea034a1cd68038e",
   "validation_size": 128,
-  "source_identity_measured_on_clean_head": true
+  "source_identity_measured_on_clean_head": true,
+  "evaluation_model_types": ["I"],
+  "evaluation_comparator": "B1 baseline retained internally; I-only rows emitted with exact S0 metric semantics"
 }
