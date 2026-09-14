@@ -394,7 +394,12 @@ def evaluate_walk_forward(
                 base_frame_train = baseline.iloc[train_slice]
                 base_frame_validation = baseline.iloc[validation_slice].loc[valid_validation]
                 base_names = list(baseline.columns)
-                base_model = fit_logistic_model(base_frame_train.loc[valid_train], y_train[valid_train], base_names, regularization)
+                try:
+                    base_model = fit_logistic_model(base_frame_train.loc[valid_train], y_train[valid_train], base_names, regularization)
+                except ValueError:
+                    fold += 1
+                    train_end += step_size
+                    continue
                 base_probabilities = base_model.predict_proba(base_frame_validation)
                 base_plus_names = base_names + available
                 combined_train = pd.concat([base_frame_train, frame.loc[frame.index[train_slice], available]], axis=1)
