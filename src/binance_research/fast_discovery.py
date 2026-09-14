@@ -329,7 +329,15 @@ def _source_identity() -> dict[str, object]:
         digest.update(path.read_bytes())
     try:
         commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
-        status = subprocess.check_output(["git", "status", "--porcelain=v1", "--untracked-files=all", "--", "src", "tests", "configs", "campaigns"], cwd=root, text=True)
+        scientific_paths = [
+            "src", "tests", "configs", "scripts",
+            "campaigns/fast_discovery_v2/FEATURE_REGISTRY_V3.csv",
+            "campaigns/fast_discovery_v2/broad_replication_v1/PREREGISTRATION.json",
+            "campaigns/fast_discovery_v2/broad_replication_v1/REPLICATION_REGISTRY.csv",
+            "campaigns/fast_discovery_v2/broad_replication_v1/SPLIT_MANIFEST.json",
+            "campaigns/fast_discovery_v2/broad_replication_v1/SCREENING_POLICY.json",
+        ]
+        status = subprocess.check_output(["git", "status", "--porcelain=v1", "--untracked-files=all", "--", *scientific_paths], cwd=root, text=True)
     except (OSError, subprocess.CalledProcessError):
         commit, status = "UNKNOWN", "IDENTITY_UNAVAILABLE"
     return {"implementation_commit": commit, "scientific_source_clean": not bool(status.strip()), "source_tree_sha256": digest.hexdigest()}
