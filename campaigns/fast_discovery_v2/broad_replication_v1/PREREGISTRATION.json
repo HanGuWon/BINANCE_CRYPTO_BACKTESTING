@@ -28,16 +28,16 @@
   "campaign_id": "FAST_DISCOVERY_V2_1_BROAD_REPLICATION_V1",
   "cohort_sha256": "f82e7132967b87615e58e870eaed6dfc98ece7175121b21a95d5c664f8b94ff4",
   "cohort_source": "campaigns\\r1_gap_safe_cohort_v1\\universe_monthly.csv",
-  "created_at": "2026-09-14T01:21:11.430657+00:00",
+  "created_at": "2026-09-14T10:21:11.430657+09:00",
   "development_interval": {
     "calendar_blocks": "UTC calendar month labels emitted by evaluate_walk_forward; independent blocks are unioned",
-    "development_month_end_exclusive_utc": "2024-03-01T00:00:00+00:00",
-    "development_start_utc": "2020-03-01T00:00:00+00:00",
+    "development_month_end_exclusive_utc": "2024-03-01T09:00:00+09:00",
+    "development_start_utc": "2020-03-01T09:00:00+09:00",
     "final_holdout": "UNTOUCHED",
     "first_holdout_open_utc": {
-      "15m": "2024-02-10T00:15:00+00:00",
-      "1h": "2024-02-10T01:00:00+00:00",
-      "4h": "2024-02-10T04:00:00+00:00"
+      "15m": "2024-02-10T09:15:00+09:00",
+      "1h": "2024-02-10T10:00:00+09:00",
+      "4h": "2024-02-10T13:00:00+09:00"
     },
     "point_in_time_rule": "bar open_time < lane first holdout open; Top50 selected by same universe_month",
     "source_timeframe": "native Binance UM kline archive per lane"
@@ -103,8 +103,8 @@
   ],
   "replication_registry_sha256": "972e46b2cf6783afa4cdb3602acafb1ca1f39ff661b2cb294a748d828fece056",
   "source_identity": {
-    "implementation_commit": "2d49845b87a836455f40ce9d808fe847cc2245d4",
-    "scientific_source_clean": false,
+    "implementation_commit": "25909b39c69f382e9780fcda7d9b4bcd790f49a3",
+    "scientific_source_clean": true,
     "source_tree_sha256": "a71abbdd396fc348510a2f722e54aaec154d1a8e795248cf3fc8fb352d8f92db"
   },
   "split_manifest_sha256": "358536735a17a9da34a38f0eba7c84f10578e9219d7172b26d4785b96022c72c",
@@ -133,5 +133,6 @@
   "trade_rows": 0,
   "v3_feature_registry": "campaigns/fast_discovery_v2/FEATURE_REGISTRY_V3.csv",
   "v3_feature_registry_sha256": "c92dc50f8529554b82cbd0d732c41891945d0c3babcf89df5ea034a1cd68038e",
-  "validation_size": 128
+  "validation_size": 128,
+  "source_identity_measured_on_clean_head": true
 }
