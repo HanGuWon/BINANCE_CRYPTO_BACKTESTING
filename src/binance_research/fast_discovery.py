@@ -1,7 +1,7 @@
 """Outcome-blind Fast Discovery funnel with deterministic cached screening."""
 from __future__ import annotations
 import hashlib, json, subprocess, os
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from pathlib import Path
 from typing import Callable, Iterable
 import numpy as np
@@ -181,6 +181,12 @@ def screen_s0_complete(
     complete = pd.DataFrame(rows)
     return complete, pd.DataFrame(rejected), cache
 
+def _evaluate_s0_group_process(args: tuple[str, pd.DataFrame, str, tuple[str, ...], tuple[str, ...], int, int, int, str, tuple[str, ...]]) -> pd.DataFrame:
+    symbol, group, timeframe, horizon_ids, primitive_ids, minimum_train, validation_size, step_size, market, model_type_tuple = args
+    complete, _, _ = screen_s0_complete(group.reset_index(drop=True), timeframe=timeframe, horizons=horizon_ids, primitives=primitive_ids, minimum_train=minimum_train, validation_size=validation_size, step_size=step_size, cache=FeatureCache(), market=market, require_multi_symbol=False, model_types=model_type_tuple)
+    complete.insert(0, "_symbol", symbol)
+    return complete
+
 def screen_s0_panel(
     frame: pd.DataFrame,
     *,
@@ -203,17 +209,13 @@ def screen_s0_panel(
     rejected_parts: list[pd.DataFrame] = []
     groups = [(str(symbol), group) for symbol, group in frame.groupby("symbol", sort=True)]
     model_type_tuple = tuple(model_types)
-    def evaluate_group(item: tuple[str, pd.DataFrame]) -> pd.DataFrame:
-        symbol, group = item
-        complete, _, _ = screen_s0_complete(group.reset_index(drop=True), timeframe=timeframe, horizons=horizons, primitives=primitives, minimum_train=minimum_train, validation_size=validation_size, step_size=step_size, cache=FeatureCache(), market=market, require_multi_symbol=False, model_types=model_type_tuple)
-        complete.insert(0, "_symbol", symbol)
-        return complete
     if model_type_tuple == ("I",) and len(groups) > 1:
-        workers = min(8, os.cpu_count() or 1, len(groups))
-        with ThreadPoolExecutor(max_workers=workers) as executor:
-            per_symbol = list(executor.map(evaluate_group, groups))
+        workers = min(4, os.cpu_count() or 1, len(groups))
+        tasks = [(symbol, group, timeframe, tuple(horizons), tuple(primitives), minimum_train, validation_size, step_size, market, model_type_tuple) for symbol, group in groups]
+        with ProcessPoolExecutor(max_workers=workers) as executor:
+            per_symbol = list(executor.map(_evaluate_s0_group_process, tasks))
     else:
-        per_symbol = [evaluate_group(item) for item in groups]
+        per_symbol = [_evaluate_s0_group_process((symbol, group, timeframe, tuple(horizons), tuple(primitives), minimum_train, validation_size, step_size, market, model_type_tuple)) for symbol, group in groups]
     if not per_symbol:
         return pd.DataFrame(), pd.DataFrame(), cache
     detail = pd.concat(per_symbol, ignore_index=True)
