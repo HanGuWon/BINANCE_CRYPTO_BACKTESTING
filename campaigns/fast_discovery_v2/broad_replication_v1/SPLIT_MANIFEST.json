@@ -1,0 +1,13 @@
+{
+  "calendar_blocks": "UTC calendar month labels emitted by evaluate_walk_forward; independent blocks are unioned",
+  "development_month_end_exclusive_utc": "2024-03-01T00:00:00+00:00",
+  "development_start_utc": "2020-03-01T00:00:00+00:00",
+  "final_holdout": "UNTOUCHED",
+  "first_holdout_open_utc": {
+    "15m": "2024-02-10T00:15:00+00:00",
+    "1h": "2024-02-10T01:00:00+00:00",
+    "4h": "2024-02-10T04:00:00+00:00"
+  },
+  "point_in_time_rule": "bar open_time < lane first holdout open; Top50 selected by same universe_month",
+  "source_timeframe": "native Binance UM kline archive per lane"
+}

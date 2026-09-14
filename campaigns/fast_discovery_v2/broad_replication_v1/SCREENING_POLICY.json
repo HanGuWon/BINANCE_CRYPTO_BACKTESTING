@@ -1,0 +1,10 @@
+{
+  "early_stop_if_broad_s0_survivors_zero": true,
+  "final_holdout": "UNTOUCHED",
+  "no_trade_rows_before_s1_s2": true,
+  "policy_id": "FAST_DISCOVERY_V2_1_BROAD_S0_V1",
+  "s0_max_survivors": 8,
+  "s1_max_combinations": 6,
+  "s1_max_survivors": 3,
+  "s2_max_finalists": 3
+}

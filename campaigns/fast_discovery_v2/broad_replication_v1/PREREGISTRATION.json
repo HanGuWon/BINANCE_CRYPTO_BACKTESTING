@@ -1,0 +1,137 @@
+{
+  "archive_manifests": {
+    "15m": {
+      "archive_list_sha256": "b8dbf05339ab4c444a346026ad1bda44ace55fc336b5211c27a8b10aed37b8b5",
+      "missing_count": 0,
+      "missing_selected_archives": [],
+      "path": "campaigns\\fast_discovery_v2\\broad_replication_v1\\SOURCE_ARCHIVE_MANIFEST_15m.csv",
+      "rows": 3032
+    },
+    "1h": {
+      "archive_list_sha256": "9c17665acc45a6250c6b295de63cc981ac18024a038e4c0838bbd346a8cbbce7",
+      "missing_count": 0,
+      "missing_selected_archives": [],
+      "path": "campaigns\\fast_discovery_v2\\broad_replication_v1\\SOURCE_ARCHIVE_MANIFEST_1h.csv",
+      "rows": 3032
+    },
+    "4h": {
+      "archive_list_sha256": "135778e5f03c4e4418a839a1f3c68283fbae6a7f5c9f3319055765b135b79ff6",
+      "missing_count": 0,
+      "missing_selected_archives": [],
+      "path": "campaigns\\fast_discovery_v2\\broad_replication_v1\\SOURCE_ARCHIVE_MANIFEST_4h.csv",
+      "rows": 3032
+    }
+  },
+  "b0_contract": "baseline-only probability model with causal labels",
+  "b1_contract": "baseline model with fixed logistic feature model",
+  "b1_plus_i_contract": "baseline plus fixed feature model; paired validation log-loss improvement",
+  "campaign_id": "FAST_DISCOVERY_V2_1_BROAD_REPLICATION_V1",
+  "cohort_sha256": "f82e7132967b87615e58e870eaed6dfc98ece7175121b21a95d5c664f8b94ff4",
+  "cohort_source": "campaigns\\r1_gap_safe_cohort_v1\\universe_monthly.csv",
+  "created_at": "2026-09-14T01:21:11.430657+00:00",
+  "development_interval": {
+    "calendar_blocks": "UTC calendar month labels emitted by evaluate_walk_forward; independent blocks are unioned",
+    "development_month_end_exclusive_utc": "2024-03-01T00:00:00+00:00",
+    "development_start_utc": "2020-03-01T00:00:00+00:00",
+    "final_holdout": "UNTOUCHED",
+    "first_holdout_open_utc": {
+      "15m": "2024-02-10T00:15:00+00:00",
+      "1h": "2024-02-10T01:00:00+00:00",
+      "4h": "2024-02-10T04:00:00+00:00"
+    },
+    "point_in_time_rule": "bar open_time < lane first holdout open; Top50 selected by same universe_month",
+    "source_timeframe": "native Binance UM kline archive per lane"
+  },
+  "final_holdout": "UNTOUCHED",
+  "market": "um",
+  "minimum_train": 256,
+  "outcome_access": "NONE",
+  "promotion_gates": {
+    "aggregate_paired_delta_log_loss": "> 0",
+    "deterministic_rerun_parity": "required for any survivor",
+    "maximum_s0_survivors": 8,
+    "maximum_top_symbol_concentration": 0.8,
+    "minimum_independent_calendar_blocks": 2,
+    "minimum_valid_symbols": 2,
+    "positive_fold_fraction": "> 0.5"
+  },
+  "replication_family_15m": [
+    {
+      "feature_id": "donchian_breakout20",
+      "horizon": "1h"
+    },
+    {
+      "feature_id": "donchian_breakout20",
+      "horizon": "4h"
+    },
+    {
+      "feature_id": "roc6",
+      "horizon": "1h"
+    },
+    {
+      "feature_id": "roc6",
+      "horizon": "4h"
+    },
+    {
+      "feature_id": "rvol20",
+      "horizon": "4h"
+    },
+    {
+      "feature_id": "vwap_deviation20",
+      "horizon": "1h"
+    },
+    {
+      "feature_id": "vwap_deviation20",
+      "horizon": "4h"
+    },
+    {
+      "feature_id": "taker_buy_sell_ratio",
+      "horizon": "4h"
+    },
+    {
+      "feature_id": "cvd_slope6",
+      "horizon": "1h"
+    },
+    {
+      "feature_id": "cvd_slope6",
+      "horizon": "4h"
+    },
+    {
+      "feature_id": "cvd_slope6",
+      "horizon": "24h"
+    }
+  ],
+  "replication_registry_sha256": "972e46b2cf6783afa4cdb3602acafb1ca1f39ff661b2cb294a748d828fece056",
+  "source_identity": {
+    "implementation_commit": "2d49845b87a836455f40ce9d808fe847cc2245d4",
+    "scientific_source_clean": false,
+    "source_tree_sha256": "a71abbdd396fc348510a2f722e54aaec154d1a8e795248cf3fc8fb352d8f92db"
+  },
+  "split_manifest_sha256": "358536735a17a9da34a38f0eba7c84f10578e9219d7172b26d4785b96022c72c",
+  "status": "PREREGISTERED_DEVELOPMENT_ONLY",
+  "step_size": 128,
+  "structural_family_1h_4h": [
+    "donchian_breakout20",
+    "roc6",
+    "rvol20",
+    "vwap_deviation20",
+    "taker_buy_sell_ratio",
+    "cvd_slope6",
+    "bb_bandwidth20",
+    "premium",
+    "premium_zscore90",
+    "relative_strength_24h",
+    "relative_strength_rank",
+    "btc_regime",
+    "top50_breadth"
+  ],
+  "timeframes": [
+    "1h",
+    "4h",
+    "15m"
+  ],
+  "trade_rows": 0,
+  "v3_feature_registry": "campaigns/fast_discovery_v2/FEATURE_REGISTRY_V3.csv",
+  "v3_feature_registry_sha256": "c92dc50f8529554b82cbd0d732c41891945d0c3babcf89df5ea034a1cd68038e",
+  "validation_size": 128
+}
