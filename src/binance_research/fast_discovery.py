@@ -115,6 +115,16 @@ def screen_s0_complete(
     rejected: list[dict[str, object]] = []
     missing_labels = sorted(required - set(frame.columns))
     symbol_series = frame.get("symbol", pd.Series("UNKNOWN", index=frame.index)).astype(str)
+    model_type_tuple = tuple(model_types)
+    batched_evaluation: pd.DataFrame | None = None
+    if model_type_tuple == ("I",) and not missing_labels:
+        batch_features = [feature_id for feature_id in primitive_ids if feature_id in frame]
+        if batch_features:
+            batch_work = frame.copy()
+            for feature_id in batch_features:
+                key = canonical_cache_key(market, timeframe, str(symbol_series.iloc[0]), str(frame.get("segment_id", pd.Series(["UNKNOWN"])).iloc[0]), feature_id, "raw", _source_hash(frame))
+                batch_work[feature_id] = cache.get(key, lambda f=feature_id: pd.to_numeric(frame[f], errors="coerce"))
+            batched_evaluation = evaluate_walk_forward(batch_work, batch_features, horizons=horizon_ids, minimum_train=minimum_train, validation_size=validation_size, step_size=step_size, source_timeframe=timeframe, model_types=model_type_tuple)
     for feature_id in primitive_ids:
         availability = "HISTORICAL_AVAILABLE" if feature_id in frame and pd.to_numeric(frame[feature_id], errors="coerce").notna().any() else "HISTORICAL_PARTIAL"
         coverage_mask = pd.to_numeric(frame[feature_id], errors="coerce").notna() if feature_id in frame else pd.Series(False, index=frame.index)
@@ -132,7 +142,7 @@ def screen_s0_complete(
         key = canonical_cache_key(market, timeframe, str(symbol_series.iloc[0]), str(frame.get("segment_id", pd.Series(["UNKNOWN"])).iloc[0]), feature_id, "raw", source_hash)
         values = cache.get(key, lambda f=feature_id: pd.to_numeric(frame[f], errors="coerce"))
         work = frame.copy(); work[feature_id] = values
-        evaluation = evaluate_walk_forward(work, [feature_id], horizons=horizon_ids, minimum_train=minimum_train, validation_size=validation_size, step_size=step_size, source_timeframe=timeframe, model_types=tuple(model_types))
+        evaluation = batched_evaluation if batched_evaluation is not None else evaluate_walk_forward(work, [feature_id], horizons=horizon_ids, minimum_train=minimum_train, validation_size=validation_size, step_size=step_size, source_timeframe=timeframe, model_types=model_type_tuple)
         if not evaluation.empty and "horizon" not in evaluation:
             evaluation = evaluation.assign(horizon=horizon_ids[0])
         evaluation = evaluation[evaluation["model"].eq("I:" + feature_id)] if not evaluation.empty else evaluation
