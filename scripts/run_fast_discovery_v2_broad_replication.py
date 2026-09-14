@@ -305,6 +305,7 @@ def run_lane(raw_root: Path, universe_path: Path, root: Path, timeframe: str) ->
         step_size=int(prereg["step_size"]),
         market="um",
         require_multi_symbol=True,
+        model_types=("I",),
     )
     scoring_seconds = time.perf_counter() - phase
     if timeframe == "15m":
@@ -351,6 +352,8 @@ def run_lane(raw_root: Path, universe_path: Path, root: Path, timeframe: str) ->
         "archive_list_sha256": prereg["archive_manifests"][timeframe]["archive_list_sha256"],
         "cohort_sha256": prereg["cohort_sha256"],
         "registry_sha256": prereg["v3_feature_registry_sha256"],
+        "evaluation_model_types": ["I"],
+        "evaluation_comparator": "B1 baseline retained internally; I-only rows emitted with exact S0 metric semantics",
         "final_holdout": "UNTOUCHED",
         "historical_r2b_r3_outcomes": "NOT_RUN",
     }

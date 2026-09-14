@@ -357,10 +357,15 @@ def evaluate_walk_forward(
     step_size: int = 96,
     regularization: float = 1.0,
     source_timeframe: str = "15m",
+    model_types: Sequence[str] = ("B0", "B1", "B1+I", "I"),
 ) -> pd.DataFrame:
     if "open_time" not in frame:
         raise ValueError("walk-forward evaluation requires open_time for strict label maturity")
     baseline = _baseline_columns(frame)
+    requested_models = set(model_types)
+    unknown_models = requested_models - {"B0", "B1", "B1+I", "I"}
+    if unknown_models:
+        raise ValueError(f"unknown model_types: {', '.join(sorted(unknown_models))}")
     available = [name for name in feature_columns if name in frame]
     rows: list[dict[str, object]] = []
     for horizon_name in horizons:
@@ -404,11 +409,16 @@ def evaluate_walk_forward(
                     validation_times = label_frame.iloc[validation_slice].loc[valid_validation]["decision_time"]
                     block_labels = calendar_block_ids(validation_times)
                     rows.append({"horizon": horizon_name, "fold": fold, "model": model_name, "train_rows": int(valid_train.sum()), "validation_rows": int(valid_validation.sum()), "validation_start_time": validation_times.min().isoformat(), "validation_end_time": validation_times.max().isoformat(), "validation_calendar_blocks": "|".join(sorted(block_labels.astype(str).unique())), "independent_calendar_block_count": independent_calendar_block_count(validation_times), "ci_low_log_loss_improvement": ci_low, "ci_high_log_loss_improvement": ci_high, **metrics})
-                add_result("B0", baseline_probabilities, baseline_probabilities)
-                add_result("B1", base_probabilities, baseline_probabilities)
-                model_specs: list[tuple[str, Sequence[str], pd.DataFrame, pd.DataFrame, np.ndarray]] = [("B1+I", base_names + available, combined_train, combined_validation, base_probabilities)]
-                for feature in available:
-                    model_specs.append(("I:" + feature, [feature], frame.loc[frame.index[train_slice], [feature]].loc[valid_train], frame.loc[frame.index[validation_slice], [feature]].loc[valid_validation], base_probabilities))
+                if "B0" in requested_models:
+                    add_result("B0", baseline_probabilities, baseline_probabilities)
+                if "B1" in requested_models:
+                    add_result("B1", base_probabilities, baseline_probabilities)
+                model_specs: list[tuple[str, Sequence[str], pd.DataFrame, pd.DataFrame, np.ndarray]] = []
+                if "B1+I" in requested_models:
+                    model_specs.append(("B1+I", base_names + available, combined_train, combined_validation, base_probabilities))
+                if "I" in requested_models:
+                    for feature in available:
+                        model_specs.append(("I:" + feature, [feature], frame.loc[frame.index[train_slice], [feature]].loc[valid_train], frame.loc[frame.index[validation_slice], [feature]].loc[valid_validation], base_probabilities))
                 for model_name, names, train_frame, validation_frame, comparator in model_specs:
                     try:
                         model = fit_logistic_model(train_frame.loc[valid_train], y_train[valid_train], names, regularization)
@@ -419,6 +429,7 @@ def evaluate_walk_forward(
             fold += 1
             train_end += step_size
     return pd.DataFrame.from_records(rows)
+
 
 
 

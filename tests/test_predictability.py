@@ -137,3 +137,17 @@ def test_strict_walk_forward_and_direct_label_mapping_fail_closed() -> None:
     without_times = _bars(420).drop(columns=["open_time"])
     with pytest.raises(ValueError, match="requires open_time"):
         evaluate_walk_forward(without_times, ["signal"], horizons=["15m"], minimum_train=80, validation_size=40, step_size=40)
+
+def test_walk_forward_i_only_mode_matches_full_evaluation_rows() -> None:
+    bars = _bars()
+    bars["signal"] = np.where(np.arange(len(bars)) % 3 == 0, 1.0, -1.0)
+    full = evaluate_walk_forward(
+        bars, ["signal"], horizons=["15m"], minimum_train=160, validation_size=80, step_size=80
+    )
+    optimized = evaluate_walk_forward(
+        bars, ["signal"], horizons=["15m"], minimum_train=160, validation_size=80, step_size=80, model_types=("I",)
+    )
+    expected = full.loc[full["model"].eq("I:signal")].reset_index(drop=True)
+    got = optimized.reset_index(drop=True)
+    assert list(got["model"]) == ["I:signal"] * len(expected)
+    pd.testing.assert_frame_equal(got, expected, check_dtype=False, check_exact=True)

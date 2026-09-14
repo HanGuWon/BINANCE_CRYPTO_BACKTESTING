@@ -98,6 +98,7 @@ def screen_s0_complete(
     cache: FeatureCache | None = None,
     market: str = "um",
     require_multi_symbol: bool = True,
+    model_types: Iterable[str] = ("B0", "B1", "B1+I", "I"),
 ) -> tuple[pd.DataFrame, pd.DataFrame, FeatureCache]:
     """Return one complete aggregate row per primitive and horizon.
 
@@ -131,7 +132,7 @@ def screen_s0_complete(
         key = canonical_cache_key(market, timeframe, str(symbol_series.iloc[0]), str(frame.get("segment_id", pd.Series(["UNKNOWN"])).iloc[0]), feature_id, "raw", source_hash)
         values = cache.get(key, lambda f=feature_id: pd.to_numeric(frame[f], errors="coerce"))
         work = frame.copy(); work[feature_id] = values
-        evaluation = evaluate_walk_forward(work, [feature_id], horizons=horizon_ids, minimum_train=minimum_train, validation_size=validation_size, step_size=step_size, source_timeframe=timeframe)
+        evaluation = evaluate_walk_forward(work, [feature_id], horizons=horizon_ids, minimum_train=minimum_train, validation_size=validation_size, step_size=step_size, source_timeframe=timeframe, model_types=tuple(model_types))
         if not evaluation.empty and "horizon" not in evaluation:
             evaluation = evaluation.assign(horizon=horizon_ids[0])
         evaluation = evaluation[evaluation["model"].eq("I:" + feature_id)] if not evaluation.empty else evaluation
@@ -181,6 +182,7 @@ def screen_s0_panel(
     cache: FeatureCache | None = None,
     market: str = "um",
     require_multi_symbol: bool = True,
+    model_types: Iterable[str] = ("B0", "B1", "B1+I", "I"),
 ) -> tuple[pd.DataFrame, pd.DataFrame, FeatureCache]:
     """Evaluate each symbol independently, then aggregate complete S0 rows."""
     if "symbol" not in frame:
@@ -189,7 +191,7 @@ def screen_s0_panel(
     per_symbol: list[pd.DataFrame] = []
     rejected_parts: list[pd.DataFrame] = []
     for symbol, group in frame.groupby("symbol", sort=True):
-        complete, _, cache = screen_s0_complete(group.reset_index(drop=True), timeframe=timeframe, horizons=horizons, primitives=primitives, minimum_train=minimum_train, validation_size=validation_size, step_size=step_size, cache=cache, market=market, require_multi_symbol=False)
+        complete, _, cache = screen_s0_complete(group.reset_index(drop=True), timeframe=timeframe, horizons=horizons, primitives=primitives, minimum_train=minimum_train, validation_size=validation_size, step_size=step_size, cache=cache, market=market, require_multi_symbol=False, model_types=model_types)
         complete.insert(0, "_symbol", str(symbol))
         per_symbol.append(complete)
     if not per_symbol:
