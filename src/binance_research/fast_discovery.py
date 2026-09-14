@@ -1,6 +1,7 @@
 """Outcome-blind Fast Discovery funnel with deterministic cached screening."""
 from __future__ import annotations
-import hashlib, json, subprocess
+import hashlib, json, subprocess, os
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Callable, Iterable
 import numpy as np
@@ -200,10 +201,19 @@ def screen_s0_panel(
     cache = cache or FeatureCache()
     per_symbol: list[pd.DataFrame] = []
     rejected_parts: list[pd.DataFrame] = []
-    for symbol, group in frame.groupby("symbol", sort=True):
-        complete, _, cache = screen_s0_complete(group.reset_index(drop=True), timeframe=timeframe, horizons=horizons, primitives=primitives, minimum_train=minimum_train, validation_size=validation_size, step_size=step_size, cache=cache, market=market, require_multi_symbol=False, model_types=model_types)
-        complete.insert(0, "_symbol", str(symbol))
-        per_symbol.append(complete)
+    groups = [(str(symbol), group) for symbol, group in frame.groupby("symbol", sort=True)]
+    model_type_tuple = tuple(model_types)
+    def evaluate_group(item: tuple[str, pd.DataFrame]) -> pd.DataFrame:
+        symbol, group = item
+        complete, _, _ = screen_s0_complete(group.reset_index(drop=True), timeframe=timeframe, horizons=horizons, primitives=primitives, minimum_train=minimum_train, validation_size=validation_size, step_size=step_size, cache=FeatureCache(), market=market, require_multi_symbol=False, model_types=model_type_tuple)
+        complete.insert(0, "_symbol", symbol)
+        return complete
+    if model_type_tuple == ("I",) and len(groups) > 1:
+        workers = min(8, os.cpu_count() or 1, len(groups))
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            per_symbol = list(executor.map(evaluate_group, groups))
+    else:
+        per_symbol = [evaluate_group(item) for item in groups]
     if not per_symbol:
         return pd.DataFrame(), pd.DataFrame(), cache
     detail = pd.concat(per_symbol, ignore_index=True)
